@@ -380,23 +380,26 @@ export default function App() {
             onExpand={() => setIsLeftCollapsed(false)}
             onResize={handleLeftResize}
           >
-            {isLeftCollapsed ? (
-              <div 
-                className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
-                onClick={() => leftPanelRef.current?.resize(18)}
-              >
-                <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-                  <PanelLeftOpen className="w-4 h-4 text-muted-foreground" />
+            <div className="h-full w-full relative">
+              {isLeftCollapsed && (
+                <div 
+                  className="absolute inset-0 z-10 group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                  onClick={() => leftPanelRef.current?.resize(18)}
+                >
+                  <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                    <PanelLeftOpen className="w-4 h-4 text-muted-foreground" />
+                  </div>
                 </div>
+              )}
+              <div className={isLeftCollapsed ? "hidden" : "h-full"}>
+                <NoteSidebar 
+                  notes={notes}
+                  setNotes={setNotes}
+                  selectedNoteId={selectedNoteId}
+                  onSelectNote={setSelectedNoteId}
+                />
               </div>
-            ) : (
-              <NoteSidebar 
-                notes={notes}
-                setNotes={setNotes}
-                selectedNoteId={selectedNoteId}
-                onSelectNote={setSelectedNoteId}
-              />
-            )}
+            </div>
           </ResizablePanel>
           
           <ResizableHandle withHandle />
@@ -434,19 +437,22 @@ export default function App() {
                 onExpand={() => setIsPDFCollapsed(false)}
                 onResize={handlePDFResize}
               >
-                {isPDFCollapsed ? (
-                  <div 
-                    className="h-full w-full group border-b bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
-                    onClick={() => pdfPanelRef.current?.resize(50)}
-                  >
-                    <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">PDF</span>
+                <div className="h-full w-full relative">
+                  {isPDFCollapsed && (
+                    <div 
+                      className="absolute inset-0 z-10 group border-b bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                      onClick={() => pdfPanelRef.current?.resize(50)}
+                    >
+                      <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">PDF</span>
+                      </div>
                     </div>
+                  )}
+                  <div className={isPDFCollapsed ? "hidden" : "h-full"}>
+                    <PDFReader onScreenshotCapture={handleScreenshotCapture} />
                   </div>
-                ) : (
-                  <PDFReader onScreenshotCapture={handleScreenshotCapture} />
-                )}
+                </div>
               </ResizablePanel>
               
               <ResizableHandle withHandle />
@@ -462,19 +468,22 @@ export default function App() {
                 onExpand={() => setIsEditorCollapsed(false)}
                 onResize={handleEditorResize}
               >
-                {isEditorCollapsed ? (
-                  <div 
-                    className="h-full w-full group border-t bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
-                    onClick={() => editorPanelRef.current?.resize(50)}
-                  >
-                    <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">AI Chat</span>
+                <div className="h-full w-full relative">
+                  {isEditorCollapsed && (
+                    <div 
+                      className="absolute inset-0 z-10 group border-t bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                      onClick={() => editorPanelRef.current?.resize(50)}
+                    >
+                      <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">AI Chat</span>
+                      </div>
                     </div>
+                  )}
+                  <div className={isEditorCollapsed ? "hidden" : "h-full"}>
+                    <LLMChat note={selectedNote} externalContextItems={screenshots} />
                   </div>
-                ) : (
-                  <LLMChat note={selectedNote} externalContextItems={screenshots} />
-                )}
+                </div>
               </ResizablePanel>
             </ResizablePanelGroup>
             )}
@@ -494,18 +503,21 @@ export default function App() {
             onExpand={() => setIsRightCollapsed(false)}
             onResize={handleRightResize}
           >
-            {isRightCollapsed ? (
-              <div 
-                className="h-full w-full group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
-                onClick={() => rightPanelRef.current?.resize(30)}
-              >
-                <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-                  <PanelRightOpen className="w-4 h-4 text-muted-foreground" />
+            <div className="h-full w-full relative">
+              {isRightCollapsed && (
+                <div 
+                  className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                  onClick={() => rightPanelRef.current?.resize(30)}
+                >
+                  <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                    <PanelRightOpen className="w-4 h-4 text-muted-foreground" />
+                  </div>
                 </div>
+              )}
+              <div className={isRightCollapsed ? "hidden" : "h-full"}>
+                <MarkdownEditor note={selectedNote} />
               </div>
-            ) : (
-              <MarkdownEditor note={selectedNote} />
-            )}
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
