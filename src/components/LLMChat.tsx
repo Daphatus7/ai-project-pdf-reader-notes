@@ -205,14 +205,14 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-background border-l">
+    <div className="h-full flex flex-col bg-background">
       {/* Chat Header */}
       <div className="border-b px-4 py-3 bg-muted/30">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h2 className="text-sm">AI Assistant</h2>
-          </div>
+          </div> */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

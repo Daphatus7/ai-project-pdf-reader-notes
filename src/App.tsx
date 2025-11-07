@@ -15,7 +15,7 @@ import {
   ChevronDown, 
   ChevronUp 
 } from "lucide-react";
-import type {ImperativePanelHandle} from "react-resizable-panels";
+import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -304,6 +304,7 @@ export default function App() {
   const [screenshots, setScreenshots] = useState<ScreenshotContext[]>([]);
   
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
+  const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
   const [isRightCollapsed, setIsRightCollapsed] = useState(false);
   const [isPDFCollapsed, setIsPDFCollapsed] = useState(false);
   const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
@@ -321,6 +322,7 @@ export default function App() {
   };
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
+  const centerPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
   const pdfPanelRef = useRef<ImperativePanelHandle>(null);
   const editorPanelRef = useRef<ImperativePanelHandle>(null);
@@ -332,6 +334,12 @@ export default function App() {
   const handleLeftResize = (size: number) => {
     if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isLeftCollapsed) {
       leftPanelRef.current?.collapse();
+    }
+  };
+
+  const handleCenterResize = (size: number) => {
+    if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isCenterCollapsed) {
+      centerPanelRef.current?.collapse();
     }
   };
 
@@ -367,15 +375,18 @@ export default function App() {
             minSize={10} 
             maxSize={25}
             collapsible
-            collapsedSize={2}
+            collapsedSize={1}
             onCollapse={() => setIsLeftCollapsed(true)}
             onExpand={() => setIsLeftCollapsed(false)}
             onResize={handleLeftResize}
           >
             {isLeftCollapsed ? (
-              <div className="h-full group bg-muted/20 border-r hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-center" onClick={() => leftPanelRef.current?.expand()}>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <PanelLeftOpen className="w-3.5 h-3.5 text-muted-foreground" />
+              <div 
+                className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                onClick={() => leftPanelRef.current?.resize(18)}
+              >
+                <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                  <PanelLeftOpen className="w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
             ) : (
@@ -390,8 +401,27 @@ export default function App() {
           
           <ResizableHandle withHandle />
           
-          {/* Center Content - PDF Reader and Markdown Editor */}
-          <ResizablePanel defaultSize={52} minSize={30}>
+          {/* Center Content - PDF Reader and AI Chat */}
+          <ResizablePanel 
+            ref={centerPanelRef}
+            defaultSize={52} 
+            minSize={10}
+            collapsible
+            collapsedSize={2}
+            onCollapse={() => setIsCenterCollapsed(true)}
+            onExpand={() => setIsCenterCollapsed(false)}
+            onResize={handleCenterResize}
+          >
+            {isCenterCollapsed ? (
+              <div 
+                className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                onClick={() => centerPanelRef.current?.resize(52)}
+              >
+                <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                  <PanelLeftOpen className="w-4 h-4 text-muted-foreground rotate-180" />
+                </div>
+              </div>
+            ) : (
             <ResizablePanelGroup direction="vertical">
               {/* PDF Reader */}
               <ResizablePanel 
@@ -405,9 +435,12 @@ export default function App() {
                 onResize={handlePDFResize}
               >
                 {isPDFCollapsed ? (
-                  <div className="h-full group bg-muted/20 border-b hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-center" onClick={() => pdfPanelRef.current?.expand()}>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                  <div 
+                    className="h-full w-full group border-b bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                    onClick={() => pdfPanelRef.current?.resize(50)}
+                  >
+                    <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       <span className="text-xs text-muted-foreground">PDF</span>
                     </div>
                   </div>
@@ -418,39 +451,43 @@ export default function App() {
               
               <ResizableHandle withHandle />
               
-              {/* Markdown Editor */}
+              {/* LLM Chat */}
               <ResizablePanel 
                 ref={editorPanelRef}
                 defaultSize={50} 
                 minSize={15}
                 collapsible
-                collapsedSize={3}
+                collapsedSize={1}
                 onCollapse={() => setIsEditorCollapsed(true)}
                 onExpand={() => setIsEditorCollapsed(false)}
                 onResize={handleEditorResize}
               >
                 {isEditorCollapsed ? (
-                  <div className="h-full group bg-muted/20 border-t hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-center" onClick={() => editorPanelRef.current?.expand()}>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Editor</span>
+                  <div 
+                    className="h-full w-full group border-t bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                    onClick={() => editorPanelRef.current?.resize(50)}
+                  >
+                    <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">AI Chat</span>
                     </div>
                   </div>
                 ) : (
-                  <MarkdownEditor note={selectedNote} />
+                  <LLMChat note={selectedNote} externalContextItems={screenshots} />
                 )}
               </ResizablePanel>
             </ResizablePanelGroup>
+            )}
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
-          {/* Right Sidebar - LLM Chat */}
+          {/* Right Sidebar - Markdown Editor */}
           <ResizablePanel 
             ref={rightPanelRef}
             defaultSize={30} 
-            minSize={10} 
-            maxSize={40}
+            minSize={5} 
+            maxSize={98}
             collapsible
             collapsedSize={2}
             onCollapse={() => setIsRightCollapsed(true)}
@@ -458,13 +495,16 @@ export default function App() {
             onResize={handleRightResize}
           >
             {isRightCollapsed ? (
-              <div className="h-full group bg-muted/20 border-l hover:bg-muted/40 transition-colors cursor-pointer flex items-center justify-center" onClick={() => rightPanelRef.current?.expand()}>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <PanelRightOpen className="w-3.5 h-3.5 text-muted-foreground" />
+              <div 
+                className="h-full w-full group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200" 
+                onClick={() => rightPanelRef.current?.resize(30)}
+              >
+                <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+                  <PanelRightOpen className="w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
             ) : (
-              <LLMChat note={selectedNote} externalContextItems={screenshots} />
+              <MarkdownEditor note={selectedNote} />
             )}
           </ResizablePanel>
         </ResizablePanelGroup>
