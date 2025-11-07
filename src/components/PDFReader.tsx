@@ -49,7 +49,7 @@ export function PDFReader({  }: PDFReaderProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	
 	// Reader setup
-	const workerUrl = 'https://unpkg.com/pdfjs-dist/build/pdf.worker.min.js';
+	const workerUrl = "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 	const layoutRef = useRef(returnDefaultLayout());
 	function returnDefaultLayout() {
 		return defaultLayoutPlugin();
@@ -203,8 +203,6 @@ export function PDFReader({  }: PDFReaderProps) {
 					</div>
 
 					{/* PDF Viewer */}
-					<ScrollArea className="flex-1">
-						<div className="p-8 flex justify-center relative" ref={pdfViewerRef}>
 							<Worker workerUrl={workerUrl}>
 								{activePDF ? (
 									<Viewer
@@ -224,8 +222,6 @@ export function PDFReader({  }: PDFReaderProps) {
 									<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
 								)}
 							</Worker>
-						</div>
-					</ScrollArea>
 				</>
 			) : (
 				<div className="flex-1 flex items-center justify-center">
