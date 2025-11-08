@@ -1,56 +1,31 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import type { JSONContent } from '@tiptap/core';
-import type { Note } from '../../App';
+import type { Note } from '../App';
+
+import StarterKit from '@tiptap/starter-kit'
+import { Markdown } from '@tiptap/markdown'
 
 interface NoteTakerProps {
     note?: Note;
 }
 
-function debounce<T extends (...args: any[]) => void>(fn: T, ms: number) {
-    let t: ReturnType<typeof setTimeout> | null = null;
-    return (...args: Parameters<T>) => {
-        if (t) clearTimeout(t);
-        t = setTimeout(() => fn(...args), ms);
-    };
-}
-
 export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
-    const latest = useRef<JSONContent | null>(null);
+	const editor = useEditor({
+		extensions: [StarterKit, Markdown],
+		content: note?.content || '',
+		editorProps: {
+			attributes: {
+				class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-full p-4',
+			},
+		},
+	})
 
-    const save = useRef(
-        debounce((data: JSONContent) => {
-            console.log('saved', data);
-        }, 1500)
-    ).current;
-
-    const editor = useEditor({
-        extensions: [StarterKit],
-        content: note?.content || '<p>Start taking notes…</p>',
-        autofocus: 'end',
-        onUpdate: ({ editor, transaction }) => {
-            if (!transaction.docChanged) return;        // no-op edits
-            const json = editor.getJSON();              // serialize once
-            latest.current = json;                      // no React state churn
-            save(json);                                 // debounced save
-        },
-    });
-
-    // Update editor content when note changes
-    useEffect(() => {
-        if (editor && note) {
-            editor.commands.setContent(note.content);
-        }
-    }, [editor, note?.id, note?.content]);
-
-    // optional: save on unload
-    useEffect(() => {
-        const handler = () => latest.current && save(latest.current);
-        window.addEventListener('beforeunload', handler);
-        return () => window.removeEventListener('beforeunload', handler);
-    }, [save]);
-
+	React.useEffect(() => {
+		if (editor && note?.content !== undefined) {
+			editor.commands.setContent(note.content)
+		}
+	}, [editor, note?.content])
+	
     return <EditorContent editor={editor} />;
 };
 
