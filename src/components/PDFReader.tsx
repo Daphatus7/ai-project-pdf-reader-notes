@@ -10,7 +10,6 @@ import {
 	MessageSquare,
 	X
 } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "./ui/utils";
 import {
 	Tooltip,
@@ -34,10 +33,6 @@ interface PDFReaderProps {
 	onScreenshotCapture?: (imageDataUrl: string, name: string) => void;
 }
 
-const pdfs: PDFDocument[] = [
-	{ pdfUrl: "pdf1", name: "ML Research Paper.pdf", pages: 24 },
-	{ pdfUrl: "pdf2", name: "React Documentation.pdf", pages: 156 }
-];
 
 export function PDFReader({  }: PDFReaderProps) {
 	const [openPDFs, setOpenPDFs] = useState<PDFDocument[]>([]);
@@ -45,7 +40,6 @@ export function PDFReader({  }: PDFReaderProps) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [zoom, setZoom] = useState(100);
 	const [screenshotMode, setScreenshotMode] = useState(false);
-	const pdfViewerRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	
 	// Reader setup

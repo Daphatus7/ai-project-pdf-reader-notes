@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { Header } from "./components/Header";
 import { NoteSidebar } from "./components/NoteSidebar";
 import { PDFReader } from "./components/PDFReader";
-import { MarkdownEditor } from "./components/MarkdownEditor";
 import { LLMChat } from "./components/LLMChat";
 import {
   ResizableHandle,
@@ -18,6 +17,7 @@ import {
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import NoteTaker from "./components/note-taker.tsx";
 
 export interface Note {
   id: string;
@@ -515,7 +515,7 @@ export default function App() {
                 </div>
               )}
               <div className={isRightCollapsed ? "hidden" : "h-full"}>
-                <MarkdownEditor note={selectedNote} />
+                <NoteTaker note={selectedNote} />
               </div>
             </div>
           </ResizablePanel>

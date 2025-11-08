@@ -2,6 +2,11 @@ import React, { useRef, useEffect } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import type { JSONContent } from '@tiptap/core';
+import type { Note } from '../../App';
+
+interface NoteTakerProps {
+    note?: Note;
+}
 
 function debounce<T extends (...args: any[]) => void>(fn: T, ms: number) {
     let t: ReturnType<typeof setTimeout> | null = null;
@@ -11,7 +16,7 @@ function debounce<T extends (...args: any[]) => void>(fn: T, ms: number) {
     };
 }
 
-export const NoteTaker: React.FC = () => {
+export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
     const latest = useRef<JSONContent | null>(null);
 
     const save = useRef(
@@ -22,7 +27,7 @@ export const NoteTaker: React.FC = () => {
 
     const editor = useEditor({
         extensions: [StarterKit],
-        content: '<p>Start taking notes…</p>',
+        content: note?.content || '<p>Start taking notes…</p>',
         autofocus: 'end',
         onUpdate: ({ editor, transaction }) => {
             if (!transaction.docChanged) return;        // no-op edits
@@ -31,6 +36,13 @@ export const NoteTaker: React.FC = () => {
             save(json);                                 // debounced save
         },
     });
+
+    // Update editor content when note changes
+    useEffect(() => {
+        if (editor && note) {
+            editor.commands.setContent(note.content);
+        }
+    }, [editor, note?.id, note?.content]);
 
     // optional: save on unload
     useEffect(() => {

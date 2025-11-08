@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import NoteTaker from '../components/note-taker/note-taker';
+import NoteTaker from '../../components/note-taker.tsx';
 import ChatWindow from '../components/chat/chat-window';
 import '../../App.css';
 import {ReaderPage} from "../components/reader/reader_page";
