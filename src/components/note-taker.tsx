@@ -234,13 +234,13 @@ export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
                             />
                         </div>
                     </TabsContent>
+					
                     <TabsContent value="editor" className="h-full m-0">
                         {editor && (
-                            <ScrollArea className="h-full">
-                                <SimpleEditor/>
-                            </ScrollArea>
+							<SimpleEditor/>
                         )}
                     </TabsContent>
+					
 					<TabsContent value="preview" className="h-full m-0">
 						<ScrollArea className="h-full">
 							<div className="p-6 prose prose-sm max-w-none dark:prose-invert">

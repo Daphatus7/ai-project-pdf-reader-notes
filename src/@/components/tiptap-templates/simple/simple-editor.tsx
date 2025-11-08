@@ -245,7 +245,11 @@ export function SimpleEditor() {
   }, [isMobile, mobileView])
 
   return (
-    <div className="simple-editor-wrapper">
+    <div
+		style={{
+			width: "100%",
+		}}
+		className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
