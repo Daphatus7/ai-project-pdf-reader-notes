@@ -1,3 +1,7 @@
+/*tip tap editor*/
+@import '/src/@/styles/_variables.scss';
+@import '/src/@/styles/_variables.scss';
+
 /*! tailwindcss v4.1.3 | MIT License | https://tailwindcss.com */
 @layer properties {
   @supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {

@@ -4,6 +4,8 @@ import type { Note } from '../App';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { SimpleEditor } from '@@/@/components/tiptap-templates/simple/simple-editor'
+
 import { ScrollArea } from './ui/scroll-area';
 import { Textarea } from './ui/textarea';
 import { useDrop } from 'react-dnd';
@@ -235,7 +237,7 @@ export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
                     <TabsContent value="editor" className="h-full m-0">
                         {editor && (
                             <ScrollArea className="h-full">
-                                <EditorContent editor={editor} />
+                                <SimpleEditor/>
                             </ScrollArea>
                         )}
                     </TabsContent>
