@@ -18,7 +18,8 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import NoteTaker from "./components/note-taker.tsx";
-import type {JSONContent} from "@tiptap/react";
+
+import {mdContent} from "./components/content.ts";
 
 export interface Note {
 	id: string;
@@ -26,7 +27,7 @@ export interface Note {
 	preview: string;
 	format: 'pm_json';
 	updatedAt: string;
-	content: JSONContent;
+	content: string;
 }
 
 const initialNotes: Note[] = [
@@ -36,137 +37,8 @@ const initialNotes: Note[] = [
 		preview: "Core ideas of supervised and unsupervised learning.",
 		updatedAt: "2 hours ago",
 		format: "pm_json",
-		content: {
-			type: "doc",
-			content: [
-				{
-					type: "heading",
-					attrs: { level: 1 },
-					content: [{ type: "text", text: "Machine Learning Fundamentals" }],
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Supervised learning uses labeled data, while unsupervised learning finds structure within unlabeled datasets. Typical algorithms include linear regression, decision trees, k-means, and PCA." },
-					],
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Mathematically, training minimizes a loss function such as " },
-						{ type: "text", marks: [{ type: "code" }], text: "L = (y - ŷ)^2" },
-						{ type: "text", text: " to update model parameters." },
-					],
-				},
-			],
-		},
-	},
-	{
-		id: "2",
-		title: "Neural Network Basics",
-		preview: "Understanding perceptrons and gradient descent.",
-		updatedAt: "6 hours ago",
-		format: "pm_json",
-		content: {
-			type: "doc",
-			content: [
-				{ type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Neural Network Basics" }] },
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "A neural network approximates complex functions by stacking layers of neurons. Each neuron applies an activation function such as ReLU or sigmoid." },
-					],
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Weights are optimized by gradient descent, where " },
-						{ type: "text", marks: [{ type: "code" }], text: "w := w - η * ∂L/∂w" },
-						{ type: "text", text: " adjusts parameters in the direction of lower loss." },
-					],
-				},
-			],
-		},
-	},
-	{
-		id: "3",
-		title: "Data Preprocessing",
-		preview: "Normalization and feature scaling essentials.",
-		updatedAt: "1 day ago",
-		format: "pm_json",
-		content: {
-			type: "doc",
-			content: [
-				{ type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Data Preprocessing" }] },
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Raw data requires cleaning and normalization. Missing values can be imputed, categorical features encoded, and continuous variables standardized." },
-					],
-				},
-				{
-					type: "bulletList",
-					content: [
-						{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Min–Max scaling maps features to [0,1]." }] }] },
-						{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Z-score normalization sets mean = 0, std = 1." }] }] },
-					],
-				},
-			],
-		},
-	},
-	{
-		id: "4",
-		title: "Evaluation Metrics",
-		preview: "Accuracy, precision, recall, and F1-score explained.",
-		updatedAt: "2 days ago",
-		format: "pm_json",
-		content: {
-			type: "doc",
-			content: [
-				{ type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Evaluation Metrics" }] },
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Model performance can’t be judged by accuracy alone. For imbalanced datasets, precision and recall are key:" },
-					],
-				},
-				{
-					type: "orderedList",
-					content: [
-						{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Precision = TP / (TP + FP)" }] }] },
-						{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Recall = TP / (TP + FN)" }] }] },
-						{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "F1 = 2 * Precision * Recall / (Precision + Recall)" }] }] },
-					],
-				},
-			],
-		},
-	},
-	{
-		id: "5",
-		title: "Overfitting & Regularization",
-		preview: "How to reduce variance in complex models.",
-		updatedAt: "5 days ago",
-		format: "pm_json",
-		content: {
-			type: "doc",
-			content: [
-				{ type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Overfitting & Regularization" }] },
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", text: "Overfitting occurs when a model memorizes training data but fails to generalize. Regularization adds a penalty term to the loss function." },
-					],
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", marks: [{ type: "code" }], text: "L_total = L_data + λ * ||w||²" },
-						{ type: "text", text: " controls complexity by discouraging large weights." },
-					],
-				},
-			],
-		},
-	},
+		content: mdContent
+	}
 ];
 
 

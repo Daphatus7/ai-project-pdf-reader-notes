@@ -1,222 +1,194 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { EditorContent, useEditor } from '@tiptap/react';
-import type { Note } from '../App';
-import StarterKit from '@tiptap/starter-kit';
-import { Markdown } from '@tiptap/markdown';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { SimpleEditor } from '@@/@/components/tiptap-templates/simple/simple-editor'
+import { useState } from 'react'
+import { EditorContent, NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
+import type { Note } from '../App'
+import { createBlockMarkdownSpec, Node } from '@tiptap/core'
+import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
+import { Highlight } from '@tiptap/extension-highlight'
+import { Image } from '@tiptap/extension-image'
+import { TaskItem, TaskList } from '@tiptap/extension-list'
+import { Mathematics } from '@tiptap/extension-mathematics'
+import { Mention } from '@tiptap/extension-mention'
+import { TableKit } from '@tiptap/extension-table'
+import { Youtube } from '@tiptap/extension-youtube'
+import { Markdown } from '@tiptap/markdown'
+import StarterKit from '@tiptap/starter-kit'
 
-import { ScrollArea } from './ui/scroll-area';
-import { Textarea } from './ui/textarea';
-import { useDrop } from 'react-dnd';
-import { cn } from './ui/utils';
-import { DRAG_TYPE } from './LLMChat';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { mdContent } from './content.js'
 
 interface NoteTakerProps {
-    note?: Note;
+	notes?: Note[]
 }
 
-type ViewMode = 'markdown' | 'preview' | 'editor';
+type ViewMode = 'markdown' | 'preview' | 'editor'
 
-export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
-    const [content, setContent] = useState(note?.content || '');
-    const [activeView, setActiveView] = useState<ViewMode>('editor');
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [dropLineIndex, setDropLineIndex] = useState<number | null>(null);
-    const savedScrollPositionRef = useRef(0);
-
-    const LINE_HEIGHT = 20;
-    const PADDING_TOP = 24;
-
-    const isUpdatingFromEditor = useRef(false);
-    const isUpdatingFromExternal = useRef(false);
-
-    const editor = useEditor({
-        extensions: [StarterKit, Markdown],
-        content: content,
-        editorProps: {
-            attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-full p-4',
-            },
-        },
-        onUpdate: ({ editor }) => {
-            if (isUpdatingFromExternal.current) return;
-            
-            isUpdatingFromEditor.current = true;
-            try {
-                const markdown = (editor.storage.markdown as any)?.getMarkdown?.() || 
-                                (editor.storage.markdown as any)?.serializer?.serialize?.(editor.getJSON()) ||
-                                content;
-                if (markdown !== content) {
-                    setContent(markdown);
-                }
-            } catch (e) {
-                // If markdown extraction fails, keep current content
-            } finally {
-                isUpdatingFromEditor.current = false;
-            }
-        },
-    });
-
-    useEffect(() => {
-        if (note?.content !== undefined && note.content !== content) {
-            isUpdatingFromExternal.current = true;
-            setContent(note.content);
-            if (editor && !isUpdatingFromEditor.current) {
-                editor.commands.setContent(note.content);
-            }
-            setTimeout(() => {
-                isUpdatingFromExternal.current = false;
-            }, 100);
-        }
-    }, [note?.id, note?.content, editor]);
-
-    useEffect(() => {
-        if (editor && !isUpdatingFromEditor.current && content !== note?.content) {
-            isUpdatingFromExternal.current = true;
-            editor.commands.setContent(content);
-            setTimeout(() => {
-                isUpdatingFromExternal.current = false;
-            }, 100);
-        }
-    }, [content]);
-
-    useEffect(() => {
-        if (activeView === 'markdown' && textareaRef.current) {
-            textareaRef.current.scrollTop = savedScrollPositionRef.current;
-        } else if (activeView !== 'markdown' && textareaRef.current) {
-            savedScrollPositionRef.current = textareaRef.current.scrollTop;
-        }
-    }, [activeView]);
-
-    const getLineFromMousePosition = (clientY: number): number => {
-        const textarea = textareaRef.current;
-        if (!textarea) return 0;
-
-        const rect = textarea.getBoundingClientRect();
-        const scrollTop = textarea.scrollTop;
-        const relativeY = (clientY - rect.top) - PADDING_TOP + scrollTop;
-        const lineIndex = Math.max(0, Math.floor(relativeY / LINE_HEIGHT));
-        
-        return lineIndex;
-    };
-
-    const getCharPositionForLine = (lineIndex: number): number => {
-        const currentContent = textareaRef.current?.value || content;
-        const lines = currentContent.split('\n');
-        if (lineIndex >= lines.length) {
-            return currentContent.length;
-        }
-        
-        let position = 0;
-        for (let i = 0; i < lineIndex; i++) {
-            position += lines[i].length + 1;
-        }
-        
-        return position;
-    };
-
-    const [{ isOver, canDrop }, drop] = useDrop<{ content: string }, unknown, { isOver: boolean; canDrop: boolean }>(() => ({
-        accept: DRAG_TYPE,
-        hover: (_item, monitor) => {
-            const clientOffset = monitor.getClientOffset();
-            if (clientOffset && activeView === 'markdown') {
-                const lineIndex = getLineFromMousePosition(clientOffset.y);
-                setDropLineIndex(lineIndex);
-            }
-        },
-        drop: (item) => {
-            if (activeView !== 'markdown') return;
-            
-            const textarea = textareaRef.current;
-            if (!textarea || dropLineIndex === null) return;
-
-            const savedScrollTop = textarea.scrollTop;
-            const currentContent = textarea.value;
-            const insertPosition = getCharPositionForLine(dropLineIndex);
-            const beforeDrop = currentContent.substring(0, insertPosition);
-            const afterDrop = currentContent.substring(insertPosition);
-
-            let newContent: string;
-            let addedChars: number;
-            
-            if (beforeDrop.length === 0) {
-                newContent = `${item.content}\n${afterDrop}`;
-                addedChars = item.content.length + 1;
-            } else if (beforeDrop.endsWith('\n') || beforeDrop.endsWith('\n\n')) {
-                newContent = `${beforeDrop}${item.content}\n${afterDrop}`;
-                addedChars = item.content.length + 1;
-            } else {
-                newContent = `${beforeDrop}\n${item.content}\n${afterDrop}`;
-                addedChars = item.content.length + 2;
-            }
-            
-            setContent(newContent);
-            if (editor) {
-                editor.commands.setContent(newContent);
-            }
-            setDropLineIndex(null);
-
-            requestAnimationFrame(() => {
-                if (textarea) {
-                    textarea.scrollTop = savedScrollTop;
-                    const newCursorPosition = insertPosition + addedChars;
-                    textarea.focus({ preventScroll: true });
-                    textarea.setSelectionRange(newCursorPosition, newCursorPosition);
-                    textarea.scrollTop = savedScrollTop;
-                }
-            });
-        },
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop(),
-        }),
-    }), [content, dropLineIndex, activeView, editor]);
-
-    useEffect(() => {
-        if (!isOver) {
-            setDropLineIndex(null);
-        }
-    }, [isOver]);
-
-    const handleMarkdownChange = (newContent: string) => {
-        setContent(newContent);
-        if (editor) {
-            editor.commands.setContent(newContent);
-        }
-    };
-
-    return (
-        <div className="h-full flex flex-col bg-background">
-            <Tabs value={activeView} onValueChange={(v: string) => setActiveView(v as ViewMode)} className="h-full flex flex-col">
-                <div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
-                    <TabsList>
-                        <TabsTrigger value="markdown">Markdown</TabsTrigger>
-						<TabsTrigger value="editor">Editor</TabsTrigger>
-						<TabsTrigger value="preview">Preview</TabsTrigger>
-                    </TabsList>
-                </div>
-
-                <div className="flex-1 overflow-hidden relative">
-                    <TabsContent value="markdown" className="h-full m-0">
-						
-                    </TabsContent>
-					
-                    <TabsContent value="editor" className="h-full m-0">
-                        {editor && note && (
-							<SimpleEditor note={note}/>
-                        )}
-                    </TabsContent>
-					
-					<TabsContent value="preview" className="h-full m-0">
-					</TabsContent>
-
+// ----- Custom React component for demonstration -----
+const CustomReactComponent = ({ node }: any) => {
+	return (
+		<NodeViewWrapper className="custom-react-node">
+			<div
+				style={{
+					border: '2px solid #3b82f6',
+					borderRadius: '8px',
+					padding: '16px',
+					margin: '8px 0',
+					backgroundColor: '#eff6ff',
+				}}
+			>
+				<h4 style={{ margin: '0 0 8px 0', color: '#1e40af' }}>Custom React Component</h4>
+				<p style={{ margin: 0, color: '#374151' }}>{node.attrs.content || 'This is a custom React node view!'}</p>
+				<div>
+					<NodeViewContent />
 				</div>
-            </Tabs>
-        </div>
-    );
-};
+			</div>
+		</NodeViewWrapper>
+	)
+}
 
-export default NoteTaker;
+// ----- Custom node extension with React node view -----
+const CustomReactNode = Node.create({
+	name: 'customReactNode',
+	group: 'block',
+	content: 'block+',
+
+	addAttributes() {
+		return {
+			content: {
+				default: 'This is a custom React node view!',
+			},
+		}
+	},
+
+	parseHTML() {
+		return [{ tag: 'div[data-type="custom-react-node"]' }]
+	},
+
+	renderHTML({ HTMLAttributes }) {
+		return ['div', { 'data-type': 'custom-react-node', ...HTMLAttributes }, 0]
+	},
+
+	addNodeView() {
+		return ReactNodeViewRenderer(CustomReactComponent)
+	},
+
+	markdownTokenName: 'customReactNode',
+
+	...createBlockMarkdownSpec({
+		nodeName: 'customReactNode',
+		name: 'react',
+	}),
+})
+
+export function NoteTaker({ notes }: NoteTakerProps) {
+	const [markdownInput, setMarkdownInput] = useState<string>(mdContent)
+	const [error, setError] = useState<string | null>(null)
+
+	const editor = useEditor({
+		extensions: [
+			Markdown,
+			StarterKit,
+			Details,
+			DetailsSummary,
+			DetailsContent,
+			TaskList,
+			TaskItem.configure({ nested: true }),
+			Youtube.configure({ inline: false, width: 480, height: 320 }),
+			Image,
+			TableKit,
+			Highlight,
+			Mention.configure({
+				HTMLAttributes: { class: 'mention' },
+				suggestion: {
+					items: ({ query }) =>
+						[
+							'Lea Thompson',
+							'Cyndi Lauper',
+							'Tom Cruise',
+							'Madonna',
+							'Jerry Hall',
+							'Joan Collins',
+							'Winona Ryder',
+							'Christina Applegate',
+						]
+							.filter((item) => item.toLowerCase().startsWith(query.toLowerCase()))
+							.slice(0, 5),
+				},
+			}),
+			Mathematics,
+			notes[0].content,
+		],
+		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
+		contentType: 'markdown',
+	})
+
+	const parseMarkdown = () => {
+		if (!editor) {
+			setError('Editor not available')
+			return
+		}
+		try {
+			setError(null)
+			editor.commands.setContent(markdownInput, { contentType: 'markdown' })
+		} catch (err) {
+			console.error(err)
+			setError(`Error parsing markdown: ${err instanceof Error ? err.message : String(err)}`)
+		}
+	}
+
+	const getEditorAsMarkdown = () => {
+		if (!editor) return ''
+		try {
+			// Provided by @tiptap/markdown. If not present, fallback to plain text.
+			// @ts-ignore - some typings may not include getMarkdown in Editor
+			return editor.getMarkdown ? editor.getMarkdown() : editor.getText()
+		} catch {
+			return editor.getText()
+		}
+	}
+
+	return (
+		<div className="markdown-parser-demo">
+			<div className="control-group">
+				<div className="button-group">
+					<button type="button" onClick={parseMarkdown} disabled={!editor || !markdownInput.trim()}>
+						Parse Markdown →
+					</button>
+
+					<button
+						type="button"
+						onClick={() => {
+							if (editor) {
+								const markdown = getEditorAsMarkdown()
+								setMarkdownInput(markdown)
+							}
+						}}
+					>
+						← Extract Markdown
+					</button>
+				</div>
+			</div>
+
+			{error && <div className="error">{error}</div>}
+
+			<div className="split">
+				<div className="input-panel">
+					<div className="panel-label">Markdown Input</div>
+					<textarea
+						className="markdown-input"
+						value={markdownInput}
+						onChange={(e) => setMarkdownInput(e.target.value)}
+						placeholder="Enter markdown here..."
+					/>
+				</div>
+
+				<div className="editor-panel">
+					<div className="panel-label">Tiptap Editor</div>
+					<div className="editor-container">
+						{editor ? <EditorContent editor={editor} /> : <div>Loading editor…</div>}
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+export default NoteTaker
