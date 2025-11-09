@@ -16,12 +16,11 @@ import StarterKit from '@tiptap/starter-kit'
 import { mdContent } from './content.js'
 
 interface NoteTakerProps {
-	notes?: Note[]
+	note?: Note
 }
 
 type ViewMode = 'markdown' | 'preview' | 'editor'
 
-// ----- Custom React component for demonstration -----
 const CustomReactComponent = ({ node }: any) => {
 	return (
 		<NodeViewWrapper className="custom-react-node">
@@ -44,10 +43,12 @@ const CustomReactComponent = ({ node }: any) => {
 	)
 }
 
-// ----- Custom node extension with React node view -----
+// Custom node extension with React node view
 const CustomReactNode = Node.create({
 	name: 'customReactNode',
+
 	group: 'block',
+
 	content: 'block+',
 
 	addAttributes() {
@@ -59,7 +60,11 @@ const CustomReactNode = Node.create({
 	},
 
 	parseHTML() {
-		return [{ tag: 'div[data-type="custom-react-node"]' }]
+		return [
+			{
+				tag: 'div[data-type="custom-react-node"]',
+			},
+		]
 	},
 
 	renderHTML({ HTMLAttributes }) {
@@ -78,8 +83,9 @@ const CustomReactNode = Node.create({
 	}),
 })
 
-export function NoteTaker({ notes }: NoteTakerProps) {
-	const [markdownInput, setMarkdownInput] = useState<string>(mdContent)
+
+export function NoteTaker({ note }: NoteTakerProps) {
+	const [markdownInput, setMarkdownInput] = useState(mdContent)
 	const [error, setError] = useState<string | null>(null)
 
 	const editor = useEditor({
@@ -90,16 +96,24 @@ export function NoteTaker({ notes }: NoteTakerProps) {
 			DetailsSummary,
 			DetailsContent,
 			TaskList,
-			TaskItem.configure({ nested: true }),
-			Youtube.configure({ inline: false, width: 480, height: 320 }),
+			TaskItem.configure({
+				nested: true,
+			}),
+			Youtube.configure({
+				inline: false,
+				width: 480,
+				height: 320,
+			}),
 			Image,
 			TableKit,
 			Highlight,
 			Mention.configure({
-				HTMLAttributes: { class: 'mention' },
+				HTMLAttributes: {
+					class: 'mention',
+				},
 				suggestion: {
-					items: ({ query }) =>
-						[
+					items: ({ query }) => {
+						return [
 							'Lea Thompson',
 							'Cyndi Lauper',
 							'Tom Cruise',
@@ -109,22 +123,24 @@ export function NoteTaker({ notes }: NoteTakerProps) {
 							'Winona Ryder',
 							'Christina Applegate',
 						]
-							.filter((item) => item.toLowerCase().startsWith(query.toLowerCase()))
-							.slice(0, 5),
+							.filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
+							.slice(0, 5)
+					},
 				},
 			}),
 			Mathematics,
-			notes[0].content,
+			CustomReactNode,
 		],
 		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
 		contentType: 'markdown',
 	})
 
 	const parseMarkdown = () => {
-		if (!editor) {
-			setError('Editor not available')
+		if (!editor || !editor.markdown) {
+			setError('Editor or MarkdownManager not available')
 			return
 		}
+
 		try {
 			setError(null)
 			editor.commands.setContent(markdownInput, { contentType: 'markdown' })
@@ -135,11 +151,12 @@ export function NoteTaker({ notes }: NoteTakerProps) {
 	}
 
 	const getEditorAsMarkdown = () => {
-		if (!editor) return ''
+		if (!editor) {
+			return ''
+		}
+
 		try {
-			// Provided by @tiptap/markdown. If not present, fallback to plain text.
-			// @ts-ignore - some typings may not include getMarkdown in Editor
-			return editor.getMarkdown ? editor.getMarkdown() : editor.getText()
+			return editor.getMarkdown()
 		} catch {
 			return editor.getText()
 		}
@@ -175,7 +192,7 @@ export function NoteTaker({ notes }: NoteTakerProps) {
 					<textarea
 						className="markdown-input"
 						value={markdownInput}
-						onChange={(e) => setMarkdownInput(e.target.value)}
+						onChange={e => setMarkdownInput(e.target.value)}
 						placeholder="Enter markdown here..."
 					/>
 				</div>
