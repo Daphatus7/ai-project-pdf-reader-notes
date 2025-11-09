@@ -201,71 +201,16 @@ export const NoteTaker: React.FC<NoteTakerProps> = ({ note }) => {
 
                 <div className="flex-1 overflow-hidden relative">
                     <TabsContent value="markdown" className="h-full m-0">
-                        <div 
-                            ref={(node) => {
-                                drop(node);
-                            }}
-                            className={cn(
-                                "h-full relative",
-                                isOver && canDrop && activeView === 'markdown' && "ring-2 ring-primary ring-inset"
-                            )}
-                        >
-                            {isOver && canDrop && activeView === 'markdown' && dropLineIndex !== null && (
-                                <div 
-                                    className="absolute left-0 right-0 pointer-events-none z-20"
-                                    style={{
-                                        top: `${PADDING_TOP + dropLineIndex * LINE_HEIGHT - (textareaRef.current?.scrollTop || 0)}px`,
-                                        height: `${LINE_HEIGHT}px`,
-                                        marginLeft: `${PADDING_TOP}px`,
-                                        marginRight: `${PADDING_TOP}px`,
-                                    }}
-                                >
-                                    <div className="h-full bg-primary/20 border-l-2 border-primary rounded-sm" />
-                                </div>
-                            )}
-                            
-                            <Textarea
-                                ref={textareaRef}
-                                value={content}
-                                onChange={(e) => handleMarkdownChange(e.target.value)}
-                                className="h-full w-full border-0 rounded-none resize-none focus-visible:ring-0 font-mono text-sm p-6 bg-transparent relative z-10"
-                                placeholder="Start writing your notes in Markdown..."
-                                style={{ lineHeight: '20px' }}
-                            />
-                        </div>
+						
                     </TabsContent>
 					
                     <TabsContent value="editor" className="h-full m-0">
-                        {editor && (
-							<SimpleEditor/>
+                        {editor && note && (
+							<SimpleEditor note={note}/>
                         )}
                     </TabsContent>
 					
 					<TabsContent value="preview" className="h-full m-0">
-						<ScrollArea className="h-full">
-							<div className="p-6 prose prose-sm max-w-none dark:prose-invert">
-								<ReactMarkdown
-									remarkPlugins={[remarkGfm]}
-									components={{
-										code({ node, inline, className, children, ...props }: any) {
-											return inline ? (
-												<code className={className} {...props}>
-													{children}
-												</code>
-											) : (
-												<pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-                                                    <code className={className} {...props}>
-                                                        {children}
-                                                    </code>
-                                                </pre>
-											);
-										},
-									}}
-								>
-									{content}
-								</ReactMarkdown>
-							</div>
-						</ScrollArea>
 					</TabsContent>
 
 				</div>

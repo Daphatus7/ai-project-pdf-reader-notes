@@ -73,8 +73,9 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@@/@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@@/@/components/tiptap-templates/simple/simple-editor.scss"
+import type {Note} from "@@/App.tsx";
 
-import content from "@@/@/components/tiptap-templates/simple/data/content.json"
+// import content from "@@/@/components/tiptap-templates/simple/data/content.json"
 
 
 
@@ -186,7 +187,7 @@ const MobileToolbarContent = ({
 	</>
 )
 
-export function SimpleEditor() {
+export function SimpleEditor({ note }: { note: Note }) {
 	const isMobile = useIsMobile()
 	const { height } = useWindowSize()
 	const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -232,7 +233,7 @@ export function SimpleEditor() {
 				onError: (error) => console.error("Upload failed:", error),
 			}),
 		],
-		content,
+		content: note.content,
 	})
 
 	const rect = useCursorVisibility({
