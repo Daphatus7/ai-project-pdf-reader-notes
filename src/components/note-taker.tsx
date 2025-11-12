@@ -14,6 +14,9 @@ import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
 
 import { mdContent } from './content.js'
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/components/ui/tabs.tsx";
+import {ScrollArea} from "@@/components/ui/scroll-area.tsx";
+import ReactMarkdown from "react-markdown";
 
 interface NoteTakerProps {
 	note?: Note
@@ -133,8 +136,16 @@ export function NoteTaker({ note }: NoteTakerProps) {
 		],
 		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
 		contentType: 'markdown',
+		onUpdate: ({ editor: currentEditor }) => {
+			setSerializedContent(currentEditor.getMarkdown())
+		},
+		onCreate: ({ editor: currentEditor }) => {
+			setSerializedContent(currentEditor.getMarkdown())
+		},
 	})
 
+	
+	// A function to parse the markdown input and update the editor content
 	const parseMarkdown = () => {
 		if (!editor || !editor.markdown) {
 			setError('Editor or MarkdownManager not available')
@@ -149,61 +160,69 @@ export function NoteTaker({ note }: NoteTakerProps) {
 			setError(`Error parsing markdown: ${err instanceof Error ? err.message : String(err)}`)
 		}
 	}
-
+	
+	// A function to extract the markdown content from the editor and update the input field
 	const getEditorAsMarkdown = () => {
 		if (!editor) {
-			return ''
+			return 'error: editor not available'
 		}
-
 		try {
 			return editor.getMarkdown()
 		} catch {
-			return editor.getText()
+			return "error: could not extract markdown from editor"
 		}
 	}
-
+	const [activeView, setActiveView] = useState<ViewMode>('editor');
+	const [serializedContent, setSerializedContent] = useState('')
+	
+	const applyMarkdownToEditor = () => {}
+	
+	const getPreviewMarkdown = () => {}
+	
 	return (
-		<div className="markdown-parser-demo">
-			<div className="control-group">
-				<div className="button-group">
-					<button type="button" onClick={parseMarkdown} disabled={!editor || !markdownInput.trim()}>
-						Parse Markdown →
-					</button>
-
-					<button
-						type="button"
-						onClick={() => {
-							if (editor) {
-								const markdown = getEditorAsMarkdown()
-								setMarkdownInput(markdown)
-							}
-						}}
-					>
-						← Extract Markdown
-					</button>
-				</div>
-			</div>
-
-			{error && <div className="error">{error}</div>}
-
-			<div className="split">
-				<div className="input-panel">
-					<div className="panel-label">Markdown Input</div>
-					<textarea
-						className="markdown-input"
-						value={markdownInput}
-						onChange={e => setMarkdownInput(e.target.value)}
-						placeholder="Enter markdown here..."
-					/>
+		<div className="h-full flex flex-col bg-background">
+			<Tabs value={activeView} onValueChange={(v: string) => setActiveView(v as ViewMode)} className="h-full flex flex-col">
+				<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
+					<TabsList>
+						<TabsTrigger 
+							value="markdown"
+							onChange = {parseMarkdown}
+						>Markdown</TabsTrigger>
+						<TabsTrigger value="editor">Editor</TabsTrigger>
+						<TabsTrigger value="preview">Preview</TabsTrigger>
+					</TabsList>
 				</div>
 
-				<div className="editor-panel">
-					<div className="panel-label">Tiptap Editor</div>
-					<div className="editor-container">
-						{editor ? <EditorContent editor={editor} /> : <div>Loading editor…</div>}
-					</div>
+				<div className="flex-1 overflow-hidden relative">
+					{/* Markdown view */}
+					<TabsContent value="markdown" className="h-full m-0">
+						<ScrollArea className="h-full">
+							<textarea
+								className="markdown-input"
+								value={getEditorAsMarkdown()}
+								onChange={e => setMarkdownInput(e.target.value)}
+								placeholder="Enter markdown here..."
+							/>
+						</ScrollArea>
+					</TabsContent>
+
+					{/* Editor view */}
+					<TabsContent value="editor" className="h-full m-0">
+						<ScrollArea className="h-full">
+							{editor && <EditorContent editor={editor} />}
+						</ScrollArea>
+					</TabsContent>
+
+					{/* Preview view */}
+					<TabsContent value="preview" className="h-full m-0">
+						<ScrollArea className="h-full">
+							<div className="p-4 prose prose-sm max-w-none">
+								<ReactMarkdown>{getEditorAsMarkdown()}</ReactMarkdown>
+							</div>
+						</ScrollArea>
+					</TabsContent>
 				</div>
-			</div>
+			</Tabs>
 		</div>
 	)
 }
