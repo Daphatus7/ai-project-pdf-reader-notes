@@ -176,13 +176,15 @@ export function NoteTaker({ note }: NoteTakerProps) {
 
 				<div className="flex-1 overflow-hidden relative">
 					{/* Markdown view */}
-					<TabsContent value="markdown" className="h-full m-0">
-						<ScrollArea className="h-full">
-							<textarea
-								className="markdown-input"
-								value={serializedContent}
-								onChange={e => setSerializedContent(e.target.value)}
-							/>
+					<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
+						<ScrollArea className="flex-1 w-full">
+							<div className="h-full">
+								<textarea
+									className="markdown-input w-full h-full p-4 resize-none border-0 outline-none bg-transparent font-mono text-sm"
+									value={serializedContent}
+									onChange={e => setSerializedContent(e.target.value)}
+								/>
+							</div>
 						</ScrollArea>
 					</TabsContent>
 
