@@ -1,18 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
-
-// --- Tiptap Core Extensions ---
-import { StarterKit } from "@tiptap/starter-kit"
-import { Image } from "@tiptap/extension-image"
-import { TaskItem, TaskList } from "@tiptap/extension-list"
-import { TextAlign } from "@tiptap/extension-text-align"
-import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
-import { Subscript } from "@tiptap/extension-subscript"
-import { Superscript } from "@tiptap/extension-superscript"
-import { Selection } from "@tiptap/extensions"
+import {type Editor, EditorContent, EditorContext} from "@tiptap/react"
 
 // --- UI Primitives ---
 import { Button } from "@@/@/components/tiptap-ui-primitive/button"
@@ -25,8 +14,6 @@ import {
 } from "@@/@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@@/@/components/tiptap-node/image-upload-node/image-upload-node-extension"
-import { HorizontalRule } from "@@/@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
 import "@@/@/components/tiptap-node/blockquote-node/blockquote-node.scss"
 import "@@/@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@@/@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
@@ -68,14 +55,8 @@ import { useCursorVisibility } from "@@/@/hooks/use-cursor-visibility"
 // --- Components ---
 import { ThemeToggle } from "@@/@/components/tiptap-templates/simple/theme-toggle"
 
-// --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@@/@/lib/tiptap-utils"
-
 // --- Styles ---
 import "@@/@/components/tiptap-templates/simple/simple-editor.scss"
-import type {Note} from "@@/App.tsx";
-
-// import content from "@@/@/components/tiptap-templates/simple/data/content.json"
 
 
 
@@ -187,54 +168,13 @@ const MobileToolbarContent = ({
 	</>
 )
 
-export function SimpleEditor({ note }: { note: Note }) {
+export function SimpleEditor({ editor }: { editor: Editor }) {
 	const isMobile = useIsMobile()
 	const { height } = useWindowSize()
 	const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
 		"main"
 	)
 	const toolbarRef = useRef<HTMLDivElement>(null)
-
-	const editor = useEditor({
-		immediatelyRender: false,
-		shouldRerenderOnTransaction: false,
-		editorProps: {
-			attributes: {
-				autocomplete: "off",
-				autocorrect: "off",
-				autocapitalize: "off",
-				"aria-label": "Main content area, start typing to enter text.",
-				class: "simple-editor",
-			},
-		},
-		extensions: [
-			StarterKit.configure({
-				horizontalRule: false,
-				link: {
-					openOnClick: false,
-					enableClickSelection: true,
-				},
-			}),
-			HorizontalRule,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-			TaskList,
-			TaskItem.configure({ nested: true }),
-			Highlight.configure({ multicolor: true }),
-			Image,
-			Typography,
-			Superscript,
-			Subscript,
-			Selection,
-			ImageUploadNode.configure({
-				accept: "image/*",
-				maxSize: MAX_FILE_SIZE,
-				limit: 3,
-				upload: handleImageUpload,
-				onError: (error) => console.error("Upload failed:", error),
-			}),
-		],
-		content: note.content,
-	})
 
 	const rect = useCursorVisibility({
 		editor,

@@ -17,6 +17,7 @@ import { mdContent } from './content.js'
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/components/ui/tabs.tsx";
 import {ScrollArea} from "@@/components/ui/scroll-area.tsx";
 import ReactMarkdown from "react-markdown";
+import {SimpleEditor} from "@@/@/components/tiptap-templates/simple/simple-editor.tsx";
 
 interface NoteTakerProps {
 	note?: Note
@@ -190,9 +191,10 @@ export function NoteTaker({ note }: NoteTakerProps) {
 
 					{/* Editor view */}
 					<TabsContent value="editor" className="h-full m-0">
-						<ScrollArea className="h-full">
-							{editor && <EditorContent editor={editor} />}
-						</ScrollArea>
+						{/*<ScrollArea className="h-full">*/}
+						{/*	{editor && <EditorContent editor={editor} />}*/}
+						{/*</ScrollArea>*/}
+						<SimpleEditor editor={editor} />
 					</TabsContent>
 
 					{/* Preview view */}
