@@ -158,7 +158,7 @@ export function NoteTaker({ note }: NoteTakerProps) {
 		editor.commands.setContent(serializedContent, { contentType: 'markdown' });
 		isPushing.current = false;
 	};
-	
+
 	return (
 		<div className="h-full flex flex-col bg-background">
 			<Tabs value={activeView} onValueChange={(v: string) => setActiveView(v as ViewMode)} className="h-full flex flex-col">
@@ -171,7 +171,7 @@ export function NoteTaker({ note }: NoteTakerProps) {
 						<TabsTrigger value="editor"
 						onClick ={applySerializedToEditor}
 						>Editor</TabsTrigger>
-						<TabsTrigger value="preview">Preview</TabsTrigger>
+						{/*<TabsTrigger value="preview">Preview</TabsTrigger>*/}
 					</TabsList>
 				</div>
 
@@ -193,16 +193,16 @@ export function NoteTaker({ note }: NoteTakerProps) {
 						<SimpleEditor editor={editor} />
 					</TabsContent>
 
-					{/* Preview view */}
-					<TabsContent value="preview" className="h-full m-0">
-						<ScrollArea className="h-full">
-							{/*<div className="p-4 prose prose-sm max-w-none">*/}
-							{/*	<ReactMarkdown>{editor.getMarkdown()}</ReactMarkdown>*/}
-							{/*</div>*/}
-						{/*	the preview should be readonly while preserve the original content, including visual representation */}
-							
-						</ScrollArea>
-					</TabsContent>
+					{/*/!* Preview view *!/*/}
+					{/*<TabsContent value="preview" className="h-full m-0">*/}
+					{/*	<ScrollArea className="h-full">*/}
+					{/*		/!*<div className="p-4 prose prose-sm max-w-none">*!/*/}
+					{/*		/!*	<ReactMarkdown>{editor.getMarkdown()}</ReactMarkdown>*!/*/}
+					{/*		/!*</div>*!/*/}
+					{/*	/!*	the preview should be readonly while preserve the original content, including visual representation *!/*/}
+					{/*		*/}
+					{/*	</ScrollArea>*/}
+					{/*</TabsContent>*/}
 				</div>
 			</Tabs>
 		</div>
