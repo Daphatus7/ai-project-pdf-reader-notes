@@ -6,17 +6,19 @@ import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-detai
 import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
+import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
 import { Mathematics } from '@tiptap/extension-mathematics'
+
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
 import { Youtube } from '@tiptap/extension-youtube'
+import { Gapcursor } from '@tiptap/extensions'
 import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
 
-import { mdContent } from './content.js'
+
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/components/ui/tabs.tsx";
-import {ScrollArea} from "@@/components/ui/scroll-area.tsx";
-import ReactMarkdown from "react-markdown";
+
 import {SimpleEditor} from "@@/@/components/tiptap-templates/simple/simple-editor.tsx";
 
 interface NoteTakerProps {
@@ -97,6 +99,7 @@ export function NoteTaker({ note }: NoteTakerProps) {
 			DetailsSummary,
 			DetailsContent,
 			TaskList,
+			Gapcursor,
 			TaskItem.configure({
 				nested: true,
 			}),
@@ -108,6 +111,7 @@ export function NoteTaker({ note }: NoteTakerProps) {
 			Image,
 			TableKit,
 			Highlight,
+			Mathematics,
 			Mention.configure({
 				HTMLAttributes: {
 					class: 'mention',
@@ -129,7 +133,6 @@ export function NoteTaker({ note }: NoteTakerProps) {
 					},
 				},
 			}),
-			Mathematics,
 			CustomReactNode,
 		],
 		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
@@ -141,6 +144,7 @@ export function NoteTaker({ note }: NoteTakerProps) {
 		},
 		onCreate: ({ editor: currentEditor }) => {
 			setSerializedContent(currentEditor.getMarkdown());
+			migrateMathStrings(currentEditor);
 		},
 	})
 	
