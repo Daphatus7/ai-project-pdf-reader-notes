@@ -6,8 +6,10 @@ import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-detai
 import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
-import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
+import { migrateMathStrings } from '@tiptap/extension-mathematics'
 import { Mathematics } from '@tiptap/extension-mathematics'
+// import DragHandle from '@tiptap/extension-drag-handle'
+import DragHandle from "@tiptap/extension-drag-handle-react";
 
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
@@ -109,6 +111,20 @@ export function NoteTaker({ note }: NoteTakerProps) {
 				height: 320,
 			}),
 			Image,
+			// DragHandle.configure({
+			// 	render: () => {
+			// 		const element = document.createElement('div')
+			//
+			// 		// Use as a hook for CSS to insert an icon
+			// 		element.classList.add('custom-drag-handle')
+			//
+			// 		return element
+			// 	},
+			// 	computePositionConfig: {
+			// 		placement: 'left',
+			// 		strategy: 'fixed',
+			// 	},
+			// }),
 			TableKit,
 			Highlight,
 			Mathematics,
@@ -146,7 +162,13 @@ export function NoteTaker({ note }: NoteTakerProps) {
 			setSerializedContent(currentEditor.getMarkdown());
 			migrateMathStrings(currentEditor);
 		},
+		
 	})
+
+	const toggleEditable = () => {
+		editor.setEditable(!editor.isEditable)
+		editor.view.dispatch(editor.view.state.tr)
+	}
 	
 	const [activeView, setActiveView] = useState<ViewMode>('editor');
 	const [serializedContent, setSerializedContent] = useState('')
@@ -194,6 +216,14 @@ export function NoteTaker({ note }: NoteTakerProps) {
 						{/*<ScrollArea className="h-full">*/}
 						{/*	{editor && <EditorContent editor={editor} />}*/}
 						{/*</ScrollArea>*/}
+						<div>
+							<button onClick={toggleEditable}>Toggle editable</button>
+						</div>
+						<DragHandle editor={editor}>
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+							</svg>
+						</DragHandle>
 						<SimpleEditor editor={editor} />
 					</TabsContent>
 
