@@ -8,8 +8,6 @@ import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
 import { migrateMathStrings } from '@tiptap/extension-mathematics'
 import { Mathematics } from '@tiptap/extension-mathematics'
-// import DragHandle from '@tiptap/extension-drag-handle'
-import DragHandle from "@tiptap/extension-drag-handle-react";
 
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
@@ -216,14 +214,6 @@ export function NoteTaker({ note }: NoteTakerProps) {
 						{/*<ScrollArea className="h-full">*/}
 						{/*	{editor && <EditorContent editor={editor} />}*/}
 						{/*</ScrollArea>*/}
-						<div>
-							<button onClick={toggleEditable}>Toggle editable</button>
-						</div>
-						<DragHandle editor={editor}>
-							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-								<path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
-							</svg>
-						</DragHandle>
 						<SimpleEditor editor={editor} />
 					</TabsContent>
 
