@@ -7,13 +7,13 @@ from typing import AsyncGenerator
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 
-from dependencies import dependencies
-from llm.llm_service import LLMService
-from llm.types import TextContent, ImageContent
 from ..models.request_models import (
     ChatRequest, ImageAnalysisRequest, TableOfContentsRequest,
     StreamChunk, ErrorResponse, HealthResponse, ProviderInfo
 )
+from ...dependencies import dependencies
+from ...llm_service.llm_service import LLMService
+from ...llm_service.types import TextContent, ImageContent
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ async def chat(
     """Non-streaming chat endpoint"""
     try:
         if request.images:
-            inputs = [TextContent(content=request.message)]
+            inputs = [ImageContent(content=request.message, format='url', mime_type='image/jpeg')]
             for image in request.images:
                 inputs.append(ImageContent(
                     content=image,
@@ -82,8 +82,7 @@ async def chat(
                 ))
             response = await llm_service.process(inputs)
         else:
-            response = await llm_service.process_text(request.message, request.context)
-        
+            response = await llm_service.process_text(request.message, request.context)      
         return {
             "content": response.content,
             "provider": response.provider,
@@ -111,7 +110,7 @@ async def analyze_image(
         )]
         
         if request.prompt:
-            inputs.insert(0, TextContent(content=request.prompt))
+            inputs.insert(0, ImageContent(content=request.prompt, format='url', mime_type='image/jpeg'))
         
         response = await llm_service.process(inputs)
         
