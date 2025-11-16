@@ -1,21 +1,29 @@
 services:
+  # Backend service - FastAPI with LLM integration
   backend:
-    build: ./backend
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+      target: development
     volumes:
-      - .:/app
+      # Mount source code for hot reload in development
+      - ./src/backend:/app
     ports:
       - "8000:8000"
+    environment:
+      - CORS_ORIGINS=http://localhost:3000
+
+  # Frontend service - React/Vite application
   frontend:
-    build: ./src/frontend
+    build:
+      context: .
+      dockerfile: ./src/frontend/Dockerfile
+      target: development
+    volumes:
+      # Mount source code for hot reload in development
+      - .:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
-#  database:
-#    image: supabase/postgres:latest
-#    environment:
-#      POSTGRES_PASSWORD: examplepassword
-#      POSTGRES_DB: postgres
-#      POSTGRES_USER: postgres
-#    volumes:
-#      - ./postgres/data:/var/lib/postgresql/data
-#      
-      
+    depends_on:
+      - backend

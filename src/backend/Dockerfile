@@ -1,12 +1,10 @@
-# Multi-stage Dockerfile supporting production and hot-reload development for the FastAPI backend
-FROM python:3.11-slim AS base
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+# Multi-stage Dockerfile for FastAPI backend
+# Stage 1: Base - Install dependencies (shared between dev and prod)
+FROM python:3.12 AS base
 
 WORKDIR /app
 
-# System dependencies shared across stages
+# Install system dependencies needed for health checks
 RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -15,25 +13,29 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create app user shared across stages
+# Create non-root user for security
 RUN useradd --create-home --shell /bin/bash app
 
-# Development stage with auto-reload enabled
+# Stage 2: Development - Hot reload with uvicorn --reload
 FROM base AS development
 COPY . .
 RUN chown -R app:app /app
 USER app
 EXPOSE 8000
+# Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
+# Start with auto-reload for development
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-# Production stage optimized for deployment
+# Stage 3: Production - Optimized for deployment
 FROM base AS production
 COPY . .
 RUN chown -R app:app /app
 USER app
 EXPOSE 8000
+# Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
+# Start without reload for production
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
