@@ -12,8 +12,8 @@ from ..models.request_models import (
     StreamChunk, ErrorResponse, HealthResponse, ProviderInfo
 )
 from ...dependencies import dependencies
-from ...llm_service.llm_service import LLMService
-from ...llm_service.types import TextContent, ImageContent
+from src.backend.services.llm_service import LLMService
+from src.backend.services.llm_service import TextContent, ImageContent
 
 logger = logging.getLogger(__name__)
 
