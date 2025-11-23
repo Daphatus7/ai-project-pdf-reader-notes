@@ -64,7 +64,6 @@ async def chat_stream(
         }
     )
 
-
 @router.post("/chat")
 async def chat(
     request: ChatRequest,
