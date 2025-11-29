@@ -11,5 +11,6 @@ from ...dependencies import dependencies
 
 logger = logging.getLogger(__name__)
 
+
 router = APIRouter(prefix="/api/llm", tags=["llm"])
 

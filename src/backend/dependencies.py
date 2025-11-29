@@ -32,6 +32,7 @@ class Dependencies:
         from src.backend.services.llm_service.llm_service import LlmService
         config = get_default_config()
         llm_service = LlmService()
+        llm_service.start()
         self.register('llm_service', llm_service)
     
     def get(self, service_name: str) -> Any:
@@ -47,7 +48,8 @@ class Dependencies:
     def shutdown(self):
         """Shutdown all services"""
         for service_name, service in self._services.items():
-            service.shutdown()
+            if hasattr(service, 'shut_down'):
+                service.shut_down()
         #clear services
         self._services.clear()
     
@@ -61,7 +63,8 @@ class Dependencies:
             return
         #shut down the service
         service = self._services[service_name]
-        service.shutdown()
+        if hasattr(service, 'shut_down'):
+            service.shut_down()
         del self._services[service_name]
         
 # Global dependencies instance

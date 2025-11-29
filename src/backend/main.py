@@ -39,7 +39,7 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("Shutting down LLM Backend Service...")
-    dependencies.shut_down()
+    dependencies.shutdown()
     
 
 
@@ -62,7 +62,8 @@ app = FastAPI(
 )
 
 # Include routers
-# app.include_router(llm_router)
+from src.backend.api.routers.llm_call.llm_call import router as llm_call_router
+app.include_router(llm_call_router)
 
 # Configure CORS
 app.add_middleware(
