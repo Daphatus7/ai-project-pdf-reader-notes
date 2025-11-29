@@ -3,15 +3,26 @@ from http.client import responses
 from langchain.chat_models import init_chat_model
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
+from src.backend.services.service import Service
 
 
-class LlmService:
+class LlmService(Service):
     """
         Provide a unified interface for providing LLM services.
     """
-    def __init__(self):
-        dotenv.load_dotenv()
+
+    def start(self):
         self.model = init_chat_model("gpt-5-nano")
+
+    def shut_down(self):
+        pass
+    def restart(self):
+        pass
+
+    def __init__(self):
+        super().__init__()
+        dotenv.load_dotenv()
+        self.model = None
         
     def chat(self, 
              system_message : SystemMessage = SystemMessage(content="You are a helpful assistant."),

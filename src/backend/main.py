@@ -8,11 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 import sys
-
-from api.routers.llm_router import router as llm_router
 from config import settings
-from dependencies import dependencies
-
+from src.backend.dependencies import dependencies
 
 # Configure logging
 logging.basicConfig(
@@ -42,6 +39,8 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("Shutting down LLM Backend Service...")
+    dependencies.shut_down()
+    
 
 
 @asynccontextmanager
@@ -63,7 +62,7 @@ app = FastAPI(
 )
 
 # Include routers
-app.include_router(llm_router)
+# app.include_router(llm_router)
 
 # Configure CORS
 app.add_middleware(
@@ -102,9 +101,6 @@ async def root():
         "docs": "/docs",
         "health": "/health"
     }
-
-
-
 
 
 if __name__ == "__main__":
