@@ -25,6 +25,7 @@ import {
 } from "./ui/tooltip.tsx";
 import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
+import { llmService, ApiError } from "../../api";
 
 interface Message {
   id: string;
@@ -120,6 +121,7 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
   const [isAddContextOpen, setIsAddContextOpen] = useState(false);
   const [newContextText, setNewContextText] = useState("");
   const [newContextName, setNewContextName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Merge external context items (like screenshots) with manual context items
@@ -136,27 +138,68 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
     ]);
   }, [note.id]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     
-    const newMessage: Message = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input
     };
     
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, userMessage]);
+    const messageText = input;
     setInput("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "I've analyzed your question. This is a simulated response. In production, this would connect to your configured LLM API."
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+    // Create AI message placeholder for streaming
+    const aiMessageId = (Date.now() + 1).toString();
+    const aiMessage: Message = {
+      id: aiMessageId,
+      role: "assistant",
+      content: ""
+    };
+    setMessages(prev => [...prev, aiMessage]);
+
+    try {
+      // Build system message with note context
+      const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
+The user is working on a document and may ask questions about it or request help expanding their notes.
+${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}`;
+
+      // Use streaming response
+      let fullResponse = '';
+      for await (const chunk of llmService.chatStream({
+        message: messageText,
+        system_message: systemMessage
+      })) {
+        fullResponse += chunk;
+        
+        // Update the AI message with accumulated content
+        setMessages(prev => prev.map(msg => 
+          msg.id === aiMessageId 
+            ? { ...msg, content: fullResponse }
+            : msg
+        ));
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Remove the placeholder message and add error message
+      setMessages(prev => {
+        const filtered = prev.filter(msg => msg.id !== aiMessageId);
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: error instanceof ApiError 
+            ? `Error: ${error.message}` 
+            : 'Sorry, I encountered an error processing your message. Please try again.'
+        };
+        return [...filtered, errorMessage];
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAddTextContext = () => {
@@ -467,7 +510,7 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
           
           <Button 
             onClick={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLoading}
             className="shrink-0"
           >
             <Send className="w-4 h-4" />

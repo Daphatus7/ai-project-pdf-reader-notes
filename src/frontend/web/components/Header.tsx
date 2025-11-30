@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button.tsx";
-import { Input } from "./ui/input.tsx";
 import { 
   FileText, 
-  Search, 
   Settings, 
   User, 
   LogIn,

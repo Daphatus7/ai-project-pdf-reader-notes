@@ -4,10 +4,7 @@ Dependency injection container for the LLM backend service
 import logging
 from typing import Dict, Any
 
-from src.backend.services.service import Service
-
-
-class Dependencies:
+class Services:
     """Dependency injection container"""
     
     def __init__(self):
@@ -28,8 +25,8 @@ class Dependencies:
     
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
-        from src.backend.services.llm_service.configuration import get_default_config
-        from src.backend.services.llm_service.llm_service import LlmService
+        from services.llm_service.configuration import get_default_config
+        from services.llm_service.llm_service import LlmService
         config = get_default_config()
         llm_service = LlmService()
         llm_service.start()
@@ -68,4 +65,4 @@ class Dependencies:
         del self._services[service_name]
         
 # Global dependencies instance
-dependencies = Dependencies()
+services = Services()

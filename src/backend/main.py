@@ -9,7 +9,8 @@ from fastapi.responses import JSONResponse
 import logging
 import sys
 from config import settings
-from src.backend.dependencies import dependencies
+from servers import services
+from src.backend.api.routers.llm_router import router
 
 # Configure logging
 logging.basicConfig(
@@ -28,7 +29,7 @@ async def startup_event():
     """Initialize services on startup"""
     logger.info("Starting LLM Backend Service...")
     try:
-        dependencies.initialize()
+        services.initialize()
         logger.info("Dependencies initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize dependencies: {e}")
@@ -39,7 +40,7 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("Shutting down LLM Backend Service...")
-    dependencies.shutdown()
+    services.shutdown()
     
 
 
@@ -62,8 +63,7 @@ app = FastAPI(
 )
 
 # Include routers
-from src.backend.api.routers.llm_call.llm_call import router as llm_call_router
-app.include_router(llm_call_router)
+app.include_router(router)
 
 # Configure CORS
 app.add_middleware(

@@ -1,12 +1,9 @@
 import base64
 import os
 from dotenv import load_dotenv
-from networkx import display
 from unstructured.documents.elements import Element
-from unstructured.partition.auto import partition
 from unstructured.partition.pdf import partition_pdf
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate

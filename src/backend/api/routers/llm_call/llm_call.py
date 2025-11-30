@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
-from src.backend.dependencies import dependencies
+from src.backend.servers import services
 from ...models.request_models import ChatRequest, ChatResponse, StreamChatRequest
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ router = APIRouter(prefix='/api/llm', tags=['llm'])
 def get_llm_service():
     """Dependency to get LLM service"""
     try:
-        return dependencies.get('llm_service')
+        return services.get('llm_service')
     except ValueError as e:
         logger.error(f'Failed to get LLM service: {e}')
         raise HTTPException(status_code=503, detail='LLM service not available')
