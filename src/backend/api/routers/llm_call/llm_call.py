@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
-from src.backend.servers import services
+from servers import services
 from ...models.request_models import ChatRequest, ChatResponse, StreamChatRequest
 
 logger = logging.getLogger(__name__)

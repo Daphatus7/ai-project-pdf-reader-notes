@@ -3,10 +3,10 @@ from http.client import responses
 from langchain.chat_models import init_chat_model
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
-from src.backend.services.service import Service
 
 
-class LlmService(Service):
+
+class LlmService:
     """
         Provide a unified interface for providing LLM services.
     """

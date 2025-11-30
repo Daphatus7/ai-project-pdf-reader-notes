@@ -10,7 +10,7 @@ import logging
 import sys
 from config import settings
 from servers import services
-from src.backend.api.routers.llm_router import router
+from api.routers.llm_router import router
 
 # Configure logging
 logging.basicConfig(
