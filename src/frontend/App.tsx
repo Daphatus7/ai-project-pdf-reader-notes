@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
-import { Header } from "@@/frontend/components/Header.tsx";
-import { NoteSidebar } from "@@/frontend/components/NoteSidebar.tsx";
-import { PDFReader } from "@@/frontend/components/PDFReader.tsx";
-import { LLMChat } from "@@/frontend/components/LLMChat.tsx";
+import { Header } from "@@/frontend/web/components/Header.tsx";
+import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
+import { PDFReader } from "@@/frontend/web/components/PDFReader.tsx";
+import { LLMChat } from "@@/frontend/web/components/LLMChat.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from "@@/frontend/components/ui/resizable.tsx";
+} from "@@/frontend/web/components/ui/resizable.tsx";
 import {
 	PanelLeftOpen,
 	PanelRightOpen,
@@ -17,7 +17,7 @@ import {
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import NoteTaker from "@@/frontend/components/note-taker.tsx";
+import NoteTaker from "@@/frontend/web/components/note-taker.tsx";
 
 export interface Note {
 	id: string;

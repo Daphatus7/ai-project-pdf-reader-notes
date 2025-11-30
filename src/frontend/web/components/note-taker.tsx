@@ -1,6 +1,6 @@
 import {useRef, useState} from 'react'
 import { EditorContent, NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
-import type { Note } from '../App.tsx'
+import type { Note } from '../../App.tsx'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
 import { Highlight } from '@tiptap/extension-highlight'
@@ -17,7 +17,7 @@ import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
 
 
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/components/ui/tabs.tsx";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/web/components/ui/tabs.tsx";
 
 import {SimpleEditor} from "@@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
 

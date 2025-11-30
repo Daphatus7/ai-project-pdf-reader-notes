@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip.tsx";
-import type { Note } from "../App.tsx";
+import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
 
 interface Message {
