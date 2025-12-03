@@ -1,23 +1,18 @@
 import { useState, useRef } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
-import { PDFReader } from "@@/frontend/web/components/PDFReader.tsx";
-import { LLMChat } from "@@/frontend/web/components/LLMChat.tsx";
+import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
+import { LLMChatSection } from "@@/frontend/web/components/LLMChatSection.tsx";
+import { NoteSection } from "@@/frontend/web/components/NoteSection.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@@/frontend/web/components/ui/resizable.tsx";
-import {
-	PanelLeftOpen,
-	PanelRightOpen,
-	ChevronDown,
-	ChevronUp
-} from "lucide-react";
+import { PanelLeftOpen } from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import NoteTaker from "@@/frontend/web/components/note-taker.tsx";
 
 export interface Note {
 	id: string;
@@ -305,9 +300,6 @@ export default function App() {
 
 	const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
-	const [isRightCollapsed, setIsRightCollapsed] = useState(false);
-	const [isPDFCollapsed, setIsPDFCollapsed] = useState(false);
-	const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
 
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 
@@ -323,13 +315,9 @@ export default function App() {
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
-	const rightPanelRef = useRef<ImperativePanelHandle>(null);
-	const pdfPanelRef = useRef<ImperativePanelHandle>(null);
-	const editorPanelRef = useRef<ImperativePanelHandle>(null);
 
 	// Collapse thresholds (based on UI/UX standards like Overleaf)
 	const SIDEBAR_COLLAPSE_THRESHOLD = 12; // 12% for sidebars
-	const VERTICAL_COLLAPSE_THRESHOLD = 18; // 18% for vertical panels
 
 	const handleLeftResize = (size: number) => {
 		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isLeftCollapsed) {
@@ -340,24 +328,6 @@ export default function App() {
 	const handleCenterResize = (size: number) => {
 		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isCenterCollapsed) {
 			centerPanelRef.current?.collapse();
-		}
-	};
-
-	const handleRightResize = (size: number) => {
-		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isRightCollapsed) {
-			rightPanelRef.current?.collapse();
-		}
-	};
-
-	const handlePDFResize = (size: number) => {
-		if (size < VERTICAL_COLLAPSE_THRESHOLD && !isPDFCollapsed) {
-			pdfPanelRef.current?.collapse();
-		}
-	};
-
-	const handleEditorResize = (size: number) => {
-		if (size < VERTICAL_COLLAPSE_THRESHOLD && !isEditorCollapsed) {
-			editorPanelRef.current?.collapse();
 		}
 	};
 
@@ -426,65 +396,14 @@ export default function App() {
 								</div>
 							) : (
 								<ResizablePanelGroup direction="vertical">
-									{/* PDF Reader */}
-									<ResizablePanel
-										ref={pdfPanelRef}
-										defaultSize={50}
-										minSize={15}
-										collapsible
-										collapsedSize={3}
-										onCollapse={() => setIsPDFCollapsed(true)}
-										onExpand={() => setIsPDFCollapsed(false)}
-										onResize={handlePDFResize}
-									>
-										<div className="h-full w-full relative">
-											{isPDFCollapsed && (
-												<div
-													className="absolute inset-0 z-10 group border-b bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-													onClick={() => pdfPanelRef.current?.resize(50)}
-												>
-													<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
-														<ChevronDown className="w-4 h-4 text-muted-foreground" />
-														<span className="text-xs text-muted-foreground">PDF</span>
-													</div>
-												</div>
-											)}
-											<div className={isPDFCollapsed ? "hidden" : "h-full"}>
-												<PDFReader onScreenshotCapture={handleScreenshotCapture} />
-											</div>
-										</div>
-									</ResizablePanel>
+									<PDFSection onScreenshotCapture={handleScreenshotCapture} />
 
 									<ResizableHandle withHandle />
 
-									{/* LLM Chat */}
-									<ResizablePanel
-										ref={editorPanelRef}
-										defaultSize={50}
-										minSize={15}
-										collapsible
-										collapsedSize={1}
-										onCollapse={() => setIsEditorCollapsed(true)}
-										onExpand={() => setIsEditorCollapsed(false)}
-										onResize={handleEditorResize}
-									>
-										<div className="h-full w-full relative">
-											{isEditorCollapsed && (
-												<div
-													className="absolute inset-0 z-10 group border-t bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-													onClick={() => editorPanelRef.current?.resize(50)}
-												>
-													<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5">
-														<ChevronUp className="w-4 h-4 text-muted-foreground" />
-														<span className="text-xs text-muted-foreground">AI Chat</span>
-													</div>
-												</div>
-											)}
-											<div className={isEditorCollapsed ? "hidden" : "h-full"}>
-												<LLMChat note={selectedNote} externalContextItems={screenshots} />
-											</div>
-										</div>
-									</ResizablePanel>
+									<LLMChatSection 
+										note={selectedNote} 
+										externalContextItems={screenshots} 
+									/>
 								</ResizablePanelGroup>
 							)}
 						</ResizablePanel>
@@ -492,33 +411,7 @@ export default function App() {
 						<ResizableHandle withHandle />
 
 						{/* Right Sidebar - Markdown Editor */}
-						<ResizablePanel
-							ref={rightPanelRef}
-							defaultSize={30}
-							minSize={5}
-							maxSize={98}
-							collapsible
-							collapsedSize={2}
-							onCollapse={() => setIsRightCollapsed(true)}
-							onExpand={() => setIsRightCollapsed(false)}
-							onResize={handleRightResize}
-						>
-							<div className="h-full w-full relative">
-								{isRightCollapsed && (
-									<div
-										className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-										onClick={() => rightPanelRef.current?.resize(30)}
-									>
-										<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-											<PanelRightOpen className="w-4 h-4 text-muted-foreground" />
-										</div>
-									</div>
-								)}
-								<div className={isRightCollapsed ? "hidden" : "h-full"}>
-									<NoteTaker note={selectedNote} />
-								</div>
-							</div>
-						</ResizablePanel>
+						<NoteSection note={selectedNote} />
 					</ResizablePanelGroup>
 				</div>
 			</div>
