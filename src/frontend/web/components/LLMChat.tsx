@@ -164,8 +164,8 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 		try {
 			// Build system message with note context
 			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
-The user is working on a document and may ask questions about it or request help expanding their notes.
-${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}`;
+			The user is working on a document and may ask questions about it or request help expanding their notes.
+			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}`;
 
 			// Use streaming response
 			let fullResponse = '';
