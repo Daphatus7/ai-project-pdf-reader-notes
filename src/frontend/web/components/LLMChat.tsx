@@ -25,6 +25,7 @@ import {
 import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
 import { llmService, ApiError } from "../../api";
+import { MarkdownRenderer } from "./MarkdownRenderer.tsx";
 
 interface Message {
 	id: string;
@@ -94,7 +95,7 @@ function DraggableMessage({ message }: DraggableMessageProps) {
 					</Tooltip>
 				</TooltipProvider>
 
-				<p className="text-sm whitespace-pre-wrap">{message.content}</p>
+				<MarkdownRenderer content={message.content} className="text-sm" />
 			</div>
 		</div>
 	);
