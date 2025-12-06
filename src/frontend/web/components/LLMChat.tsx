@@ -140,64 +140,56 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: `# Comparison of Fourier Series and Laplace Transform
+				content: `# Fourier Series Solution
 
-Here is a concise side-by-side comparison table.
-
-| Aspect | Fourier Series | Laplace Transform |
-|--------|----------------|-------------------|
-| Domain | Periodic functions on $[-L, L]$ or $[0, T]$ | Functions for $t \\geq 0$, exponential order |
-| Spectrum | Discrete; coefficients $a_0, a_n, b_n$ | Continuous; $F(s)$ for $s \\in \\mathbb{C}$ |
-| Kernel | $e^{in\\omega_0 t}$ with $\\omega_0 = \\pi/L$ | $e^{-st}$ with $s = \\sigma + i\\omega$ |
-| Transform | $a_n = \\frac{1}{L}\\int_{-L}^{L} f(t)\\cos(n\\pi t/L)\\,dt$ | $F(s) = \\int_0^{\\infty} e^{-st} f(t)\\,dt$ |
-| Inversion | $f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty}[a_n\\cos + b_n\\sin]$ | $f(t) = \\frac{1}{2\\pi i}\\int_{\\sigma-i\\infty}^{\\sigma+i\\infty} e^{st}F(s)\\,ds$ |
-| Applications | Periodic signals, spectral analysis, PDEs | LTI systems, control theory, ODEs |
-
-## Key Formulas
-
-The fundamental angular frequency:
+The expression you gave is the complex Fourier series representation of a $T$-periodic signal $P(t)$:
 
 $$
-\\omega_0 = \\frac{2\\pi}{T}
+P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}, \\quad \\text{where } \\omega = \\frac{2\\pi}{T}
 $$
 
-**Fourier Series (Real Form):**
+## Computing the Coefficients
+
+**Forward transform** (to find $c_n$ from $P(t)$):
 
 $$
-f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n\\omega_0 t) + b_n \\sin(n\\omega_0 t) \\right]
+c_n = \\frac{1}{T} \\int_{t_0}^{t_0+T} P(t)\\, e^{-jn\\omega t}\\, dt
 $$
 
-**Laplace Transform:**
+You can choose any interval of length $T$ (commonly $t_0 = 0$ or $t_0 = -T/2$).
+
+**Inverse transform** (the given representation):
 
 $$
-F(s) = \\int_0^{\\infty} e^{-st} f(t)\\, dt
+P(t) = \\sum_{n=-\\infty}^{\\infty} c_n\\, e^{jn\\omega t}
 $$
 
-## Properties
+## Notes
 
-- If $f(t)$ is even, only cosine terms appear ($b_n = 0$)
-- If $f(t)$ is odd, only sine terms appear (no $a_n$ except $a_0$)
+- The integrals converge under the Dirichlet conditions: $P(t)$ is piecewise continuous with a finite number of extrema and discontinuities per period.
+- If $P(t)$ is real-valued, the coefficients satisfy $c_{-n} = c_n^*$.
 
-## Example Code
+## Simple Examples
 
-\`\`\`python
-import numpy as np
+**Example 1:** $P(t) = A\\cos(\\omega t)$
 
-def fourier_coeffs(f, T, N, t0=0, num_samples=10000):
-    t = np.linspace(t0, t0 + T, num_samples, endpoint=False)
-    y = f(t)
-    omega0 = 2 * np.pi / T
-    
-    a0 = (2 / T) * np.trapz(y, t)
-    an = np.zeros(N)
-    bn = np.zeros(N)
-    
-    for n in range(1, N + 1):
-        an[n-1] = (2 / T) * np.trapz(y * np.cos(n * omega0 * t), t)
-        bn[n-1] = (2 / T) * np.trapz(y * np.sin(n * omega0 * t), t)
-    
-    return a0 / 2.0, an, bn
-\`\`\``
+Using $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$, the nonzero coefficients are:
+- $c_1 = c_{-1} = A/2$
+- All other $c_n = 0$
+
+**Example 2:** $P(t) = Ae^{j\\omega t}$ (a single complex exponential)
+
+Nonzero coefficient:
+- $c_1 = A$
+- All other $c_n = 0$
+
+## How to Proceed
+
+- If you're given $P(t)$ explicitly, plug into the forward formula to obtain $c_n$.
+- Then reconstruct $P(t)$ with the inverse formula to verify.
+- If you're given $c_n$ and $\\omega$ (or $T$), write $P(t)$ directly as the sum.
+
+If you share a specific $P(t)$ or period $T$, I can compute the $c_n$ for you or show a worked example.`
 			}
 		]);
 	}, [note.id]);
@@ -231,23 +223,23 @@ def fourier_coeffs(f, T, N, t0=0, num_samples=10000):
 The user is working on a document and may ask questions about it or request help expanding their notes.
 ${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
 
-FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
+MATH FORMATTING (CRITICAL - follow EXACTLY):
 
-1. HEADERS: Use # ## ### for section organization
+1. ALWAYS wrap ALL math in $...$ delimiters:
+   - Variables: $P(t)$, $c_n$, $\\omega$
+   - Equations: $P(t) = A\\cos(\\omega t)$
+   - Subscripts: $c_{-1}$, $e^{j\\omega t}$
 
-2. MATH EXPRESSIONS (CRITICAL - ALWAYS use $ delimiters):
-   - Inline math: ALWAYS wrap in $...$ (e.g., "$e^{i\\omega t}$")
-   - Display/block math: Use $$ on separate lines
-   - NEVER write math without $ delimiters!
+2. Use LaTeX commands, NEVER Unicode:
+   - WRONG: ∑, ∞, ω, π (Unicode)
+   - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$
 
-3. TABLES WITH MATH:
-   - ALL math in table cells MUST use $...$ delimiters
-   - WRONG: e^{x} (no delimiters)
-   - CORRECT: $e^{x}$ (with delimiters)
+3. Display math: $$ on separate lines, NOT inside bullets
 
-4. CODE BLOCKS: Use \`\`\`language for code
+WRONG: P(t) = ∑ c_n e^{jnωt}, c_{-n} = c_n^*
+CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
 
-5. LISTS: Use - for bullets`;
+Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
 
 			// Use structured streaming API
 			let accumulatedContent = "";
