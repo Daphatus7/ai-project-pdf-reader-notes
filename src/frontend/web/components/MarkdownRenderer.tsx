@@ -13,7 +13,9 @@ interface MarkdownRendererProps {
 /**
  * Preprocesses content to normalize various math delimiters to standard format.
  * Converts \(...\) to $...$ and \[...\] to $$...$$ for remark-math compatibility.
- * Also handles display math inside list items by extracting them to separate blocks.
+ * Also handles:
+ * - Display math inside list items by extracting them to separate blocks
+ * - Pipe characters | inside math expressions (conflicts with GFM table delimiters)
  */
 function preprocessMathContent(content: string): string {
 	// Step 1: Normalize math delimiters
@@ -23,7 +25,27 @@ function preprocessMathContent(content: string): string {
 		// \[ ... \]  ->  $$...$$
 		.replace(/\\\[([\s\S]*?)\\\]/g, '\n$$\n$1\n$$\n');
 
-	// Step 2: Fix display math that's indented inside list items
+	// Step 2: Escape | inside math expressions to prevent GFM table conflicts
+	// Replace | with \vert inside $...$ (inline math)
+	processed = processed.replace(
+		/\$([^$]+)\$/g,
+		(match, mathContent) => {
+			// Replace | with \vert, but not if already escaped as \|
+			const escaped = mathContent.replace(/(?<!\\)\|/g, '\\vert ');
+			return `$${escaped}$`;
+		}
+	);
+
+	// Step 3: Escape | inside $$...$$ (display math)
+	processed = processed.replace(
+		/\$\$([\s\S]*?)\$\$/g,
+		(match, mathContent) => {
+			const escaped = mathContent.replace(/(?<!\\)\|/g, '\\vert ');
+			return `$$${escaped}$$`;
+		}
+	);
+
+	// Step 4: Fix display math that's indented inside list items
 	// Pattern: list item with display math on next lines
 	// Convert indented $$ blocks inside lists to properly formatted blocks
 	processed = processed.replace(

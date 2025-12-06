@@ -140,56 +140,24 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: `# Fourier Series Solution
+				content: `
+# Perceptron Activation Functions — Comparison
 
-The expression you gave is the complex Fourier series representation of a $T$-periodic signal $P(t)$:
+| Activation | Formula | Output range | Differentiability | Pros | Cons | Typical usage |
+|---|---|---|---|---|---|---|
+| Step (Heaviside) | $f(x) = \\begin{cases} 1, & x \\ge 0 \\\\ 0, & x < 0 \\end{cases}$ | $\\{0,1\\}$ | Not differentiable at $x=0$ (derivative 0 for $x \\neq 0$) | Simple threshold behavior | Not differentiable; not suitable for gradient-based learning | Classic perceptron; binary decision boundaries |
+| Sign | $f(x) = \\begin{cases} 1, & x \\ge 0 \\\\ -1, & x < 0 \\end{cases}$ | $\\{-1,1\\}$ | Not differentiable at $x=0$ | Clear class decision | Not differentiable; rarely used in modern nets | Historical perceptron variants |
+| Sigmoid (Logistic) | $f(x) = \\sigma(x) = \\dfrac{1}{1+e^{-x}}$ | $(0,1)$ | Yes; $f'(x) = f(x)(1-f(x))$ | Smooth; probabilistic interpretation | Vanishing gradient for large $|x|$ | Binary classification; some hidden layers (older nets) |
+| Tanh | $f(x) = \\tanh(x)$ | $(-1,1)$ | Yes; $f'(x) = 1 - \\tanh^2(x)$ | Zero-centered; often faster training | Vanishing gradient for large $|x|$ | Hidden layers; faster convergence than sigmoid in some cases |
+| ReLU | $f(x) = \\max(0,x)$ | $[0,\\infty)$ | Not differentiable at $x=0$ | Simple; sparse activations; no vanishing gradient for $x>0$ | Dead neurons for negative inputs | Deep neural networks |
+| Leaky ReLU | $f(x) = \\begin{cases} x, & x \\ge 0 \\\\ \\alpha x, & x < 0 \\end{cases}$, $\\alpha \\in (0,1)$ | $(-\\infty,\\infty)$ | Not differentiable at $x=0$ | Mitigates dead neurons | Slightly more compute; still piecewise linear | Alternatives to ReLU |
+| Softplus | $f(x) = \\log(1+e^{x})$ | $(0,\\infty)$ | Yes; $f'(x) = \\dfrac{1}{1+e^{-x}}$ | Smooth approximation to ReLU | More expensive to compute | Hidden layers requiring smoothness |
+| ELU | $f(x) = \\begin{cases} x, & x > 0 \\\\ \\alpha (e^{x}-1), & x \\le 0 \\end{cases}$, $\\alpha>0$ | $(-\\alpha,\\infty)$ | Yes | Smooth for negative inputs; improves robustness | Slightly heavier compute | Deep nets needing negative activations |
+| Swish | $f(x) = x \\cdot \\sigma(x)$ | All real numbers | Yes; $f'(x) = \\sigma(x) + x \\sigma(x)(1-\\sigma(x))$ | Smooth; non-monotone; can improve performance | More compute than ReLU variants | Modern networks (e.g., some experiments show gains) |
+| GELU | $f(x) = x \\cdot \\Phi(x)$, $\\Phi(x) = \\dfrac{1}{2}\\left[1+\\operatorname{erf}\\left(\\dfrac{x}{\\sqrt{2}}\\right)\\right]$ | All real numbers | Yes; $f'(x) = \\Phi(x) + x \\phi(x)$, $\\phi(x) = \\dfrac{1}{\\sqrt{2\\pi}} e^{-x^{2}/2}$ | Smooth with probabilistic interpretation | Computation heavier | State-of-the-art variants in some transformers |
 
-$$
-P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}, \\quad \\text{where } \\omega = \\frac{2\\pi}{T}
-$$
-
-## Computing the Coefficients
-
-**Forward transform** (to find $c_n$ from $P(t)$):
-
-$$
-c_n = \\frac{1}{T} \\int_{t_0}^{t_0+T} P(t)\\, e^{-jn\\omega t}\\, dt
-$$
-
-You can choose any interval of length $T$ (commonly $t_0 = 0$ or $t_0 = -T/2$).
-
-**Inverse transform** (the given representation):
-
-$$
-P(t) = \\sum_{n=-\\infty}^{\\infty} c_n\\, e^{jn\\omega t}
-$$
-
-## Notes
-
-- The integrals converge under the Dirichlet conditions: $P(t)$ is piecewise continuous with a finite number of extrema and discontinuities per period.
-- If $P(t)$ is real-valued, the coefficients satisfy $c_{-n} = c_n^*$.
-
-## Simple Examples
-
-**Example 1:** $P(t) = A\\cos(\\omega t)$
-
-Using $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$, the nonzero coefficients are:
-- $c_1 = c_{-1} = A/2$
-- All other $c_n = 0$
-
-**Example 2:** $P(t) = Ae^{j\\omega t}$ (a single complex exponential)
-
-Nonzero coefficient:
-- $c_1 = A$
-- All other $c_n = 0$
-
-## How to Proceed
-
-- If you're given $P(t)$ explicitly, plug into the forward formula to obtain $c_n$.
-- Then reconstruct $P(t)$ with the inverse formula to verify.
-- If you're given $c_n$ and $\\omega$ (or $T$), write $P(t)$ directly as the sum.
-
-If you share a specific $P(t)$ or period $T$, I can compute the $c_n$ for you or show a worked example.`
+If you’d like, I can tailor this to a specific framework (e.g., PyTorch or TensorFlow) or add columns for gradient behavior in practice.
+`
 			}
 		]);
 	}, [note.id]);

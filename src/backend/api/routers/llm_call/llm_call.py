@@ -172,13 +172,16 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
 3. CODE BLOCKS: Use ```language
 
-4. TABLES WITH MATH: All math in cells MUST use $...$ delimiters
+4. TABLES WITH MATH (CRITICAL):
+   - All math in cells MUST use $...$ delimiters
+   - For absolute value |x|, use $\\lvert x \\rvert$ NOT $|x|$ (pipe conflicts with table syntax)
+   - Example: "Vanishing gradient for large $\\lvert x \\rvert$"
 
 5. LISTS: Use - for bullets. Keep math inline with $...$
 
 6. BLOCKQUOTES: Use > for notes
 
-CRITICAL REMINDER: Every single math expression - variables, equations, Greek letters, subscripts - must be wrapped in $...$ delimiters using LaTeX syntax.'''
+CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
 
 
 @router.post('/chat/structured', response_model=StructuredChatResponse)
