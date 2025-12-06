@@ -140,73 +140,45 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: `# Fourier Series
+				content: `# Comparison of Fourier Series and Laplace Transform
 
-A Fourier series expresses a periodic function as a sum of simple sines and cosines (or, equivalently, complex exponentials). It allows us to analyze and synthesize signals by breaking them into frequency components.
+Here is a concise side-by-side comparison table.
 
-## Mathematical formulation
+| Aspect | Fourier Series | Laplace Transform |
+|--------|----------------|-------------------|
+| Domain | Periodic functions on $[-L, L]$ or $[0, T]$ | Functions for $t \\geq 0$, exponential order |
+| Spectrum | Discrete; coefficients $a_0, a_n, b_n$ | Continuous; $F(s)$ for $s \\in \\mathbb{C}$ |
+| Kernel | $e^{in\\omega_0 t}$ with $\\omega_0 = \\pi/L$ | $e^{-st}$ with $s = \\sigma + i\\omega$ |
+| Transform | $a_n = \\frac{1}{L}\\int_{-L}^{L} f(t)\\cos(n\\pi t/L)\\,dt$ | $F(s) = \\int_0^{\\infty} e^{-st} f(t)\\,dt$ |
+| Inversion | $f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty}[a_n\\cos + b_n\\sin]$ | $f(t) = \\frac{1}{2\\pi i}\\int_{\\sigma-i\\infty}^{\\sigma+i\\infty} e^{st}F(s)\\,ds$ |
+| Applications | Periodic signals, spectral analysis, PDEs | LTI systems, control theory, ODEs |
 
-Let a function $f(t)$ be periodic with period $T$. The fundamental angular frequency is:
+## Key Formulas
+
+The fundamental angular frequency:
 
 $$
 \\omega_0 = \\frac{2\\pi}{T}
 $$
 
-**Real form (cosines and sines):**
+**Fourier Series (Real Form):**
 
 $$
-f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n \\omega_0 t) + b_n \\sin(n \\omega_0 t) \\right]
+f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n\\omega_0 t) + b_n \\sin(n\\omega_0 t) \\right]
 $$
 
-The coefficients are:
+**Laplace Transform:**
 
 $$
-a_n = \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\cos(n \\omega_0 t)\\, dt, \\quad b_n = \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\sin(n \\omega_0 t)\\, dt
+F(s) = \\int_0^{\\infty} e^{-st} f(t)\\, dt
 $$
 
-The choice of $t_0$ is arbitrary; common choices are $t_0 = -T/2$ or $t_0 = 0$.
-
-**Complex form:**
-
-$$
-f(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{i n \\omega_0 t}, \\quad c_n = \\frac{1}{T} \\int_{t_0}^{t_0+T} f(t) e^{-i n \\omega_0 t}\\, dt
-$$
-
-**Convergence:** Under mild conditions, the Fourier series converges to the average of the left/right limits at points of discontinuity and to the function value at points of continuity (Dirichlet conditions).
-
-## Key properties
-
-**Orthogonality over one period:**
-
-$$
-\\int_{t_0}^{t_0+T} \\cos(n \\omega_0 t)\\cos(m \\omega_0 t)\\, dt \\propto \\delta_{nm}
-$$
-
-$$
-\\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\sin(m \\omega_0 t)\\, dt \\propto \\delta_{nm}
-$$
-
-$$
-\\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\cos(m \\omega_0 t)\\, dt = 0
-$$
+## Properties
 
 - If $f(t)$ is even, only cosine terms appear ($b_n = 0$)
-- If $f(t)$ is odd, only sine terms appear (no $a_n$ terms except $a_0$)
+- If $f(t)$ is odd, only sine terms appear (no $a_n$ except $a_0$)
 
-## Common examples
-
-**Square wave** (period $2\\pi$, amplitude ±1):
-
-$$
-f(t) = \\frac{4}{\\pi} \\sum_{k=0}^{\\infty} \\frac{1}{2k+1} \\sin\\big((2k+1)t\\big)
-$$
-
-- **Triangle wave:** only odd harmonics with coefficients decreasing as $1/(2k+1)^2$
-- **Sawtooth wave:** both sine and cosine terms; coefficients fall off roughly as $1/n$
-
-## Numerical computation
-
-You can compute Fourier coefficients numerically by integrating over one period:
+## Example Code
 
 \`\`\`python
 import numpy as np
@@ -225,9 +197,7 @@ def fourier_coeffs(f, T, N, t0=0, num_samples=10000):
         bn[n-1] = (2 / T) * np.trapz(y * np.sin(n * omega0 * t), t)
     
     return a0 / 2.0, an, bn
-\`\`\`
-
-Given a function $f$, period $T$, and the number of terms $N$, this returns $a_0/2$, $a_n$ for $n=1,\\dots,N$, and $b_n$ for $n=1,\\dots,N$.`
+\`\`\``
 			}
 		]);
 	}, [note.id]);
@@ -265,21 +235,19 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
 1. HEADERS: Use # ## ### for section organization
 
-2. MATH EXPRESSIONS (follow exactly):
-   - Inline math: Use $...$ (e.g., "where $x = 5$")
-   - Display/block math: Use $$ on separate lines with blank lines around them:
-     
-     $$
-     E = mc^2
-     $$
-   
-   - NEVER put display math inside bullet points. End the bullet first, add blank line, then math block.
+2. MATH EXPRESSIONS (CRITICAL - ALWAYS use $ delimiters):
+   - Inline math: ALWAYS wrap in $...$ (e.g., "$e^{i\\omega t}$")
+   - Display/block math: Use $$ on separate lines
+   - NEVER write math without $ delimiters!
 
-3. CODE BLOCKS: Use \`\`\`language for code
+3. TABLES WITH MATH:
+   - ALL math in table cells MUST use $...$ delimiters
+   - WRONG: e^{x} (no delimiters)
+   - CORRECT: $e^{x}$ (with delimiters)
 
-4. TABLES: Use GFM table syntax
+4. CODE BLOCKS: Use \`\`\`language for code
 
-5. LISTS: Use - for bullets, keep content concise`;
+5. LISTS: Use - for bullets`;
 
 			// Use structured streaming API
 			let accumulatedContent = "";

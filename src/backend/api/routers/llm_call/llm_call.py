@@ -147,39 +147,35 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
 1. HEADERS: Use # ## ### for section organization
 
-2. MATH EXPRESSIONS (CRITICAL - follow exactly):
-   - Inline math: Use $...$ (e.g., "where $x = 5$")
-   - Display/block math: Use $$ on separate lines:
-     
-     $$
-     E = mc^2
-     $$
-   
-   - NEVER put display math inside bullet points. Instead, end the bullet, add a blank line, then the math block:
-     
-     WRONG:
-     - The formula is $$x = y$$
-     
-     CORRECT:
-     - The formula is:
-     
-     $$
-     x = y
-     $$
+2. MATH EXPRESSIONS (CRITICAL - ALWAYS use $ delimiters):
+   - Inline math: ALWAYS wrap in $...$ (e.g., "$e^{i\\omega t}$", "$\\int_0^T f(t) dt$")
+   - Display/block math: Use $$ on separate lines with blank lines around
+   - NEVER write math without $ delimiters - raw LaTeX like e^{x} won't render!
+   - NEVER put display math inside bullet points - end bullet, blank line, then $$
 
 3. CODE BLOCKS: Use ```language (e.g., ```python, ```javascript)
 
-4. TABLES: Use GFM table syntax with | separators
+4. TABLES WITH MATH (CRITICAL):
+   - Use GFM table syntax with | separators
+   - ALL math in table cells MUST use $...$ delimiters
+   - Example of CORRECT table with math:
+     | Symbol | Formula |
+     |--------|---------|
+     | Integral | $\\int_a^b f(x) dx$ |
+     | Sum | $\\sum_{n=1}^{\\infty} a_n$ |
+     | Exponential | $e^{i\\omega t}$ |
+   
+   - WRONG: e^{x}, ∫_0^∞ f(t) dt (no $ delimiters)
+   - CORRECT: $e^{x}$, $\\int_0^{\\infty} f(t) dt$ (with $ delimiters)
 
 5. LISTS: Use - or * for bullets, 1. 2. 3. for numbered lists
 
 6. BLOCKQUOTES: Use > for important notes
 
 STYLE GUIDELINES:
+- Every math expression needs $...$ delimiters, including in tables
 - Keep paragraphs concise and well-spaced
-- Use blank lines between different elements (headers, paragraphs, math blocks)
-- Structure content logically with clear section breaks
-- When explaining technical concepts, include relevant code examples and mathematical formulas'''
+- Use blank lines between different elements'''
 
 
 @router.post('/chat/structured', response_model=StructuredChatResponse)
