@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button.tsx";
 import { Input } from "./ui/input.tsx";
-import { ScrollArea } from "./ui/scroll-area.tsx";
 import { Avatar, AvatarFallback } from "./ui/avatar.tsx";
 import {
 	Send,
@@ -133,7 +132,28 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: `I'm now viewing your note: "${note.title}". I have access to the full content of this note. How can I help you with it?`
+				content: `I'm now viewing your note: "${note.title}". # 一元二次方程求根
+
+我们考虑方程：
+
+$$
+ax^2 + bx + c = 0
+$$
+
+## 参数说明
+
+| 符号 | 含义         |
+| ---- | ------------ |
+| a    | 二次项系数   |
+| b    | 一次项系数   |
+| c    | 常数项       |
+
+## 求根公式
+
+解为：
+
+\`\`\`math
+x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`
 			}
 		]);
 	}, [note.id]);
