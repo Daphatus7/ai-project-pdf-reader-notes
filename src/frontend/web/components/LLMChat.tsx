@@ -140,98 +140,103 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: "# Bayes' Theorem (Bayes' Formula)\n" +
+				content: "# Fourier Series\n" +
 					"\n" +
-					"Bayes' theorem relates the probability of a hypothesis to the evidence provided by data. It’s fundamental in probabilistic reasoning and is widely used in machine learning (e.g., Naive Bayes, Bayesian inference).\n" +
+					"A Fourier series expresses a periodic function as a sum of simple sines and cosines (or, equivalently, complex exponentials). It allows us to analyze and synthesize signals by breaking them into frequency components.\n" +
 					"\n" +
-					"## The formula\n" +
+					"## Mathematical formulation\n" +
 					"\n" +
-					"- Discrete form (with hypotheses H1, H2, ..., Hn and data D):\n" +
-					"  $$P(H_i \\mid D) = \\frac{P(D \\mid H_i)\\,P(H_i)}{\\displaystyle \\sum_{j=1}^n P(D \\mid H_j)\\,P(H_j)}$$\n" +
+					"- Let a function \\( f(t) \\) be periodic with period \\( T \\). The fundamental angular frequency is\n" +
+					"  \\[\n" +
+					"  \\omega_0 \\;=\\; \\frac{2\\pi}{T}.\n" +
+					"  \\]\n" +
 					"\n" +
-					"- Alternatively, using a single hypothesis H:\n" +
-					"  $$P(H \\mid D) = \\frac{P(D \\mid H)\\,P(H)}{P(D)}$$\n" +
+					"- Real form (cosines and sines):\n" +
+					"  \\[\n" +
+					"  f(t) \\;=\\; \\frac{a_0}{2} \\;+\\; \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n \\omega_0 t) \\;+\\; b_n \\sin(n \\omega_0 t) \\right].\n" +
+					"  \\]\n" +
 					"\n" +
-					"Where:\n" +
-					"- \\(P(H)\\) is the prior probability of the hypothesis before seeing data.\n" +
-					"- \\(P(D \\mid H)\\) is the likelihood: the probability of the data given the hypothesis.\n" +
-					"- \\(P(D)\\) is the evidence (the total probability of the data under all hypotheses):  \n" +
-					"  \\(P(D) = \\sum_j P(D \\mid H_j) P(H_j)\\) (discrete case) or\n" +
-					"  \\(P(D) = \\int P(D \\mid \\theta) P(\\theta) \\, d\\theta\\) (continuous case).\n" +
+					"  Coefficients:\n" +
+					"  \\[\n" +
+					"  a_n \\;=\\; \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\cos(n \\omega_0 t)\\, dt, \\quad\n" +
+					"  b_n \\;=\\; \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\sin(n \\omega_0 t)\\, dt.\n" +
+					"  \\]\n" +
 					"\n" +
-					"- The posterior \\(P(H \\mid D)\\) is the updated belief after observing data.\n" +
+					"  (The choice of \\( t_0 \\) is arbitrary; common choices are \\( t_0 = -T/2 \\) or \\( t_0 = 0 \\).)\n" +
 					"\n" +
-					"In the continuous (densities) form:\n" +
-					"$$\n" +
-					"f(\\theta \\mid D) = \\frac{f(D \\mid \\theta)\\,f(\\theta)}{f(D)}, \\quad\n" +
-					"f(D) = \\int f(D \\mid \\theta)\\,f(\\theta)\\,d\\theta\n" +
-					"$$\n" +
+					"- Complex form:\n" +
+					"  \\[\n" +
+					"  f(t) \\;=\\; \\sum_{n=-\\infty}^{\\infty} c_n e^{i n \\omega_0 t},\n" +
+					"  \\quad\n" +
+					"  c_n \\;=\\; \\frac{1}{T} \\int_{t_0}^{t_0+T} f(t) e^{-i n \\omega_0 t}\\, dt.\n" +
+					"  \\]\n" +
 					"\n" +
-					"## Intuition\n" +
+					"- Convergence (intuition): under mild conditions, the Fourier series converges to the average of the left/right limits at points of discontinuity and to the function value at points of continuity (Dirichlet conditions).\n" +
 					"\n" +
-					"- Start with a prior belief about which hypothesis is true.\n" +
-					"- Observe data and compute how likely that data is under each hypothesis (the likelihood).\n" +
-					"- Update beliefs by weighing priors by their likelihoods, then normalize by the total probability of the data (the evidence).\n" +
+					"## Key properties\n" +
 					"\n" +
-					"## Worked example: medical testing\n" +
+					"- Orthogonality over one period:\n" +
+					"  \\[\n" +
+					"  \\int_{t_0}^{t_0+T} \\cos(n \\omega_0 t)\\,\\cos(m \\omega_0 t)\\, dt \\propto \\delta_{nm},\n" +
+					"  \\quad\n" +
+					"  \\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\,\\sin(m \\omega_0 t)\\, dt \\propto \\delta_{nm},\n" +
+					"  \\quad\n" +
+					"  \\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\,\\cos(m \\omega_0 t)\\, dt = 0.\n" +
+					"  \\]\n" +
 					"\n" +
-					"Suppose:\n" +
-					"- Disease prevalence \\(P(D) = 0.01\\) (1%)\n" +
-					"- Test sensitivity: \\(P(\\text{Pos} \\mid D) = 0.99\\)\n" +
-					"- Test false positive rate: \\(P(\\text{Pos} \\mid \\neg D) = 0.05\\)\n" +
+					"- If \\( f(t) \\) is even, only cosine terms appear (\\( b_n = 0 \\)).\n" +
+					"- If \\( f(t) \\) is odd, only sine terms appear (no \\( a_n \\) terms except \\( a_0 \\)).\n" +
 					"\n" +
-					"Question: If the test result is positive, what's \\(P(D \\mid \\text{Pos})\\)?\n" +
+					"## Common examples\n" +
 					"\n" +
-					"1) Compute the evidence:\n" +
-					"- \\(P(\\text{Pos}) = P(\\text{Pos} \\mid D)P(D) + P(\\text{Pos} \\mid \\neg D)P(\\neg D)\\)\n" +
-					"- \\(P(\\text{Pos}) = 0.99 \\times 0.01 + 0.05 \\times 0.99 = 0.0099 + 0.0495 = 0.0594\\)\n" +
+					"- Square wave (period 2\\(\\pi\\), amplitude ±1):\n" +
+					"  \\[\n" +
+					"  f(t) = \\frac{4}{\\pi} \\sum_{k=0}^{\\infty} \\frac{1}{2k+1} \\sin\\big((2k+1)t\\big).\n" +
+					"  \\]\n" +
 					"\n" +
-					"2) Compute the posterior:\n" +
-					"- \\(P(D \\mid \\text{Pos}) = \\dfrac{P(\\text{Pos} \\mid D) P(D)}{P(\\text{Pos})} = \\dfrac{0.0099}{0.0594} \\approx 0.167\\)\n" +
+					"- Triangle wave: only odd harmonics with coefficients decreasing as \\( 1/(2k+1)^2 \\).\n" +
 					"\n" +
-					"So, given a positive test, the probability you actually have the disease is about 16.7%.\n" +
+					"- Sawtooth wave: both sine and cosine terms; coefficients fall off roughly as \\( 1/n \\).\n" +
 					"\n" +
-					"## Quick derivations (idea)\n" +
+					"## Numerical computation (brief)\n" +
 					"\n" +
-					"- Start from the joint distribution symmetry: \\(P(H, D) = P(D \\mid H) P(H) = P(H \\mid D) P(D)\\).\n" +
-					"- Solve for the posterior: \\(P(H \\mid D) = \\frac{P(D \\mid H) P(H)}{P(D)}\\).\n" +
-					"- Use the law of total probability to compute \\(P(D)\\) (the evidence).\n" +
-					"\n" +
-					"## Why this matters in ML\n" +
-					"\n" +
-					"- Bayesian inference treats probabilities as degrees of belief and updates them with data.\n" +
-					"- Naive Bayes classifiers use Bayes’ rule with the assumption of feature independence to compute posteriors efficiently.\n" +
-					"- Bayesian methods provide posterior distributions over parameters, enabling uncertainty quantification.\n" +
-					"- The posterior predictive distribution for a new observation is:\n" +
-					"  $$P(D_{\\text{new}} \\mid \\text{data}) = \\sum_{\\text{hypotheses}} P(D_{\\text{new}} \\mid H) P(H \\mid \\text{data})$$\n" +
-					"  or, in the continuous case, an integral over parameters.\n" +
-					"\n" +
-					"## Minimal Python example\n" +
+					"You can compute Fourier coefficients numerically by integrating over one period. Here is a simple Python sketch using trapezoidal rule:\n" +
 					"\n" +
 					"```python\n" +
-					"def bayes_posterior(prior, likelihood):\n" +
-					"    \"\"\"\n" +
-					"    prior: list or array of P(H_i)\n" +
-					"    likelihood: list or array of P(D | H_i)\n" +
-					"    returns: posterior probabilities P(H_i | D) and the evidence P(D)\n" +
-					"    \"\"\"\n" +
-					"    import numpy as np\n" +
-					"    prior = np.asarray(prior, dtype=float)\n" +
-					"    likelihood = np.asarray(likelihood, dtype=float)\n" +
-					"    unnorm = prior * likelihood\n" +
-					"    evidence = unnorm.sum()\n" +
-					"    posterior = unnorm / evidence\n" +
-					"    return posterior, evidence\n" +
+					"import numpy as np\n" +
 					"\n" +
-					"# Example: two hypotheses\n" +
-					"prior = [0.6, 0.4]\n" +
-					"likelihood = [0.7, 0.2]  # P(D | H1) and P(D | H2)\n" +
-					"post, ev = bayes_posterior(prior, likelihood)\n" +
-					"print(\"Posterior:\", post)\n" +
-					"print(\"Evidence:\", ev)\n" +
+					"def fourier_coeffs(f, T, N, t0=0, num_samples=10000):\n" +
+					"    # sample points over one period\n" +
+					"    t = np.linspace(t0, t0 + T, num_samples, endpoint=False)\n" +
+					"    y = f(t)\n" +
+					"    omega0 = 2 * np.pi / T\n" +
+					"\n" +
+					"    a0 = (2 / T) * np.trapz(y, t)\n" +
+					"\n" +
+					"    an = np.zeros(N)\n" +
+					"    bn = np.zeros(N)\n" +
+					"    for n in range(1, N + 1):\n" +
+					"        an[n-1] = (2 / T) * np.trapz(y * np.cos(n * omega0 * t), t)\n" +
+					"        bn[n-1] = (2 / T) * np.trapz(y * np.sin(n * omega0 * t), t)\n" +
+					"\n" +
+					"    return a0 / 2.0, an, bn\n" +
 					"```\n" +
 					"\n" +
-					"If you’d like, I can tailor this explanation to your notes or add more ML-specific examples (e.g., Naive Bayes, conjugate priors)."
+					"- Given a function \\( f \\), period \\( T \\), and the number of terms \\( N \\), this returns \\( a_0/2 \\), \\( a_n \\) for \\( n=1,\\dots,N \\), and \\( b_n \\) for \\( n=1,\\dots,N \\).\n" +
+					"\n" +
+					"## When to use Fourier series\n" +
+					"\n" +
+					"- Analyzing periodic signals in engineering (signal processing, communications).\n" +
+					"- Solving partial differential equations with periodic boundary conditions (e.g., heat/diffusion, wave equations) via separation of variables.\n" +
+					"- Representing arbitrary periodic functions as a sum of harmonics for approximation or synthesis.\n" +
+					"\n" +
+					"## Notes for your notes\n" +
+					"\n" +
+					"- The real form emphasizes a clean separation into cosine (even symmetry) and sine (odd symmetry) components.\n" +
+					"- The complex form is often more compact for algebraic manipulation and in many signal-processing contexts.\n" +
+					"- Convergence matters: in practice, high-frequency terms (large \\( n \\)) may be needed to approximate sharp features (Gibbs phenomenon near discontinuities).\n" +
+					"\n" +
+					"If you’d like, I can tailor this to a specific function you’re studying or add a worked example step-by-step."
 			}
 		]);
 	}, [note.id]);

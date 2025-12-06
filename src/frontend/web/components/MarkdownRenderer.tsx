@@ -10,8 +10,18 @@ interface MarkdownRendererProps {
 	className?: string;
 }
 
+
 export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
 	const ref = useRef<HTMLDivElement | null>(null);
+
+	function normalizeMath(content: string): string {
+		return content
+			// \( ... \)  ->  $...$
+			.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$')
+			// \[ ... \]  ->  $$...$$
+			.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$\n$1\n$$$$');
+	}
+	content = normalizeMath(content);
 
 	useEffect(() => {
 		if (!ref.current) return;
