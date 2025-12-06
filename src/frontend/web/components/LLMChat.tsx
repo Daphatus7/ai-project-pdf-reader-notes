@@ -140,28 +140,98 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: `I'm now viewing your note: "${note.title}". # 一元二次方程求根
-
-我们考虑方程：
-
-$$
-ax^2 + bx + c = 0
-$$
-
-## 参数说明
-
-| 符号 | 含义         |
-| ---- | ------------ |
-| a    | 二次项系数   |
-| b    | 一次项系数   |
-| c    | 常数项       |
-
-## 求根公式
-
-解为：
-
-\`\`\`math
-x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`
+				content: "# Bayes' Theorem (Bayes' Formula)\n" +
+					"\n" +
+					"Bayes' theorem relates the probability of a hypothesis to the evidence provided by data. It’s fundamental in probabilistic reasoning and is widely used in machine learning (e.g., Naive Bayes, Bayesian inference).\n" +
+					"\n" +
+					"## The formula\n" +
+					"\n" +
+					"- Discrete form (with hypotheses H1, H2, ..., Hn and data D):\n" +
+					"  $$P(H_i \\mid D) = \\frac{P(D \\mid H_i)\\,P(H_i)}{\\displaystyle \\sum_{j=1}^n P(D \\mid H_j)\\,P(H_j)}$$\n" +
+					"\n" +
+					"- Alternatively, using a single hypothesis H:\n" +
+					"  $$P(H \\mid D) = \\frac{P(D \\mid H)\\,P(H)}{P(D)}$$\n" +
+					"\n" +
+					"Where:\n" +
+					"- \\(P(H)\\) is the prior probability of the hypothesis before seeing data.\n" +
+					"- \\(P(D \\mid H)\\) is the likelihood: the probability of the data given the hypothesis.\n" +
+					"- \\(P(D)\\) is the evidence (the total probability of the data under all hypotheses):  \n" +
+					"  \\(P(D) = \\sum_j P(D \\mid H_j) P(H_j)\\) (discrete case) or\n" +
+					"  \\(P(D) = \\int P(D \\mid \\theta) P(\\theta) \\, d\\theta\\) (continuous case).\n" +
+					"\n" +
+					"- The posterior \\(P(H \\mid D)\\) is the updated belief after observing data.\n" +
+					"\n" +
+					"In the continuous (densities) form:\n" +
+					"$$\n" +
+					"f(\\theta \\mid D) = \\frac{f(D \\mid \\theta)\\,f(\\theta)}{f(D)}, \\quad\n" +
+					"f(D) = \\int f(D \\mid \\theta)\\,f(\\theta)\\,d\\theta\n" +
+					"$$\n" +
+					"\n" +
+					"## Intuition\n" +
+					"\n" +
+					"- Start with a prior belief about which hypothesis is true.\n" +
+					"- Observe data and compute how likely that data is under each hypothesis (the likelihood).\n" +
+					"- Update beliefs by weighing priors by their likelihoods, then normalize by the total probability of the data (the evidence).\n" +
+					"\n" +
+					"## Worked example: medical testing\n" +
+					"\n" +
+					"Suppose:\n" +
+					"- Disease prevalence \\(P(D) = 0.01\\) (1%)\n" +
+					"- Test sensitivity: \\(P(\\text{Pos} \\mid D) = 0.99\\)\n" +
+					"- Test false positive rate: \\(P(\\text{Pos} \\mid \\neg D) = 0.05\\)\n" +
+					"\n" +
+					"Question: If the test result is positive, what's \\(P(D \\mid \\text{Pos})\\)?\n" +
+					"\n" +
+					"1) Compute the evidence:\n" +
+					"- \\(P(\\text{Pos}) = P(\\text{Pos} \\mid D)P(D) + P(\\text{Pos} \\mid \\neg D)P(\\neg D)\\)\n" +
+					"- \\(P(\\text{Pos}) = 0.99 \\times 0.01 + 0.05 \\times 0.99 = 0.0099 + 0.0495 = 0.0594\\)\n" +
+					"\n" +
+					"2) Compute the posterior:\n" +
+					"- \\(P(D \\mid \\text{Pos}) = \\dfrac{P(\\text{Pos} \\mid D) P(D)}{P(\\text{Pos})} = \\dfrac{0.0099}{0.0594} \\approx 0.167\\)\n" +
+					"\n" +
+					"So, given a positive test, the probability you actually have the disease is about 16.7%.\n" +
+					"\n" +
+					"## Quick derivations (idea)\n" +
+					"\n" +
+					"- Start from the joint distribution symmetry: \\(P(H, D) = P(D \\mid H) P(H) = P(H \\mid D) P(D)\\).\n" +
+					"- Solve for the posterior: \\(P(H \\mid D) = \\frac{P(D \\mid H) P(H)}{P(D)}\\).\n" +
+					"- Use the law of total probability to compute \\(P(D)\\) (the evidence).\n" +
+					"\n" +
+					"## Why this matters in ML\n" +
+					"\n" +
+					"- Bayesian inference treats probabilities as degrees of belief and updates them with data.\n" +
+					"- Naive Bayes classifiers use Bayes’ rule with the assumption of feature independence to compute posteriors efficiently.\n" +
+					"- Bayesian methods provide posterior distributions over parameters, enabling uncertainty quantification.\n" +
+					"- The posterior predictive distribution for a new observation is:\n" +
+					"  $$P(D_{\\text{new}} \\mid \\text{data}) = \\sum_{\\text{hypotheses}} P(D_{\\text{new}} \\mid H) P(H \\mid \\text{data})$$\n" +
+					"  or, in the continuous case, an integral over parameters.\n" +
+					"\n" +
+					"## Minimal Python example\n" +
+					"\n" +
+					"```python\n" +
+					"def bayes_posterior(prior, likelihood):\n" +
+					"    \"\"\"\n" +
+					"    prior: list or array of P(H_i)\n" +
+					"    likelihood: list or array of P(D | H_i)\n" +
+					"    returns: posterior probabilities P(H_i | D) and the evidence P(D)\n" +
+					"    \"\"\"\n" +
+					"    import numpy as np\n" +
+					"    prior = np.asarray(prior, dtype=float)\n" +
+					"    likelihood = np.asarray(likelihood, dtype=float)\n" +
+					"    unnorm = prior * likelihood\n" +
+					"    evidence = unnorm.sum()\n" +
+					"    posterior = unnorm / evidence\n" +
+					"    return posterior, evidence\n" +
+					"\n" +
+					"# Example: two hypotheses\n" +
+					"prior = [0.6, 0.4]\n" +
+					"likelihood = [0.7, 0.2]  # P(D | H1) and P(D | H2)\n" +
+					"post, ev = bayes_posterior(prior, likelihood)\n" +
+					"print(\"Posterior:\", post)\n" +
+					"print(\"Evidence:\", ev)\n" +
+					"```\n" +
+					"\n" +
+					"If you’d like, I can tailor this explanation to your notes or add more ML-specific examples (e.g., Naive Bayes, conjugate priors)."
 			}
 		]);
 	}, [note.id]);
@@ -246,6 +316,7 @@ x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`
 					break;
 				}
 			}
+			console.log(accumulatedContent);
 		} catch (error) {
 			console.error('Error sending message:', error);
 
