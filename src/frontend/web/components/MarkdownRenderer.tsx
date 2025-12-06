@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import renderMathInElement from 'katex/contrib/auto-render';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { cn } from './ui/utils.ts';
 
@@ -10,37 +10,41 @@ interface MarkdownRendererProps {
 	className?: string;
 }
 
+/**
+ * Preprocesses content to normalize various math delimiters to standard format.
+ * Converts \(...\) to $...$ and \[...\] to $$...$$ for remark-math compatibility.
+ * Also handles display math inside list items by extracting them to separate blocks.
+ */
+function preprocessMathContent(content: string): string {
+	// Step 1: Normalize math delimiters
+	let processed = content
+		// \( ... \)  ->  $...$
+		.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$')
+		// \[ ... \]  ->  $$...$$
+		.replace(/\\\[([\s\S]*?)\\\]/g, '\n$$\n$1\n$$\n');
+
+	// Step 2: Fix display math that's indented inside list items
+	// Pattern: list item with display math on next lines
+	// Convert indented $$ blocks inside lists to properly formatted blocks
+	processed = processed.replace(
+		/^(\s*[-*]\s+[^\n]*)\n\s+\$\$\n([\s\S]*?)\n\s*\$\$/gm,
+		(_, listItem, mathContent) => {
+			// Keep the list item text, then add display math as a separate block
+			return `${listItem}\n\n$$\n${mathContent.trim()}\n$$`;
+		}
+	);
+
+	return processed;
+}
 
 export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
-	const ref = useRef<HTMLDivElement | null>(null);
-
-	function normalizeMath(content: string): string {
-		return content
-			// \( ... \)  ->  $...$
-			.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$')
-			// \[ ... \]  ->  $$...$$
-			.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$\n$1\n$$$$');
-	}
-	content = normalizeMath(content);
-
-	useEffect(() => {
-		if (!ref.current) return;
-
-		renderMathInElement(ref.current, {
-			delimiters: [
-				{ left: '$$', right: '$$', display: true },
-				{ left: '\\[', right: '\\]', display: true },
-				{ left: '$', right: '$', display: false },
-				{ left: '\\(', right: '\\)', display: false },
-			],
-			throwOnError: false,
-		});
-	}, [content]);
+	const processedContent = preprocessMathContent(content);
 
 	return (
-		<div ref={ref} className={cn('markdown-renderer', className)}>
+		<div className={cn('markdown-renderer', className)}>
 			<ReactMarkdown
-				remarkPlugins={[remarkGfm]}
+				remarkPlugins={[remarkGfm, remarkMath]}
+				rehypePlugins={[rehypeKatex]}
 				components={{
 					// 代码块
 					code({ inline, className, children, ...props }) {
@@ -199,7 +203,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
 					},
 				}}
 			>
-				{content}
+				{processedContent}
 			</ReactMarkdown>
 		</div>
 	);

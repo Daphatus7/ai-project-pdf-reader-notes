@@ -143,16 +143,43 @@ async def async_chat(request: ChatRequest, llm_service=Depends(get_llm_service))
 
 STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
 
-Your responses MUST be formatted with proper markdown, including:
-- Headers (# ## ###) for section organization
-- Code blocks with language specification (```python, ```javascript, etc.)
-- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
-- GFM tables when presenting tabular data
-- Bullet points and numbered lists for clarity
-- Blockquotes for important notes or citations
+FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
-Always structure your response to be clear, organized, and easy to read.
-When explaining technical concepts, include relevant code examples and mathematical formulas where appropriate.'''
+1. HEADERS: Use # ## ### for section organization
+
+2. MATH EXPRESSIONS (CRITICAL - follow exactly):
+   - Inline math: Use $...$ (e.g., "where $x = 5$")
+   - Display/block math: Use $$ on separate lines:
+     
+     $$
+     E = mc^2
+     $$
+   
+   - NEVER put display math inside bullet points. Instead, end the bullet, add a blank line, then the math block:
+     
+     WRONG:
+     - The formula is $$x = y$$
+     
+     CORRECT:
+     - The formula is:
+     
+     $$
+     x = y
+     $$
+
+3. CODE BLOCKS: Use ```language (e.g., ```python, ```javascript)
+
+4. TABLES: Use GFM table syntax with | separators
+
+5. LISTS: Use - or * for bullets, 1. 2. 3. for numbered lists
+
+6. BLOCKQUOTES: Use > for important notes
+
+STYLE GUIDELINES:
+- Keep paragraphs concise and well-spaced
+- Use blank lines between different elements (headers, paragraphs, math blocks)
+- Structure content logically with clear section breaks
+- When explaining technical concepts, include relevant code examples and mathematical formulas'''
 
 
 @router.post('/chat/structured', response_model=StructuredChatResponse)

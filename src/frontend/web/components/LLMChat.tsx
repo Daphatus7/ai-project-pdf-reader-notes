@@ -140,103 +140,94 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 			{
 				id: Date.now().toString(),
 				role: "assistant",
-				content: "# Fourier Series\n" +
-					"\n" +
-					"A Fourier series expresses a periodic function as a sum of simple sines and cosines (or, equivalently, complex exponentials). It allows us to analyze and synthesize signals by breaking them into frequency components.\n" +
-					"\n" +
-					"## Mathematical formulation\n" +
-					"\n" +
-					"- Let a function \\( f(t) \\) be periodic with period \\( T \\). The fundamental angular frequency is\n" +
-					"  \\[\n" +
-					"  \\omega_0 \\;=\\; \\frac{2\\pi}{T}.\n" +
-					"  \\]\n" +
-					"\n" +
-					"- Real form (cosines and sines):\n" +
-					"  \\[\n" +
-					"  f(t) \\;=\\; \\frac{a_0}{2} \\;+\\; \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n \\omega_0 t) \\;+\\; b_n \\sin(n \\omega_0 t) \\right].\n" +
-					"  \\]\n" +
-					"\n" +
-					"  Coefficients:\n" +
-					"  \\[\n" +
-					"  a_n \\;=\\; \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\cos(n \\omega_0 t)\\, dt, \\quad\n" +
-					"  b_n \\;=\\; \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\sin(n \\omega_0 t)\\, dt.\n" +
-					"  \\]\n" +
-					"\n" +
-					"  (The choice of \\( t_0 \\) is arbitrary; common choices are \\( t_0 = -T/2 \\) or \\( t_0 = 0 \\).)\n" +
-					"\n" +
-					"- Complex form:\n" +
-					"  \\[\n" +
-					"  f(t) \\;=\\; \\sum_{n=-\\infty}^{\\infty} c_n e^{i n \\omega_0 t},\n" +
-					"  \\quad\n" +
-					"  c_n \\;=\\; \\frac{1}{T} \\int_{t_0}^{t_0+T} f(t) e^{-i n \\omega_0 t}\\, dt.\n" +
-					"  \\]\n" +
-					"\n" +
-					"- Convergence (intuition): under mild conditions, the Fourier series converges to the average of the left/right limits at points of discontinuity and to the function value at points of continuity (Dirichlet conditions).\n" +
-					"\n" +
-					"## Key properties\n" +
-					"\n" +
-					"- Orthogonality over one period:\n" +
-					"  \\[\n" +
-					"  \\int_{t_0}^{t_0+T} \\cos(n \\omega_0 t)\\,\\cos(m \\omega_0 t)\\, dt \\propto \\delta_{nm},\n" +
-					"  \\quad\n" +
-					"  \\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\,\\sin(m \\omega_0 t)\\, dt \\propto \\delta_{nm},\n" +
-					"  \\quad\n" +
-					"  \\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\,\\cos(m \\omega_0 t)\\, dt = 0.\n" +
-					"  \\]\n" +
-					"\n" +
-					"- If \\( f(t) \\) is even, only cosine terms appear (\\( b_n = 0 \\)).\n" +
-					"- If \\( f(t) \\) is odd, only sine terms appear (no \\( a_n \\) terms except \\( a_0 \\)).\n" +
-					"\n" +
-					"## Common examples\n" +
-					"\n" +
-					"- Square wave (period 2\\(\\pi\\), amplitude ±1):\n" +
-					"  \\[\n" +
-					"  f(t) = \\frac{4}{\\pi} \\sum_{k=0}^{\\infty} \\frac{1}{2k+1} \\sin\\big((2k+1)t\\big).\n" +
-					"  \\]\n" +
-					"\n" +
-					"- Triangle wave: only odd harmonics with coefficients decreasing as \\( 1/(2k+1)^2 \\).\n" +
-					"\n" +
-					"- Sawtooth wave: both sine and cosine terms; coefficients fall off roughly as \\( 1/n \\).\n" +
-					"\n" +
-					"## Numerical computation (brief)\n" +
-					"\n" +
-					"You can compute Fourier coefficients numerically by integrating over one period. Here is a simple Python sketch using trapezoidal rule:\n" +
-					"\n" +
-					"```python\n" +
-					"import numpy as np\n" +
-					"\n" +
-					"def fourier_coeffs(f, T, N, t0=0, num_samples=10000):\n" +
-					"    # sample points over one period\n" +
-					"    t = np.linspace(t0, t0 + T, num_samples, endpoint=False)\n" +
-					"    y = f(t)\n" +
-					"    omega0 = 2 * np.pi / T\n" +
-					"\n" +
-					"    a0 = (2 / T) * np.trapz(y, t)\n" +
-					"\n" +
-					"    an = np.zeros(N)\n" +
-					"    bn = np.zeros(N)\n" +
-					"    for n in range(1, N + 1):\n" +
-					"        an[n-1] = (2 / T) * np.trapz(y * np.cos(n * omega0 * t), t)\n" +
-					"        bn[n-1] = (2 / T) * np.trapz(y * np.sin(n * omega0 * t), t)\n" +
-					"\n" +
-					"    return a0 / 2.0, an, bn\n" +
-					"```\n" +
-					"\n" +
-					"- Given a function \\( f \\), period \\( T \\), and the number of terms \\( N \\), this returns \\( a_0/2 \\), \\( a_n \\) for \\( n=1,\\dots,N \\), and \\( b_n \\) for \\( n=1,\\dots,N \\).\n" +
-					"\n" +
-					"## When to use Fourier series\n" +
-					"\n" +
-					"- Analyzing periodic signals in engineering (signal processing, communications).\n" +
-					"- Solving partial differential equations with periodic boundary conditions (e.g., heat/diffusion, wave equations) via separation of variables.\n" +
-					"- Representing arbitrary periodic functions as a sum of harmonics for approximation or synthesis.\n" +
-					"\n" +
-					"## Notes for your notes\n" +
-					"\n" +
-					"- The real form emphasizes a clean separation into cosine (even symmetry) and sine (odd symmetry) components.\n" +
-					"- The complex form is often more compact for algebraic manipulation and in many signal-processing contexts.\n" +
-					"- Convergence matters: in practice, high-frequency terms (large \\( n \\)) may be needed to approximate sharp features (Gibbs phenomenon near discontinuities).\n" +
-					"\n" +
-					"If you’d like, I can tailor this to a specific function you’re studying or add a worked example step-by-step."
+				content: `# Fourier Series
+
+A Fourier series expresses a periodic function as a sum of simple sines and cosines (or, equivalently, complex exponentials). It allows us to analyze and synthesize signals by breaking them into frequency components.
+
+## Mathematical formulation
+
+Let a function $f(t)$ be periodic with period $T$. The fundamental angular frequency is:
+
+$$
+\\omega_0 = \\frac{2\\pi}{T}
+$$
+
+**Real form (cosines and sines):**
+
+$$
+f(t) = \\frac{a_0}{2} + \\sum_{n=1}^{\\infty} \\left[ a_n \\cos(n \\omega_0 t) + b_n \\sin(n \\omega_0 t) \\right]
+$$
+
+The coefficients are:
+
+$$
+a_n = \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\cos(n \\omega_0 t)\\, dt, \\quad b_n = \\frac{2}{T} \\int_{t_0}^{t_0+T} f(t) \\sin(n \\omega_0 t)\\, dt
+$$
+
+The choice of $t_0$ is arbitrary; common choices are $t_0 = -T/2$ or $t_0 = 0$.
+
+**Complex form:**
+
+$$
+f(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{i n \\omega_0 t}, \\quad c_n = \\frac{1}{T} \\int_{t_0}^{t_0+T} f(t) e^{-i n \\omega_0 t}\\, dt
+$$
+
+**Convergence:** Under mild conditions, the Fourier series converges to the average of the left/right limits at points of discontinuity and to the function value at points of continuity (Dirichlet conditions).
+
+## Key properties
+
+**Orthogonality over one period:**
+
+$$
+\\int_{t_0}^{t_0+T} \\cos(n \\omega_0 t)\\cos(m \\omega_0 t)\\, dt \\propto \\delta_{nm}
+$$
+
+$$
+\\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\sin(m \\omega_0 t)\\, dt \\propto \\delta_{nm}
+$$
+
+$$
+\\int_{t_0}^{t_0+T} \\sin(n \\omega_0 t)\\cos(m \\omega_0 t)\\, dt = 0
+$$
+
+- If $f(t)$ is even, only cosine terms appear ($b_n = 0$)
+- If $f(t)$ is odd, only sine terms appear (no $a_n$ terms except $a_0$)
+
+## Common examples
+
+**Square wave** (period $2\\pi$, amplitude ±1):
+
+$$
+f(t) = \\frac{4}{\\pi} \\sum_{k=0}^{\\infty} \\frac{1}{2k+1} \\sin\\big((2k+1)t\\big)
+$$
+
+- **Triangle wave:** only odd harmonics with coefficients decreasing as $1/(2k+1)^2$
+- **Sawtooth wave:** both sine and cosine terms; coefficients fall off roughly as $1/n$
+
+## Numerical computation
+
+You can compute Fourier coefficients numerically by integrating over one period:
+
+\`\`\`python
+import numpy as np
+
+def fourier_coeffs(f, T, N, t0=0, num_samples=10000):
+    t = np.linspace(t0, t0 + T, num_samples, endpoint=False)
+    y = f(t)
+    omega0 = 2 * np.pi / T
+    
+    a0 = (2 / T) * np.trapz(y, t)
+    an = np.zeros(N)
+    bn = np.zeros(N)
+    
+    for n in range(1, N + 1):
+        an[n-1] = (2 / T) * np.trapz(y * np.cos(n * omega0 * t), t)
+        bn[n-1] = (2 / T) * np.trapz(y * np.sin(n * omega0 * t), t)
+    
+    return a0 / 2.0, an, bn
+\`\`\`
+
+Given a function $f$, period $T$, and the number of terms $N$, this returns $a_0/2$, $a_n$ for $n=1,\\dots,N$, and $b_n$ for $n=1,\\dots,N$.`
 			}
 		]);
 	}, [note.id]);
@@ -266,17 +257,29 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 
 		try {
 			// Build system message with note context
-			const systemMessage = `
-			You are a helpful assistant helping the user with their note: "${note.title}". 
-			The user is working on a document and may ask questions about it or request help expanding their notes.
-			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
-			
-			Always respond with well-structured markdown content including:
-			- Headers for organization
-			- Code blocks with language specification when showing code
-			- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
-			- GFM tables when presenting tabular data
-			- Bullet points and numbered lists for clarity`;
+			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
+The user is working on a document and may ask questions about it or request help expanding their notes.
+${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
+
+FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
+
+1. HEADERS: Use # ## ### for section organization
+
+2. MATH EXPRESSIONS (follow exactly):
+   - Inline math: Use $...$ (e.g., "where $x = 5$")
+   - Display/block math: Use $$ on separate lines with blank lines around them:
+     
+     $$
+     E = mc^2
+     $$
+   
+   - NEVER put display math inside bullet points. End the bullet first, add blank line, then math block.
+
+3. CODE BLOCKS: Use \`\`\`language for code
+
+4. TABLES: Use GFM table syntax
+
+5. LISTS: Use - for bullets, keep content concise`;
 
 			// Use structured streaming API
 			let accumulatedContent = "";
