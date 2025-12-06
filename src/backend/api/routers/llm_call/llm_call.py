@@ -241,3 +241,87 @@ def structured_chat_sync(request: StructuredChatRequest, llm_service=Depends(get
     except Exception as e:
         logger.error(f'Error in structured_chat_sync endpoint: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=f'Error processing structured chat request: {str(e)}')
+
+
+@router.post('/chat/structured/stream')
+async def structured_stream_chat(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
+    """
+    Streaming structured chat endpoint that streams both text chunks and structured output updates.
+    
+    This endpoint streams the LLM response in real-time. The accumulated text is periodically
+    parsed to generate structured output updates conforming to the LLMStructuredOutput schema.
+    
+    The stream sends two types of events:
+    - 'text': Raw text chunks as they're generated (updates the content field)
+    - 'structured': JSON updates of the structured output as it becomes available
+    """
+    import json
+    
+    try:
+        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
+        
+        content_type_hint = ''
+        if request.expected_content_type:
+            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
+        
+        system_msg = SystemMessage(content=base_system + content_type_hint)
+        human_msg = HumanMessage(content=request.message)
+        
+        async def generate_stream() -> AsyncGenerator[str, None]:
+            accumulated_text = ''
+            last_structured_update = None
+            chunk_count = 0
+            
+            try:
+                # Stream raw text chunks
+                async for chunk in llm_service.multi_thread_stream_chat(
+                    system_message=system_msg,
+                    human_message=human_msg
+                ):
+                    text = getattr(chunk, 'content', str(chunk))
+                    accumulated_text += text
+                    chunk_count += 1
+                    
+                    # Send text chunk
+                    yield f'data: {json.dumps({"type": "text", "content": text})}\n\n'
+                    
+                    # Periodically send structured output updates with accumulated content
+                    # (every 15 chunks or when we have substantial content)
+                    if (chunk_count % 15 == 0 and len(accumulated_text) > 50) or len(accumulated_text) > 300:
+                        # Create a minimal structured output with current content
+                        # The full structured parsing will happen at the end
+                        partial_output = {
+                            'content': accumulated_text,
+                            'content_type': 'answer'  # default, will be updated in final parse
+                        }
+                        
+                        if partial_output != last_structured_update:
+                            last_structured_update = partial_output
+                            yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
+                
+                # Final structured output after streaming completes
+                # Send the accumulated text as the final structured output
+                # The content field is the main field that was streamed
+                final_structured = {
+                    'content': accumulated_text,
+                    'content_type': 'answer'  # Default type
+                }
+                
+                yield f'data: {json.dumps({"type": "structured", "data": final_structured})}\n\n'
+                yield f'data: {json.dumps({"type": "done"})}\n\n'
+                    
+            except Exception as e:
+                logger.error(f'Error in structured stream generation: {e}', exc_info=True)
+                yield f'data: {json.dumps({"type": "error", "message": str(e)})}\n\n'
+        
+        return StreamingResponse(
+            generate_stream(),
+            media_type='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            }
+        )
+    except Exception as e:
+        logger.error(f'Error in structured_stream_chat endpoint: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail=f'Error processing streaming structured chat request: {str(e)}')

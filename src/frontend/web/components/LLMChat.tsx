@@ -124,9 +124,15 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 	const [newContextName, setNewContextName] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	// Merge external context items (like screenshots) with manual context items
 	const allContextItems = [...contextItems, ...externalContextItems];
+
+	// Auto-scroll to bottom when messages update
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+	}, [messages]);
 
 	// Reset messages when note changes
 	useEffect(() => {
@@ -185,35 +191,61 @@ x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`
 
 		try {
 			// Build system message with note context
-			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
-The user is working on a document and may ask questions about it or request help expanding their notes.
-${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
+			const systemMessage = `
+			You are a helpful assistant helping the user with their note: "${note.title}". 
+			The user is working on a document and may ask questions about it or request help expanding their notes.
+			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
+			
+			Always respond with well-structured markdown content including:
+			- Headers for organization
+			- Code blocks with language specification when showing code
+			- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
+			- GFM tables when presenting tabular data
+			- Bullet points and numbered lists for clarity`;
 
-Always respond with well-structured markdown content including:
-- Headers for organization
-- Code blocks with language specification when showing code
-- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
-- GFM tables when presenting tabular data
-- Bullet points and numbered lists for clarity`;
-
-			// Use structured output API
-			const response = await llmService.chatStructured({
+			// Use structured streaming API
+			let accumulatedContent = "";
+			let currentStructuredOutput: LLMStructuredOutput | undefined = undefined;
+			
+			for await (const event of llmService.chatStructuredStream({
 				message: messageText,
 				system_message: systemMessage
-			});
-
-			const { structured_output } = response;
-
-			// Update the AI message with structured content
-			setMessages(prev => prev.map(msg =>
-				msg.id === aiMessageId
-					? {
-						...msg,
-						content: structured_output.content,
-						structuredOutput: structured_output
-					}
-					: msg
-			));
+			})) {
+				if (event.type === 'text' && event.content) {
+					// Accumulate text chunks
+					accumulatedContent += event.content;
+					
+					// Update message with accumulated content
+					setMessages(prev => prev.map(msg =>
+						msg.id === aiMessageId
+							? {
+								...msg,
+								content: accumulatedContent,
+								structuredOutput: currentStructuredOutput
+							}
+							: msg
+					));
+				} else if (event.type === 'structured' && event.data) {
+					// Update structured output
+					currentStructuredOutput = event.data as LLMStructuredOutput;
+					
+					// Update message with structured output
+					setMessages(prev => prev.map(msg =>
+						msg.id === aiMessageId
+							? {
+								...msg,
+								content: currentStructuredOutput?.content || accumulatedContent,
+								structuredOutput: currentStructuredOutput
+							}
+							: msg
+					));
+				} else if (event.type === 'error') {
+					throw new Error(event.message || 'Streaming error occurred');
+				} else if (event.type === 'done') {
+					// Streaming complete
+					break;
+				}
+			}
 		} catch (error) {
 			console.error('Error sending message:', error);
 
@@ -323,6 +355,7 @@ Always respond with well-structured markdown content including:
 						</div>
 					)
 				))}
+				<div ref={messagesEndRef} />
 			</div>
 
 			{/* Input Area */}

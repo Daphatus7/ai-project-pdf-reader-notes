@@ -13,6 +13,7 @@ export const apiConfig = {
       chatAsync: '/api/llm/chat/async',
       chatStructured: '/api/llm/chat/structured',
       chatStructuredSync: '/api/llm/chat/structured/sync',
+      chatStructuredStream: '/api/llm/chat/structured/stream',
     },
   },
 } as const;

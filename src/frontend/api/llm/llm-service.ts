@@ -61,6 +61,27 @@ export class LLMService {
 	async chatStructuredSync(request: StructuredChatRequest): Promise<StructuredChatResponse> {
 		return post<StructuredChatResponse>(apiConfig.endpoints.llm.chatStructuredSync, request);
 	}
+
+	/**
+	 * Streaming structured output chat endpoint.
+	 * 
+	 * Streams both text chunks and structured output updates.
+	 * Yields objects with type 'text', 'structured', 'done', or 'error'.
+	 * 
+	 * @param request - The structured chat request
+	 * @returns Async generator yielding stream events
+	 */
+	async *chatStructuredStream(request: StructuredChatRequest): AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
+		for await (const chunk of streamRequest(apiConfig.endpoints.llm.chatStructuredStream, request)) {
+			try {
+				const parsed = JSON.parse(chunk);
+				yield parsed;
+			} catch {
+				// If parsing fails, treat as plain text (backward compatibility)
+				yield { type: 'text', content: chunk };
+			}
+		}
+	}
 }
 
 // Export singleton instance
