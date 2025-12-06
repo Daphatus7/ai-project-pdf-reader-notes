@@ -29,7 +29,7 @@ function preprocessMathContent(content: string): string {
 	// Replace | with \vert inside $...$ (inline math)
 	processed = processed.replace(
 		/\$([^$]+)\$/g,
-		(match, mathContent) => {
+		(_match, mathContent) => {
 			// Replace | with \vert, but not if already escaped as \|
 			const escaped = mathContent.replace(/(?<!\\)\|/g, '\\vert ');
 			return `$${escaped}$`;
@@ -39,7 +39,7 @@ function preprocessMathContent(content: string): string {
 	// Step 3: Escape | inside $$...$$ (display math)
 	processed = processed.replace(
 		/\$\$([\s\S]*?)\$\$/g,
-		(match, mathContent) => {
+		(_match, mathContent) => {
 			const escaped = mathContent.replace(/(?<!\\)\|/g, '\\vert ');
 			return `$$${escaped}$$`;
 		}
