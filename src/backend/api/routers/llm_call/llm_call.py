@@ -1,5 +1,10 @@
 """
-LLM API endpoints for chat functionality
+LLM API endpoints for chat functionality.
+
+Provides endpoints for:
+- Regular chat (sync and async)
+- Streaming chat
+- Structured output chat (enforces schema-conformant responses)
 """
 import logging
 from typing import AsyncGenerator
@@ -8,7 +13,14 @@ from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
 from servers import services
-from ...models.request_models import ChatRequest, ChatResponse, StreamChatRequest
+from ...models.request_models import (
+    ChatRequest,
+    ChatResponse,
+    StreamChatRequest,
+    StructuredChatRequest,
+    StructuredChatResponse,
+    LLMStructuredOutput,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -127,3 +139,105 @@ async def async_chat(request: ChatRequest, llm_service=Depends(get_llm_service))
     except Exception as e:
         logger.error(f'Error in async_chat endpoint: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=f'Error processing async chat request: {str(e)}')
+
+
+STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
+
+Your responses MUST be formatted with proper markdown, including:
+- Headers (# ## ###) for section organization
+- Code blocks with language specification (```python, ```javascript, etc.)
+- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
+- GFM tables when presenting tabular data
+- Bullet points and numbered lists for clarity
+- Blockquotes for important notes or citations
+
+Always structure your response to be clear, organized, and easy to read.
+When explaining technical concepts, include relevant code examples and mathematical formulas where appropriate.'''
+
+
+@router.post('/chat/structured', response_model=StructuredChatResponse)
+async def structured_chat(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
+    """
+    Structured chat endpoint that enforces schema-conformant LLM output.
+    
+    This endpoint ensures the LLM returns responses that conform to the
+    LLMStructuredOutput schema, making it easier to parse and display
+    markdown, LaTeX, and GFM content consistently.
+    
+    The response includes:
+    - content: Main markdown content with LaTeX and GFM support
+    - content_type: Type of response (explanation, summary, answer, etc.)
+    - sections: Optional breakdown into sections
+    - key_points: Key takeaways
+    - code_blocks: Extracted code with language info
+    - math_expressions: Extracted LaTeX expressions
+    - suggested_followups: Suggested follow-up questions
+    """
+    try:
+        # Build enhanced system message for structured output
+        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
+        
+        content_type_hint = ''
+        if request.expected_content_type:
+            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
+        
+        system_msg = SystemMessage(content=base_system + content_type_hint)
+        human_msg = HumanMessage(content=request.message)
+        
+        structured_output = await llm_service.async_chat_with_structured_output(
+            output_schema=LLMStructuredOutput,
+            system_message=system_msg,
+            human_message=human_msg
+        )
+        
+        usage = None
+        try:
+            usage = llm_service.get_usage()
+        except Exception:
+            pass
+        
+        return StructuredChatResponse(
+            structured_output=structured_output,
+            usage=usage
+        )
+    except Exception as e:
+        logger.error(f'Error in structured_chat endpoint: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail=f'Error processing structured chat request: {str(e)}')
+
+
+@router.post('/chat/structured/sync', response_model=StructuredChatResponse)
+def structured_chat_sync(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
+    """
+    Synchronous structured chat endpoint for debugging and simple use cases.
+    
+    Same as /chat/structured but synchronous for easier debugging.
+    """
+    try:
+        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
+        
+        content_type_hint = ''
+        if request.expected_content_type:
+            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
+        
+        system_msg = SystemMessage(content=base_system + content_type_hint)
+        human_msg = HumanMessage(content=request.message)
+        
+        structured_output = llm_service.chat_with_structured_output(
+            output_schema=LLMStructuredOutput,
+            system_message=system_msg,
+            human_message=human_msg
+        )
+        
+        usage = None
+        try:
+            usage = llm_service.get_usage()
+        except Exception:
+            pass
+        
+        return StructuredChatResponse(
+            structured_output=structured_output,
+            usage=usage
+        )
+    except Exception as e:
+        logger.error(f'Error in structured_chat_sync endpoint: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail=f'Error processing structured chat request: {str(e)}')

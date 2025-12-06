@@ -11,6 +11,8 @@ export const apiConfig = {
       chat: '/api/llm/chat',
       chatStream: '/api/llm/chat/stream',
       chatAsync: '/api/llm/chat/async',
+      chatStructured: '/api/llm/chat/structured',
+      chatStructuredSync: '/api/llm/chat/structured/sync',
     },
   },
 } as const;

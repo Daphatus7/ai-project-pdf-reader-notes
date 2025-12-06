@@ -24,7 +24,7 @@ import {
 } from "./ui/tooltip.tsx";
 import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
-import { llmService, ApiError } from "../../api";
+import { llmService, ApiError, type LLMStructuredOutput } from "../../api";
 import { MarkdownRenderer } from "./MarkdownRenderer.tsx";
 
 interface Message {
@@ -32,6 +32,7 @@ interface Message {
 	role: "user" | "assistant";
 	content: string;
 	hasImage?: boolean;
+	structuredOutput?: LLMStructuredOutput;
 }
 
 interface ContextItem {
@@ -173,51 +174,60 @@ x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`
 		setInput("");
 		setIsLoading(true);
 
-		// Create AI message placeholder for streaming
+		// Create AI message placeholder while loading
 		const aiMessageId = (Date.now() + 1).toString();
 		const aiMessage: Message = {
 			id: aiMessageId,
 			role: "assistant",
-			content: ""
+			content: "Thinking..."
 		};
 		setMessages(prev => [...prev, aiMessage]);
 
 		try {
 			// Build system message with note context
 			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
-			The user is working on a document and may ask questions about it or request help expanding their notes.
-			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}`;
+The user is working on a document and may ask questions about it or request help expanding their notes.
+${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
 
-			// Use streaming response
-			let fullResponse = '';
-			for await (const chunk of llmService.chatStream({
+Always respond with well-structured markdown content including:
+- Headers for organization
+- Code blocks with language specification when showing code
+- LaTeX math expressions using $...$ for inline and $$...$$ for block equations
+- GFM tables when presenting tabular data
+- Bullet points and numbered lists for clarity`;
+
+			// Use structured output API
+			const response = await llmService.chatStructured({
 				message: messageText,
 				system_message: systemMessage
-			})) {
-				fullResponse += chunk;
+			});
 
-				// Update the AI message with accumulated content
-				setMessages(prev => prev.map(msg =>
-					msg.id === aiMessageId
-						? { ...msg, content: fullResponse }
-						: msg
-				));
-			}
+			const { structured_output } = response;
+
+			// Update the AI message with structured content
+			setMessages(prev => prev.map(msg =>
+				msg.id === aiMessageId
+					? {
+						...msg,
+						content: structured_output.content,
+						structuredOutput: structured_output
+					}
+					: msg
+			));
 		} catch (error) {
 			console.error('Error sending message:', error);
 
-			// Remove the placeholder message and add error message
-			setMessages(prev => {
-				const filtered = prev.filter(msg => msg.id !== aiMessageId);
-				const errorMessage: Message = {
-					id: (Date.now() + 1).toString(),
-					role: "assistant",
-					content: error instanceof ApiError
-						? `Error: ${error.message}`
-						: 'Sorry, I encountered an error processing your message. Please try again.'
-				};
-				return [...filtered, errorMessage];
-			});
+			// Update the placeholder message with error
+			setMessages(prev => prev.map(msg =>
+				msg.id === aiMessageId
+					? {
+						...msg,
+						content: error instanceof ApiError
+							? `**Error:** ${error.message}`
+							: '**Error:** Sorry, I encountered an error processing your message. Please try again.'
+					}
+					: msg
+			));
 		} finally {
 			setIsLoading(false);
 		}

@@ -1,14 +1,18 @@
-from http.client import responses
-
 from langchain.chat_models import init_chat_model
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
+from typing import TypeVar, Type
+from pydantic import BaseModel
 
+T = TypeVar('T', bound=BaseModel)
 
 
 class LlmService:
     """
-        Provide a unified interface for providing LLM services.
+    Provide a unified interface for providing LLM services.
+    
+    Supports both regular chat and structured output modes.
+    Structured output ensures the LLM returns responses conforming to a specified Pydantic schema.
     """
 
     def start(self):
@@ -65,6 +69,54 @@ class LlmService:
         messages = [system_message, human_message]
         async for chunk in self.model.astream(messages):
             yield chunk
+
+    def chat_with_structured_output(
+            self,
+            output_schema: Type[T],
+            system_message: SystemMessage = SystemMessage(content='You are a helpful assistant.'),
+            human_message: HumanMessage | None = None,
+    ) -> T:
+        """
+        Chat with LLM and enforce structured output conforming to the provided Pydantic schema.
+        
+        Uses LangChain's with_structured_output to ensure the LLM returns
+        a response that matches the expected schema.
+        
+        Args:
+            output_schema: Pydantic model class defining the expected output structure
+            system_message: System message to set assistant behavior
+            human_message: User's message
+            
+        Returns:
+            Instance of the output_schema Pydantic model
+        """
+        structured_model = self.model.with_structured_output(output_schema)
+        messages = [system_message, human_message]
+        return structured_model.invoke(messages)
+
+    async def async_chat_with_structured_output(
+            self,
+            output_schema: Type[T],
+            system_message: SystemMessage = SystemMessage(content='You are a helpful assistant.'),
+            human_message: HumanMessage | None = None,
+    ) -> T:
+        """
+        Async chat with LLM and enforce structured output conforming to the provided Pydantic schema.
+        
+        Uses LangChain's with_structured_output to ensure the LLM returns
+        a response that matches the expected schema.
+        
+        Args:
+            output_schema: Pydantic model class defining the expected output structure
+            system_message: System message to set assistant behavior
+            human_message: User's message
+            
+        Returns:
+            Instance of the output_schema Pydantic model
+        """
+        structured_model = self.model.with_structured_output(output_schema)
+        messages = [system_message, human_message]
+        return await structured_model.ainvoke(messages)
 
 # import asyncio
 # 
