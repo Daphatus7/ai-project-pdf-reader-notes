@@ -9,6 +9,15 @@ import React, {type ReactNode, useState, useCallback, type JSX } from 'react';
 interface MarkdownRendererProps {
 	content: string;
 	className?: string;
+	/**
+	 * Callback when a section is clicked.
+	 * 
+	 * Used for click-to-insert functionality where clicking any section
+	 * (heading, paragraph, code block, etc.) triggers insertion into the note editor.
+	 * 
+	 * @param sectionType - Type of section that was clicked
+	 * @param content - Extracted text content from the section
+	 */
 	onSectionClick?: (sectionType: string, content: string) => void;
 }
 
@@ -28,7 +37,14 @@ interface SelectableWrapperProps {
 
 /**
  * Wrapper component that adds hover feedback and click selection to markdown sections.
- * Extracts text content from children and triggers callback on click.
+ * 
+ * Extracts text content from React children and triggers callback on click.
+ * Used to enable click-to-insert functionality for all markdown elements.
+ * 
+ * Features:
+ * - Visual hover feedback (outline and background highlight)
+ * - Click detection and content extraction
+ * - Prevents event propagation to avoid conflicts
  */
 function SelectableWrapper({ 
 	children, 
@@ -58,11 +74,11 @@ function SelectableWrapper({
 	const handleClick = useCallback((e: React.MouseEvent) => {
 		e.stopPropagation();
 		const textContent = extractTextContent(children);
-		console.log(`[MarkdownRenderer] Section clicked: ${sectionType}`);
-		console.log(`[MarkdownRenderer] Content: ${textContent}`);
+		// console.log(`[MarkdownRenderer] Section clicked: ${sectionType}`);
+		// console.log(`[MarkdownRenderer] Content: ${textContent}`);
 		onSelect(sectionType, textContent);
 	}, [children, sectionType, onSelect, extractTextContent]);
-
+	
 	const hoverStyles = isHovered 
 		? 'bg-primary/10 outline outline-2 outline-primary/30 rounded cursor-pointer' 
 		: '';
@@ -163,6 +179,22 @@ function preprocessMathContent(content: string): string {
 	return processed;
 }
 
+/**
+ * Markdown Renderer component with click-to-insert functionality.
+ * 
+ * Renders markdown content with support for:
+ * - GitHub Flavored Markdown (GFM) including tables, task lists
+ * - Math expressions (LaTeX) with KaTeX rendering
+ * - Clickable sections for content insertion
+ * 
+ * All sections (headings, paragraphs, code blocks, tables, etc.) are clickable.
+ * Clicking a section extracts its content and triggers the onSectionClick callback,
+ * which can be used to insert the content into a note editor.
+ * 
+ * @param content - Markdown content to render
+ * @param className - Optional CSS class name
+ * @param onSectionClick - Callback when a section is clicked
+ */
 export function MarkdownRenderer({ content, className, onSectionClick }: MarkdownRendererProps) {
 	// Apply preprocessing: lists first, then math (to avoid conflicts)
 	const processedContent = preprocessMathContent(preprocessListContent(content));

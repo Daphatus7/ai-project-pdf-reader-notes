@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
@@ -13,6 +13,7 @@ import { PanelLeftOpen } from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
 
 export interface Note {
 	id: string;
@@ -293,6 +294,18 @@ interface ScreenshotContext {
 	name: string;
 }
 
+/**
+ * Main App component.
+ * 
+ * Coordinates the entire application including:
+ * - Note management (sidebar)
+ * - PDF reading (center left)
+ * - LLM chat with click-to-insert functionality (center right)
+ * - Note editing with TipTap editor (right sidebar)
+ * 
+ * Handles content insertion flow:
+ * MarkdownRenderer (click) → LLMChat → App → NoteTaker (insert)
+ */
 export default function App() {
 	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
@@ -315,6 +328,7 @@ export default function App() {
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
+	const noteTakerRef = useRef<NoteTakerHandle>(null);
 
 	// Collapse thresholds (based on UI/UX standards like Overleaf)
 	const SIDEBAR_COLLAPSE_THRESHOLD = 12; // 12% for sidebars
@@ -330,6 +344,27 @@ export default function App() {
 			centerPanelRef.current?.collapse();
 		}
 	};
+
+	/**
+	 * Handles content insertion from LLMChat into NoteTaker.
+	 * 
+	 * Called when user clicks on a section in MarkdownRenderer.
+	 * Inserts the formatted markdown content into the note editor.
+	 * 
+	 * @param insertion - Content insertion payload with formatted markdown
+	 */
+	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
+		if (!noteTakerRef.current) {
+			console.warn('[App] NoteTaker ref not available, cannot insert content');
+			return;
+		}
+
+		// Insert content at cursor position
+		noteTakerRef.current.insertContent(insertion.content, 'cursor');
+		
+		// Focus the editor after insertion
+		noteTakerRef.current.focus();
+	}, []);
 
 	return (
 		<DndProvider backend={HTML5Backend}>
@@ -402,7 +437,8 @@ export default function App() {
 
 									<LLMChatSection 
 										note={selectedNote} 
-										externalContextItems={screenshots} 
+										externalContextItems={screenshots}
+										onContentInsert={handleContentInsert}
 									/>
 								</ResizablePanelGroup>
 							)}
@@ -411,7 +447,10 @@ export default function App() {
 						<ResizableHandle withHandle />
 
 						{/* Right Sidebar - Markdown Editor */}
-						<NoteSection note={selectedNote} />
+						<NoteSection 
+							note={selectedNote}
+							noteTakerRef={noteTakerRef}
+						/>
 					</ResizablePanelGroup>
 				</div>
 			</div>

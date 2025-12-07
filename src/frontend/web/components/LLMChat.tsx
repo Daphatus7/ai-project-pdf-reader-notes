@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "./ui/button.tsx";
 import { Input } from "./ui/input.tsx";
 import { Avatar, AvatarFallback } from "./ui/avatar.tsx";
@@ -26,6 +26,8 @@ import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
 import { llmService, ApiError, type LLMStructuredOutput } from "../../api";
 import { MarkdownRenderer } from "./MarkdownRenderer.tsx";
+import type { ContentInsertion, SectionType } from "../types/content-insertion.ts";
+import { transformContentForInsertion } from "../utils/content-transformer.ts";
 
 interface Message {
 	id: string;
@@ -47,9 +49,18 @@ export const DRAG_TYPE = "AI_MESSAGE";
 
 interface DraggableMessageProps {
 	message: Message;
+	onSectionClick?: (sectionType: string, content: string) => void;
 }
 
-function DraggableMessage({ message }: DraggableMessageProps) {
+/**
+ * Draggable message component that displays assistant messages.
+ * 
+ * Supports both drag-and-drop and click-to-insert functionality.
+ * 
+ * @param message - The message to display
+ * @param onSectionClick - Callback when a section is clicked in MarkdownRenderer
+ */
+function DraggableMessage({ message, onSectionClick }: DraggableMessageProps) {
 	const [{ isDragging }, drag, preview] = useDrag(() => ({
 		type: DRAG_TYPE,
 		item: { content: message.content },
@@ -96,7 +107,11 @@ function DraggableMessage({ message }: DraggableMessageProps) {
 					</Tooltip>
 				</TooltipProvider>
 
-				<MarkdownRenderer content={message.content} className="text-sm" />
+				<MarkdownRenderer 
+					content={message.content} 
+					className="text-sm"
+					onSectionClick={onSectionClick}
+				/>
 			</div>
 		</div>
 	);
@@ -105,6 +120,12 @@ function DraggableMessage({ message }: DraggableMessageProps) {
 interface LLMChatProps {
 	note: Note;
 	externalContextItems?: ContextItem[];
+	/**
+	 * Callback when content should be inserted into the note editor.
+	 * 
+	 * @param insertion - Content insertion payload with formatted markdown
+	 */
+	onContentInsert?: (insertion: ContentInsertion) => void;
 }
 
 const mockMessages: Message[] = [
@@ -115,7 +136,20 @@ const mockMessages: Message[] = [
 	}
 ];
 
-export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
+/**
+ * LLM Chat component for interacting with AI assistant.
+ * 
+ * Features:
+ * - Chat interface with message history
+ * - Context items (images and text) for enhanced prompts
+ * - Click-to-insert: Click any section in assistant messages to insert into notes
+ * - Drag-and-drop: Drag entire messages to insert into notes
+ * 
+ * @param note - Current note being edited
+ * @param externalContextItems - External context items (e.g., screenshots)
+ * @param onContentInsert - Callback when content should be inserted into notes
+ */
+export function LLMChat({ note, externalContextItems = [], onContentInsert }: LLMChatProps) {
 	const [messages, setMessages] = useState<Message[]>(mockMessages);
 	const [input, setInput] = useState("");
 	const [contextItems, setContextItems] = useState<ContextItem[]>([]);
@@ -128,6 +162,42 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 
 	// Merge external context items (like screenshots) with manual context items
 	const allContextItems = [...contextItems, ...externalContextItems];
+
+	/**
+	 * Handles section clicks from MarkdownRenderer.
+	 * 
+	 * Transforms the raw content into properly formatted markdown
+	 * and notifies the parent component to insert it into the note editor.
+	 * 
+	 * @param sectionType - Type of section that was clicked
+	 * @param content - Raw content extracted from the section
+	 */
+	const handleSectionClick = useCallback((sectionType: string, content: string) => {
+		if (!onContentInsert) {
+			console.warn('[LLMChat] onContentInsert callback not provided');
+			return;
+		}
+
+		// Transform content based on section type
+		const transformedContent = transformContentForInsertion({
+			sectionType: sectionType as SectionType,
+			rawContent: content,
+			preserveFormatting: true,
+		});
+
+		// Create insertion payload
+		const insertion: ContentInsertion = {
+			content: transformedContent,
+			sectionType: sectionType as SectionType,
+			source: 'markdown-renderer',
+			metadata: {
+				preserveFormatting: true,
+			},
+		};
+
+		// Notify parent
+		onContentInsert(insertion);
+	}, [onContentInsert]);
 
 	// Auto-scroll to bottom when messages update
 	useEffect(() => {
@@ -350,7 +420,11 @@ Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
 			<div className="scroll-y flex-1 min-h-0 overflow-y-auto px-4 pb-4 space-y-3" data-testid="chat-messages">
 				{messages.map((message) => (
 					message.role === "assistant" ? (
-						<DraggableMessage key={message.id} message={message} />
+						<DraggableMessage 
+							key={message.id} 
+							message={message}
+							onSectionClick={handleSectionClick}
+						/>
 					) : (
 						<div key={message.id} className="flex gap-3 justify-end">
 							<div className="rounded-lg px-4 py-2 max-w-[85%] bg-primary text-primary-foreground">

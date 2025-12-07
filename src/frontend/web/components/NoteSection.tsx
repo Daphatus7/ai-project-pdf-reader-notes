@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { ResizablePanel } from "@@/frontend/web/components/ui/resizable.tsx";
 import { type ImperativePanelHandle } from "react-resizable-panels";
 import { PanelRightOpen } from "lucide-react";
 import NoteTaker from "./note-taker.tsx";
 import type { Note } from "../../App.tsx";
+import type { NoteTakerHandle } from "../types/content-insertion.ts";
 
 interface NoteSectionProps {
 	defaultSize?: number;
@@ -11,20 +12,40 @@ interface NoteSectionProps {
 	maxSize?: number;
 	collapsedSize?: number;
 	note: Note;
+	/**
+	 * Ref to the NoteTaker component for imperative operations.
+	 */
+	noteTakerRef?: React.RefObject<NoteTakerHandle>;
 }
 
 const SIDEBAR_COLLAPSE_THRESHOLD = 12;
 
+/**
+ * Note Section component.
+ * 
+ * Wraps NoteTaker in a resizable panel and forwards refs for imperative operations.
+ * 
+ * @param defaultSize - Default panel size percentage
+ * @param minSize - Minimum panel size percentage
+ * @param maxSize - Maximum panel size percentage
+ * @param collapsedSize - Size when collapsed
+ * @param note - Current note being edited
+ * @param noteTakerRef - Ref to NoteTaker for imperative operations
+ */
 export function NoteSection({
 	defaultSize = 30,
 	minSize = 5,
 	maxSize = 98,
 	collapsedSize = 2,
 	note,
+	noteTakerRef,
 }: NoteSectionProps) {
 	const rightPanelRef = useRef<ImperativePanelHandle>(null);
 	const [isRightCollapsed, setIsRightCollapsed] = useState(false);
-
+	
+	console.log("trying to ")
+	console.log(noteTakerRef)
+	
 	const handleRightResize = (size: number) => {
 		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isRightCollapsed) {
 			rightPanelRef.current?.collapse();
@@ -55,7 +76,7 @@ export function NoteSection({
 					</div>
 				)}
 				<div className={isRightCollapsed ? "hidden" : "h-full"}>
-					<NoteTaker note={note} />
+					<NoteTaker note={note} ref={noteTakerRef} />
 				</div>
 			</div>
 		</ResizablePanel>

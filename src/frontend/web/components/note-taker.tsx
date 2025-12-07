@@ -1,6 +1,8 @@
-import {useRef, useState} from 'react'
-import { EditorContent, NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
+import {useRef, useState, forwardRef, useImperativeHandle} from 'react'
+import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
+import type { Editor } from '@tiptap/core'
 import type { Note } from '../../App.tsx'
+import type { NoteTakerHandle } from '../types/content-insertion.ts'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
 import { Highlight } from '@tiptap/extension-highlight'
@@ -90,7 +92,19 @@ const CustomReactNode = Node.create({
 })
 
 
-export function NoteTaker({ note }: NoteTakerProps) {
+/**
+ * Note Taker component with TipTap editor.
+ * 
+ * Provides a markdown editor with multiple view modes:
+ * - Markdown: Raw markdown text editing
+ * - Editor: WYSIWYG editor with markdown support
+ * 
+ * Exposes imperative handle for programmatic content insertion.
+ * 
+ * @param note - Optional note to load
+ */
+export const NoteTaker = 
+	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
 	const editor = useEditor({
 		extensions: [
 			Markdown,
@@ -109,20 +123,6 @@ export function NoteTaker({ note }: NoteTakerProps) {
 				height: 320,
 			}),
 			Image,
-			// DragHandle.configure({
-			// 	render: () => {
-			// 		const element = document.createElement('div')
-			//
-			// 		// Use as a hook for CSS to insert an icon
-			// 		element.classList.add('custom-drag-handle')
-			//
-			// 		return element
-			// 	},
-			// 	computePositionConfig: {
-			// 		placement: 'left',
-			// 		strategy: 'fixed',
-			// 	},
-			// }),
 			TableKit,
 			Highlight,
 			Mathematics,
@@ -183,6 +183,83 @@ export function NoteTaker({ note }: NoteTakerProps) {
 		isPushing.current = false;
 	};
 
+	/**
+	 * Exposes imperative handle for parent components to insert content programmatically.
+	 */
+	useImperativeHandle(ref, () => ({
+		/**
+		 * Inserts markdown content into the editor at the specified position.
+		 * 
+		 * @param content - Markdown content to insert
+		 * @param position - Where to insert: 'cursor' (current cursor position) or 'end' (end of document)
+		 */
+		insertContent: (content: string, position: 'cursor' | 'end' = 'cursor') => {
+			if (!editor) {
+				console.warn('[NoteTaker] Editor not ready, cannot insert content');
+				return;
+			}
+
+			// Validate content
+			if (!content || content.trim().length === 0) {
+				console.warn('[NoteTaker] Empty content, skipping insertion');
+				return;
+			}
+
+			try {
+				// Ensure we're in editor view for insertion
+				if (activeView !== 'editor') {
+					// // setActiveView('editor');
+					// // Wait for view to switch before inserting
+					setTimeout(() => {
+						insertContentInternal(content, position);
+					}, 100);
+				} else {
+					insertContentInternal(content, position);
+				}
+				console.log(content)
+			} catch (error) {
+				console.error('[NoteTaker] Failed to insert content:', error);
+			}
+		},
+
+		/**
+		 * Focuses the editor.
+		 */
+		focus: () => {
+			if (!editor) return;
+			
+			// Switch to editor view if not already
+			if (activeView !== 'editor') {
+				setActiveView('editor');
+				setTimeout(() => {
+					editor.commands.focus();
+				}, 100);
+			} else {
+				editor.commands.focus();
+			}
+		},
+
+		/**
+		 * Gets the underlying TipTap editor instance.
+		 * 
+		 * @returns Editor instance or null if not initialized
+		 */
+		getEditor: () => editor,
+	}), [editor, activeView]);
+
+	/**
+	 * Internal helper to insert content into the editor.
+	 * 
+	 * @param content - Markdown content to insert
+	 * @param position - Where to insert
+	 */
+	const insertContentInternal = (content: string, position: 'cursor' | 'end') => {
+		if (!editor) return;
+		
+		console.log("inserting ------->>>>", content);
+		editor.commands.insertContent(content)
+	};
+
 	return (
 		<div className="h-full flex flex-col bg-background">
 			<Tabs value={activeView} onValueChange={(v: string) => setActiveView(v as ViewMode)} className="h-full flex flex-col">
@@ -231,6 +308,6 @@ export function NoteTaker({ note }: NoteTakerProps) {
 			</Tabs>
 		</div>
 	)
-}
+});
 
 export default NoteTaker

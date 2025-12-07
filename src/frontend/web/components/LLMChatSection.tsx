@@ -4,6 +4,7 @@ import { type ImperativePanelHandle } from "react-resizable-panels";
 import { ChevronUp } from "lucide-react";
 import { LLMChat } from "./LLMChat.tsx";
 import type { Note } from "../../App.tsx";
+import type { ContentInsertion } from "../types/content-insertion.ts";
 
 interface ScreenshotContext {
 	id: string;
@@ -18,16 +19,35 @@ interface LLMChatSectionProps {
 	collapsedSize?: number;
 	note: Note;
 	externalContextItems?: ScreenshotContext[];
+	/**
+	 * Callback when content should be inserted into the note editor.
+	 * 
+	 * @param insertion - Content insertion payload with formatted markdown
+	 */
+	onContentInsert?: (insertion: ContentInsertion) => void;
 }
 
 const VERTICAL_COLLAPSE_THRESHOLD = 18;
 
+/**
+ * LLM Chat Section component.
+ * 
+ * Wraps LLMChat in a resizable panel and passes through content insertion callbacks.
+ * 
+ * @param defaultSize - Default panel size percentage
+ * @param minSize - Minimum panel size percentage
+ * @param collapsedSize - Size when collapsed
+ * @param note - Current note being edited
+ * @param externalContextItems - External context items (e.g., screenshots)
+ * @param onContentInsert - Callback when content should be inserted into notes
+ */
 export function LLMChatSection({
 	defaultSize = 50,
 	minSize = 15,
 	collapsedSize = 1,
 	note,
 	externalContextItems = [],
+	onContentInsert,
 }: LLMChatSectionProps) {
 	const editorPanelRef = useRef<ImperativePanelHandle>(null);
 	const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
@@ -62,7 +82,11 @@ export function LLMChatSection({
 					</div>
 				)}
 				<div className={isEditorCollapsed ? "hidden" : "h-full min-h-0"}>
-					<LLMChat note={note} externalContextItems={externalContextItems} />
+					<LLMChat 
+						note={note} 
+						externalContextItems={externalContextItems}
+						onContentInsert={onContentInsert}
+					/>
 				</div>
 			</div>
 		</ResizablePanel>
