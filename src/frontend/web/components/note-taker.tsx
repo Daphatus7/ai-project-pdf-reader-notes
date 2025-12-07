@@ -193,18 +193,12 @@ export const NoteTaker =
 		 * @param content - Markdown content to insert
 		 * @param position - Where to insert: 'cursor' (current cursor position) or 'end' (end of document)
 		 */
-		insertContent: (content: string, position: 'cursor' | 'end' = 'cursor') => {
+		insertContent: (content: any, position: 'cursor' | 'end' = 'cursor') => {
 			if (!editor) {
 				console.warn('[NoteTaker] Editor not ready, cannot insert content');
 				return;
 			}
-
-			// Validate content
-			if (!content || content.trim().length === 0) {
-				console.warn('[NoteTaker] Empty content, skipping insertion');
-				return;
-			}
-
+			
 			try {
 				// Ensure we're in editor view for insertion
 				if (activeView !== 'editor') {
@@ -216,7 +210,6 @@ export const NoteTaker =
 				} else {
 					insertContentInternal(content, position);
 				}
-				console.log(content)
 			} catch (error) {
 				console.error('[NoteTaker] Failed to insert content:', error);
 			}
@@ -226,17 +219,18 @@ export const NoteTaker =
 		 * Focuses the editor.
 		 */
 		focus: () => {
-			if (!editor) return;
-			
-			// Switch to editor view if not already
-			if (activeView !== 'editor') {
-				setActiveView('editor');
-				setTimeout(() => {
-					editor.commands.focus();
-				}, 100);
-			} else {
-				editor.commands.focus();
-			}
+			return
+			// if (!editor) return;
+			//
+			// // Switch to editor view if not already
+			// if (activeView !== 'editor') {
+			// 	setActiveView('editor');
+			// 	setTimeout(() => {
+			// 		editor.commands.focus();
+			// 	}, 100);
+			// } else {
+			// 	editor.commands.focus();
+			// }
 		},
 
 		/**
@@ -253,11 +247,12 @@ export const NoteTaker =
 	 * @param content - Markdown content to insert
 	 * @param position - Where to insert
 	 */
-	const insertContentInternal = (content: string, position: 'cursor' | 'end') => {
+	const insertContentInternal = (content: any, position: 'cursor' | 'end') => {
 		if (!editor) return;
-		
-		console.log("inserting ------->>>>", content);
-		editor.commands.insertContent(content)
+		console.log("The content ------>",content);
+
+		// console.log("inserting ------->>>>", content);
+		// editor.commands.insertContent(content)
 	};
 
 	return (

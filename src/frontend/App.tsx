@@ -360,7 +360,7 @@ export default function App() {
 		}
 
 		// Insert content at cursor position
-		noteTakerRef.current.insertContent(insertion.content, 'cursor');
+		noteTakerRef.current.insertContent(insertion, 'cursor');
 		
 		// Focus the editor after insertion
 		noteTakerRef.current.focus();

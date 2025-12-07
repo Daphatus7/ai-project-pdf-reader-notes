@@ -70,7 +70,7 @@ export interface NoteTakerHandle {
 	 * @param content - Markdown content to insert
 	 * @param position - Where to insert: 'cursor' (current cursor position) or 'end' (end of document)
 	 */
-	insertContent: (content: string, position?: 'cursor' | 'end') => void;
+	insertContent: (content: any, position?: 'cursor' | 'end') => void;
 	
 	/**
 	 * Focuses the editor.
