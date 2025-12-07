@@ -157,6 +157,9 @@ export function LLMChat({ note, externalContextItems = [] }: LLMChatProps) {
 | GELU | $f(x) = x \\cdot \\Phi(x)$, $\\Phi(x) = \\dfrac{1}{2}\\left[1+\\operatorname{erf}\\left(\\dfrac{x}{\\sqrt{2}}\\right)\\right]$ | All real numbers | Yes; $f'(x) = \\Phi(x) + x \\phi(x)$, $\\phi(x) = \\dfrac{1}{\\sqrt{2\\pi}} e^{-x^{2}/2}$ | Smooth with probabilistic interpretation | Computation heavier | State-of-the-art variants in some transformers |
 
 If you’d like, I can tailor this to a specific framework (e.g., PyTorch or TensorFlow) or add columns for gradient behavior in practice.
+- 1. a
+- 2. b
+- 3. c
 `
 			}
 		]);
