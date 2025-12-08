@@ -261,26 +261,26 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 		try {
 			// Build system message with note context
 			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
-The user is working on a document and may ask questions about it or request help expanding their notes.
-${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
-
-MATH FORMATTING (CRITICAL - follow EXACTLY):
-
-1. ALWAYS wrap ALL math in $...$ delimiters:
-   - Variables: $P(t)$, $c_n$, $\\omega$
-   - Equations: $P(t) = A\\cos(\\omega t)$
-   - Subscripts: $c_{-1}$, $e^{j\\omega t}$
-
-2. Use LaTeX commands, NEVER Unicode:
-   - WRONG: ∑, ∞, ω, π (Unicode)
-   - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$
-
-3. Display math: $$ on separate lines, NOT inside bullets
-
-WRONG: P(t) = ∑ c_n e^{jnωt}, c_{-n} = c_n^*
-CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
-
-Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
+			The user is working on a document and may ask questions about it or request help expanding their notes.
+			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
+			
+			MATH FORMATTING (CRITICAL - follow EXACTLY):
+			
+			1. ALWAYS wrap ALL math in $...$ delimiters:
+			   - Variables: $P(t)$, $c_n$, $\\omega$
+			   - Equations: $P(t) = A\\cos(\\omega t)$
+			   - Subscripts: $c_{-1}$, $e^{j\\omega t}$
+			
+			2. Use LaTeX commands, NEVER Unicode:
+			   - WRONG: ∑, ∞, ω, π (Unicode)
+			   - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$
+			
+			3. Display math: $$ on separate lines, NOT inside bullets
+			
+			WRONG: P(t) = ∑ c_n e^{jnωt}, c_{-n} = c_n^*
+			CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
+			
+			Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
 
 			// Use structured streaming API
 			let accumulatedContent = "";

@@ -108,7 +108,7 @@ function preprocessListContent(content: string): string {
 	// Step 1: Convert bullet points that start with numbered format to numbered lists
 	// Pattern: `- 1. text` or `- 1) text` -> `1. text`
 	// This handles cases where LLM outputs numbered items as bullet points
-	processed = processed.replace(/^(\s*)[-*]\s+(\d+)([.)])\s+(.+)$/gm, (match, indent, number, delimiter, text) => {
+	processed = processed.replace(/^(\s*)[-*]\s+(\d+)([.)])\s+(.+)$/gm, (_match, indent, number, _delimiter, text) => {
 		// Convert to numbered list format (always use period)
 		return `${indent}${number}. ${text}`;
 	});
