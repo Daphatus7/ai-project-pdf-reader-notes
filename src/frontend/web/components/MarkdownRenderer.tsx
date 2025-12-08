@@ -4,7 +4,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { cn } from './ui/utils.ts';
-import React, {type ReactNode, useState, useCallback, type JSX, useMemo} from 'react';
+import React, {type ReactNode, useState, useCallback, type JSX, useRef, useEffect} from 'react';
 
 interface MarkdownRendererProps {
 	content: string;
@@ -17,8 +17,9 @@ interface MarkdownRendererProps {
 	 * 
 	 * @param sectionType - Type of section that was clicked
 	 * @param content - Extracted text content from the section
+	 * @param htmlContent - Extracted HTML content from the section
 	 */
-	onSectionClick?: (sectionType: string, content: string) => void;
+	onSectionClick?: (sectionType: string, content: string, htmlContent: string) => void;
 }
 
 type SectionType = 
@@ -30,7 +31,7 @@ type SectionType =
 interface SelectableWrapperProps {
 	children: ReactNode;
 	sectionType: SectionType;
-	onSelect: (sectionType: string, content: string) => void;
+	onSelect: (sectionType: string, content: string, htmlContent: string) => void;
 	className?: string;
 	as?: keyof JSX.IntrinsicElements;
 }
@@ -64,8 +65,8 @@ function SelectableWrapper({
 			return node.map(extractTextContent).join('');
 		}
 		
-		if (typeof node === 'object' && 'props' in node) {
-			return extractTextContent(node.props.children);
+		if (typeof node === 'object' && 'props' in node && node.props && typeof node.props === 'object' && 'children' in node.props) {
+			return extractTextContent((node.props as any).children);
 		}
 		
 		return '';
@@ -74,24 +75,29 @@ function SelectableWrapper({
 	const handleClick = useCallback((e: React.MouseEvent) => {
 		e.stopPropagation();
 		const textContent = extractTextContent(children);
+		// Extract HTML from the DOM element
+		const target = e.currentTarget as HTMLElement;
+		const htmlContent = target.innerHTML || '';
 		// console.log(`[MarkdownRenderer] Section clicked: ${sectionType}`);
 		// console.log(`[MarkdownRenderer] Content: ${textContent}`);
-		onSelect(sectionType, textContent);
+		// console.log(`[MarkdownRenderer] HTML: ${htmlContent}`);
+		onSelect(sectionType, textContent, htmlContent);
 	}, [children, sectionType, onSelect, extractTextContent]);
 	
 	const hoverStyles = isHovered 
 		? 'bg-primary/10 outline outline-2 outline-primary/30 rounded cursor-pointer' 
 		: '';
 
-	return (
-		<Component
-			className={cn(className, hoverStyles, 'transition-all duration-150')}
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
-			onClick={handleClick}
-		>
-			{children}
-		</Component>
+	// TypeScript has issues with dynamic component types, so we use React.createElement
+	return React.createElement(
+		Component,
+		{
+			className: cn(className, hoverStyles, 'transition-all duration-150'),
+			onMouseEnter: () => setIsHovered(true),
+			onMouseLeave: () => setIsHovered(false),
+			onClick: handleClick,
+		},
+		children
 	);
 }
 
@@ -198,22 +204,31 @@ function preprocessMathContent(content: string): string {
 export function MarkdownRenderer({ content, className, onSectionClick }: MarkdownRendererProps) {
 	// Apply preprocessing: lists first, then math (to avoid conflicts)
 	const processedContent = preprocessMathContent(preprocessListContent(content));
+	const markdownRef = useRef<HTMLDivElement>(null);
 	
 	// Default handler that logs to console if no callback provided
-	const handleSectionSelect = useCallback((sectionType: string, textContent: string) => {
+	const handleSectionSelect = useCallback((sectionType: string, textContent: string, htmlContent: string) => {
 		if (onSectionClick) {
-			onSectionClick(sectionType, textContent);
+			onSectionClick(sectionType, textContent, htmlContent);
 		}
 	}, [onSectionClick]);
 
+	// Log the rendered HTML after component renders
+	useEffect(() => {
+		if (markdownRef.current) {
+			console.log('[MarkdownRenderer] Rendered HTML:', markdownRef.current.innerHTML);
+		}
+	}, [processedContent]);
+
 	const raw_markdown = (
-		<div className={cn('markdown-renderer', className)}>
+		<div ref={markdownRef} className={cn('markdown-renderer', className)}>
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkMath]}
 				rehypePlugins={[rehypeKatex]}
 				components={{
 					// Code blocks
-					code({ inline, className, children, ...props }) {
+					code(props: any) {
+						const { inline, className, children, ...restProps } = props;
 						const match = /language-(\w+)/.exec(className || '');
 						const language = match ? match[1] : '';
 
@@ -242,7 +257,7 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 									</div>
 								)}
 								<pre className="overflow-x-auto p-4 rounded-lg bg-muted/50 border">
-									<code className={cn('text-sm font-mono', className)} {...props}>
+									<code className={cn('text-sm font-mono', className)} {...restProps}>
 										{children}
 									</code>
 								</pre>
@@ -405,9 +420,10 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 								onClick={(e) => {
 									e.stopPropagation();
 									const textContent = typeof children === 'string' ? children : '';
+									const htmlContent = (e.currentTarget as HTMLElement).outerHTML;
 									console.log(`[MarkdownRenderer] Link clicked: ${href}`);
 									console.log(`[MarkdownRenderer] Link text: ${textContent}`);
-									handleSectionSelect('link', `${textContent} (${href})`);
+									handleSectionSelect('link', `${textContent} (${href})`, htmlContent);
 								}}
 							>
 								{children}
@@ -454,6 +470,5 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 		</div>
 	);
 	
-	console.log(raw_markdown)
 	return raw_markdown;
 }

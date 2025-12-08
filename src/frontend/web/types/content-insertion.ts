@@ -42,6 +42,11 @@ export interface ContentInsertion {
 	content: string;
 	
 	/**
+	 * The HTML content to be inserted (preferred for TipTap).
+	 */
+	htmlContent?: string;
+	
+	/**
 	 * Type of section that was clicked.
 	 */
 	sectionType: SectionType;

@@ -171,8 +171,9 @@ export function LLMChat({ note, externalContextItems = [], onContentInsert }: LL
 	 * 
 	 * @param sectionType - Type of section that was clicked
 	 * @param content - Raw content extracted from the section
+	 * @param htmlContent - HTML content extracted from the section
 	 */
-	const handleSectionClick = useCallback((sectionType: string, content: string) => {
+	const handleSectionClick = useCallback((sectionType: string, content: string, htmlContent: string) => {
 		if (!onContentInsert) {
 			console.warn('[LLMChat] onContentInsert callback not provided');
 			return;
@@ -185,9 +186,10 @@ export function LLMChat({ note, externalContextItems = [], onContentInsert }: LL
 			preserveFormatting: true,
 		});
 
-		// Create insertion payload
+		// Create insertion payload with HTML content
 		const insertion: ContentInsertion = {
 			content: transformedContent,
+			htmlContent: htmlContent,
 			sectionType: sectionType as SectionType,
 			source: 'markdown-renderer',
 			metadata: {

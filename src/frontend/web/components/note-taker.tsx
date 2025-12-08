@@ -244,17 +244,42 @@ export const NoteTaker =
 	/**
 	 * Internal helper to insert content into the editor.
 	 * 
-	 * @param content - Markdown content to insert
+	 * @param content - Content insertion payload with HTML or markdown
 	 * @param position - Where to insert
 	 */
 	const insertContentInternal = (content: any, position: 'cursor' | 'end') => {
 		if (!editor) return;
-		console.log("The content ------>",content);
+		console.log("The content ------>", content);
 
-		console.log("inserting ------->>>>", content.content);
-		// editor.commands.insertContent(content)
-		editor.commands.setContent(content.content, { parseOptions: { preserveWhitespace: "full" } })
+		// Prefer HTML content if available, otherwise fall back to markdown
+		const contentToInsert = content.htmlContent || content.content;
+		console.log("inserting ------->>>>", contentToInsert);
 
+		if (content.htmlContent) {
+			// Insert HTML content
+			if (position === 'cursor') {
+				// Insert HTML at cursor position
+				editor.commands.insertContent(content.htmlContent);
+			} else {
+				// Move to end and insert HTML
+				editor.commands.setTextSelection(editor.state.doc.content.size);
+				editor.commands.insertContent(content.htmlContent);
+			}
+		} else {
+			// Fall back to markdown insertion
+			if (position === 'cursor') {
+				editor.commands.insertContent(content.content, {
+					contentType: 'markdown',
+					parseOptions: { preserveWhitespace: "full" }
+				});
+			} else {
+				editor.commands.setTextSelection(editor.state.doc.content.size);
+				editor.commands.insertContent(content.content, {
+					contentType: 'markdown',
+					parseOptions: { preserveWhitespace: "full" }
+				});
+			}
+		}
 	};
 
 	return (
