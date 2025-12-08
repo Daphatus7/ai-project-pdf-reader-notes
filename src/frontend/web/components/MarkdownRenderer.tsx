@@ -4,7 +4,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { cn } from './ui/utils.ts';
-import React, {type ReactNode, useState, useCallback, type JSX } from 'react';
+import React, {type ReactNode, useState, useCallback, type JSX, useMemo} from 'react';
 
 interface MarkdownRendererProps {
 	content: string;
@@ -206,7 +206,7 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 		}
 	}, [onSectionClick]);
 
-	return (
+	const raw_markdown = (
 		<div className={cn('markdown-renderer', className)}>
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkMath]}
@@ -453,4 +453,7 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 			</ReactMarkdown>
 		</div>
 	);
+	
+	console.log(raw_markdown)
+	return raw_markdown;
 }

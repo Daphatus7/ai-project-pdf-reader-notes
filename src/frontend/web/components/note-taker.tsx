@@ -251,8 +251,10 @@ export const NoteTaker =
 		if (!editor) return;
 		console.log("The content ------>",content);
 
-		// console.log("inserting ------->>>>", content);
+		console.log("inserting ------->>>>", content.content);
 		// editor.commands.insertContent(content)
+		editor.commands.setContent(content.content, { parseOptions: { preserveWhitespace: "full" } })
+
 	};
 
 	return (
