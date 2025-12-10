@@ -13,7 +13,7 @@ dist
 *.egg-info
 
 # Environment files
-.env
+src/backend/.env
 .env.local
 .env.*.local
 

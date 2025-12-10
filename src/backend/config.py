@@ -1,7 +1,11 @@
 """
-Configuration management for the LLM backend service
+Configuration management for the LLM backend service.
+
+Ensures environment variables are loaded from the backend-local .env file to
+avoid missing values when running FastAPI from the backend directory.
 """
 import os
+from pathlib import Path
 from typing import List, Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -17,7 +21,7 @@ def read_secret_file(secret_name: str) -> str:
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables and Docker secrets"""
+    """Application settings loaded from environment variables and Docker secrets."""
     
     # LLM API Keys - read from Docker secrets first, then environment variables
     openai_api_key: str = Field(default_factory=lambda: read_secret_file("openai_api_key") or os.getenv("OPENAI_API_KEY", ""))
@@ -47,7 +51,7 @@ class Settings(BaseSettings):
     max_retries: int = Field(default=3, env="MAX_RETRIES")
     
     class Config:
-        env_file = "../../.env"
+        env_file = Path(__file__).resolve().parent / '.env'
         case_sensitive = False
 
 
