@@ -104,6 +104,51 @@ const CustomReactNode = Node.create({
  */
 export const NoteTaker = 
 	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
+	/**
+	 * Normalizes incoming HTML snippets to TipTap math nodes.
+	 * 
+	 * Converts KaTeX-rendered math (from markdown renderers) into
+	 * `<span data-type="inline-math" data-latex="...">` or
+	 * `<div data-type="block-math" data-latex="...">` so the
+	 * mathematics extension can parse them. Falls back to the
+	 * original HTML on parsing errors.
+	 */
+	const normalizeMathHtml = (htmlContent?: string): string | undefined => {
+		if (!htmlContent) return htmlContent;
+
+		try {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(`<div data-root="math-wrapper">${htmlContent}</div>`, 'text/html');
+			const wrapper = doc.body.firstElementChild as HTMLElement | null;
+
+			if (!wrapper) return htmlContent;
+
+			const replaceKatex = (element: Element, isDisplay: boolean) => {
+				const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
+				const latex = annotation?.textContent?.trim();
+				if (!latex) return;
+
+				const replacement = doc.createElement(isDisplay ? 'div' : 'span');
+				replacement.setAttribute('data-type', isDisplay ? 'block-math' : 'inline-math');
+				replacement.setAttribute('data-latex', latex);
+				replacement.textContent = latex;
+				element.replaceWith(replacement);
+			};
+
+			// Display math comes with katex-display class; inline math has katex class without it
+			wrapper.querySelectorAll('.katex-display').forEach(el => replaceKatex(el, true));
+			wrapper.querySelectorAll('.katex').forEach(el => {
+				if ((el as Element).classList.contains('katex-display')) return;
+				replaceKatex(el, false);
+			});
+
+			return wrapper.innerHTML;
+		} catch (error) {
+			console.warn('[NoteTaker] Failed to normalize math HTML', error);
+			return htmlContent;
+		}
+	};
+
 	const editor = useEditor({
 		shouldRerenderOnTransaction: true,
 		extensions: [
@@ -273,14 +318,15 @@ export const NoteTaker =
 		console.log("inserting ------->>>>", contentToInsert);
 
 		if (content.htmlContent) {
+			const normalizedHtml = normalizeMathHtml(content.htmlContent);
 			// Insert HTML content
 			if (position === 'cursor') {
 				// Insert HTML at cursor position
-				editor.commands.insertContent(content.htmlContent);
+				editor.commands.insertContent(normalizedHtml || content.htmlContent);
 			} else {
 				// Move to end and insert HTML
 				editor.commands.setTextSelection(editor.state.doc.content.size);
-				editor.commands.insertContent(content.htmlContent);
+				editor.commands.insertContent(normalizedHtml || content.htmlContent);
 			}
 		} else {
 			// Fall back to markdown insertion
