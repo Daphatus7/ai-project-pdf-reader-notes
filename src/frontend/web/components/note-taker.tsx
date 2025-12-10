@@ -1,6 +1,6 @@
 import {useRef, useState, forwardRef, useImperativeHandle} from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
-import type { Editor } from '@tiptap/core'
+import 'katex/dist/katex.min.css'
 import type { Note } from '../../App.tsx'
 import type { NoteTakerHandle } from '../types/content-insertion.ts'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
@@ -8,8 +8,7 @@ import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-detai
 import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
-import { migrateMathStrings } from '@tiptap/extension-mathematics'
-import { Mathematics } from '@tiptap/extension-mathematics'
+import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
 
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
@@ -106,6 +105,7 @@ const CustomReactNode = Node.create({
 export const NoteTaker = 
 	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
 	const editor = useEditor({
+		shouldRerenderOnTransaction: true,
 		extensions: [
 			Markdown,
 			StarterKit,
@@ -125,7 +125,24 @@ export const NoteTaker =
 			Image,
 			TableKit,
 			Highlight,
-			Mathematics,
+			Math.configure({
+				blockOptions: {
+					onClick: (node, pos) => {
+						const newCalculation = prompt('Enter new calculation:', node.attrs.latex)
+						if (newCalculation) {
+							editor.chain().setNodeSelection(pos).updateBlockMath({ latex: newCalculation }).focus().run()
+						}
+					},
+				},
+				inlineOptions: {
+					onClick: (node, pos) => {
+						const newCalculation = prompt('Enter new calculation:', node.attrs.latex)
+						if (newCalculation) {
+							editor.chain().setNodeSelection(pos).updateInlineMath({ latex: newCalculation }).focus().run()
+						}
+					},
+				},
+			}),
 			Mention.configure({
 				HTMLAttributes: {
 					class: 'mention',
