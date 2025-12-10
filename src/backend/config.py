@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     max_retries: int = Field(default=3, env="MAX_RETRIES")
     
     class Config:
-        env_file = ".env"
+        env_file = "../../.env"
         case_sensitive = False
 
 
