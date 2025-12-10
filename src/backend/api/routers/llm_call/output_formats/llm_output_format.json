@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LLMStructuredOutput",
+  "description": "Schema for structured LLM output with markdown support",
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "string",
+      "description": "Main content in markdown format with LaTeX and GFM support"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": ["explanation", "summary", "answer", "analysis", "code", "table", "list"],
+      "description": "Type of content being returned"
+    },
+    "title": {
+      "type": "string",
+      "description": "Optional title for the response"
+    },
+    "sections": {
+      "type": "array",
+      "description": "Optional breakdown into sections",
+      "items": {
+        "type": "object",
+        "properties": {
+          "heading": {
+            "type": "string",
+            "description": "Section heading"
+          },
+          "content": {
+            "type": "string",
+            "description": "Section content in markdown format"
+          }
+        },
+        "required": ["heading", "content"]
+      }
+    },
+    "key_points": {
+      "type": "array",
+      "description": "Key takeaways or bullet points",
+      "items": {
+        "type": "string"
+      }
+    },
+    "code_blocks": {
+      "type": "array",
+      "description": "Extracted code blocks if any",
+      "items": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "Programming language"
+          },
+          "code": {
+            "type": "string",
+            "description": "Code content"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Optional explanation of the code"
+          }
+        },
+        "required": ["language", "code"]
+      }
+    },
+    "math_expressions": {
+      "type": "array",
+      "description": "Extracted LaTeX math expressions if any",
+      "items": {
+        "type": "object",
+        "properties": {
+          "latex": {
+            "type": "string",
+            "description": "LaTeX expression"
+          },
+          "description": {
+            "type": "string",
+            "description": "Plain text description of the expression"
+          },
+          "is_block": {
+            "type": "boolean",
+            "description": "Whether this is a block (display) or inline expression"
+          }
+        },
+        "required": ["latex"]
+      }
+    },
+    "references": {
+      "type": "array",
+      "description": "References or sources if applicable",
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggested_followups": {
+      "type": "array",
+      "description": "Suggested follow-up questions",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["content", "content_type"]
+}
+
