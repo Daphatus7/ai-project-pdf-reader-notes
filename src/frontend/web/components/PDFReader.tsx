@@ -117,97 +117,28 @@ export function PDFReader({  }: PDFReaderProps) {
 							</Button>
 						</div>
 					</div>
-
 					{/* PDF Controls */}
-					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
-						<div className="flex items-center gap-2">
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<Button
-											variant={screenshotMode ? "default" : "outline"}
-											size="sm"
-											onClick={() => setScreenshotMode(!screenshotMode)}
-										>
-											<Scissors className="w-4 h-4 mr-2" />
-											Screenshot
-										</Button>
-									</TooltipTrigger>
-								</Tooltip>
-							</TooltipProvider>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-								disabled={currentPage === 1}
-							>
-								<ChevronLeft className="w-4 h-4" />
-							</Button>
-
-							<span className="text-sm px-2 min-w-[80px] text-center">
-                {currentPage} / {activePDFDoc?.pages}
-              </span>
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setCurrentPage(Math.min(activePDFDoc?.pages || 1, currentPage + 1))}
-								disabled={currentPage === activePDFDoc?.pages}
-							>
-								<ChevronRight className="w-4 h-4" />
-							</Button>
-
-							<div className="w-px h-6 bg-border mx-2" />
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setZoom(Math.max(50, zoom - 10))}
-							>
-								<ZoomOut className="w-4 h-4" />
-							</Button>
-
-							<span className="text-sm px-2 min-w-[60px] text-center">
-								{zoom}%
-							</span>
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setZoom(Math.min(200, zoom + 10))}
-							>
-								<ZoomIn className="w-4 h-4" />
-							</Button>
-						</div>
-					</div>
-
+					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20"></div>
 					{/* PDF Viewer */}
-							<Worker workerUrl={workerUrl}>
-								{activePDF ? (
-									<Viewer
-										key={activePDF}
-										fileUrl={activePDF}
-										plugins={plugins}
-										onDocumentLoad={(e) => {
-											setOpenPDFs(prev =>
-												prev.map(p =>
-													p.pdfUrl === activePDF ? { ...p, pages: e.doc.numPages } : p
-												)
-											);
-											setCurrentPage(1);
-										}}
-									/>
-								) : (
-									<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
-								)}
-							</Worker>
+					<Worker workerUrl={workerUrl}>
+						{activePDF ? (
+							<Viewer
+								key={activePDF}
+								fileUrl={activePDF}
+								plugins={plugins}
+								onDocumentLoad={(e) => {
+									setOpenPDFs(prev =>
+										prev.map(p =>
+											p.pdfUrl === activePDF ? { ...p, pages: e.doc.numPages } : p
+										)
+									);
+									setCurrentPage(1);
+								}}
+							/>
+						) : (
+							<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
+						)}
+					</Worker>
 				</>
 			) : (
 				<div className="flex-1 flex items-center justify-center">
