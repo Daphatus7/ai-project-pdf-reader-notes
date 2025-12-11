@@ -133,16 +133,8 @@ export function PDFReader({  }: PDFReaderProps) {
 											Screenshot
 										</Button>
 									</TooltipTrigger>
-									<TooltipContent>
-										<p>Take a screenshot and ask AI</p>
-									</TooltipContent>
 								</Tooltip>
 							</TooltipProvider>
-
-							<Button variant="outline" size="sm">
-								<MessageSquare className="w-4 h-4 mr-2" />
-								Ask AI
-							</Button>
 						</div>
 
 						<div className="flex items-center gap-2">
