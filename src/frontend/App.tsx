@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
@@ -311,7 +311,7 @@ export default function App() {
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
 	const [screenshots, setScreenshots] = useState<ScreenshotContext[]>([]);
 
-	const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
+	const [isLeftCollapsed, setIsLeftCollapsed] = useState(true);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
 
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
@@ -325,10 +325,15 @@ export default function App() {
 		};
 		setScreenshots(prev => [...prev, newScreenshot]);
 	};
+	
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
 	const noteTakerRef = useRef<NoteTakerHandle>(null);
+
+	useEffect(() => {
+		leftPanelRef.current?.collapse();
+	}, []);
 
 	// Collapse thresholds (based on UI/UX standards like Overleaf)
 	const SIDEBAR_COLLAPSE_THRESHOLD = 12; // 12% for sidebars
