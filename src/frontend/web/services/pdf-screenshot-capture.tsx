@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { getPage } from '@react-pdf-viewer/core';
-import type { Plugin, PluginRenderPageLayer, PdfJs, ViewerState } from '@react-pdf-viewer/core';
+import { useEffect, useRef } from 'react';
+import {type Plugin, type PluginRenderPageLayer, type PdfJs, type ViewerState, getPage} from '@react-pdf-viewer/core';
 
 export interface Rect {
   left: number;

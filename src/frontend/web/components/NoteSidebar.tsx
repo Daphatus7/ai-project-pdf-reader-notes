@@ -8,7 +8,6 @@ import {
   Trash2, 
   Download,
   MoreVertical,
-  FolderOpen,
   GripVertical,
   Search
 } from "lucide-react";
