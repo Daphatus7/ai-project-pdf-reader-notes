@@ -13,7 +13,7 @@ import type {
 	ChatResponse,
 	StreamChatRequest,
 	StructuredChatRequest,
-	StructuredChatResponse,
+	StructuredChatResponse, StructuredImageChatRequest,
 } from './types';
 
 export class LLMService {
@@ -71,7 +71,8 @@ export class LLMService {
 	 * @param request - The structured chat request
 	 * @returns Async generator yielding stream events
 	 */
-	async *chatStructuredStream(request: StructuredChatRequest): AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
+	async *chatStructuredStream(request: StructuredChatRequest): 
+		AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
 		for await (const chunk of streamRequest(apiConfig.endpoints.llm.chatStructuredStream, request)) {
 			try {
 				const parsed = JSON.parse(chunk);
@@ -79,6 +80,19 @@ export class LLMService {
 			} catch {
 				// If parsing fails, treat as plain text (backward compatibility)
 				yield { type: 'text', content: chunk };
+			}
+		}
+	}
+	
+	async *chatStructuredStreamImage(request: StructuredImageChatRequest): 
+		AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
+		for await (const chunk of streamRequest(apiConfig.endpoints.llm.chatStructuredStream, request)) {
+			try {
+				const parsed = JSON.parse(chunk);
+				yield parsed;
+			} catch {
+				// If parsing fails, treat as plain text (backward compatibility)
+				yield {type: 'text', content: chunk};
 			}
 		}
 	}

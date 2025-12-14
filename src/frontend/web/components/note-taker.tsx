@@ -21,6 +21,8 @@ import StarterKit from '@tiptap/starter-kit'
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/web/components/ui/tabs.tsx";
 
 import {SimpleEditor} from "@@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
+import TextAlign from "@tiptap/extension-text-align";
+import {ImageUploadNode} from "@@/frontend/@/components/tiptap-node/image-upload-node";
 
 interface NoteTakerProps {
 	note?: Note
@@ -103,7 +105,7 @@ const CustomReactNode = Node.create({
  * @param note - Optional note to load
  */
 export const NoteTaker = 
-	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
+	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ }, ref) {
 	/**
 	 * Normalizes incoming HTML snippets to TipTap math nodes.
 	 * 
@@ -155,6 +157,8 @@ export const NoteTaker =
 			Markdown,
 			StarterKit,
 			Details,
+			TextAlign,
+			ImageUploadNode,
 			DetailsSummary,
 			DetailsContent,
 			TaskList,

@@ -127,7 +127,7 @@ export function ScreenshotCapture({
       onCapture(imageDataUrl, name);
     } catch (error) {
       console.error('Screenshot capture failed:', error);
-      alert('Screenshot capture failed. Please try again.');
+      // alert('captureSelection capture failed. Please try again.');
     } finally {
       if (isMountedRef.current) setIsCapturing(false);
     }
@@ -150,7 +150,7 @@ export function ScreenshotCapture({
       onCapture(imageDataUrl, name);
     } catch (error) {
       console.error('Screenshot capture failed:', error);
-      alert('Screenshot capture failed. Please try again.');
+      alert('captureFullArea capture failed. Please try again.');
     } finally {
       if (isMountedRef.current) setIsCapturing(false);
     }

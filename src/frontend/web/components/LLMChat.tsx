@@ -83,7 +83,9 @@ function DraggableMessage({ message, onSectionClick }: DraggableMessageProps) {
 			</Avatar>
 
 			<div
-				ref={preview}
+				ref={(node) => {
+					preview(node);
+				}}
 				className={cn(
 					"rounded-lg px-4 py-2 max-w-[85%] bg-muted relative"
 				)}
@@ -92,7 +94,9 @@ function DraggableMessage({ message, onSectionClick }: DraggableMessageProps) {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div
-								ref={drag}
+								ref={(node) => {
+									drag(node);
+								}}
 								className={cn(
 									"absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing",
 									"bg-muted border border-border rounded p-1 hover:bg-primary/10 hover:border-primary"
@@ -120,6 +124,12 @@ function DraggableMessage({ message, onSectionClick }: DraggableMessageProps) {
 interface LLMChatProps {
 	note: Note;
 	externalContextItems?: ContextItem[];
+	pendingImageAnalysis?: {
+		id: string;
+		imageDataUrl: string;
+		name: string;
+	} | null;
+	onPendingImageAnalysisHandled?: (id: string) => void;
 	/**
 	 * Callback when content should be inserted into the note editor.
 	 * 
@@ -149,7 +159,13 @@ const mockMessages: Message[] = [
  * @param externalContextItems - External context items (e.g., screenshots)
  * @param onContentInsert - Callback when content should be inserted into notes
  */
-export function LLMChat({ note, externalContextItems = [], onContentInsert }: LLMChatProps) {
+export function LLMChat({
+	note,
+	externalContextItems = [],
+	pendingImageAnalysis = null,
+	onPendingImageAnalysisHandled,
+	onContentInsert
+}: LLMChatProps) {
 	const [messages, setMessages] = useState<Message[]>(mockMessages);
 	const [input, setInput] = useState("");
 	const [contextItems, setContextItems] = useState<ContextItem[]>([]);
@@ -159,10 +175,124 @@ export function LLMChat({ note, externalContextItems = [], onContentInsert }: LL
 	const [isLoading, setIsLoading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const lastHandledPendingImageIdRef = useRef<string | null>(null);
 
 	// Merge external context items (like screenshots) with manual context items
 	const allContextItems = [...contextItems, ...externalContextItems];
 
+	type LLMStreamEvent = { type: string; content?: string; data?: unknown; message?: string };
+
+	const buildSystemMessage = useCallback(() => {
+		return `You are a helpful assistant helping the user with their note: "${note.title}". 
+			The user is working on a document and may ask questions about it or request help expanding their notes.
+			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
+			
+			MATH FORMATTING (CRITICAL - follow EXACTLY):
+			
+			1. ALWAYS wrap ALL math in $...$ delimiters:
+			   - Variables: $P(t)$, $c_n$, $\\omega$
+			   - Equations: $P(t) = A\\cos(\\omega t)$
+			   - Subscripts: $c_{-1}$, $e^{j\\omega t}$
+			
+			2. Use LaTeX commands, NEVER Unicode:
+			   - WRONG: ∑, ∞, ω, π (Unicode)
+			   - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$
+			
+			3. Display math: $$ on separate lines, NOT inside bullets
+			
+			WRONG: P(t) = ∑ c_n e^{jnωt}, c_{-n} = c_n^*
+			CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
+			
+			Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
+	}, [note.title, allContextItems.length]);
+
+	const consumeStructuredStream = useCallback(async (
+		stream: AsyncGenerator<LLMStreamEvent, void, unknown>,
+		aiMessageId: string
+	) => {
+		let accumulatedContent = "";
+		let currentStructuredOutput: LLMStructuredOutput | undefined = undefined;
+
+		for await (const event of stream) {
+			if (event.type === 'text' && event.content) {
+				accumulatedContent += event.content;
+
+				setMessages(prev => prev.map(msg =>
+					msg.id === aiMessageId
+						? {
+							...msg,
+							content: accumulatedContent,
+							structuredOutput: currentStructuredOutput
+						}
+						: msg
+				));
+			} else if (event.type === 'structured' && event.data) {
+				currentStructuredOutput = event.data as LLMStructuredOutput;
+
+				setMessages(prev => prev.map(msg =>
+					msg.id === aiMessageId
+						? {
+							...msg,
+							content: currentStructuredOutput?.content || accumulatedContent,
+							structuredOutput: currentStructuredOutput
+						}
+						: msg
+				));
+			} else if (event.type === 'error') {
+				throw new Error(event.message || 'Streaming error occurred');
+			} else if (event.type === 'done') {
+				break;
+			}
+		}
+	}, []);
+
+	const sendImagesToLLM = 
+		useCallback(async (params: { messageText: string; imageUrls: string[]; hasImage?: boolean }) => {
+		if (isLoading) return;
+
+		const userMessage: Message = {
+			id: Date.now().toString(),
+			role: "user",
+			content: params.messageText,
+			hasImage: params.hasImage ?? true,
+		};
+
+		setMessages(prev => [...prev, userMessage]);
+		setIsLoading(true);
+
+		// Create AI message placeholder while loading
+		const aiMessageId = (Date.now() + 1).toString();
+		const aiMessage: Message = {
+			id: aiMessageId,
+			role: "assistant",
+			content: "Thinking..."
+		};
+		setMessages(prev => [...prev, aiMessage]);
+
+		try {
+			const systemMessage = buildSystemMessage();
+			await consumeStructuredStream(llmService.chatStructuredStreamImage({
+				message: params.messageText,
+				system_message: systemMessage,
+				image_urls: params.imageUrls
+			}) as AsyncGenerator<LLMStreamEvent, void, unknown>, aiMessageId);
+		} catch (error) {
+			console.error('Error sending image message:', error);
+
+			setMessages(prev => prev.map(msg =>
+				msg.id === aiMessageId
+					? {
+						...msg,
+						content: error instanceof ApiError
+							? `**Error:** ${error.message}`
+							: '**Error:** Sorry, I encountered an error processing your image message. Please try again.'
+					}
+					: msg
+			));
+		} finally {
+			setIsLoading(false);
+		}
+	}, [buildSystemMessage, consumeStructuredStream, isLoading]);
 	/**
 	 * Handles section clicks from MarkdownRenderer.
 	 * 
@@ -173,7 +303,8 @@ export function LLMChat({ note, externalContextItems = [], onContentInsert }: LL
 	 * @param content - Raw content extracted from the section
 	 * @param htmlContent - HTML content extracted from the section
 	 */
-	const handleSectionClick = useCallback((sectionType: string, content: string, htmlContent: string) => {
+	const handleSectionClick = 
+		useCallback((sectionType: string, content: string, htmlContent: string = '') => {
 		if (!onContentInsert) {
 			console.warn('[LLMChat] onContentInsert callback not provided');
 			return;
@@ -205,6 +336,25 @@ export function LLMChat({ note, externalContextItems = [], onContentInsert }: LL
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
+
+	// Auto-analyze a pending screenshot/image request (triggered by App)
+	useEffect(() => {
+		if (!pendingImageAnalysis) return;
+		if (isLoading) return;
+		if (pendingImageAnalysis.id === lastHandledPendingImageIdRef.current) return;
+
+		lastHandledPendingImageIdRef.current = pendingImageAnalysis.id;
+
+		// Clear the pending event early to prevent duplicate sends on re-render.
+		onPendingImageAnalysisHandled?.(pendingImageAnalysis.id);
+
+		const messageText = `Explain the attached screenshot "${pendingImageAnalysis.name}" and extract the relevant content for note-taking. Use clear headings, bullet points, and LaTeX for math.`;
+		void sendImagesToLLM({
+			messageText,
+			imageUrls: [pendingImageAnalysis.imageDataUrl],
+			hasImage: true,
+		});
+	}, [pendingImageAnalysis, isLoading, onPendingImageAnalysisHandled, sendImagesToLLM]);
 
 	// Reset messages when note changes
 	useEffect(() => {
@@ -261,73 +411,11 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 		setMessages(prev => [...prev, aiMessage]);
 
 		try {
-			// Build system message with note context
-			const systemMessage = `You are a helpful assistant helping the user with their note: "${note.title}". 
-			The user is working on a document and may ask questions about it or request help expanding their notes.
-			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
-			
-			MATH FORMATTING (CRITICAL - follow EXACTLY):
-			
-			1. ALWAYS wrap ALL math in $...$ delimiters:
-			   - Variables: $P(t)$, $c_n$, $\\omega$
-			   - Equations: $P(t) = A\\cos(\\omega t)$
-			   - Subscripts: $c_{-1}$, $e^{j\\omega t}$
-			
-			2. Use LaTeX commands, NEVER Unicode:
-			   - WRONG: ∑, ∞, ω, π (Unicode)
-			   - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$
-			
-			3. Display math: $$ on separate lines, NOT inside bullets
-			
-			WRONG: P(t) = ∑ c_n e^{jnωt}, c_{-n} = c_n^*
-			CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
-			
-			Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
-
-			// Use structured streaming API
-			let accumulatedContent = "";
-			let currentStructuredOutput: LLMStructuredOutput | undefined = undefined;
-			
-			for await (const event of llmService.chatStructuredStream({
+			const systemMessage = buildSystemMessage();
+			await consumeStructuredStream(llmService.chatStructuredStream({
 				message: messageText,
 				system_message: systemMessage
-			})) {
-				if (event.type === 'text' && event.content) {
-					// Accumulate text chunks
-					accumulatedContent += event.content;
-					
-					// Update message with accumulated content
-					setMessages(prev => prev.map(msg =>
-						msg.id === aiMessageId
-							? {
-								...msg,
-								content: accumulatedContent,
-								structuredOutput: currentStructuredOutput
-							}
-							: msg
-					));
-				} else if (event.type === 'structured' && event.data) {
-					// Update structured output
-					currentStructuredOutput = event.data as LLMStructuredOutput;
-					
-					// Update message with structured output
-					setMessages(prev => prev.map(msg =>
-						msg.id === aiMessageId
-							? {
-								...msg,
-								content: currentStructuredOutput?.content || accumulatedContent,
-								structuredOutput: currentStructuredOutput
-							}
-							: msg
-					));
-				} else if (event.type === 'error') {
-					throw new Error(event.message || 'Streaming error occurred');
-				} else if (event.type === 'done') {
-					// Streaming complete
-					break;
-				}
-			}
-			console.log(accumulatedContent);
+			}) as AsyncGenerator<LLMStreamEvent, void, unknown>, aiMessageId);
 		} catch (error) {
 			console.error('Error sending message:', error);
 
@@ -345,6 +433,32 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 		} finally {
 			setIsLoading(false);
 		}
+	};
+
+	/**
+	 * Sends an image-based prompt to the LLM using the existing structured streaming image endpoint.
+	 *
+	 * Uses any context images currently attached (manual uploads + external screenshots).
+	 * If there is no text input, a default instruction prompt is used.
+	 */
+	const handleSendImage = async () => {
+		if (isLoading) return;
+
+		const imageUrls = allContextItems
+			.filter((item) => item.type === "image")
+			.map((item) => item.content)
+			.filter(Boolean);
+
+		if (imageUrls.length === 0) {
+			setIsAddContextOpen(true);
+			return;
+		}
+
+		const messageText = input.trim().length > 0
+			? input
+			: "Analyze the attached image(s) and extract the relevant content for note-taking. Use clear headings, bullet points, and LaTeX for math.";
+		setInput("");
+		await sendImagesToLLM({ messageText, imageUrls, hasImage: true });
 	};
 
 	const handleAddTextContext = () => {
@@ -451,6 +565,8 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 						variant="outline"
 						size="icon"
 						className="shrink-0"
+						onClick={handleSendImage}
+						disabled={isLoading}
 					>
 						<ImageIcon className="w-4 h-4" />
 					</Button>

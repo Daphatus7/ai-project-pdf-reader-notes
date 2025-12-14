@@ -15,7 +15,7 @@ interface NoteSectionProps {
 	/**
 	 * Ref to the NoteTaker component for imperative operations.
 	 */
-	noteTakerRef?: React.RefObject<NoteTakerHandle>;
+	noteTakerRef?: React.RefObject<NoteTakerHandle | null>;
 }
 
 const SIDEBAR_COLLAPSE_THRESHOLD = 12;

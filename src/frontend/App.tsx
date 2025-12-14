@@ -14,6 +14,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
+import type { ExternalContextItem } from "@@/frontend/web/components/LLMChatSection.tsx";
 
 export interface Note {
 	id: string;
@@ -287,13 +288,6 @@ Grid is designed for two-dimensional layouts (rows and columns).
 	}
 ];
 
-interface ScreenshotContext {
-	id: string;
-	type: "image";
-	content: string;
-	name: string;
-}
-
 /**
  * Main App component.
  * 
@@ -309,7 +303,12 @@ interface ScreenshotContext {
 export default function App() {
 	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
-	const [screenshots, setScreenshots] = useState<ScreenshotContext[]>([]);
+	const [screenshots, setScreenshots] = useState<ExternalContextItem[]>([]);
+	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<{
+		id: string;
+		imageDataUrl: string;
+		name: string;
+	} | null>(null);
 
 	const [isLeftCollapsed, setIsLeftCollapsed] = useState(true);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
@@ -317,19 +316,23 @@ export default function App() {
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 
 	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-		const newScreenshot: ScreenshotContext = {
+		const newScreenshot: ExternalContextItem = {
 			id: Date.now().toString() + Math.random(),
 			type: "image",
 			content: imageDataUrl,
 			name,
 		};
+		
+		// Make the screenshot available as context immediately
 		setScreenshots(prev => [...prev, newScreenshot]);
+		// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
+		setPendingImageAnalysis({ id: newScreenshot.id, imageDataUrl, name });
 	};
 	
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
-	const noteTakerRef = useRef<NoteTakerHandle>(null);
+	const noteTakerRef = useRef<NoteTakerHandle | null>(null);
 
 	useEffect(() => {
 		leftPanelRef.current?.collapse();
@@ -443,6 +446,10 @@ export default function App() {
 									<LLMChatSection 
 										note={selectedNote} 
 										externalContextItems={screenshots}
+										pendingImageAnalysis={pendingImageAnalysis}
+										onPendingImageAnalysisHandled={(handledId) => {
+											setPendingImageAnalysis((prev) => (prev?.id === handledId ? null : prev));
+										}}
 										onContentInsert={handleContentInsert}
 									/>
 								</ResizablePanelGroup>

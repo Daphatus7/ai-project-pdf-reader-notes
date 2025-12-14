@@ -6,11 +6,12 @@ import { LLMChat } from "./LLMChat.tsx";
 import type { Note } from "../../App.tsx";
 import type { ContentInsertion } from "../types/content-insertion.ts";
 
-interface ScreenshotContext {
+export interface ExternalContextItem {
 	id: string;
-	type: "image";
+	type: "image" | "text";
 	content: string;
 	name: string;
+	preview?: string;
 }
 
 interface LLMChatSectionProps {
@@ -18,7 +19,13 @@ interface LLMChatSectionProps {
 	minSize?: number;
 	collapsedSize?: number;
 	note: Note;
-	externalContextItems?: ScreenshotContext[];
+	externalContextItems?: ExternalContextItem[];
+	pendingImageAnalysis?: {
+		id: string;
+		imageDataUrl: string;
+		name: string;
+	} | null;
+	onPendingImageAnalysisHandled?: (id: string) => void;
 	/**
 	 * Callback when content should be inserted into the note editor.
 	 * 
@@ -47,6 +54,8 @@ export function LLMChatSection({
 	collapsedSize = 1,
 	note,
 	externalContextItems = [],
+	pendingImageAnalysis = null,
+	onPendingImageAnalysisHandled,
 	onContentInsert,
 }: LLMChatSectionProps) {
 	const editorPanelRef = useRef<ImperativePanelHandle>(null);
@@ -85,6 +94,8 @@ export function LLMChatSection({
 					<LLMChat 
 						note={note} 
 						externalContextItems={externalContextItems}
+						pendingImageAnalysis={pendingImageAnalysis}
+						onPendingImageAnalysisHandled={onPendingImageAnalysisHandled}
 						onContentInsert={onContentInsert}
 					/>
 				</div>
