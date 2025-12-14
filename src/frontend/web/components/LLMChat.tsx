@@ -348,7 +348,8 @@ export function LLMChat({
 		// Clear the pending event early to prevent duplicate sends on re-render.
 		onPendingImageAnalysisHandled?.(pendingImageAnalysis.id);
 
-		const messageText = `Explain the attached screenshot "${pendingImageAnalysis.name}" and extract the relevant content for note-taking. Use clear headings, bullet points, and LaTeX for math.`;
+		const messageText = `Explain the attached screenshot`;
+		console.log("image analysis :", pendingImageAnalysis.imageDataUrl);
 		void sendImagesToLLM({
 			messageText,
 			imageUrls: [pendingImageAnalysis.imageDataUrl],

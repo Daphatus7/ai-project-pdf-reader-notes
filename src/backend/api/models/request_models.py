@@ -1,16 +1,30 @@
 """
 Request and response models for LLM API endpoints
 """
-from typing import Optional, Literal
+from typing import Union, Literal, Optional
 from pydantic import BaseModel, Field
+
+class TextContent(BaseModel):
+    type: Literal["text"] = "text"
+    text: str
+
+class ImageContent(BaseModel):
+    type: Literal["image"] = "image"
+    data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
+    mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
+    name: Optional[str] = None
+
+InputContent = Union[TextContent, ImageContent]
 
 
 class ChatRequest(BaseModel):
     """Request model for chat endpoint"""
-    message: str = Field(..., description='User message to send to LLM')
+    contents: list[InputContent] = Field(
+        ...,
+        description="Ordered list of text and image inputs"
+    )
     system_message: Optional[str] = Field(
-        default='You are a helpful assistant.',
-        description='System message to set the assistant behavior'
+        default="You are a helpful assistant."
     )
 
 
@@ -22,11 +36,11 @@ class ChatResponse(BaseModel):
 
 class StreamChatRequest(BaseModel):
     """Request model for streaming chat endpoint"""
-    message: str = Field(..., description='User message to send to LLM')
+    contents: list[InputContent]
     system_message: Optional[str] = Field(
-        default='You are a helpful assistant.',
-        description='System message to set the assistant behavior'
+        default="You are a helpful assistant. Always respond with well-structured markdown content."
     )
+    expected_content_type: Optional[ContentType] = None
 
 
 # Structured Output Models
@@ -74,15 +88,13 @@ class LLMStructuredOutput(BaseModel):
 
 class StructuredChatRequest(BaseModel):
     """Request model for structured chat endpoint"""
-    message: str = Field(..., description='User message to send to LLM')
+    contents: list[InputContent]
     system_message: Optional[str] = Field(
         default='You are a helpful assistant. Always respond with well-structured markdown content.',
         description='System message to set the assistant behavior'
     )
-    expected_content_type: Optional[ContentType] = Field(
-        default=None,
-        description='Hint for the expected type of response'
-    )
+    expected_content_type: Optional[ContentType] = None
+
 
 
 class StructuredChatResponse(BaseModel):
