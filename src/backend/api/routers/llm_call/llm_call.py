@@ -47,6 +47,9 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     try:
         system_msg = SystemMessage(content=request.system_message)
         
+        print("Request contents:", request.contents)
+        
+        
         # Build content array from contents
         content_parts = []
         for item in request.contents:
