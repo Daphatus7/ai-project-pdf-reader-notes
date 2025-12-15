@@ -46,7 +46,21 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     """
     try:
         system_msg = SystemMessage(content=request.system_message)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         response = llm_service.chat(
             system_message=system_msg,

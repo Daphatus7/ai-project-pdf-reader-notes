@@ -16,6 +16,8 @@ class ImageContent(BaseModel):
 
 InputContent = Union[TextContent, ImageContent]
 
+ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
+
 
 class ChatRequest(BaseModel):
     """Request model for chat endpoint"""
@@ -63,9 +65,6 @@ class Section(BaseModel):
     """Model for content section in structured output"""
     heading: str = Field(..., description='Section heading')
     content: str = Field(..., description='Section content in markdown format')
-
-
-ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
 
 
 class LLMStructuredOutput(BaseModel):
