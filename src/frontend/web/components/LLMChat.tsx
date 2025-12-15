@@ -24,7 +24,7 @@ import {
 } from "./ui/tooltip.tsx";
 import type { Note } from "../../App.tsx";
 import { useDrag } from "react-dnd";
-import { llmService, ApiError, type LLMStructuredOutput } from "../../api";
+import { llmApi, ApiError, type LLMStructuredOutput } from "../services/api-services.tsx";
 import { MarkdownRenderer } from "./MarkdownRenderer.tsx";
 import type { ContentInsertion, SectionType } from "../types/content-insertion.ts";
 import { transformContentForInsertion } from "../utils/content-transformer.ts";
@@ -260,7 +260,6 @@ export function LLMChat({
 		setMessages(prev => [...prev, userMessage]);
 		setIsLoading(true);
 
-		// Create AI message placeholder while loading
 		const aiMessageId = (Date.now() + 1).toString();
 		const aiMessage: Message = {
 			id: aiMessageId,
@@ -271,14 +270,12 @@ export function LLMChat({
 
 		try {
 			const systemMessage = buildSystemMessage();
-			await consumeStructuredStream(llmService.chatStructuredStreamImage({
-				message: params.messageText,
-				system_message: systemMessage,
-				image_urls: params.imageUrls
-			}) as AsyncGenerator<LLMStreamEvent, void, unknown>, aiMessageId);
+			await consumeStructuredStream(
+				llmApi.sendMessageWithImages(params.messageText, params.imageUrls, systemMessage) as AsyncGenerator<LLMStreamEvent, void, unknown>,
+				aiMessageId
+			);
 		} catch (error) {
 			console.error('Error sending image message:', error);
-
 			setMessages(prev => prev.map(msg =>
 				msg.id === aiMessageId
 					? {
@@ -402,7 +399,6 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 		setInput("");
 		setIsLoading(true);
 
-		// Create AI message placeholder while loading
 		const aiMessageId = (Date.now() + 1).toString();
 		const aiMessage: Message = {
 			id: aiMessageId,
@@ -413,14 +409,12 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 
 		try {
 			const systemMessage = buildSystemMessage();
-			await consumeStructuredStream(llmService.chatStructuredStream({
-				message: messageText,
-				system_message: systemMessage
-			}) as AsyncGenerator<LLMStreamEvent, void, unknown>, aiMessageId);
+			await consumeStructuredStream(
+				llmApi.sendMessage(messageText, systemMessage) as AsyncGenerator<LLMStreamEvent, void, unknown>,
+				aiMessageId
+			);
 		} catch (error) {
 			console.error('Error sending message:', error);
-
-			// Update the placeholder message with error
 			setMessages(prev => prev.map(msg =>
 				msg.id === aiMessageId
 					? {
