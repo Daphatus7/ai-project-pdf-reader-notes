@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button.tsx";
 import { Input } from "./ui/input.tsx";
 import { Avatar, AvatarFallback } from "./ui/avatar.tsx";
@@ -182,7 +182,7 @@ export function LLMChat({
 
 	type LLMStreamEvent = { type: string; content?: string; data?: unknown; message?: string };
 
-	const buildSystemMessage = useCallback(() => {
+	const buildSystemMessage = () => {
 		return `You are a helpful assistant helping the user with their note: "${note.title}". 
 			The user is working on a document and may ask questions about it or request help expanding their notes.
 			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
@@ -204,9 +204,9 @@ export function LLMChat({
 			CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
 			
 			Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
-	}, [note.title, allContextItems.length]);
+	};
 
-	const consumeStructuredStream = useCallback(async (
+	const consumeStructuredStream = async (
 		stream: AsyncGenerator<LLMStreamEvent, void, unknown>,
 		aiMessageId: string
 	) => {
@@ -244,10 +244,9 @@ export function LLMChat({
 				break;
 			}
 		}
-	}, []);
+	};
 
-	const sendImagesToLLM = 
-		useCallback(async (params: { messageText: string; imageUrls: string[]; hasImage?: boolean }) => {
+	const sendImagesToLLM = async (params: { messageText: string; imageUrls: string[]; hasImage?: boolean }) => {
 		if (isLoading) return;
 
 		const userMessage: Message = {
@@ -289,7 +288,7 @@ export function LLMChat({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [buildSystemMessage, consumeStructuredStream, isLoading]);
+	};
 	/**
 	 * Handles section clicks from MarkdownRenderer.
 	 * 
@@ -300,8 +299,7 @@ export function LLMChat({
 	 * @param content - Raw content extracted from the section
 	 * @param htmlContent - HTML content extracted from the section
 	 */
-	const handleSectionClick = 
-		useCallback((sectionType: string, content: string, htmlContent: string = '') => {
+	const handleSectionClick = (sectionType: string, content: string, htmlContent: string = '') => {
 		if (!onContentInsert) {
 			console.warn('[LLMChat] onContentInsert callback not provided');
 			return;
@@ -327,7 +325,7 @@ export function LLMChat({
 
 		// Notify parent
 		onContentInsert(insertion);
-	}, [onContentInsert]);
+	};
 
 	// Auto-scroll to bottom when messages update
 	useEffect(() => {
