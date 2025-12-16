@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
-import { LLMChatSection } from "@@/frontend/web/components/LLMChatSection.tsx";
+import { LLMChat } from "@@/frontend/web/components/LLMChat.tsx";
 import { NoteSection } from "@@/frontend/web/components/NoteSection.tsx";
 import {
 	ResizableHandle,
@@ -14,7 +14,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
-import type { ExternalContextItem } from "@@/frontend/web/components/LLMChatSection.tsx";
+import type { ExternalContextItem } from "@@/frontend/web/components/LLMChat.tsx";
 
 export interface Note {
 	id: string;
@@ -443,7 +443,7 @@ export default function App() {
 
 									<ResizableHandle withHandle />
 
-									<LLMChatSection 
+									<LLMChat 
 										note={selectedNote} 
 										externalContextItems={screenshots}
 										pendingImageAnalysis={pendingImageAnalysis}

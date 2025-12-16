@@ -153,9 +153,6 @@ export function PDFReader({ onScreenshotCapture }: PDFReaderProps) {
 							isActive={screenshotMode}
 							onCapture={(imageDataUrl, name) => {
 								setScreenshotMode(false);
-								// const safeBaseName = sanitizeFilename(name) || 'screenshot';
-								// const fileName = `${safeBaseName}.png`;
-								// downloadDataUrlAsFile(imageDataUrl, fileName);
 								onScreenshotCapture?.(imageDataUrl, name);
 							}}
 							onCancel={() => setScreenshotMode(false)}
