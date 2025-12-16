@@ -75,15 +75,15 @@ function AssistantMessage({ message, onSectionClick }: AssistantMessageProps) {
 			</Avatar>
 
 			<div className="rounded-lg px-4 py-2 max-w-[85%] bg-muted relative">
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					className="absolute right-2 top-2 h-7 px-2"
-					onClick={() => onSectionClick?.("paragraph", message.content)}
-				>
-					Insert
-				</Button>
+				{/*<Button*/}
+				{/*	type="button"*/}
+				{/*	variant="ghost"*/}
+				{/*	size="sm"*/}
+				{/*	className="absolute right-2 top-2 h-7 px-2"*/}
+				{/*	onClick={() => onSectionClick?.("paragraph", message.content)}*/}
+				{/*>*/}
+				{/*	Insert*/}
+				{/*</Button>*/}
 				<MarkdownRenderer 
 					content={message.content} 
 					className="text-sm"
@@ -172,10 +172,12 @@ export function LLMChat({
 	type LLMStreamEvent = { type: string; content?: string; data?: unknown; message?: string };
 
 	const buildSystemMessage = () => {
-		return `You are a helpful assistant helping the user with their note: "${note.title}". 
-			The user is working on a document and may ask questions about it or request help expanding their notes.
-			${allContextItems.length > 0 ? 'The user has provided additional context items (images or text) that may be relevant to their question.' : ''}
-			
+		return defaultInstruction() + buildMessageFormat() + buildMessageContext();
+	};
+
+	const buildMessageFormat = () => {
+		return `
+			The format of the output if there is a table or math formulae
 			MATH FORMATTING (CRITICAL - follow EXACTLY):
 			
 			1. ALWAYS wrap ALL math in $...$ delimiters:
@@ -193,8 +195,21 @@ export function LLMChat({
 			CORRECT: $P(t) = \\sum c_n e^{jn\\omega t}$, $c_{-n} = c_n^*$
 			
 			Use # ## ### for headers, \`\`\`lang for code, - for bullets.`;
-	};
-
+	}
+	
+	const buildMessageContext = () => {
+		return "";
+	}
+	
+	const defaultInstruction=()=>{
+		return "your a helpful assistant "
+	}
+	
+	const imageInstruction=()=>{
+		return "explain the image";
+	}
+	
+	
 	const consumeStructuredStream = async (
 		stream: AsyncGenerator<LLMStreamEvent, void, unknown>,
 		aiMessageId: string
@@ -258,9 +273,12 @@ export function LLMChat({
 		setMessages(prev => [...prev, aiMessage]);
 
 		try {
-			const systemMessage = buildSystemMessage();
+			const systemMessage = imageInstruction();
 			await consumeStructuredStream(
-				llmApi.sendMessageWithImages(params.messageText, params.imageUrls, systemMessage) as AsyncGenerator<LLMStreamEvent, void, unknown>,
+				llmApi.sendMessageWithImages(params.messageText, 
+					params.imageUrls, 
+					systemMessage) as 
+					AsyncGenerator<LLMStreamEvent, void, unknown>,
 				aiMessageId
 			);
 		} catch (error) {
