@@ -325,15 +325,13 @@ export function LLMChat({
 	useEffect(() => {
 
 		//插入image 到llm 直接发起对话
-		if (imageContext && !isLoading) {
-			sendImagesToLLM(
-				imageContext,
-			)
+		if (imageContext) {
+			sendImagesToLLM(imageContext,)
 		}
 		
 		//
 		
-	}, [imageContext ,isLoading, sendImagesToLLM]);
+	}, [imageContext]);
 
 	// Reset messages when note changes
 	useEffect(() => {
