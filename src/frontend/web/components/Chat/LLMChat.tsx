@@ -102,7 +102,7 @@ interface LLMChatProps {
 	 */
 
 	onContentInsert?: (insertion: ContentInsertion) => void,
-	imageContext?: ImageContextItem
+	imageContextItem?: ImageContextItem
 }
 
 const mockMessages: Message[] = [
@@ -132,7 +132,7 @@ export function LLMChat({
 							minSize = 15,
 							collapsedSize = 1,
 							onContentInsert,
-							imageContext
+							imageContextItem
 						}: LLMChatProps) {
 	const editorPanelRef = useRef<ImperativePanelHandle>(null);
 	const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
@@ -323,15 +323,11 @@ export function LLMChat({
 
 	// Auto-analyze a pending screenshot/image request (triggered by App)
 	useEffect(() => {
-
 		//插入image 到llm 直接发起对话
-		if (imageContext) {
-			sendImagesToLLM(imageContext,)
+		if (imageContextItem) {
+			sendImagesToLLM(imageContextItem,)
 		}
-		
-		//
-		
-	}, [imageContext]);
+	}, [imageContextItem]);
 
 	// Reset messages when note changes
 	useEffect(() => {

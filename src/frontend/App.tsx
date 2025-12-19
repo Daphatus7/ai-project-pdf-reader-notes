@@ -449,7 +449,7 @@ export default function App() {
 									<LLMChat 
 										note={selectedNote} 
 										externalContextItems={screenshots}
-										imageContext={pendingImageAnalysis}
+										imageContextItem={pendingImageAnalysis}
 										onContentInsert={handleContentInsert}
 									/>
 								</ResizablePanelGroup>
