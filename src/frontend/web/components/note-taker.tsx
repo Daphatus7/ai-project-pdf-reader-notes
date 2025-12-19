@@ -16,6 +16,8 @@ import { Youtube } from '@tiptap/extension-youtube'
 import { Gapcursor } from '@tiptap/extensions'
 import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
+import { FontSize, TextStyle } from '@tiptap/extension-text-style'
+
 
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/web/components/ui/tabs.tsx";
@@ -158,6 +160,8 @@ export const NoteTaker =
 			StarterKit,
 			Details,
 			TextAlign,
+			FontSize,
+			TextStyle,
 			ImageUploadNode,
 			DetailsSummary,
 			DetailsContent,
