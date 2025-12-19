@@ -72,13 +72,7 @@ interface AssistantMessageProps {
 function AssistantMessage({message, onSectionClick}: AssistantMessageProps) {
 	return (
 		<div className="flex gap-3 justify-start">
-			<Avatar className="h-8 w-8 shrink-0">
-				<AvatarFallback className="bg-primary text-primary-foreground">
-					<Sparkles className="w-4 h-4"/>
-				</AvatarFallback>
-			</Avatar>
-
-			<div className="rounded-lg px-4 py-2 max-w-[85%] bg-muted relative">
+			<div className="rounded-lg px-4 py-2 max-w-[100%]  relative">
 				<MarkdownRenderer
 					content={message.content}
 					className="text-sm"
@@ -234,7 +228,6 @@ export function LLMChat({
 
 	const sendImagesToLLM =
 		async (imageContext: ImageContextItem) => {
-			if (isLoading) return;
 
 			const userMessage: Message = {
 				id: Date.now().toString(),
