@@ -9,7 +9,7 @@ import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
 import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
-
+import { UndoRedo } from '@tiptap/extensions'
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
 import { Youtube } from '@tiptap/extension-youtube'
@@ -168,6 +168,7 @@ export const NoteTaker =
 			DetailsContent,
 			TaskList,
 			Gapcursor,
+			UndoRedo,
 			TaskItem.configure({
 				nested: true,
 			}),
@@ -177,7 +178,11 @@ export const NoteTaker =
 				height: 320,
 			}),
 			Image,
-			TableKit,
+			TableKit.configure(
+				{
+					table: { resizable: true },
+				}
+			),
 			Highlight,
 			Math.configure({
 				blockOptions: {
