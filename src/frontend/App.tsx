@@ -381,7 +381,6 @@ export default function App() {
 		<DndProvider backend={HTML5Backend}>
 			<div className="h-screen flex flex-col bg-background">
 				<Header />
-
 				<div className="flex-1 overflow-hidden">
 					<ResizablePanelGroup direction="horizontal">
 						{/* Left Sidebar - Note Management */}
@@ -423,7 +422,7 @@ export default function App() {
 						{/* Center Content - PDF Reader and AI Chat */}
 						<ResizablePanel
 							ref={centerPanelRef}
-							defaultSize={52}
+							defaultSize={33}
 							minSize={10}
 							collapsible
 							collapsedSize={2}
@@ -443,19 +442,17 @@ export default function App() {
 							) : (
 								<ResizablePanelGroup direction="vertical">
 									<PDFSection onScreenshotCapture={handleScreenshotCapture} />
-
-									<ResizableHandle withHandle />
-
-									<LLMChat 
-										note={selectedNote} 
-										externalContextItems={screenshots}
-										imageContextItem={pendingImageAnalysis}
-										onContentInsert={handleContentInsert}
-									/>
 								</ResizablePanelGroup>
 							)}
 						</ResizablePanel>
+						<ResizableHandle withHandle />
 
+						<LLMChat
+							note={selectedNote}
+							externalContextItems={screenshots}
+							imageContextItem={pendingImageAnalysis}
+							onContentInsert={handleContentInsert}
+						/>
 						<ResizableHandle withHandle />
 
 						{/* Right Sidebar - Markdown Editor */}
