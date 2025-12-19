@@ -160,7 +160,8 @@ export const NoteTaker =
 			StarterKit,
 			Details,
 			TextAlign,
-			FontSize,
+			FontSize.configure({
+			}),
 			TextStyle,
 			ImageUploadNode,
 			DetailsSummary,
@@ -369,11 +370,11 @@ export const NoteTaker =
 					</TabsList>
 				</div>
 
-				<div className="flex-1 overflow-hidden relative">
+				<div className="flex-1 overflow-hidden relative text-base">
 					{/* Markdown view */}
 					<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
 						<textarea
-							className="markdown-input w-full h-full font-mono p-4 text-sm"
+							className="markdown-input w-full h-full font-mono p-4"
 							value={serializedContent}
 							onChange={e => setSerializedContent(e.target.value)}
 						/>

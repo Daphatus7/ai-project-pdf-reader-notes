@@ -97,9 +97,9 @@
     --container-7xl: 80rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1 / .75);
-    --text-sm: .875rem;
+    --text-sm: .8rem;
     --text-sm--line-height: calc(1.25 / .875);
-    --text-base: 1rem;
+    --text-base: 0.8rem;
     --text-base--line-height: calc(1.5 / 1);
     --text-lg: 1.125rem;
     --text-lg--line-height: calc(1.75 / 1.125);
