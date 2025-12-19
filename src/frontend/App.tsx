@@ -386,11 +386,7 @@ export default function App() {
 						{/* Left Sidebar - Note Management */}
 						<ResizablePanel
 							ref={leftPanelRef}
-							defaultSize={18}
-							minSize={10}
-							maxSize={25}
 							collapsible
-							collapsedSize={1}
 							onCollapse={() => setIsLeftCollapsed(true)}
 							onExpand={() => setIsLeftCollapsed(false)}
 							onResize={handleLeftResize}

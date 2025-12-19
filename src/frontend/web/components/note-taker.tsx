@@ -215,7 +215,7 @@ export const NoteTaker =
 			}),
 			CustomReactNode,
 		],
-		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
+		content: '-----remove this',
 		contentType: 'markdown',
 		onUpdate: ({ editor: currentEditor }) => {
 			if (!isPushing.current) {
