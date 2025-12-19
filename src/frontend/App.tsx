@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
-import { LLMChat } from "@@/frontend/web/components/LLMChat.tsx";
+import {type ImageContextItem, LLMChat} from "@@/frontend/web/components/Chat/LLMChat.tsx";
 import { NoteSection } from "@@/frontend/web/components/NoteSection.tsx";
 import {
 	ResizableHandle,
@@ -14,7 +14,6 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
-import type { ExternalContextItem } from "@@/frontend/web/components/LLMChat.tsx";
 
 export interface Note {
 	id: string;
@@ -22,6 +21,13 @@ export interface Note {
 	preview: string;
 	updatedAt: string;
 	content: string;
+}
+
+export interface imageContext {
+	id: string;
+	name: string;
+	imageUrl: string;
+	userMessage: string
 }
 
 const initialNotes: Note[] = [
@@ -303,12 +309,8 @@ Grid is designed for two-dimensional layouts (rows and columns).
 export default function App() {
 	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
-	const [screenshots, setScreenshots] = useState<ExternalContextItem[]>([]);
-	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<{
-		id: string;
-		imageDataUrl: string;
-		name: string;
-	} | null>(null);
+	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
+	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
 
 	const [isLeftCollapsed, setIsLeftCollapsed] = useState(true);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
@@ -316,18 +318,19 @@ export default function App() {
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 
 	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-		const newScreenshot: ExternalContextItem = {
+		const newScreenshot: ImageContextItem = {
 			id: Date.now().toString() + Math.random(),
 			type: "image",
-			content: imageDataUrl,
-			name,
-		};
-		
+			name: name,
+			userPrompt: "Explain the image",
+			imageUrls:[imageDataUrl]
+	};
+
 		// Make the screenshot available as context immediately
 		setScreenshots(prev => [...prev, newScreenshot]);
 		// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
-		setPendingImageAnalysis({ id: newScreenshot.id, imageDataUrl, name });
-	};
+		setPendingImageAnalysis(newScreenshot);
+	}
 	
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
@@ -446,10 +449,7 @@ export default function App() {
 									<LLMChat 
 										note={selectedNote} 
 										externalContextItems={screenshots}
-										pendingImageAnalysis={pendingImageAnalysis}
-										onPendingImageAnalysisHandled={(handledId) => {
-											setPendingImageAnalysis((prev) => (prev?.id === handledId ? null : prev));
-										}}
+										imageContext={pendingImageAnalysis}
 										onContentInsert={handleContentInsert}
 									/>
 								</ResizablePanelGroup>
