@@ -88,6 +88,13 @@ export interface NoteTakerHandle {
 	 * @returns Editor instance or null if not initialized
 	 */
 	getEditor: () => any | null;
+	
+	/**
+	 * Gets the current markdown content from the editor.
+	 * 
+	 * @returns The markdown content as string
+	 */
+	getContent: () => string;
 }
 
 

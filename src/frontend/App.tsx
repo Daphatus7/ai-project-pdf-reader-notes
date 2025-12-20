@@ -32,7 +32,7 @@ export interface imageContext {
 	userMessage: string
 }
 
-const initialNotes: Note[] = [
+let initialNotes: Note[] = [
 	{
 		id: "1",
 		title: "Machine Learning Fundamentals",
@@ -391,6 +391,17 @@ export default function App() {
 			rightPanelRef.current?.collapse();
 		}
 	};
+	
+	const handleSaveNote = () => {
+		if (noteTakerRef.current && selectedNote) {
+			const updatedContent = noteTakerRef.current.getContent();
+			setNotes(prevNotes =>
+				prevNotes.map(note =>
+					note.id === selectedNote.id ? { ...note, content: updatedContent } : note
+				)
+			);
+		}
+	}
 
 	return (
 		<DndProvider backend={HTML5Backend}>
@@ -415,6 +426,8 @@ export default function App() {
 							setNotes={setNotes}
 							selectedNoteId={selectedNoteId}
 							onSelectNote={(id) => {
+								//Save previous note before switching
+								handleSaveNote();
 								setSelectedNoteId(id);
 								setIsSidebarOpen(false);
 							}}
@@ -495,6 +508,7 @@ export default function App() {
 							)}
 							<div className={isRightCollapsed ? "hidden" : "h-full"}>
 								<NoteTaker 
+									
 									note={selectedNote} 
 									ref={noteTakerRef} />
 							</div>

@@ -234,8 +234,8 @@ export const NoteTaker =
 			migrateMathStrings(currentEditor);
 		},
 		
-	})
-
+	});
+	
 	const toggleEditable = () => {
 		editor.setEditable(!editor.isEditable)
 		editor.view.dispatch(editor.view.state.tr)
@@ -325,6 +325,16 @@ export const NoteTaker =
 		 * @returns Editor instance or null if not initialized
 		 */
 		getEditor: () => editor,
+		
+		/**
+		 * Gets the current markdown content from the editor.
+		 * 
+		 * @returns The markdown content as string
+		 */
+		getContent: () => {
+			if (!editor) return '';
+			return editor.getMarkdown();
+		},
 	}), [editor, activeView]);
 
 	/**
