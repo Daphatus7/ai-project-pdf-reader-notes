@@ -376,44 +376,26 @@ export default function App() {
 		// Focus the editor after insertion
 		noteTakerRef.current.focus();
 	}, []);
+	
+	//closing tag for notesidebar
 
 	return (
 		<DndProvider backend={HTML5Backend}>
-			<div className="h-screen flex flex-col bg-background">
+			<div className="h-screen w-screen flex flex-col bg-background">
 				<Header />
-				<div className="flex-1 overflow-hidden">
-					<ResizablePanelGroup direction="horizontal">
+				{/*Floating Slidebar*/}
+				<div>
+					<NoteSidebar
+						notes={notes}
+						setNotes={setNotes}
+						selectedNoteId={selectedNoteId}
+						onSelectNote={setSelectedNoteId}
+					/>
+				</div>
+				
+				<ResizablePanelGroup direction="horizontal">
 						{/* Left Sidebar - Note Management */}
-						<ResizablePanel
-							ref={leftPanelRef}
-							collapsible
-							onCollapse={() => setIsLeftCollapsed(true)}
-							onExpand={() => setIsLeftCollapsed(false)}
-							onResize={handleLeftResize}
-						>
-							<div className="h-full w-full relative">
-								{isLeftCollapsed && (
-									<div
-										className="absolute inset-0 z-10 group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-										onClick={() => leftPanelRef.current?.resize(18)}
-									>
-										<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-											<PanelLeftOpen className="w-4 h-4 text-muted-foreground" />
-										</div>
-									</div>
-								)}
-								<div className={isLeftCollapsed ? "hidden" : "h-full"}>
-									<NoteSidebar
-										notes={notes}
-										setNotes={setNotes}
-										selectedNoteId={selectedNoteId}
-										onSelectNote={setSelectedNoteId}
-									/>
-								</div>
-							</div>
-						</ResizablePanel>
 
-						<ResizableHandle withHandle />
 
 						{/* Center Content - PDF Reader and AI Chat */}
 						<ResizablePanel
@@ -452,12 +434,16 @@ export default function App() {
 						<ResizableHandle withHandle />
 
 						{/* Right Sidebar - Markdown Editor */}
-						<NoteSection 
+						<NoteSection
 							note={selectedNote}
 							noteTakerRef={noteTakerRef}
 						/>
 					</ResizablePanelGroup>
-				</div>
+				
+				
+				{/*Main Content Area*/}
+
+
 			</div>
 		</DndProvider>
 	);
