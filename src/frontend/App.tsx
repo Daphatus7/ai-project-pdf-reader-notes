@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
@@ -9,12 +9,13 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@@/frontend/web/components/ui/resizable.tsx";
-import { PanelLeftOpen, Menu } from "lucide-react";
+import {PanelLeftOpen, Menu, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
 import { Button } from "@@/frontend/web/components/ui/button.tsx";
+import NoteTaker from "@@/frontend/web/components/note-taker.tsx";
 
 export interface Note {
 	id: string;
@@ -308,6 +309,7 @@ Grid is designed for two-dimensional layouts (rows and columns).
  * MarkdownRenderer (click) → LLMChat → App → NoteTaker (insert)
  */
 export default function App() {
+	
 	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
 	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
@@ -378,8 +380,17 @@ export default function App() {
 		// Focus the editor after insertion
 		noteTakerRef.current.focus();
 	}, []);
-	
+
 	//closing tag for notesidebar
+
+	const rightPanelRef = useRef<ImperativePanelHandle>(null);
+	const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+
+	const handleRightResize = (size: number) => {
+		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isRightCollapsed) {
+			rightPanelRef.current?.collapse();
+		}
+	};
 
 	return (
 		<DndProvider backend={HTML5Backend}>
@@ -465,10 +476,31 @@ export default function App() {
 						<ResizableHandle withHandle />
 
 						{/* Right Sidebar - Markdown Editor */}
-						<NoteSection
-							note={selectedNote}
-							noteTakerRef={noteTakerRef}
-						/>
+					
+						<ResizablePanel
+							ref={rightPanelRef}
+							collapsible
+							defaultSize={33}
+							onCollapse={() => setIsRightCollapsed(true)}
+							onExpand={() => setIsRightCollapsed(false)}
+							onResize={handleRightResize}
+						>
+							<div className="h-full w-full relative">
+								{isRightCollapsed && (
+									<div
+										className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
+										onClick={() => rightPanelRef.current?.resize(50)}
+									>
+										<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+											<PanelRightOpen className="w-4 h-4 text-muted-foreground" />
+										</div>
+									</div>
+								)}
+								<div className={isRightCollapsed ? "hidden" : "h-full"}>
+									<NoteTaker note={selectedNote} ref={noteTakerRef} />
+								</div>
+							</div>
+						</ResizablePanel>
 					</ResizablePanelGroup>
 				
 				
