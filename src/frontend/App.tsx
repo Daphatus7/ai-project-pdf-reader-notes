@@ -9,11 +9,12 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@@/frontend/web/components/ui/resizable.tsx";
-import { PanelLeftOpen } from "lucide-react";
+import { PanelLeftOpen, Menu } from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ContentInsertion, NoteTakerHandle } from "./web/types/content-insertion.ts";
+import { Button } from "@@/frontend/web/components/ui/button.tsx";
 
 export interface Note {
 	id: string;
@@ -314,6 +315,7 @@ export default function App() {
 
 	const [isLeftCollapsed, setIsLeftCollapsed] = useState(true);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 
@@ -383,14 +385,43 @@ export default function App() {
 		<DndProvider backend={HTML5Backend}>
 			<div className="h-screen w-screen flex flex-col bg-background">
 				<Header />
-				{/*Floating Slidebar*/}
+
+				{/* Floating Sidebar */}
+				{isSidebarOpen ? (
+					<div className="fixed top-0 left-0 h-20 bg-background shadow-2xl z-50">
+						{/* Toggle button attached to sidebar */}
+						<Button
+							variant="ghost"
+							size="icon"
+							className="absolute top-4 -right-10 shadow-md bg-background"
+							onClick={() => setIsSidebarOpen(false)}
+						>
+							<Menu className="w-5 h-5" />
+						</Button>
+
+						<NoteSidebar
+							notes={notes}
+							setNotes={setNotes}
+							selectedNoteId={selectedNoteId}
+							onSelectNote={(id) => {
+								setSelectedNoteId(id);
+								setIsSidebarOpen(false);
+							}}
+						/>
+					</div>
+				) : (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="fixed top-16 left-4 z-40 shadow-md"
+						onClick={() => setIsSidebarOpen(true)}
+					>
+						<Menu className="w-5 h-5" />
+					</Button>
+				)}
+
 				<div>
-					<NoteSidebar
-						notes={notes}
-						setNotes={setNotes}
-						selectedNoteId={selectedNoteId}
-						onSelectNote={setSelectedNoteId}
-					/>
+					
 				</div>
 				
 				<ResizablePanelGroup direction="horizontal">
