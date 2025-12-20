@@ -213,12 +213,6 @@ export function MarkdownRenderer({ content, className, onSectionClick }: Markdow
 		}
 	}, [onSectionClick]);
 
-	// Log the rendered HTML after component renders
-	useEffect(() => {
-		if (markdownRef.current) {
-			console.log('[MarkdownRenderer] Rendered HTML:', markdownRef.current.innerHTML);
-		}
-	}, [processedContent]);
 
 	const raw_markdown = (
 		<div ref={markdownRef} className={cn('markdown-renderer', className)}>
