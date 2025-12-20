@@ -191,6 +191,7 @@ export function SimpleEditor({ editor }: { editor: Editor }) {
 		<div
 			style={{
 				width: "100%",
+				height: "100%",
 			}}
 			className="simple-editor-wrapper">
 			<EditorContext.Provider value={{ editor }}>
