@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import {useEffect, useRef } from "react";
 import { Button } from "./ui/button.tsx";
 import { Input } from "./ui/input.tsx";
 import { ScrollArea } from "./ui/scroll-area.tsx";
@@ -106,7 +106,9 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote }: Not
         isSelected && "bg-muted",
         isDragging && "opacity-50"
       )}
-      onClick={() => onSelect(note.id)}
+      onClick={() => {
+        onSelect(note.id);
+      }}
     >
       <div className="flex items-start justify-between gap-2 mb-1">
         <div className="flex items-start gap-2 flex-1 min-w-0">

@@ -1,4 +1,4 @@
-import {useRef, useState, forwardRef, useImperativeHandle} from 'react'
+import {useRef, useState, forwardRef, useImperativeHandle, useEffect} from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
 import 'katex/dist/katex.min.css'
 import type { Note } from '../../App.tsx'
@@ -9,11 +9,9 @@ import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
 import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
-import { UndoRedo } from '@tiptap/extensions'
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
 import { Youtube } from '@tiptap/extension-youtube'
-import { Gapcursor } from '@tiptap/extensions'
 import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
 import { FontSize, TextStyle } from '@tiptap/extension-text-style'
@@ -107,7 +105,7 @@ const CustomReactNode = Node.create({
  * @param note - Optional note to load
  */
 export const NoteTaker = 
-	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ }, ref) {
+	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
 	/**
 	 * Normalizes incoming HTML snippets to TipTap math nodes.
 	 * 
@@ -153,6 +151,7 @@ export const NoteTaker =
 		}
 	};
 
+	// Editor setup
 	const editor = useEditor({
 		shouldRerenderOnTransaction: true,
 		extensions: [
@@ -241,6 +240,19 @@ export const NoteTaker =
 		editor.setEditable(!editor.isEditable)
 		editor.view.dispatch(editor.view.state.tr)
 	}
+
+	useEffect(() => {
+		if (!editor || !note) return;
+		loadNoteContent(note);
+	}, [editor, note]);
+	
+	const loadNoteContent = (note: Note) => {
+		if (!editor) return;
+		isPushing.current = true;
+		editor.commands.setContent(note.content, { contentType: 'markdown' });
+		isPushing.current = false;
+		setSerializedContent(note.content);
+	}
 	
 	const [activeView, setActiveView] = useState<ViewMode>('editor');
 	const [serializedContent, setSerializedContent] = useState('')
@@ -326,8 +338,6 @@ export const NoteTaker =
 		console.log("The content ------>", content);
 
 		// Prefer HTML content if available, otherwise fall back to markdown
-		const contentToInsert = content.htmlContent || content.content;
-		console.log("inserting ------->>>>", contentToInsert);
 
 		if (content.htmlContent) {
 			const normalizedHtml = normalizeMathHtml(content.htmlContent);

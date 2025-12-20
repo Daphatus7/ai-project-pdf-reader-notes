@@ -298,18 +298,18 @@ Grid is designed for two-dimensional layouts (rows and columns).
 
 /**
  * Main App component.
- * 
+ *
  * Coordinates the entire application including:
  * - Note management (sidebar)
  * - PDF reading (center left)
  * - LLM chat with click-to-insert functionality (center right)
  * - Note editing with TipTap editor (right sidebar)
- * 
+ *
  * Handles content insertion flow:
  * MarkdownRenderer (click) → LLMChat → App → NoteTaker (insert)
  */
 export default function App() {
-	
+
 	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
 	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
@@ -328,14 +328,14 @@ export default function App() {
 			name: name,
 			userPrompt: "Explain the image",
 			imageUrls:[imageDataUrl]
-	};
+		};
 
 		// Make the screenshot available as context immediately
 		setScreenshots(prev => [...prev, newScreenshot]);
 		// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
 		setPendingImageAnalysis(newScreenshot);
 	}
-	
+
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
@@ -362,10 +362,10 @@ export default function App() {
 
 	/**
 	 * Handles content insertion from LLMChat into NoteTaker.
-	 * 
+	 *
 	 * Called when user clicks on a section in MarkdownRenderer.
 	 * Inserts the formatted markdown content into the note editor.
-	 * 
+	 *
 	 * @param insertion - Content insertion payload with formatted markdown
 	 */
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
@@ -376,7 +376,7 @@ export default function App() {
 
 		// Insert content at cursor position
 		noteTakerRef.current.insertContent(insertion, 'cursor');
-		
+
 		// Focus the editor after insertion
 		noteTakerRef.current.focus();
 	}, []);
@@ -430,83 +430,77 @@ export default function App() {
 						<Menu className="w-5 h-5" />
 					</Button>
 				)}
-
-				<div>
-					
-				</div>
 				
+
 				<ResizablePanelGroup direction="horizontal">
-						{/* Left Sidebar - Note Management */}
+					{/* Left Sidebar - Note Management */}
 
 
-						{/* Center Content - PDF Reader and AI Chat */}
-						<ResizablePanel
-							ref={centerPanelRef}
-							defaultSize={33}
-							minSize={10}
-							collapsible
-							collapsedSize={2}
-							onCollapse={() => setIsCenterCollapsed(true)}
-							onExpand={() => setIsCenterCollapsed(false)}
-							onResize={handleCenterResize}
-						>
-							{isCenterCollapsed ? (
-								<div
-									className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-									onClick={() => centerPanelRef.current?.resize(52)}
-								>
-									<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-										<PanelLeftOpen className="w-4 h-4 text-muted-foreground rotate-180" />
-									</div>
-								</div>
-							) : (
-								<ResizablePanelGroup direction="vertical">
-									<PDFSection onScreenshotCapture={handleScreenshotCapture} />
-								</ResizablePanelGroup>
-							)}
-						</ResizablePanel>
-						<ResizableHandle withHandle />
-
-						<LLMChat
-							note={selectedNote}
-							externalContextItems={screenshots}
-							imageContextItem={pendingImageAnalysis}
-							onContentInsert={handleContentInsert}
-						/>
-						<ResizableHandle withHandle />
-
-						{/* Right Sidebar - Markdown Editor */}
-					
-						<ResizablePanel
-							ref={rightPanelRef}
-							collapsible
-							defaultSize={33}
-							onCollapse={() => setIsRightCollapsed(true)}
-							onExpand={() => setIsRightCollapsed(false)}
-							onResize={handleRightResize}
-						>
-							<div className="h-full w-full relative">
-								{isRightCollapsed && (
-									<div
-										className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-										onClick={() => rightPanelRef.current?.resize(50)}
-									>
-										<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-											<PanelRightOpen className="w-4 h-4 text-muted-foreground" />
-										</div>
-									</div>
-								)}
-								<div className={isRightCollapsed ? "hidden" : "h-full"}>
-									<NoteTaker note={selectedNote} ref={noteTakerRef} />
+					{/* Center Content - PDF Reader and AI Chat */}
+					<ResizablePanel
+						ref={centerPanelRef}
+						defaultSize={33}
+						minSize={10}
+						collapsible
+						collapsedSize={2}
+						onCollapse={() => setIsCenterCollapsed(true)}
+						onExpand={() => setIsCenterCollapsed(false)}
+						onResize={handleCenterResize}
+					>
+						{isCenterCollapsed ? (
+							<div
+								className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
+								onClick={() => centerPanelRef.current?.resize(52)}
+							>
+								<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+									<PanelLeftOpen className="w-4 h-4 text-muted-foreground rotate-180" />
 								</div>
 							</div>
-						</ResizablePanel>
-					</ResizablePanelGroup>
-				
-				
-				{/*Main Content Area*/}
+						) : (
+							<ResizablePanelGroup direction="vertical">
+								<PDFSection onScreenshotCapture={handleScreenshotCapture} />
+							</ResizablePanelGroup>
+						)}
+					</ResizablePanel>
+					<ResizableHandle withHandle />
 
+					<LLMChat
+						note={selectedNote}
+						externalContextItems={screenshots}
+						imageContextItem={pendingImageAnalysis}
+						onContentInsert={handleContentInsert}
+					/>
+					<ResizableHandle withHandle />
 
+					{/* Right Sidebar - Markdown Editor */}
+
+					<ResizablePanel
+						ref={rightPanelRef}
+						collapsible
+						defaultSize={33}
+						onCollapse={() => setIsRightCollapsed(true)}
+						onExpand={() => setIsRightCollapsed(false)}
+						onResize={handleRightResize}
+					>
+						<div className="h-full w-full relative">
+							{isRightCollapsed && (
+								<div
+									className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
+									onClick={() => rightPanelRef.current?.resize(50)}
+								>
+									<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
+										<PanelRightOpen className="w-4 h-4 text-muted-foreground" />
+									</div>
+								</div>
+							)}
+							<div className={isRightCollapsed ? "hidden" : "h-full"}>
+								<NoteTaker 
+									note={selectedNote} 
+									ref={noteTakerRef} />
+							</div>
+						</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
 			</div>
 		</DndProvider>
 	);
