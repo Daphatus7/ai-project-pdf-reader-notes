@@ -157,18 +157,16 @@ export const NoteTaker =
 		shouldRerenderOnTransaction: true,
 		extensions: [
 			Markdown,
-			StarterKit,
 			Details,
 			TextAlign,
 			FontSize.configure({
 			}),
 			TextStyle,
+			StarterKit,
 			ImageUploadNode,
 			DetailsSummary,
 			DetailsContent,
 			TaskList,
-			Gapcursor,
-			UndoRedo,
 			TaskItem.configure({
 				nested: true,
 			}),
