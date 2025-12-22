@@ -55,11 +55,8 @@ const CustomReactComponent = ({ node }: any) => {
 // Custom node extension with React node view
 const CustomReactNode = Node.create({
 	name: 'customReactNode',
-
 	group: 'block',
-
 	content: 'block+',
-
 	addAttributes() {
 		return {
 			content: {
@@ -67,7 +64,6 @@ const CustomReactNode = Node.create({
 			},
 		}
 	},
-
 	parseHTML() {
 		return [
 			{
@@ -75,17 +71,13 @@ const CustomReactNode = Node.create({
 			},
 		]
 	},
-
 	renderHTML({ HTMLAttributes }) {
 		return ['div', { 'data-type': 'custom-react-node', ...HTMLAttributes }, 0]
 	},
-
 	addNodeView() {
 		return ReactNodeViewRenderer(CustomReactComponent)
 	},
-
 	markdownTokenName: 'customReactNode',
-
 	...createBlockMarkdownSpec({
 		nodeName: 'customReactNode',
 		name: 'react',
@@ -226,6 +218,7 @@ export const NoteTaker =
 		contentType: 'markdown',
 		onUpdate: ({ editor: currentEditor }) => {
 			if (!isPushing.current) {
+				console.log(editor?.getJSON());
 				setSerializedContent(currentEditor.getMarkdown());
 			}
 		},

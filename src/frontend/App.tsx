@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/web/components/Header.tsx";
-import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar.tsx";
+import { NoteSidebar } from "@@/frontend/web/components/NoteSidebar/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/web/components/PDFSection.tsx";
 import {type ImageContextItem, LLMChat} from "@@/frontend/web/components/Chat/LLMChat.tsx";
 import { NoteSection } from "@@/frontend/web/components/NoteSection.tsx";
@@ -335,6 +335,19 @@ export default function App() {
 		// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
 		setPendingImageAnalysis(newScreenshot);
 	}
+	
+	const handleAddNewNote = () => {
+		console.log("New Note clicked");
+		const newNote: Note = {
+			id: Date.now().toString(),
+			title: "New Note",
+			preview: "",
+			updatedAt: "Just now",
+			content: "",
+		};
+		setNotes(prevNotes => [newNote, ...prevNotes]);
+		setSelectedNoteId(newNote.id);
+	}
 
 
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
@@ -402,7 +415,26 @@ export default function App() {
 			);
 		}
 	}
-
+	
+	const handleDeleteNote = (noteId: string) => {
+		setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+		if (noteId === selectedNoteId && notes.length > 1) {
+			// Select another note if the deleted note was selected
+			const newSelectedNote = notes.find(note => note.id !== noteId);
+			if (newSelectedNote) {
+				setSelectedNoteId(newSelectedNote.id);
+			}
+		}
+	}
+	
+	const handleNameUpdate = (noteId: string, newTitle: string) => {
+		setNotes(prevNotes =>
+			prevNotes.map(note =>
+				note.id === noteId ? { ...note, title: newTitle } : note
+			)
+		);
+	}
+	
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<div className="h-screen w-screen flex flex-col bg-background">
@@ -425,11 +457,11 @@ export default function App() {
 							notes={notes}
 							setNotes={setNotes}
 							selectedNoteId={selectedNoteId}
+							onAddNote={handleAddNewNote}
 							onSelectNote={(id) => {
 								//Save previous note before switching
 								handleSaveNote();
 								setSelectedNoteId(id);
-								setIsSidebarOpen(false);
 							}}
 						/>
 					</div>
