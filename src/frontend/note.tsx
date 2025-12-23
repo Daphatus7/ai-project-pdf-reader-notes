@@ -321,7 +321,7 @@ export default function NotePage() {
 
 	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
 		const newScreenshot: ImageContextItem = {
-			id: Date.now().toString() + Math.random(),
+			id: crypto.randomUUID(),
 			type: "image",
 			name: name,
 			userPrompt: "Explain the image",
@@ -337,7 +337,7 @@ export default function NotePage() {
 	const handleAddNewNote = () => {
 		console.log("New Note clicked");
 		const newNote: Note = {
-			id: Date.now().toString(),
+			id: crypto.randomUUID(),
 			title: "New Note",
 			preview: "",
 			updatedAt: "Just now",
