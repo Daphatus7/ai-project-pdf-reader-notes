@@ -3,7 +3,6 @@ import { Header } from "@@/frontend/components/Header.tsx";
 import { NoteSidebar } from "@@/frontend/components/NoteSidebar/NoteSidebar.tsx";
 import { PDFSection } from "@@/frontend/components/PDFSection.tsx";
 import {type ImageContextItem, LLMChat} from "@@/frontend/components/Chat/LLMChat.tsx";
-import { NoteSection } from "@@/frontend/components/NoteSection.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
