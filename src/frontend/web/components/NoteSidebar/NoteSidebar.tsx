@@ -9,7 +9,7 @@ import {
 	Download,
 	MoreVertical,
 	GripVertical,
-	Search
+	Search, Edit, EditIcon
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -45,9 +45,10 @@ interface NoteItemProps {
 	onSelect: (id: string) => void;
 	onDelete: (id: string) => void;
 	moveNote: (dragIndex: number, hoverIndex: number) => void;
+	onEditName?: () => void;
 }
 
-function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote }: NoteItemProps) {
+function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEditName }: NoteItemProps) {
 	const ref = useRef<HTMLDivElement>(null);
 
 	const [{ handlerId }, drop] = useDrop<DragItem, void, { handlerId: Identifier | null }>({
@@ -96,6 +97,9 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote }: Not
 		}),
 	});
 
+	//on editing name - the name of the title becomes editable
+	
+	
 	preview(drop(ref));
 
 	return (
@@ -138,6 +142,17 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote }: Not
 						<DropdownMenuItem>
 							<Download className="w-4 h-4 mr-2" />
 							Export to Markdown
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={(e) => {
+								e.stopPropagation();
+								if (onEditName) {
+									onEditName(note.id, note.title);
+								}
+							}}
+						>
+							<EditIcon className="w-4 h-4 mr-2" />
+							Rename
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="text-destructive"
@@ -186,6 +201,10 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 		}
 	};
 
+	useEffect(() => {
+		
+	}, []);
+	
 	return (
 		<div className="h-full flex flex-col border-r bg-muted/30">
 			<div className="p-4 border-b">
