@@ -461,7 +461,6 @@ export default function App() {
 				<ResizablePanelGroup direction="horizontal">
 					{/* Left Sidebar - Note Management */}
 
-
 					{/* Center Content - PDF Reader and AI Chat */}
 					<ResizablePanel
 						ref={centerPanelRef}
