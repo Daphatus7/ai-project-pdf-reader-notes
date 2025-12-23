@@ -358,12 +358,6 @@ export default function NotePage() {
 	// Collapse thresholds (based on UI/UX standards like Overleaf)
 	const SIDEBAR_COLLAPSE_THRESHOLD = 12; // 12% for sidebars
 
-	const handleLeftResize = (size: number) => {
-		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isLeftCollapsed) {
-			leftPanelRef.current?.collapse();
-		}
-	};
-
 	const handleCenterResize = (size: number) => {
 		if (size < SIDEBAR_COLLAPSE_THRESHOLD && !isCenterCollapsed) {
 			centerPanelRef.current?.collapse();
