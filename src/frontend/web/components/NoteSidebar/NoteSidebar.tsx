@@ -1,4 +1,4 @@
-import {useEffect, useRef } from "react";
+import {useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button.tsx";
 import { Input } from "../ui/input.tsx";
 import { ScrollArea } from "../ui/scroll-area.tsx";
@@ -45,11 +45,40 @@ interface NoteItemProps {
 	onSelect: (id: string) => void;
 	onDelete: (id: string) => void;
 	moveNote: (dragIndex: number, hoverIndex: number) => void;
-	onEditName?: () => void;
+	onEditName?: (id: string, newTitle: string) => void;
 }
 
 function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEditName }: NoteItemProps) {
 	const ref = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [isEditing, setIsEditing] = useState(false);
+	const [editValue, setEditValue] = useState(note.title);
+
+	const handleStartEdit = () => {
+		setEditValue(note.title);
+		setIsEditing(true);
+		setTimeout(() => inputRef.current?.focus(), 0);
+	};
+
+	const handleSaveEdit = () => {
+		if (editValue.trim() && editValue !== note.title && onEditName) {
+			onEditName(note.id, editValue.trim());
+		}
+		setIsEditing(false);
+	};
+
+	const handleCancelEdit = () => {
+		setEditValue(note.title);
+		setIsEditing(false);
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			handleSaveEdit();
+		} else if (e.key === "Escape") {
+			handleCancelEdit();
+		}
+	};
 
 	const [{ handlerId }, drop] = useDrop<DragItem, void, { handlerId: Identifier | null }>({
 		accept: ITEM_TYPE,
@@ -97,9 +126,6 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEdi
 		}),
 	});
 
-	//on editing name - the name of the title becomes editable
-	
-	
 	preview(drop(ref));
 
 	return (
@@ -124,7 +150,27 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEdi
 						<GripVertical className="w-4 h-4 text-muted-foreground" />
 					</div>
 					<FileText className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
-					<h3 className="text-sm truncate">{note.title}</h3>
+					{isEditing ? (
+						<Input
+							ref={inputRef}
+							value={editValue}
+							onChange={(e) => setEditValue(e.target.value)}
+							onBlur={handleSaveEdit}
+							onKeyDown={handleKeyDown}
+							onClick={(e) => e.stopPropagation()}
+							className="h-6 text-sm px-1 py-0"
+						/>
+					) : (
+						<h3
+							className="text-sm truncate"
+							onDoubleClick={(e) => {
+								e.stopPropagation();
+								handleStartEdit();
+							}}
+						>
+							{note.title}
+						</h3>
+					)}
 				</div>
 
 				<DropdownMenu>
@@ -146,9 +192,7 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEdi
 						<DropdownMenuItem
 							onClick={(e) => {
 								e.stopPropagation();
-								if (onEditName) {
-									onEditName(note.id, note.title);
-								}
+								handleStartEdit();
 							}}
 						>
 							<EditIcon className="w-4 h-4 mr-2" />
@@ -188,13 +232,20 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 		}
 	};
 
+	const handleEditName = (id: string, newTitle: string) => {
+		const updated = notes.map((note) =>
+			note.id === id ? { ...note, title: newTitle } : note
+		);
+		setNotes(updated);
+	};
+
 	const moveNote = (dragIndex: number, hoverIndex: number) => {
 		const updated = [...notes];
 		const [removed] = updated.splice(dragIndex, 1);
 		updated.splice(hoverIndex, 0, removed);
 		setNotes(updated);
 	};
-	
+
 	const handleNewNote = () => {
 		if (onAddNote) {
 			onAddNote();
@@ -237,6 +288,7 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 							onSelect={onSelectNote}
 							onDelete={handleDelete}
 							moveNote={moveNote}
+							onEditName={handleEditName}
 						/>
 					))}
 				</div>
