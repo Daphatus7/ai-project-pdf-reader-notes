@@ -1,0 +1,29 @@
+services:
+  # Backend service - FastAPI with LLM integration
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      # Mount source code for hot reload in development
+      - ./src/backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - CORS_ORIGINS=http://localhost:3000
+
+  # Frontend service - React/Vite application
+  frontend:
+    build:
+      context: .
+      dockerfile: ./src/frontend/Dockerfile
+      target: development
+    volumes:
+      # Mount source code for hot reload in development
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
