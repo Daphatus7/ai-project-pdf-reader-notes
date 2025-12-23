@@ -416,25 +416,6 @@ export default function App() {
 		}
 	}
 	
-	const handleDeleteNote = (noteId: string) => {
-		setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
-		if (noteId === selectedNoteId && notes.length > 1) {
-			// Select another note if the deleted note was selected
-			const newSelectedNote = notes.find(note => note.id !== noteId);
-			if (newSelectedNote) {
-				setSelectedNoteId(newSelectedNote.id);
-			}
-		}
-	}
-	
-	const handleNameUpdate = (noteId: string, newTitle: string) => {
-		setNotes(prevNotes =>
-			prevNotes.map(note =>
-				note.id === noteId ? { ...note, title: newTitle } : note
-			)
-		);
-	}
-	
 	return (
 		<DndProvider backend={HTML5Backend}>
 			<div className="h-screen w-screen flex flex-col bg-background">
