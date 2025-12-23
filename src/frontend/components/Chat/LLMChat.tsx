@@ -16,11 +16,11 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "../ui/tooltip.tsx";
-import type {Note} from "../../../App.tsx";
-import {llmApi, ApiError, type LLMStructuredOutput} from "../../services/api-services.tsx";
+import type {Note} from "../../App.tsx";
+import {llmApi, ApiError, type LLMStructuredOutput} from "../../features/services/api-services.tsx";
 import {MarkdownRenderer} from "../MarkdownRenderer.tsx";
-import type {ContentInsertion, SectionType} from "../../types/content-insertion.ts";
-import {transformContentForInsertion} from "../../utils/content-transformer.ts";
+import type {ContentInsertion, SectionType} from "../../features/types/content-insertion.ts";
+import {transformContentForInsertion} from "../../features/utils/content-transformer.ts";
 import {ResizablePanel} from "../ui/resizable.tsx";
 import type {ImperativePanelHandle} from "react-resizable-panels";
 

@@ -3,7 +3,7 @@ import { Button } from './ui/button.tsx';
 import { X, Check, AlertCircle } from 'lucide-react';
 import { cn } from './ui/utils.ts';
 import { ScreenshotWidget } from './ScreenshotWidget.tsx';
-import type { PdfScreenshotCaptureController } from '../services/pdf-screenshot-capture.tsx';
+import type { PdfScreenshotCaptureController } from '../features/services/pdf-screenshot-capture.tsx';
 
 interface ScreenshotCaptureProps {
   targetRef: React.RefObject<HTMLElement | null>;

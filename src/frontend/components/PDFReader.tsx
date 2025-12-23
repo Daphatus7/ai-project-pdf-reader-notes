@@ -9,8 +9,8 @@ import { cn } from './ui/utils.ts';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { ScreenshotCapture } from './ScreenshotCapture.tsx';
-import { downloadDataUrlAsFile, sanitizeFilename } from '../utils/download.ts';
-import { createPdfScreenshotCapture } from '../services/pdf-screenshot-capture.tsx';
+import { downloadDataUrlAsFile, sanitizeFilename } from '../features/utils/download.ts';
+import { createPdfScreenshotCapture } from '../features/services/pdf-screenshot-capture.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';

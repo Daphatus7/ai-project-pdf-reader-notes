@@ -1,8 +1,8 @@
 import {useRef, useState, forwardRef, useImperativeHandle, useEffect} from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
 import 'katex/dist/katex.min.css'
-import type { Note } from '../../App.tsx'
-import type { NoteTakerHandle } from '../types/content-insertion.ts'
+import type { Note } from '../App.tsx'
+import type { NoteTakerHandle } from '../features/types/content-insertion.ts'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
 import { Highlight } from '@tiptap/extension-highlight'
@@ -18,7 +18,7 @@ import { FontSize, TextStyle } from '@tiptap/extension-text-style'
 
 
 
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/web/components/ui/tabs.tsx";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/components/ui/tabs.tsx";
 
 import {SimpleEditor} from "@@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
 import TextAlign from "@tiptap/extension-text-align";
