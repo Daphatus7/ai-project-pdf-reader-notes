@@ -25,9 +25,7 @@ class Services:
     
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
-        from services.llm_service.configuration import get_default_config
         from services.llm_service.llm_service import LlmService
-        config = get_default_config()
         llm_service = LlmService()
         llm_service.start()
         self.register('llm_service', llm_service)

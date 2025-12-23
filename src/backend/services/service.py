@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 class Service(ABC):
     """Base service class"""
     
-    
     def __init__(self):
         pass
     

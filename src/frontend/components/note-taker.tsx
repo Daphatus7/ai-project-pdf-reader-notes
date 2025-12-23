@@ -1,26 +1,28 @@
-import {useRef, useState, forwardRef, useImperativeHandle} from 'react'
+import {useRef, useState, forwardRef, useImperativeHandle, useEffect} from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
 import 'katex/dist/katex.min.css'
-import type { Note } from '../../App.tsx'
-import type { NoteTakerHandle } from '../types/content-insertion.ts'
+import type { Note } from '../App.tsx'
+import type { NoteTakerHandle } from '../features/types/content-insertion.ts'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
 import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
 import Math, { migrateMathStrings } from '@tiptap/extension-mathematics'
-
 import { Mention } from '@tiptap/extension-mention'
 import { TableKit } from '@tiptap/extension-table'
 import { Youtube } from '@tiptap/extension-youtube'
-import { Gapcursor } from '@tiptap/extensions'
 import { Markdown } from '@tiptap/markdown'
 import StarterKit from '@tiptap/starter-kit'
+import { FontSize, TextStyle } from '@tiptap/extension-text-style'
 
 
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/web/components/ui/tabs.tsx";
+
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@@/frontend/components/ui/tabs.tsx";
 
 import {SimpleEditor} from "@@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
+import TextAlign from "@tiptap/extension-text-align";
+import {ImageUploadNode} from "@@/frontend/@/components/tiptap-node/image-upload-node";
 
 interface NoteTakerProps {
 	note?: Note
@@ -53,11 +55,8 @@ const CustomReactComponent = ({ node }: any) => {
 // Custom node extension with React node view
 const CustomReactNode = Node.create({
 	name: 'customReactNode',
-
 	group: 'block',
-
 	content: 'block+',
-
 	addAttributes() {
 		return {
 			content: {
@@ -65,7 +64,6 @@ const CustomReactNode = Node.create({
 			},
 		}
 	},
-
 	parseHTML() {
 		return [
 			{
@@ -73,17 +71,13 @@ const CustomReactNode = Node.create({
 			},
 		]
 	},
-
 	renderHTML({ HTMLAttributes }) {
 		return ['div', { 'data-type': 'custom-react-node', ...HTMLAttributes }, 0]
 	},
-
 	addNodeView() {
 		return ReactNodeViewRenderer(CustomReactComponent)
 	},
-
 	markdownTokenName: 'customReactNode',
-
 	...createBlockMarkdownSpec({
 		nodeName: 'customReactNode',
 		name: 'react',
@@ -149,16 +143,21 @@ export const NoteTaker =
 		}
 	};
 
+	// Editor setup
 	const editor = useEditor({
 		shouldRerenderOnTransaction: true,
 		extensions: [
 			Markdown,
-			StarterKit,
 			Details,
+			TextAlign,
+			FontSize.configure({
+			}),
+			TextStyle,
+			StarterKit,
+			ImageUploadNode,
 			DetailsSummary,
 			DetailsContent,
 			TaskList,
-			Gapcursor,
 			TaskItem.configure({
 				nested: true,
 			}),
@@ -168,7 +167,11 @@ export const NoteTaker =
 				height: 320,
 			}),
 			Image,
-			TableKit,
+			TableKit.configure(
+				{
+					table: { resizable: true },
+				}
+			),
 			Highlight,
 			Math.configure({
 				blockOptions: {
@@ -211,10 +214,11 @@ export const NoteTaker =
 			}),
 			CustomReactNode,
 		],
-		content: '# Markdown Test\n\nClick **"Parse Markdown"** to load content from the left panel.',
+		content: '-----remove this',
 		contentType: 'markdown',
 		onUpdate: ({ editor: currentEditor }) => {
 			if (!isPushing.current) {
+				console.log(editor?.getJSON());
 				setSerializedContent(currentEditor.getMarkdown());
 			}
 		},
@@ -223,11 +227,24 @@ export const NoteTaker =
 			migrateMathStrings(currentEditor);
 		},
 		
-	})
-
+	});
+	
 	const toggleEditable = () => {
 		editor.setEditable(!editor.isEditable)
 		editor.view.dispatch(editor.view.state.tr)
+	}
+
+	useEffect(() => {
+		if (!editor || !note) return;
+		loadNoteContent(note);
+	}, [editor, note]);
+	
+	const loadNoteContent = (note: Note) => {
+		if (!editor) return;
+		isPushing.current = true;
+		editor.commands.setContent(note.content, { contentType: 'markdown' });
+		isPushing.current = false;
+		setSerializedContent(note.content);
 	}
 	
 	const [activeView, setActiveView] = useState<ViewMode>('editor');
@@ -301,6 +318,16 @@ export const NoteTaker =
 		 * @returns Editor instance or null if not initialized
 		 */
 		getEditor: () => editor,
+		
+		/**
+		 * Gets the current markdown content from the editor.
+		 * 
+		 * @returns The markdown content as string
+		 */
+		getContent: () => {
+			if (!editor) return '';
+			return editor.getMarkdown();
+		},
 	}), [editor, activeView]);
 
 	/**
@@ -314,8 +341,6 @@ export const NoteTaker =
 		console.log("The content ------>", content);
 
 		// Prefer HTML content if available, otherwise fall back to markdown
-		const contentToInsert = content.htmlContent || content.content;
-		console.log("inserting ------->>>>", contentToInsert);
 
 		if (content.htmlContent) {
 			const normalizedHtml = normalizeMathHtml(content.htmlContent);
@@ -361,11 +386,11 @@ export const NoteTaker =
 					</TabsList>
 				</div>
 
-				<div className="flex-1 overflow-hidden relative">
+				<div className="flex-1 overflow-hidden relative text-base">
 					{/* Markdown view */}
 					<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
 						<textarea
-							className="markdown-input w-full h-full font-mono p-4 text-sm"
+							className="markdown-input w-full h-full font-mono p-4"
 							value={serializedContent}
 							onChange={e => setSerializedContent(e.target.value)}
 						/>

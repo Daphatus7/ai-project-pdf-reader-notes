@@ -2,26 +2,11 @@
 ## Overview
 This project is to implement an AI-powered note-taking system.
 
-Must Have
-1. PDF reader + Note-taking interface, where the left is a PDF viewer and the right is a note-taking area.
-   <br> i. Because the user wants to see the PDF file and interact with the pdf file directly.
-   <br> ii. In addition, the user wants to take notes while reading the PDF file.
-2. Basic LLM interaction.
-   <br> i. the user wants to take a screenshot, then ask the llm to explain the screenshot,
-   then the user can decide what to be inserted into the notes
-   <br> ii. ask for regenerate the output.
-3. Export the note to Markdown format.
-4. Advanced LLM interation(need to use a vector database to achieve that).
-   <br> i. the user can chat with llm to interact with the PDF reader.
-   <br> ii. use case 1. I want a table of content. then the llm will summarise the content of the table for the pdf. then the user can decide if he wants to insert the content of table into the note.
-## Top-level modules
-- `src/` write the code here
-- `src/services` backend server goes here, this is where to create classes for business layer.
-- `src/services/llm` llm service goes here.
-- `src/web` frontend code goes here, this is where to create components for UI layer. Make sure it does not handle any business logic.
-- `src/utils` utility functions go here.
-
 ## Coding Conventions
+1. Avoid Over thinking, otherwise than explicitly request to do so.
+2. Do not use useMeme, useCallBack unless explicity says so.
+3. Simple code is better than engineered code.
+
 Follow GRASP coding principles if applicable:
 GRASP Principles with Situations
 - Information Expert: When you need to decide which class should perform a calculation, validation, or update, assign the responsibility to the class that already holds the necessary data. Example: if Order knows all its LineItems, then Order should calculate the total price, not Customer or LineItem.

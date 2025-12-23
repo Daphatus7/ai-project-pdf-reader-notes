@@ -1,24 +1,16 @@
-import React, {useState, useRef, useEffect, useMemo} from "react";
-import { Button } from "./ui/button.tsx";
+import { useState, useRef, useEffect, useMemo, type MouseEvent as ReactMouseEvent } from 'react';
+import { Button } from './ui/button.tsx';
 import {
-	Upload,
-	ZoomIn,
-	ZoomOut,
-	ChevronLeft,
-	ChevronRight,
-	Scissors,
-	MessageSquare,
-	X
-} from "lucide-react";
-import { cn } from "./ui/utils.ts";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "./ui/tooltip.tsx";
+  Upload,
+  Scissors,
+  X
+} from 'lucide-react';
+import { cn } from './ui/utils.ts';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import { ScreenshotCapture } from './ScreenshotCapture.tsx';
+import { downloadDataUrlAsFile, sanitizeFilename } from '../features/utils/download.ts';
+import { createPdfScreenshotCapture } from '../features/services/pdf-screenshot-capture.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
@@ -34,24 +26,22 @@ interface PDFReaderProps {
 }
 
 
-export function PDFReader({  }: PDFReaderProps) {
+export function PDFReader({ onScreenshotCapture }: PDFReaderProps) {
 	const [openPDFs, setOpenPDFs] = useState<PDFDocument[]>([]);
 	const [activePDF, setActivePDF] = useState<string>('');
-	const [currentPage, setCurrentPage] = useState(1);
-	const [zoom, setZoom] = useState(100);
 	const [screenshotMode, setScreenshotMode] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const viewerRef = useRef<HTMLElement | null>(null);
 	
 	// Reader setup
-	const workerUrl = "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+	const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 	const layoutRef = useRef(returnDefaultLayout());
 	function returnDefaultLayout() {
 		return defaultLayoutPlugin();
 	}
-	const plugins = useMemo(() => [layoutRef.current], []);
+	const pdfScreenshot = useMemo(() => createPdfScreenshotCapture(), []);
+	const plugins = useMemo(() => [layoutRef.current, pdfScreenshot.plugin], [pdfScreenshot]);
 
-	const activePDFDoc = openPDFs.find(pdf => pdf.pdfUrl === activePDF);
-	
 	const handleUploadPdf = () => fileInputRef.current?.click();
 	useEffect(() => {
 		return () => {
@@ -102,7 +92,7 @@ export function PDFReader({  }: PDFReaderProps) {
 										variant="ghost"
 										size="icon"
 										className="h-4 w-4 p-0 hover:bg-muted-foreground/20"
-										onClick={(e) => {
+										onClick={(e: ReactMouseEvent) => {
 											e.stopPropagation();
 											handleClosePDF(pdf.pdfUrl);
 										}}
@@ -111,111 +101,63 @@ export function PDFReader({  }: PDFReaderProps) {
 									</Button>
 								</div>
 							))}
-							<Button variant="ghost" size="sm" className="ml-2 shrink-0">
+							<Button variant="ghost" size="sm" className="ml-2 shrink-0" onClick={handleUploadPdf}>
 								<Upload className="w-4 h-4 mr-2" />
 								Open PDF
 							</Button>
 						</div>
 					</div>
-
 					{/* PDF Controls */}
-					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
-						<div className="flex items-center gap-2">
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<Button
-											variant={screenshotMode ? "default" : "outline"}
-											size="sm"
-											onClick={() => setScreenshotMode(!screenshotMode)}
-										>
-											<Scissors className="w-4 h-4 mr-2" />
-											Screenshot
-										</Button>
-									</TooltipTrigger>
-									<TooltipContent>
-										<p>Take a screenshot and ask AI</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-
-							<Button variant="outline" size="sm">
-								<MessageSquare className="w-4 h-4 mr-2" />
-								Ask AI
-							</Button>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-								disabled={currentPage === 1}
-							>
-								<ChevronLeft className="w-4 h-4" />
-							</Button>
-
-							<span className="text-sm px-2 min-w-[80px] text-center">
-                {currentPage} / {activePDFDoc?.pages}
-              </span>
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setCurrentPage(Math.min(activePDFDoc?.pages || 1, currentPage + 1))}
-								disabled={currentPage === activePDFDoc?.pages}
-							>
-								<ChevronRight className="w-4 h-4" />
-							</Button>
-
-							<div className="w-px h-6 bg-border mx-2" />
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setZoom(Math.max(50, zoom - 10))}
-							>
-								<ZoomOut className="w-4 h-4" />
-							</Button>
-
-							<span className="text-sm px-2 min-w-[60px] text-center">
-								{zoom}%
-							</span>
-
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-8 w-8"
-								onClick={() => setZoom(Math.min(200, zoom + 10))}
-							>
-								<ZoomIn className="w-4 h-4" />
-							</Button>
-						</div>
-					</div>
-
+					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20"></div>
 					{/* PDF Viewer */}
-							<Worker workerUrl={workerUrl}>
-								{activePDF ? (
-									<Viewer
-										key={activePDF}
-										fileUrl={activePDF}
-										plugins={plugins}
-										onDocumentLoad={(e) => {
-											setOpenPDFs(prev =>
-												prev.map(p =>
-													p.pdfUrl === activePDF ? { ...p, pages: e.doc.numPages } : p
-												)
-											);
-											setCurrentPage(1);
-										}}
-									/>
-								) : (
-									<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
-								)}
-							</Worker>
+					<div
+						className='relative h-full'
+						ref={(el) => {
+							viewerRef.current = el;
+						}}
+					>
+						<div className='absolute top-2 right-2 z-20 flex gap-2'>
+							<Button
+								size='sm'
+								variant={screenshotMode ? 'secondary' : 'default'}
+								disabled={!activePDF}
+								onClick={() => setScreenshotMode(prev => !prev)}
+							>
+								<Scissors className='w-4 h-4 mr-2' />
+								{screenshotMode ? 'Cancel shot' : 'Screenshot'}
+							</Button>
+						</div>
+
+						<Worker workerUrl={workerUrl}>
+							{activePDF ? (
+								<Viewer
+									key={activePDF}
+									fileUrl={activePDF}
+									plugins={plugins}
+									onDocumentLoad={(e) => {
+										setOpenPDFs(prev =>
+											prev.map(p =>
+												p.pdfUrl === activePDF ? { ...p, pages: e.doc.numPages } : p
+											)
+										);
+									}}
+								/>
+							) : (
+								<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
+							)}
+						</Worker>
+
+						<ScreenshotCapture
+							targetRef={viewerRef}
+							pdfScreenshotCapture={pdfScreenshot.controller}
+							isActive={screenshotMode}
+							onCapture={(imageDataUrl, name) => {
+								setScreenshotMode(false);
+								onScreenshotCapture?.(imageDataUrl, name);
+							}}
+							onCancel={() => setScreenshotMode(false)}
+						/>
+					</div>
 				</>
 			) : (
 				<div className="flex-1 flex items-center justify-center">

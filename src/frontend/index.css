@@ -97,9 +97,9 @@
     --container-7xl: 80rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1 / .75);
-    --text-sm: .875rem;
+    --text-sm: .8rem;
     --text-sm--line-height: calc(1.25 / .875);
-    --text-base: 1rem;
+    --text-base: 0.8rem;
     --text-base--line-height: calc(1.5 / 1);
     --text-lg: 1.125rem;
     --text-lg--line-height: calc(1.75 / 1.125);
@@ -3261,4 +3261,72 @@ html {
     opacity: var(--tw-exit-opacity, 1);
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
+}
+
+/* Basic editor styles */
+.tiptap {
+    :first-child {
+        margin-top: 0;
+    }
+
+    /* Table-specific styling */
+    table {
+        border-collapse: collapse;
+        margin: 0;
+        overflow: hidden;
+        table-layout: fixed;
+        width: 100%;
+
+        td,
+        th {
+            border: 1px solid var(--gray-3);
+            box-sizing: border-box;
+            min-width: 1em;
+            padding: 6px 8px;
+            position: relative;
+            vertical-align: top;
+
+            > * {
+                margin-bottom: 0;
+            }
+        }
+
+        th {
+            background-color: var(--gray-1);
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .selectedCell:after {
+            background: var(--gray-2);
+            content: '';
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            pointer-events: none;
+            position: absolute;
+            z-index: 2;
+        }
+
+        .column-resize-handle {
+            background-color: var(--purple);
+            bottom: -2px;
+            pointer-events: none;
+            position: absolute;
+            right: -2px;
+            top: 0;
+            width: 4px;
+        }
+    }
+
+    .tableWrapper {
+        margin: 1.5rem 0;
+        overflow-x: auto;
+    }
+
+    &.resize-cursor {
+        cursor: ew-resize;
+        cursor: col-resize;
+    }
 }

@@ -46,7 +46,24 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     """
     try:
         system_msg = SystemMessage(content=request.system_message)
-        human_msg = HumanMessage(content=request.message)
+        
+        print("Request contents:", request.contents)
+        
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         response = llm_service.chat(
             system_message=system_msg,
@@ -80,7 +97,21 @@ async def stream_chat(request: StreamChatRequest, llm_service=Depends(get_llm_se
     """
     try:
         system_msg = SystemMessage(content=request.system_message)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         async def generate_stream() -> AsyncGenerator[str, None]:
             try:
@@ -117,7 +148,21 @@ async def async_chat(request: ChatRequest, llm_service=Depends(get_llm_service))
     """
     try:
         system_msg = SystemMessage(content=request.system_message)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         response = await llm_service.multi_thread_chat(
             system_message=system_msg,
@@ -211,7 +256,21 @@ async def structured_chat(request: StructuredChatRequest, llm_service=Depends(ge
             content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
         
         system_msg = SystemMessage(content=base_system + content_type_hint)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         structured_output = await llm_service.async_chat_with_structured_output(
             output_schema=LLMStructuredOutput,
@@ -249,7 +308,21 @@ def structured_chat_sync(request: StructuredChatRequest, llm_service=Depends(get
             content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
         
         system_msg = SystemMessage(content=base_system + content_type_hint)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         structured_output = llm_service.chat_with_structured_output(
             output_schema=LLMStructuredOutput,
@@ -294,7 +367,21 @@ async def structured_stream_chat(request: StructuredChatRequest, llm_service=Dep
             content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
         
         system_msg = SystemMessage(content=base_system + content_type_hint)
-        human_msg = HumanMessage(content=request.message)
+        
+        # Build content array from contents
+        content_parts = []
+        for item in request.contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                # Convert base64 to data URL format for LangChain
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": data_url}
+                })
+        
+        human_msg = HumanMessage(content=content_parts)
         
         async def generate_stream() -> AsyncGenerator[str, None]:
             accumulated_text = ''

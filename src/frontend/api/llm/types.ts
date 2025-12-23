@@ -65,3 +65,8 @@ export interface StructuredChatResponse {
   usage?: Record<string, unknown> | null;
 }
 
+export interface StructuredImageChatRequest {
+  message: string;
+  system_message?: string;
+  image_urls: string[];
+}
