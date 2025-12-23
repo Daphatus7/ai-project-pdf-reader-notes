@@ -312,7 +312,6 @@ export default function NotePage() {
 	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
 	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
 
-	const [isLeftCollapsed, setIsLeftCollapsed] = useState(true);
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 

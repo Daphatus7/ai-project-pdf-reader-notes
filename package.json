@@ -34,6 +34,7 @@
             "@react-pdf-viewer/default-layout": "^3.12.0",
             "@tailwindcss/vite": "^4.1.15",
             "@tanstack/react-query": "^5.90.12",
+            "@tanstack/react-query-devtools": "^5.91.1",
             "@tiptap/extension-collaboration": "^3.10.7",
             "@tiptap/extension-details": "^3.10.4",
             "@tiptap/extension-drag-handle": "^3.10.7",
@@ -86,7 +87,8 @@
             "tailwindcss": "^4.1.15",
             "vaul": "^1.1.2",
             "y-protocols": "^1.0.6",
-            "yjs": "^13.6.27"
+            "yjs": "^13.6.27",
+            "zustand": "^5.0.9"
       },
       "devDependencies": {
             "@types/lodash.throttle": "^4.1.9",
