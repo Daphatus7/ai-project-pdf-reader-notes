@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type {Note} from "@@/frontend/note.tsx";
+import initialNotesData from "@@/frontend/hardcoed_data.tsx";
+
 /***
  * use zustand to store global state
  */
@@ -11,10 +13,9 @@ interface StoreState {
   setSelectedNoteId: (id: string) => void;
 }
 
-export const useStore = create<StoreState>((set) => ({
-  notes: [],
+export const useNotesStore = create<StoreState>((set) => ({
+  notes: initialNotesData,
   setNotes: (notes: Note[]) => set({ notes }),
-  selectedNoteId: '',
+  selectedNoteId: '1',
   setSelectedNoteId: (id: string) => set({ selectedNoteId: id }),
 }));
-
