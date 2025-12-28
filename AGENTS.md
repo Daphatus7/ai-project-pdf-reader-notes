@@ -2,6 +2,8 @@
 ## Overview
 This project is to implement an AI-powered note-taking system.
 
+
+
 ## Coding Conventions
 1. Avoid Over thinking, otherwise than explicitly request to do so.
 2. Do not use useMeme, useCallBack unless explicity says so.

@@ -12,15 +12,15 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
-from servers import services
-from src.backend.models.request_models import (
+from models.request_models import (
     ChatRequest,
     ChatResponse,
     StreamChatRequest,
     StructuredChatRequest,
     StructuredChatResponse,
-    LLMStructuredOutput,
+    LLMStructuredOutput
 )
+from servers import services
 
 logger = logging.getLogger(__name__)
 

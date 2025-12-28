@@ -19,4 +19,8 @@ class Service(ABC):
     def restart(self):
         pass
     
+    @abstractmethod
+    def user_request(self, request):
+        pass
+    
     
