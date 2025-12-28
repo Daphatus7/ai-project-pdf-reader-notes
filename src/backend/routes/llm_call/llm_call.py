@@ -13,7 +13,7 @@ from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
 from servers import services
-from ...models.request_models import (
+from src.backend.models.request_models import (
     ChatRequest,
     ChatResponse,
     StreamChatRequest,

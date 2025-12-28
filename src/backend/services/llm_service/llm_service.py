@@ -118,6 +118,8 @@ class LlmService:
         messages = [system_message, human_message]
         return await structured_model.ainvoke(messages)
 
+
+# debug code
 # import asyncio
 # 
 # async def main():
