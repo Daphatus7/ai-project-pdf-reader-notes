@@ -1,12 +1,21 @@
 """
-Request and response models for LLM API endpoints
+LLM API schemas.
+
+Request and response models for LLM API endpoints including:
+- Chat (regular, streaming, async)
+- Structured output chat
+- Content types and input models
 """
+
 from typing import Union, Literal, Optional
 from pydantic import BaseModel, Field
 
+
+# Content Models
 class TextContent(BaseModel):
     type: Literal["text"] = "text"
     text: str
+
 
 class ImageContent(BaseModel):
     type: Literal["image"] = "image"
@@ -14,11 +23,13 @@ class ImageContent(BaseModel):
     mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
     name: Optional[str] = None
 
+
 InputContent = Union[TextContent, ImageContent]
 
 ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
 
 
+# Chat Request/Response Models
 class ChatRequest(BaseModel):
     """Request model for chat endpoint"""
     contents: list[InputContent] = Field(
@@ -46,7 +57,6 @@ class StreamChatRequest(BaseModel):
 
 
 # Structured Output Models
-
 class CodeBlock(BaseModel):
     """Model for code block in structured output"""
     language: str = Field(..., description='Programming language')
@@ -70,7 +80,7 @@ class Section(BaseModel):
 class LLMStructuredOutput(BaseModel):
     """
     Structured output model for LLM responses.
-    
+
     Ensures consistent, parseable output with markdown, LaTeX, and GFM support.
     The LLM is instructed to return responses conforming to this schema.
     """
@@ -93,7 +103,6 @@ class StructuredChatRequest(BaseModel):
         description='System message to set the assistant behavior'
     )
     expected_content_type: Optional[ContentType] = None
-
 
 
 class StructuredChatResponse(BaseModel):

@@ -10,7 +10,7 @@ import logging
 import sys
 from servers import services
 from config.config import settings
-from api.llm_call import router
+from api import v1_router
 
 # Configure logging
 logging.basicConfig(
@@ -63,7 +63,7 @@ app = FastAPI(
 )
 
 # Include routers
-app.include_router(router)
+app.include_router(v1_router)
 
 # Configure CORS
 app.add_middleware(
