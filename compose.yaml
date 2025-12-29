@@ -2,12 +2,12 @@ services:
   # Backend service - FastAPI with LLM integration
   backend:
     build:
-      context: ./src/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./src/backend/Dockerfile
       target: development
     volumes:
       # Mount source code for hot reload in development
-      - ./src/backend:/app
+      - .:/app
     ports:
       - "8000:8000"
     environment:

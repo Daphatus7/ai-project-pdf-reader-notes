@@ -10,7 +10,7 @@ Provides endpoints for:
 import logging
 from fastapi import APIRouter, HTTPException, Depends
 
-from schemas import (
+from src.backend.schemas import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,

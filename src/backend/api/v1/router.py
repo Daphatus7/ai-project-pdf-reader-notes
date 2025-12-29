@@ -6,7 +6,7 @@ that can be included in the main FastAPI application.
 """
 from fastapi import APIRouter
 
-from api.v1 import llm, auth, users
+from src.backend.api.v1 import llm, auth, users
 
 # Create the main v1 router
 router = APIRouter(prefix='/api/v1')

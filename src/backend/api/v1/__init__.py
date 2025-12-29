@@ -6,6 +6,6 @@ Contains all version 1 API endpoints organized by resource:
 - auth: Authentication and authorization endpoints
 - users: User management endpoints
 """
-from api.v1.router import router
+from src.backend.api.v1.router import router
 
 __all__ = ['router']

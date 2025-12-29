@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
-from schemas import (
+from src.backend.schemas import (
     ChatRequest,
     ChatResponse,
     StreamChatRequest,
@@ -20,7 +20,7 @@ from schemas import (
     StructuredChatResponse,
     LLMStructuredOutput
 )
-from api.deps import get_llm_service
+from src.backend.api.deps import get_llm_service
 
 logger = logging.getLogger(__name__)
 

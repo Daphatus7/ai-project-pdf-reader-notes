@@ -25,7 +25,7 @@ class Services:
     
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
-        from services.llm_service.llm_service import LlmService
+        from src.backend.services.llm_service.llm_service import LlmService
         llm_service = LlmService()
         llm_service.start()
         self.register('llm_service', llm_service)

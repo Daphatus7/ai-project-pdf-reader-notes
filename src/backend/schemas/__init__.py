@@ -10,14 +10,14 @@ This module contains Pydantic models for API endpoints across different versions
 Schemas are organized by feature domain (auth, llm, users, etc.).
 """
 
-from schemas.auth import (
+from src.backend.schemas.auth import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
     UserResponse,
 )
 
-from schemas.llm import (
+from src.backend.schemas.llm import (
     TextContent,
     ImageContent,
     InputContent,
@@ -33,7 +33,7 @@ from schemas.llm import (
     StructuredChatResponse,
 )
 
-from schemas.users import (
+from src.backend.schemas.users import (
     UserProfile,
     UpdateUserRequest,
 )

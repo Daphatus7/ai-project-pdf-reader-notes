@@ -11,11 +11,11 @@ import logging
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 
-from schemas import (
+from src.backend.schemas import (
     UserProfile,
     UpdateUserRequest,
 )
-from api.deps import get_current_user
+from src.backend.api.deps import get_current_user
 
 logger = logging.getLogger(__name__)
 

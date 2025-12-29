@@ -8,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 import sys
-from servers import services
-from config.config import settings
-from api import v1_router
+from src.backend.servers import services
+from src.backend.config.config import settings
+from src.backend.api import v1_router
 
 # Configure logging
 logging.basicConfig(
