@@ -38,7 +38,7 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     
     #todo verify authentication and rate limiting
     
-    #todo 
+    #todo send the request to the llm service
     
     
     try:
