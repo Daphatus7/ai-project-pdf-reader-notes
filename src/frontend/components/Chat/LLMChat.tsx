@@ -4,7 +4,6 @@ import {Input} from "../ui/input.tsx";
 import {Avatar, AvatarFallback} from "../ui/avatar.tsx";
 import {
 	Image as ImageIcon,
-	Sparkles,
 	User,
 	FileText,
 	ChevronUp

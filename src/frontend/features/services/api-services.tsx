@@ -3,6 +3,8 @@
  * All API interactions should go through this file
  */
 
+import { apiConfig } from '../../api/config';
+
 // Types
 export type ContentType = 'explanation' | 'summary' | 'answer' | 'analysis' | 'code' | 'table' | 'list';
 
@@ -125,21 +127,6 @@ export class ApiError extends Error {
 
 // Configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-
-const apiConfig = {
-  baseUrl: API_BASE_URL,
-  timeout: 30000,
-  endpoints: {
-    llm: {
-      chat: '/api/llm/chat',
-      chatStream: '/api/llm/chat/stream',
-      chatAsync: '/api/llm/chat/async',
-      chatStructured: '/api/llm/chat/structured',
-      chatStructuredSync: '/api/llm/chat/structured/sync',
-      chatStructuredStream: '/api/llm/chat/structured/stream',
-    },
-  },
-} as const;
 
 // Base HTTP client
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
