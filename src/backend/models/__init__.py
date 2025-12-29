@@ -9,8 +9,17 @@ Structure:
 模型：模型代表后端操作的数据结构和业务实体。无论是处理用户、产品还是交易，将模型放在指定的文件夹中都有助于提高清晰度并简化数据库交互。
 """
 
-from .api import *  # API schemas
+
+from models.chat_models import *
+from models.context_models import *
+from models.note_models import *
+from models.output_models import *
+from models.user_models import *
 
 __all__ = [
-    # Re-export all schemas from schemas module
+    # Chat models
+    "LoginRequest",
+    "RegisterRequest",
+    "TokenResponse",
+    "UserResponse"
 ]

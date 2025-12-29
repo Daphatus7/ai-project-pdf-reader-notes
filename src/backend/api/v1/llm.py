@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
-from models.api.llm import (
+from schemas import (
     ChatRequest,
     ChatResponse,
     StreamChatRequest,
@@ -35,6 +35,12 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     This endpoint accepts a user message and optional system message,
     and returns the LLM's response. Easy to debug via API calls.
     """
+    
+    #todo verify authentication and rate limiting
+    
+    #todo 
+    
+    
     try:
         system_msg = SystemMessage(content=request.system_message)
 

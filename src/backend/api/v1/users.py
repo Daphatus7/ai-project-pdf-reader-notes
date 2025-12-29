@@ -11,7 +11,7 @@ import logging
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 
-from models.api.users import (
+from schemas import (
     UserProfile,
     UpdateUserRequest,
 )

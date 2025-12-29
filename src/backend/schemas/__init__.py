@@ -1,3 +1,8 @@
+# @file        __init__.py
+# @description 
+# @author      [Peiyu Wang]
+# @date        29/12/2025
+# @license     © 2025 . All rights reserved.
 """
 API Request/Response schemas.
 
@@ -5,14 +10,14 @@ This module contains Pydantic models for API endpoints across different versions
 Schemas are organized by feature domain (auth, llm, users, etc.).
 """
 
-from .auth import (
+from schemas.auth import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
     UserResponse,
 )
 
-from .llm import (
+from schemas.llm import (
     TextContent,
     ImageContent,
     InputContent,
@@ -28,7 +33,7 @@ from .llm import (
     StructuredChatResponse,
 )
 
-from .users import (
+from schemas.users import (
     UserProfile,
     UpdateUserRequest,
 )

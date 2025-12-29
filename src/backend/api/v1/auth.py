@@ -10,13 +10,12 @@ Provides endpoints for:
 import logging
 from fastapi import APIRouter, HTTPException, Depends
 
-from models.api.auth import (
+from schemas import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
     UserResponse,
 )
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/auth', tags=['authentication'])
