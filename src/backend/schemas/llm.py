@@ -44,8 +44,6 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
     response: str = Field(..., description='LLM response message')
-    usage: Optional[dict] = Field(default=None, description='Token usage information if available')
-
 
 class StreamChatRequest(BaseModel):
     """Request model for streaming chat endpoint"""

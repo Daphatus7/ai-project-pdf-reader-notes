@@ -10,6 +10,8 @@ Request and response models for authentication endpoints including:
 from pydantic import BaseModel, Field
 
 
+
+
 class LoginRequest(BaseModel):
     """Login request model"""
     username: str
@@ -36,3 +38,13 @@ class UserResponse(BaseModel):
     username: str
     email: str
     full_name: str | None = None
+
+class UserRequest(BaseModel):
+    """
+        Contextual information about the request and user.
+    """
+    user_id: str # authenticated user ID
+    access_token: str # e.g., JWT token
+    tenant_id: str # e.g., tenant server id
+    role: str # e.g., 'user', 'admin'
+    plan: str | None = None # e.g., 'free', 'pro', 'enterprise'

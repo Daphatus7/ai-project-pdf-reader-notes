@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
+from src.backend.auth.server_auth import verify_user_is_allowed
 from src.backend.schemas import (
     ChatRequest,
     ChatResponse,
@@ -21,6 +22,7 @@ from src.backend.schemas import (
     LLMStructuredOutput
 )
 from src.backend.api.deps import get_llm_service
+from src.backend.schemas.auth import UserRequest
 
 logger = logging.getLogger(__name__)
 
@@ -84,104 +86,14 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
         raise HTTPException(status_code=500, detail=f'Error processing chat request: {str(e)}')
 
 
-@router.post('/chat/stream')
-async def stream_chat(request: StreamChatRequest, llm_service=Depends(get_llm_service)):
-    """
-    Streaming chat endpoint for real-time LLM interaction.
-
-    This endpoint accepts a user message and optional system message,
-    and streams the LLM's response as it's generated.
-    """
-    try:
-        system_msg = SystemMessage(content=request.system_message)
-
-        # Build content array from contents
-        content_parts = []
-        for item in request.contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                # Convert base64 to data URL format for LangChain
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": data_url}
-                })
-
-        human_msg = HumanMessage(content=content_parts)
-
-        async def generate_stream() -> AsyncGenerator[str, None]:
-            try:
-                async for chunk in llm_service.multi_thread_stream_chat(
-                    system_message=system_msg,
-                    human_message=human_msg
-                ):
-                    text = getattr(chunk, 'content', str(chunk))
-                    yield f'data: {text}\n\n'
-            except Exception as e:
-                logger.error(f'Error in stream generation: {e}', exc_info=True)
-                yield f'data: [ERROR] {str(e)}\n\n'
-
-        return StreamingResponse(
-            generate_stream(),
-            media_type='text/event-stream',
-            headers={
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            }
-        )
-    except Exception as e:
-        logger.error(f'Error in stream_chat endpoint: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail=f'Error processing streaming chat request: {str(e)}')
-
-
-@router.post('/chat/async', response_model=ChatResponse)
-async def async_chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
-    """
-    Async chat endpoint for non-blocking LLM interaction.
-
-    This endpoint accepts a user message and optional system message,
-    and returns the LLM's response asynchronously.
-    """
-    try:
-        system_msg = SystemMessage(content=request.system_message)
-
-        # Build content array from contents
-        content_parts = []
-        for item in request.contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                # Convert base64 to data URL format for LangChain
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": data_url}
-                })
-
-        human_msg = HumanMessage(content=content_parts)
-
-        response = await llm_service.multi_thread_chat(
-            system_message=system_msg,
-            human_message=human_msg
-        )
-
-        response_text = getattr(response, 'content', str(response))
-
-        usage = None
-        try:
-            usage = llm_service.get_usage()
-        except Exception:
-            pass
-
-        return ChatResponse(
-            response=response_text,
-            usage=usage
-        )
-    except Exception as e:
-        logger.error(f'Error in async_chat endpoint: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail=f'Error processing async chat request: {str(e)}')
-
+@router.post('/chatv2', response_model=ChatResponse)
+async def chat_v2(
+        payload: ChatRequest,
+        _: UserRequest = Depends(verify_user_is_allowed),
+        llm_service = Depends(get_llm_service)
+):
+    response = llm_service.chat_v2(payload)
+    return ChatResponse(response=response)
 
 STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
 
@@ -224,217 +136,3 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 6. BLOCKQUOTES: Use > for notes
 
 CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
-
-
-@router.post('/chat/structured', response_model=StructuredChatResponse)
-async def structured_chat(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
-    """
-    Structured chat endpoint that enforces schema-conformant LLM output.
-
-    This endpoint ensures the LLM returns responses that conform to the
-    LLMStructuredOutput schema, making it easier to parse and display
-    markdown, LaTeX, and GFM content consistently.
-
-    The response includes:
-    - content: Main markdown content with LaTeX and GFM support
-    - content_type: Type of response (explanation, summary, answer, etc.)
-    - sections: Optional breakdown into sections
-    - key_points: Key takeaways
-    - code_blocks: Extracted code with language info
-    - math_expressions: Extracted LaTeX expressions
-    - suggested_followups: Suggested follow-up questions
-    """
-    try:
-        # Build enhanced system message for structured output
-        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
-
-        content_type_hint = ''
-        if request.expected_content_type:
-            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
-
-        system_msg = SystemMessage(content=base_system + content_type_hint)
-
-        # Build content array from contents
-        content_parts = []
-        for item in request.contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                # Convert base64 to data URL format for LangChain
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": data_url}
-                })
-
-        human_msg = HumanMessage(content=content_parts)
-
-        structured_output = await llm_service.async_chat_with_structured_output(
-            output_schema=LLMStructuredOutput,
-            system_message=system_msg,
-            human_message=human_msg
-        )
-
-        usage = None
-        try:
-            usage = llm_service.get_usage()
-        except Exception:
-            pass
-
-        return StructuredChatResponse(
-            structured_output=structured_output,
-            usage=usage
-        )
-    except Exception as e:
-        logger.error(f'Error in structured_chat endpoint: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail=f'Error processing structured chat request: {str(e)}')
-
-
-@router.post('/chat/structured/sync', response_model=StructuredChatResponse)
-def structured_chat_sync(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
-    """
-    Synchronous structured chat endpoint for debugging and simple use cases.
-
-    Same as /chat/structured but synchronous for easier debugging.
-    """
-    try:
-        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
-
-        content_type_hint = ''
-        if request.expected_content_type:
-            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
-
-        system_msg = SystemMessage(content=base_system + content_type_hint)
-
-        # Build content array from contents
-        content_parts = []
-        for item in request.contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                # Convert base64 to data URL format for LangChain
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": data_url}
-                })
-
-        human_msg = HumanMessage(content=content_parts)
-
-        structured_output = llm_service.chat_with_structured_output(
-            output_schema=LLMStructuredOutput,
-            system_message=system_msg,
-            human_message=human_msg
-        )
-
-        usage = None
-        try:
-            usage = llm_service.get_usage()
-        except Exception:
-            pass
-
-        return StructuredChatResponse(
-            structured_output=structured_output,
-            usage=usage
-        )
-    except Exception as e:
-        logger.error(f'Error in structured_chat_sync endpoint: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail=f'Error processing structured chat request: {str(e)}')
-
-
-@router.post('/chat/structured/stream')
-async def structured_stream_chat(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
-    """
-    Streaming structured chat endpoint that streams both text chunks and structured output updates.
-
-    This endpoint streams the LLM response in real-time. The accumulated text is periodically
-    parsed to generate structured output updates conforming to the LLMStructuredOutput schema.
-
-    The stream sends two types of events:
-    - 'text': Raw text chunks as they're generated (updates the content field)
-    - 'structured': JSON updates of the structured output as it becomes available
-    """
-    import json
-
-    try:
-        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
-
-        content_type_hint = ''
-        if request.expected_content_type:
-            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
-
-        system_msg = SystemMessage(content=base_system + content_type_hint)
-
-        # Build content array from contents
-        content_parts = []
-        for item in request.contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                # Convert base64 to data URL format for LangChain
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": data_url}
-                })
-
-        human_msg = HumanMessage(content=content_parts)
-
-        async def generate_stream() -> AsyncGenerator[str, None]:
-            accumulated_text = ''
-            last_structured_update = None
-            chunk_count = 0
-
-            try:
-                # Stream raw text chunks
-                async for chunk in llm_service.multi_thread_stream_chat(
-                    system_message=system_msg,
-                    human_message=human_msg
-                ):
-                    text = getattr(chunk, 'content', str(chunk))
-                    accumulated_text += text
-                    chunk_count += 1
-
-                    # Send text chunk
-                    yield f'data: {json.dumps({"type": "text", "content": text})}\n\n'
-
-                    # Periodically send structured output updates with accumulated content
-                    # (every 15 chunks or when we have substantial content)
-                    if (chunk_count % 15 == 0 and len(accumulated_text) > 50) or len(accumulated_text) > 300:
-                        # Create a minimal structured output with current content
-                        # The full structured parsing will happen at the end
-                        partial_output = {
-                            'content': accumulated_text,
-                            'content_type': 'answer'  # default, will be updated in final parse
-                        }
-
-                        if partial_output != last_structured_update:
-                            last_structured_update = partial_output
-                            yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
-
-                # Final structured output after streaming completes
-                # Send the accumulated text as the final structured output
-                # The content field is the main field that was streamed
-                final_structured = {
-                    'content': accumulated_text,
-                    'content_type': 'answer'  # Default type
-                }
-
-                yield f'data: {json.dumps({"type": "structured", "data": final_structured})}\n\n'
-                yield f'data: {json.dumps({"type": "done"})}\n\n'
-
-            except Exception as e:
-                logger.error(f'Error in structured stream generation: {e}', exc_info=True)
-                yield f'data: {json.dumps({"type": "error", "message": str(e)})}\n\n'
-
-        return StreamingResponse(
-            generate_stream(),
-            media_type='text/event-stream',
-            headers={
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            }
-        )
-    except Exception as e:
-        logger.error(f'Error in structured_stream_chat endpoint: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail=f'Error processing streaming structured chat request: {str(e)}')
