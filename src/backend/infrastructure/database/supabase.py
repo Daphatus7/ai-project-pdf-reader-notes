@@ -8,23 +8,28 @@
 import os
 from supabase import create_client, Client
 
+from src.backend.services.service import Service
 
-class Supabase:
-    def __init__(self):
+
+class Supabase(Service):
+    def get(self):
+        return self.__database
+
+    def start(self):
         try:
-            url: str = os.environ.get("SUPABASE_URL") 
+            url: str = os.environ.get("SUPABASE_URL")
             if url is None:
                 raise ValueError("SUPABASE_URL environment variable is not set.")
         except Exception as e:
             raise ValueError("SUPABASE_URL environment variable is not set.") from e
         try:
-            key: str = os.environ.get("SUPABASE_KEY") 
+            key: str = os.environ.get("SUPABASE_KEY")
             if key is None:
                 raise ValueError("SUPABASE_KEY environment variable is not set.")
         except Exception as e:
             raise ValueError("SUPABASE_KEY environment variable is not set.") from e
 
         self.__database: Client = create_client(url, key)
-        
-    def get_client(self):
-        return self.__database
+
+    def __init__(self):
+        self.__database = None
