@@ -3,12 +3,14 @@
 # @author      [Peiyu Wang]
 # @date        29/12/2025
 # @license     © 2025 . All rights reserved.
-import jwt
-from fastapi import Depends, security, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from jose import JWTError, jwt
 from src.backend.config.config import settings
 from src.backend.schemas.auth import UserRequest
+
+security = HTTPBearer()
 
 
 async def verify_user_is_allowed(
@@ -19,8 +21,8 @@ async def verify_user_is_allowed(
     try:
         payload = jwt.decode(
             token,
-            settings.supabase_jwt_secret,
             algorithms=["HS256"],
+            key=settings.jwt_secret_key,
             audience="authenticated"
         )
     except JWTError:

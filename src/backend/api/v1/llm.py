@@ -85,8 +85,7 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
         logger.error(f'Error in chat endpoint: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=f'Error processing chat request: {str(e)}')
 
-
-@router.post('/chatv2', response_model=ChatResponse)
+@router.post('/chat_v2', response_model=ChatResponse)
 async def chat_v2(
         payload: ChatRequest,
         _: UserRequest = Depends(verify_user_is_allowed),

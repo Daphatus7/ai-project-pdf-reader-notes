@@ -49,7 +49,6 @@ class Settings(BaseSettings):
     temperature: float = Field(default=0.7, env="TEMPERATURE")
     timeout: int = Field(default=30, env="TIMEOUT")
     max_retries: int = Field(default=3, env="MAX_RETRIES")
-    supabase_jwt_secret: str = Field(os.getenv("SUPABASE_JWT_SECRET"))
     class Config:
         env_file = Path(__file__).resolve().parent / '.env'
         case_sensitive = False
