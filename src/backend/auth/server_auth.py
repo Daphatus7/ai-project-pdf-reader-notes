@@ -7,6 +7,7 @@ import jwt
 from fastapi import Depends, security, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 
+from src.backend.config.config import settings
 from src.backend.schemas.auth import UserRequest
 
 

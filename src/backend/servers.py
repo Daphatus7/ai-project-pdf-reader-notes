@@ -4,7 +4,7 @@ Dependency injection container for the LLM backend service
 import logging
 from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
-from src.backend.infrastructure.database.supabase import Supabase
+from src.backend.config.supabase import Database
 class Services:
     """Dependency injection container"""
     
@@ -30,7 +30,7 @@ class Services:
         llm_service.start()
         self.register('llm_service', llm_service)
         
-        database = Supabase()
+        database = Database()
         database.start()
         self.register('database', database)
         

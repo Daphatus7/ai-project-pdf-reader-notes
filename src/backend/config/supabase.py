@@ -11,7 +11,7 @@ from supabase import create_client, Client
 from src.backend.services.service import Service
 
 
-class Supabase(Service):
+class Database(Service):
     def get(self):
         return self.__database
 
