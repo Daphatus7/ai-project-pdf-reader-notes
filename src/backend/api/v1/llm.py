@@ -7,19 +7,13 @@ Provides endpoints for:
 - Structured output chat (enforces schema-conformant responses)
 """
 import logging
-from typing import AsyncGenerator
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import StreamingResponse
 from langchain.messages import SystemMessage, HumanMessage
 
 from src.backend.auth.server_auth import verify_user_is_allowed
 from src.backend.schemas import (
     ChatRequest,
     ChatResponse,
-    StreamChatRequest,
-    StructuredChatRequest,
-    StructuredChatResponse,
-    LLMStructuredOutput
 )
 from src.backend.api.deps import get_llm_service
 from src.backend.schemas.auth import UserRequest
@@ -42,7 +36,9 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     
     #todo send the request to the llm service
     
-    
+    llm_service.chat_v2(request)  # just to verify the request is valid
+    # todo log the request
+    return
     try:
         system_msg = SystemMessage(content=request.system_message)
 
@@ -71,15 +67,8 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
 
         response_text = getattr(response, 'content', str(response))
 
-        usage = None
-        try:
-            usage = llm_service.get_usage()
-        except Exception:
-            pass
-
         return ChatResponse(
             response=response_text,
-            usage=usage
         )
     except Exception as e:
         logger.error(f'Error in chat endpoint: {e}', exc_info=True)
@@ -94,44 +83,3 @@ async def chat_v2(
     response = llm_service.chat_v2(payload)
     return ChatResponse(response=response)
 
-STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
-
-FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
-
-1. HEADERS: Use # ## ### for section organization
-
-2. MATH EXPRESSIONS (CRITICAL - follow these rules EXACTLY):
-
-   A) ALWAYS wrap ALL math in $...$ delimiters - no exceptions!
-      - Variables: $P(t)$, $c_n$, $\\omega$, $T$
-      - Equations: $P(t) = A\\cos(\\omega t)$
-      - Subscripts/superscripts: $c_{-1}$, $e^{j\\omega t}$, $c_n^*$
-
-   B) Use LaTeX commands, NEVER Unicode symbols:
-      - WRONG: ∑, ∞, ω, π, ∫ (Unicode symbols)
-      - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$, $\\int$
-
-   C) Display math: Use $$ on separate lines (NOT inside bullet points)
-
-   WRONG examples (will NOT render):
-   - P(t) = ∑_{n=-∞}^{∞} c_n e^{jnωt}
-   - c_{-n} = c_n^*
-   - cos(ωt) = (e^{jωt} + e^{-jωt})/2
-
-   CORRECT examples (WILL render):
-   - $P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}$
-   - $c_{-n} = c_n^*$
-   - $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$
-
-3. CODE BLOCKS: Use ```language
-
-4. TABLES WITH MATH (CRITICAL):
-   - All math in cells MUST use $...$ delimiters
-   - For absolute value |x|, use $\\lvert x \\rvert$ NOT $|x|$ (pipe conflicts with table syntax)
-   - Example: "Vanishing gradient for large $\\lvert x \\rvert$"
-
-5. LISTS: Use - for bullets. Keep math inline with $...$
-
-6. BLOCKQUOTES: Use > for notes
-
-CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
