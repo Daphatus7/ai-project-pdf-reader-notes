@@ -2,11 +2,13 @@ from fastapi import HTTPException
 from langchain.chat_models import init_chat_model
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
+import logging
 from typing import TypeVar, Type
 from pydantic import BaseModel
 
-from src.backend.api.deps import logger
 from src.backend.schemas import ChatRequest
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar('T', bound=BaseModel)
 
@@ -89,47 +91,25 @@ class LlmService:
     def get_usage(self):
         return self.model.get_usage()
 
-STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
+    def stream_chat(self,
+                    system_message : SystemMessage = SystemMessage(content="You are a helpful assistant."),
+                    human_message : HumanMessage = None,
+                    ):
+        """Streaming chat that yields chunks synchronously"""
+        messages = [system_message, human_message]
+        response_stream = self.model.stream(messages)
+        for chunk in response_stream:
+            yield chunk
 
-FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
-
-1. HEADERS: Use # ## ### for section organization
-
-2. MATH EXPRESSIONS (CRITICAL - follow these rules EXACTLY):
-
-   A) ALWAYS wrap ALL math in $...$ delimiters - no exceptions!
-      - Variables: $P(t)$, $c_n$, $\\omega$, $T$
-      - Equations: $P(t) = A\\cos(\\omega t)$
-      - Subscripts/superscripts: $c_{-1}$, $e^{j\\omega t}$, $c_n^*$
-
-   B) Use LaTeX commands, NEVER Unicode symbols:
-      - WRONG: ∑, ∞, ω, π, ∫ (Unicode symbols)
-      - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$, $\\int$
-
-   C) Display math: Use $$ on separate lines (NOT inside bullet points)
-
-   WRONG examples (will NOT render):
-   - P(t) = ∑_{n=-∞}^{∞} c_n e^{jnωt}
-   - c_{-n} = c_n^*
-   - cos(ωt) = (e^{jωt} + e^{-jωt})/2
-
-   CORRECT examples (WILL render):
-   - $P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}$
-   - $c_{-n} = c_n^*$
-   - $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$
-
-3. CODE BLOCKS: Use ```language
-
-4. TABLES WITH MATH (CRITICAL):
-   - All math in cells MUST use $...$ delimiters
-   - For absolute value |x|, use $\\lvert x \\rvert$ NOT $|x|$ (pipe conflicts with table syntax)
-   - Example: "Vanishing gradient for large $\\lvert x \\rvert$"
-
-5. LISTS: Use - for bullets. Keep math inline with $...$
-
-6. BLOCKQUOTES: Use > for notes
-
-CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
+    async def multi_thread_stream_chat(
+            self,
+            system_message: SystemMessage = SystemMessage(content="You are a helpful assistant."),
+            human_message: HumanMessage | None = None,
+    ):
+        """Async streaming chat that yields chunks"""
+        messages = [system_message, human_message]
+        async for chunk in self.model.astream(messages):
+            yield chunk
 
 # debug code
 # import asyncio
