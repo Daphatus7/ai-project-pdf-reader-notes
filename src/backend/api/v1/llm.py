@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from langchain.messages import SystemMessage, HumanMessage
 from fastapi.responses import StreamingResponse
 from typing import AsyncGenerator
+import json
 
 from src.backend.auth.server_auth import verify_user_is_allowed
 from src.backend.schemas import (
@@ -83,7 +84,9 @@ async def chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     #todo send the request to the llm service
 
     response = llm_service.chat_v2(request)  # just to verify the request is valid
-
+    logger.info(
+        f'Chat request processed successfully.'
+    )
     return ChatResponse(response=response)
 
 # todo log the request
@@ -134,7 +137,7 @@ async def chat_v2(
 
 
 @router.post('/chat/structured/stream')
-async def structured_stream_chat(request: StructuredChatRequest, llm_service=Depends(get_llm_service)):
+async def structured_stream_chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
     """
     Streaming structured chat endpoint that streams both text chunks and structured output updates.
     
@@ -145,16 +148,11 @@ async def structured_stream_chat(request: StructuredChatRequest, llm_service=Dep
     - 'text': Raw text chunks as they're generated (updates the content field)
     - 'structured': JSON updates of the structured output as it becomes available
     """
-    import json
-
+    
     try:
-        base_system = request.system_message or STRUCTURED_OUTPUT_SYSTEM_PROMPT
-
-        content_type_hint = ''
-        if request.expected_content_type:
-            content_type_hint = f'\n\nExpected response type: {request.expected_content_type}'
-
-        system_msg = SystemMessage(content=base_system + content_type_hint)
+        base_system = STRUCTURED_OUTPUT_SYSTEM_PROMPT
+        
+        system_msg = SystemMessage(content=base_system)
 
         # Build content array from contents
         content_parts = []
