@@ -3,8 +3,9 @@ from langchain.chat_models import init_chat_model
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
 import logging
-from typing import TypeVar, Type
+from typing import TypeVar, Type, AsyncGenerator
 from pydantic import BaseModel
+import json
 
 from src.backend.schemas import ChatRequest
 
@@ -12,6 +13,47 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar('T', bound=BaseModel)
 
+STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
+
+FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
+
+1. HEADERS: Use # ## ### for section organization
+
+2. MATH EXPRESSIONS (CRITICAL - follow these rules EXACTLY):
+
+   A) ALWAYS wrap ALL math in $...$ delimiters - no exceptions!
+      - Variables: $P(t)$, $c_n$, $\\omega$, $T$
+      - Equations: $P(t) = A\\cos(\\omega t)$
+      - Subscripts/superscripts: $c_{-1}$, $e^{j\\omega t}$, $c_n^*$
+
+   B) Use LaTeX commands, NEVER Unicode symbols:
+      - WRONG: ∑, ∞, ω, π, ∫ (Unicode symbols)
+      - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$, $\\int$
+
+   C) Display math: Use $$ on separate lines (NOT inside bullet points)
+
+   WRONG examples (will NOT render):
+   - P(t) = ∑_{n=-∞}^{∞} c_n e^{jnωt}
+   - c_{-n} = c_n^*
+   - cos(ωt) = (e^{jωt} + e^{-jωt})/2
+
+   CORRECT examples (WILL render):
+   - $P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}$
+   - $c_{-n} = c_n^*$
+   - $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$
+
+3. CODE BLOCKS: Use ```language
+
+4. TABLES WITH MATH (CRITICAL):
+   - All math in cells MUST use $...$ delimiters
+   - For absolute value |x|, use $\\lvert x \\rvert$ NOT $|x|$ (pipe conflicts with table syntax)
+   - Example: "Vanishing gradient for large $\\lvert x \\rvert$"
+
+5. LISTS: Use - for bullets. Keep math inline with $...$
+
+6. BLOCKQUOTES: Use > for notes
+
+CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
 
 class LlmService:
     """
@@ -57,23 +99,9 @@ class LlmService:
         try: 
         #build system message
             system_message = SystemMessage("You are a helpful assistant.")
-            
-            content_parts = []
-            for item in valid_payload.contents:
-                if item.type == "text":
-                    content_parts.append({"type": "text", "text": item.text})
-                elif item.type == "image":
-                    # Convert base64 to data URL format for LangChain
-                    data_url = f"data:{item.mime_type};base64,{item.data}"
-                    content_parts.append({
-                        "type": "image_url",
-                        "image_url": {"url": data_url}
-                    })
-                    
+        
             # parse user messages
-            human_message = HumanMessage(
-                contextlib=valid_payload.contents
-            )
+            human_message = self._build_human_message(contents=valid_payload.contents)
             
             messages = [system_message, human_message]
             response = self.model.invoke(messages)
@@ -91,25 +119,57 @@ class LlmService:
     def get_usage(self):
         return self.model.get_usage()
 
-    def stream_chat(self,
-                    system_message : SystemMessage = SystemMessage(content="You are a helpful assistant."),
-                    human_message : HumanMessage = None,
-                    ):
-        """Streaming chat that yields chunks synchronously"""
-        messages = [system_message, human_message]
-        response_stream = self.model.stream(messages)
-        for chunk in response_stream:
-            yield chunk
+    async def structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
+        """
+        Async streaming chat that yields SSE formatted chunks.
+        """
+        system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+        human_msg = self._build_human_message(request.contents)
+    
+        accumulated_text = ''
+        chunk_count = 0
+        last_structured_update = None
+    
+        try:
+            async for chunk in self.model.astream([system_msg, human_msg]):
+                text = getattr(chunk, 'content', str(chunk))
+                accumulated_text += text
+                chunk_count += 1
+    
+                # Send text chunk
+                yield f'data: {json.dumps({"type": "text", "content": text})}\n\n'
+    
+                # Periodic structured updates
+                if self._should_send_structured_update(chunk_count, accumulated_text):
+                    partial_output = {'content': accumulated_text, 'content_type': 'answer'}
+                    if partial_output != last_structured_update:
+                        last_structured_update = partial_output
+                        yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
+    
+            # Final structured output
+            yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
+            yield f'data: {json.dumps({"type": "done"})}\n\n'
+    
+        except Exception as e:
+            logger.error(f'Error in structured stream: {e}', exc_info=True)
+            yield f'data: {json.dumps({"type": "error", "message": str(e)})}\n\n'
 
-    async def multi_thread_stream_chat(
-            self,
-            system_message: SystemMessage = SystemMessage(content="You are a helpful assistant."),
-            human_message: HumanMessage | None = None,
-    ):
-        """Async streaming chat that yields chunks"""
-        messages = [system_message, human_message]
-        async for chunk in self.model.astream(messages):
-            yield chunk
+
+    def _build_human_message(self, contents: list) -> HumanMessage:
+        """Build HumanMessage from request contents."""
+        content_parts = []
+        for item in contents:
+            if item.type == "text":
+                content_parts.append({"type": "text", "text": item.text})
+            elif item.type == "image":
+                data_url = f"data:{item.mime_type};base64,{item.data}"
+                content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
+        return HumanMessage(content=content_parts)
+    
+    
+    def _should_send_structured_update(self, chunk_count: int, text: str) -> bool:
+        """Check if we should send a structured update."""
+        return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
 # debug code
 # import asyncio

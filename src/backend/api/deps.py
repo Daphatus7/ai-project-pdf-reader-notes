@@ -8,7 +8,7 @@ Provides common dependencies used across API endpoints:
 """
 import logging
 from typing import Optional
-from fastapi import HTTPException, Depends, Header
+from fastapi import HTTPException,  Header
 
 from src.backend.servers import services
 
