@@ -55,6 +55,32 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
 CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
 
+
+def _build_human_message(contents: list) -> HumanMessage:
+    """Build HumanMessage from request contents."""
+    content_parts = []
+    for item in contents:
+        if item.type == "text":
+            content_parts.append({"type": "text", "text": item.text})
+        elif item.type == "image":
+            data_url = f"data:{item.mime_type};base64,{item.data}"
+            content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
+    return HumanMessage(content=content_parts)
+
+
+def _should_send_structured_update(chunk_count: int, text: str) -> bool:
+    """Check if we should send a structured update."""
+    return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
+
+def _build_ai_message() -> AIMessage:
+    """
+    
+    build this locally first
+    
+    :return: 
+    """
+    return AIMessage(content=content)
+
 class LlmService:
     """
     Provide a unified interface for providing LLM services.
@@ -101,7 +127,7 @@ class LlmService:
             system_message = SystemMessage("You are a helpful assistant.")
         
             # parse user messages
-            human_message = self._build_human_message(contents=valid_payload.contents)
+            human_message = _build_human_message(contents=valid_payload.contents)
             
             messages = [system_message, human_message]
             response = self.model.invoke(messages)
@@ -113,18 +139,17 @@ class LlmService:
 
         #
         
-        
         ...
     
     def get_usage(self):
         return self.model.get_usage()
-
+    
     async def structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         """
         Async streaming chat that yields SSE formatted chunks.
         """
         system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
-        human_msg = self._build_human_message(request.contents)
+        human_msg = _build_human_message(request.contents)
     
         accumulated_text = ''
         chunk_count = 0
@@ -140,7 +165,7 @@ class LlmService:
                 yield f'data: {json.dumps({"type": "text", "content": text})}\n\n'
     
                 # Periodic structured updates
-                if self._should_send_structured_update(chunk_count, accumulated_text):
+                if _should_send_structured_update(chunk_count, accumulated_text):
                     partial_output = {'content': accumulated_text, 'content_type': 'answer'}
                     if partial_output != last_structured_update:
                         last_structured_update = partial_output
@@ -154,22 +179,6 @@ class LlmService:
             logger.error(f'Error in structured stream: {e}', exc_info=True)
             yield f'data: {json.dumps({"type": "error", "message": str(e)})}\n\n'
 
-
-    def _build_human_message(self, contents: list) -> HumanMessage:
-        """Build HumanMessage from request contents."""
-        content_parts = []
-        for item in contents:
-            if item.type == "text":
-                content_parts.append({"type": "text", "text": item.text})
-            elif item.type == "image":
-                data_url = f"data:{item.mime_type};base64,{item.data}"
-                content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
-        return HumanMessage(content=content_parts)
-    
-    
-    def _should_send_structured_update(self, chunk_count: int, text: str) -> bool:
-        """Check if we should send a structured update."""
-        return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
 # debug code
 # import asyncio
