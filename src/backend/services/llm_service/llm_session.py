@@ -6,19 +6,7 @@
 
 
 
+
 class LlmSession:
-    def __init__(self):
-        ...
-    def get_context(self):
-        """
-            get llm context from different llm source
-        :return: 
-        """
-        ...
-    def llm_call(self):
-        """
-            make a llm call
-        :return: 
-        """
-        ...
+    ...
     

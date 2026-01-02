@@ -4,6 +4,8 @@ from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
 import logging
 from typing import TypeVar, Type, AsyncGenerator
+
+from langchain_core.runnables.utils import Input
 from pydantic import BaseModel
 import json
 
@@ -67,19 +69,19 @@ def _build_human_message(contents: list) -> HumanMessage:
             content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
     return HumanMessage(content=content_parts)
 
-
 def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
-def _build_ai_message() -> AIMessage:
+def _build_ai_message(request: ChatRequest) -> AIMessage:
     """
     
     build this locally first
     
     :return: 
     """
-    return AIMessage(content=content)
+    return AIMessage(request.contents)
+
 
 class LlmService:
     """
@@ -107,6 +109,16 @@ class LlmService:
              human_message : HumanMessage = None,
              ai_message : AIMessage = None
                 ) -> AIMessage:
+        """
+        Not in use
+        
+        :param system_message: 
+        :param human_message: 
+        :param ai_message: 
+        :return: 
+        """
+        
+        
         #filter out if the input is None
         if ai_message is not None:
             return ai_message
@@ -119,6 +131,7 @@ class LlmService:
                 ):
         """
             当前假设 valid_payload 已经过验证且符合 ChatRequest 结构
+            目前并没有使用，在用astream 的方式
         :param valid_payload: 
         :return: 
         """
@@ -144,12 +157,16 @@ class LlmService:
     def get_usage(self):
         return self.model.get_usage()
     
+    
+
+    
     async def structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         """
         Async streaming chat that yields SSE formatted chunks.
         """
         system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         human_msg = _build_human_message(request.contents)
+        ai_msg = _build_ai_message(request)
     
         accumulated_text = ''
         chunk_count = 0

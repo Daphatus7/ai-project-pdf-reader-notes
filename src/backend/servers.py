@@ -34,7 +34,6 @@ class Services:
         database.start()
         self.register('database', database)
         
-    
     def get(self, service_name: str) -> Any:
         """Get a service by name"""
         if not self._initialized:
