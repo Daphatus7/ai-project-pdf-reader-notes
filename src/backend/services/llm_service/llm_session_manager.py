@@ -14,7 +14,17 @@ class LlmSessionManager:
         self.llm_sessions = [LlmSession]
         
         #use redis to 
-        
+    
+    def __create_session(self, session_id: str) -> LlmSession:
+        """
+            
+        :param session_id: 
+        :return: 
+        """
+        ...
+    
+    def get_session(self, session_id: str) -> LlmSession:
+        ...
     
         
     
