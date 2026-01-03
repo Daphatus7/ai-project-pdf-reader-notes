@@ -1,28 +1,20 @@
 /**
  * Base HTTP client for API requests
+ * Provides low-level fetch wrappers with error handling
  */
-import { apiConfig } from './config';
 
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public statusCode?: number,
-    public response?: unknown
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+import { apiConfig } from './config';
+import { ApiError } from './errors';
 
 /**
  * Base fetch wrapper with error handling
  */
-async function request<T>(
+export async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${apiConfig.baseUrl}${endpoint}`;
-  
+
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
   };
@@ -80,7 +72,8 @@ export async function post<T>(endpoint: string, data: unknown): Promise<T> {
 }
 
 /**
- * Streaming request helper for Server-Sent Events
+ * Streaming request helper
+ * Returns an async generator that yields Server-Sent Events (SSE) data
  */
 export async function* streamRequest(
   endpoint: string,
@@ -131,10 +124,10 @@ export async function* streamRequest(
 
       for (const line of lines) {
         if (line.startsWith('data: ')) {
-          const text = line.slice(6); // Remove 'data: ' prefix
-          
+          const text = line.slice(6);
+
           if (text.startsWith('[ERROR]')) {
-            throw new ApiError(text.slice(8)); // Remove '[ERROR] ' prefix
+            throw new ApiError(text.slice(8));
           }
 
           yield text;
@@ -142,7 +135,7 @@ export async function* streamRequest(
       }
     }
 
-    // Process remaining buffer
+    // Handle any remaining data in buffer
     if (buffer.startsWith('data: ')) {
       const text = buffer.slice(6);
       if (!text.startsWith('[ERROR]')) {
@@ -153,5 +146,3 @@ export async function* streamRequest(
     reader.releaseLock();
   }
 }
-
-
