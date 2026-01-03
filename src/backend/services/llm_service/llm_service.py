@@ -10,6 +10,7 @@ from pydantic import BaseModel
 import json
 
 from src.backend.schemas import ChatRequest
+from src.backend.services.llm_service.llm_instance import LlmAgent
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ class LlmService:
     """
 
     def start(self):
-        self.model = init_chat_model("gpt-5-nano")
+        self.model = LlmAgent()
 
     def shut_down(self):
         pass
@@ -102,28 +103,6 @@ class LlmService:
         super().__init__()
         dotenv.load_dotenv()
         self.model = None
-        
-    def chat(self, 
-             system_message : SystemMessage = SystemMessage(content="You are a helpful assistant."),
-             human_message : HumanMessage = None,
-             ai_message : AIMessage = None
-                ) -> AIMessage:
-        """
-        Not in use
-        
-        :param system_message: 
-        :param human_message: 
-        :param ai_message: 
-        :return: 
-        """
-        
-        
-        #filter out if the input is None
-        if ai_message is not None:
-            return ai_message
-        messages = [system_message, human_message]
-        response = self.model.invoke(messages)
-        return response
     
     def chat_v2(self, 
                 valid_payload: ChatRequest,
@@ -148,11 +127,6 @@ class LlmService:
             logger.error(f'Error in chat endpoint: {e}', exc_info=True)
             raise HTTPException(status_code=500, detail=f'Error processing chat request: {str(e)}')
 
-
-        #
-        
-        ...
-    
     def get_usage(self):
         return self.model.get_usage()
     

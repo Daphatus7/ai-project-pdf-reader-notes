@@ -39,12 +39,19 @@ class UserResponse(BaseModel):
     email: str
     full_name: str | None = None
 
+class ChatInput(BaseModel):
+    message: str
+    thread_id: str | None = None
+    client_request_id: str | None = None
+
+class AuthContext(BaseModel):
+    tenant_id: str | None = None
+    user_id: str
+    role: str  # user/admin
+    plan: str | None = None
+
 class UserRequest(BaseModel):
-    """
-        Contextual information about the request and user.
-    """
-    user_id: str # authenticated user ID
-    access_token: str # e.g., JWT token
-    tenant_id: str # e.g., tenant server id
-    role: str # e.g., 'user', 'admin'
-    plan: str | None = None # e.g., 'free', 'pro', 'enterprise'
+    auth: AuthContext
+    thread_id: str
+    message: str
+    client_request_id: str | None = None
