@@ -40,7 +40,6 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
 
     Args:
         authorization: Bearer token from Authorization header
-
     Returns:
         User object if authenticated
 
@@ -56,15 +55,3 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
     # Return user object
     pass
 
-
-# Example: Database session dependency
-async def get_db():
-    """
-    Get database session.
-
-    Yields:
-        Database session
-    """
-    # TODO: Implement database session management
-    # This should use your database configuration
-    pass

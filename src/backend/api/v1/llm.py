@@ -60,17 +60,25 @@ async def chat_v2(
 
 
 @router.post('/chat/structured/stream')
-async def structured_stream_chat(request: ChatRequest, llm_service=Depends(get_llm_service)):
+async def structured_stream_chat(chat_request: ChatRequest,
+                                 use_request: UserRequest = Depends(verify_user_is_allowed),
+                                 llm_service=Depends(get_llm_service)):
     """
     Streaming structured chat endpoint.
     """
+
+    # todo workflow 
+    #  api -> 
+    #  verification(reject if not qualified) -> 
+    #  service provider (I want to use this service) -> 
+    #  api service
 
     # todo: verify authentication and rate limiting
 
     # todo: validate request
 
     return StreamingResponse(
-        llm_service.structured_stream_chat(request),
+        llm_service.achat(chat_request),
         media_type='text/event-stream',
         headers={
             'Cache-Control': 'no-cache',

@@ -57,7 +57,6 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 
 CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
 
-
 def _build_human_message(contents: list) -> HumanMessage:
     """Build HumanMessage from request contents."""
     content_parts = []
@@ -158,9 +157,16 @@ class LlmService:
         return self.model.get_usage()
     
     
-
+    async def achat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
+        """
+        Async streaming chat that yields text chunks.
+        """
+        
+        # first, get context
+        return self.__structured_stream_chat(request)
     
-    async def structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
+    
+    async def __structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         """
         Async streaming chat that yields SSE formatted chunks.
         """
