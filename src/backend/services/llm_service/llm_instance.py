@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, asdict
 from typing import Any
 
@@ -105,6 +106,11 @@ def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
             *new_messages
         ]
     }
+
+def _should_send_structured_update(chunk_count: int, text: str) -> bool:
+    """Check if we should send a structured update."""
+    return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
+
 class LlmAgent:
     def __init__(self):
         # first make sure there is a valid session for the agent
@@ -122,18 +128,40 @@ class LlmAgent:
             checkpointer=InMemorySaver(), # todo debug only - use redis instead
         )
 
-
+   
 
     async def chat(self, user_request: UserRequest):
-        # Get the correct thread and context
         config: RunnableConfig = {"configurable": {"thread_id": user_request.thread_id}}
         system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         human_msg = _build_human_message(user_request.message)
-
-        # Use ainvoke for async execution
-        final_response = self.agent.astream(
-            [system_msg, human_msg],
-            config,
-            # stream_mode="values"  # Optional: for streaming full state after each step
-        )
-        return final_response
+    
+        accumulated_text = ""
+        last_structured_update = None
+    
+        async for chunk in self.agent.astream(
+                {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
+                config,
+                stream_mode="updates"  # Streams deltas after each node (model/tools)
+        ):
+            # Extract text delta from latest model step
+            if "model" in chunk:  # Agent LLM node name
+                delta = chunk["model"].get("messages", [])
+                if isinstance(delta, list) and len(delta) > 0:
+                    last_msg_chunk = delta[-1]  # Latest AIMessageChunk
+                    if hasattr(last_msg_chunk, "content") and last_msg_chunk.content:
+                        text_delta = last_msg_chunk.content
+                        accumulated_text += text_delta
+    
+                        # Yield text SSE chunk
+                        yield f'data: {json.dumps({"type": "text", "content": text_delta})}\n\n'
+    
+                        # Periodic structured update (adapt your _should_send_structured_update)
+                        if _should_send_structured_update(len(accumulated_text), accumulated_text):
+                            partial_output = {"content": accumulated_text, "content_type": "answer"}
+                            if partial_output != last_structured_update:
+                                last_structured_update = partial_output
+                                yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
+    
+        # Final structured + done
+        yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
+        yield f'data: {json.dumps({"type": "done"})}\n\n'

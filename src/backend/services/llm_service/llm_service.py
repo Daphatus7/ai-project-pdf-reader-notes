@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar('T', bound=BaseModel)
 
 
-def _should_send_structured_update(chunk_count: int, text: str) -> bool:
-    """Check if we should send a structured update."""
-    return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
+
 
 def _build_ai_message(request: ChatRequest) -> AIMessage:
     """
@@ -86,44 +84,8 @@ class LlmService:
         """
 
         # first, get context
-        async for chunk in self.__structured_stream_chat(request):
+        async for chunk in self.model.chat(request):
             yield chunk
-    
-    
-    async def __structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
-        """
-        Async streaming chat that yields SSE formatted chunks.
-        """
-        # system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
-        # human_msg = _build_human_message(request.contents)
-
-        accumulated_text = ''
-        chunk_count = 0
-        last_structured_update = None
-
-        try:
-            async for chunk in self.model.chat(request):
-                text = getattr(chunk, 'content', str(chunk))
-                accumulated_text += text
-                chunk_count += 1
-    
-                # Send text chunk
-                yield f'data: {json.dumps({"type": "text", "content": text})}\n\n'
-    
-                # Periodic structured updates
-                if _should_send_structured_update(chunk_count, accumulated_text):
-                    partial_output = {'content': accumulated_text, 'content_type': 'answer'}
-                    if partial_output != last_structured_update:
-                        last_structured_update = partial_output
-                        yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
-    
-            # Final structured output
-            yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
-            yield f'data: {json.dumps({"type": "done"})}\n\n'
-    
-        except Exception as e:
-            logger.error(f'Error in structured stream: {e}', exc_info=True)
-            yield f'data: {json.dumps({"type": "error", "message": str(e)})}\n\n'
 
 
 # debug code

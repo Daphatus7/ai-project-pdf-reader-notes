@@ -61,7 +61,7 @@ async def chat_v2(
 
 @router.post('/chat/structured/stream')
 async def structured_stream_chat(chat_request: ChatRequest,
-                                 # use_request: UserRequest = Depends(verify_user_is_allowed),
+                                 use_request: UserRequest = Depends(verify_user_is_allowed),
                                  llm_service=Depends(get_llm_service)):
     """
     Streaming structured chat endpoint.

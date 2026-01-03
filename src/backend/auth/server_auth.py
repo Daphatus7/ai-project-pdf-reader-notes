@@ -15,6 +15,7 @@ security = HTTPBearer()
 async def verify_user_is_allowed(
         credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> UserRequest:
+    # 
     token = credentials.credentials
 
     try:
