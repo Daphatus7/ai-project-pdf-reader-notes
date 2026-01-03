@@ -135,9 +135,10 @@ class LlmService:
         """
         Async streaming chat that yields text chunks.
         """
-        
+
         # first, get context
-        return self.__structured_stream_chat(request)
+        async for chunk in self.__structured_stream_chat(request):
+            yield chunk
     
     
     async def __structured_stream_chat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
@@ -146,14 +147,13 @@ class LlmService:
         """
         system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         human_msg = _build_human_message(request.contents)
-        ai_msg = _build_ai_message(request)
-    
+
         accumulated_text = ''
         chunk_count = 0
         last_structured_update = None
-    
+
         try:
-            async for chunk in self.model.astream([system_msg, human_msg]):
+            async for chunk in self.model.chat([system_msg, human_msg]):
                 text = getattr(chunk, 'content', str(chunk))
                 accumulated_text += text
                 chunk_count += 1

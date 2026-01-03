@@ -76,7 +76,7 @@ class LlmAgent:
         config: RunnableConfig = {"configurable": {"thread_id": user_request.thread_id}}
         human_msg = HumanMessage(user_request.message)
         ai_msg = SystemMessage("you are a helpful assistant")
-    
+
         # Use ainvoke for async execution
         final_response = await self.agent.ainvoke(
             [human_msg, ai_msg],
