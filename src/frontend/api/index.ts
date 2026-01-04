@@ -8,22 +8,22 @@ export { ApiError } from './core/errors';
 export { apiConfig } from './core/config';
 
 // Services
-export { llmService, llmApi, convertDataUrlsToContents } from './services/llm.service';
+export { llmService, convertDataUrlsToContents } from './services/llm.service';
 
 // Common Types
 export type { TextContent, ImageContent, InputContent } from './types/common';
 
 // LLM Types
 export type {
-  ContentType,
-  CodeBlock,
-  MathExpression,
-  Section,
-  ChatRequest,
-  ChatResponse,
-  StreamChatRequest,
-  LLMStructuredOutput,
-  StructuredChatRequest,
-  StructuredChatResponse,
-  StructuredImageChatRequest,
+	ContentType,
+	CodeBlock,
+	MathExpression,
+	Section,
+	ChatRequest,
+	ChatResponse,
+	StreamChatRequest,
+	LLMStructuredOutput,
+	StructuredChatRequest,
+	StructuredChatResponse,
+	StructuredImageChatRequest,
 } from './types/llm';
