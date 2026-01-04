@@ -20,6 +20,7 @@ Commands:
 """
 
 import asyncio
+import json
 import sys
 from pathlib import Path
 
@@ -48,7 +49,7 @@ async def stream_chat(user_message: str, system_message: str = None):
         chat_request = ChatRequest(
             thread_id="1",
             contents=[TextContent(type="text", text=user_message)],
-            system_message=system_message or "You are a helpful assistant."
+            system_message="You are a helpful assistant."
         )
 
         # Print divider
@@ -57,17 +58,21 @@ async def stream_chat(user_message: str, system_message: str = None):
         # Stream response
         full_response = ""
         async for chunk in llm_service.achat(chat_request):
-            # The chunk might be in different formats depending on implementation
-            # Adjust based on how your achat method yields chunks
+            # Parse SSE format: "data: {json}\n\n"
             if isinstance(chunk, str):
-                full_response += chunk
-            elif isinstance(chunk, bytes):
-                text = chunk.decode('utf-8')
-                full_response += text
-            else:
-                # Handle JSON chunks if needed
-                full_response += str(chunk)
-                
+                # Remove SSE prefix and parse JSON
+                if chunk.startswith("data: "):
+                    json_str = chunk[6:].strip()
+                    try:
+                        data = json.loads(json_str)
+                        # Only process text chunks for streaming display
+                        if data.get("type") == "text":
+                            content = data.get("content", "")
+                            full_response += content
+                            print(content, end="", flush=True)
+                    except json.JSONDecodeError:
+                        pass  # Skip malformed chunks
+
         return full_response
 
     except Exception as e:
@@ -107,8 +112,7 @@ async def main():
                 continue
 
             # Process chat message
-            output = await stream_chat(user_input, system_message)
-            print(output)
+            await stream_chat(user_input, system_message)
         except KeyboardInterrupt:
             print("\n\nInterrupted. Goodbye!")
             break

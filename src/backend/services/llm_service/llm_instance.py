@@ -133,7 +133,8 @@ class LlmAgent:
 
     async def chat(self, chat_request: ChatRequest):
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
-        system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+        # system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+        system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
     
         accumulated_text = ""
