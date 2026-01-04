@@ -10,6 +10,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
 
+from src.backend.schemas import ChatRequest
 from src.backend.schemas.auth import UserRequest
 from src.backend.services.llm_service.llm_session import LlmSession
 from langgraph.checkpoint.memory import InMemorySaver
@@ -130,10 +131,10 @@ class LlmAgent:
 
    
 
-    async def chat(self, user_request: UserRequest):
-        config: RunnableConfig = {"configurable": {"thread_id": user_request.thread_id}}
+    async def chat(self, chat_request: ChatRequest):
+        config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
         system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
-        human_msg = _build_human_message(user_request.message)
+        human_msg = _build_human_message(chat_request.contents)
     
         accumulated_text = ""
         last_structured_update = None

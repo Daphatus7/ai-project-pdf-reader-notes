@@ -32,6 +32,7 @@ ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 't
 # Chat Request/Response Models
 class ChatRequest(BaseModel):
     """Request model for chat endpoint"""
+    thread_id: str
     contents: list[InputContent] = Field(
         ...,
         description="Ordered list of text and image inputs"
