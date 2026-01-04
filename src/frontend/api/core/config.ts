@@ -14,7 +14,7 @@ export const apiConfig = {
 			register:'/api/v1/auth/register',
 			logout:'/api/v1/auth/logout',
 			refresh: '/api/v1/auth/refresh',
-			
+
 			//llm
 			chat: '/api/v1/llm/chat',
 			chatStream: '/api/v1/llm/chat/stream',
