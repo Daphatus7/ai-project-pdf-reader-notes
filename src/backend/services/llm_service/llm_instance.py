@@ -90,6 +90,14 @@ def delete_messages(state):
 #         )
 
 @before_model
+def log_state(state: AgentState, runtime: Runtime) -> None:
+    """Log the agent state before model invocation."""
+    print("Agent State Before Model Call:")
+    for key, value in state.items():
+        print(f"{key}: {value}")
+    return None
+
+@before_model
 def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
     """Keep only the last few messages to fit context window."""
     messages = state["messages"]
@@ -122,7 +130,7 @@ class LlmAgent:
         
         self.agent = create_agent(
             model=self.model,
-            middleware=[trim_messages],
+            middleware=[log_state, trim_messages],
             checkpointer=InMemorySaver(), # todo debug only - use redis instead
         )
         self.counter = 0
@@ -132,6 +140,7 @@ class LlmAgent:
     async def chat(self, chat_request: ChatRequest):
         self.counter += 1
         print(f"Agent called {self.counter} times")
+        print(f"agent has the context {self.agent.get_context_jsonschema()}")
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
         # todo system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         system_msg = SystemMessage(content=chat_request.system_message)
