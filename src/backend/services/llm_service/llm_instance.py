@@ -118,9 +118,6 @@ class LlmAgent:
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
-            # max_tokens=1000,
-            # timeout=30
-            # ... (other params)
         )
         
         self.agent = create_agent(
@@ -128,12 +125,15 @@ class LlmAgent:
             middleware=[trim_messages],
             checkpointer=InMemorySaver(), # todo debug only - use redis instead
         )
+        self.counter = 0
 
    
 
     async def chat(self, chat_request: ChatRequest):
+        self.counter += 1
+        print(f"Agent called {self.counter} times")
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
-        # system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
+        # todo system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
     

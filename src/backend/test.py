@@ -22,6 +22,7 @@ Commands:
 import asyncio
 import json
 import sys
+from http.client import responses
 from pathlib import Path
 
 from humanfriendly.terminal import output
@@ -33,7 +34,7 @@ from src.backend.schemas import ChatRequest, TextContent
 from src.backend.servers import services
 
 
-async def stream_chat(user_message: str, system_message: str = None):
+async def stream_chat(user_message: str):
     """
     Send a chat message and stream the response.
 
@@ -112,7 +113,7 @@ async def main():
                 continue
 
             # Process chat message
-            await stream_chat(user_input, system_message)
+            await stream_chat(user_input)
         except KeyboardInterrupt:
             print("\n\nInterrupted. Goodbye!")
             break
