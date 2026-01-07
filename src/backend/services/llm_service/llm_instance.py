@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 from typing import Any
 
 from langchain.agents import create_agent, AgentState
-from langchain.agents.middleware import before_model, wrap_tool_call
+from langchain.agents.middleware import before_model, wrap_tool_call, after_model
 from langchain_core.messages import RemoveMessage, HumanMessage, ToolMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI

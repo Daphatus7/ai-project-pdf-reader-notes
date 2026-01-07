@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 from dotenv import load_dotenv
 from unstructured.documents.elements import Element
@@ -22,26 +23,44 @@ def __extract_pdf_text(path: str) -> list[Element]:
         filename=path,
         infer_table_structure=True,            # extract tables
         strategy="hi_res",                     # mandatory to infer tables
-    
         extract_image_block_types=["Image","Table"],   # Add 'Table' to list to extract image of tables
+        extract_images_in_pdf=True,
         # image_output_dir_path=output_path,   # if None, images and tables will saved in base64
-    
         extract_image_block_to_payload=True,   # if true, will extract base64 for API usage
-
         chunking_strategy="by_title",          # or 'basic'
         max_characters=5000,                  # defaults to 500
         # combine_text_under_n_chars=0,       # defaults to 0
         new_after_n_chars=6000,
-    
-        # extract_images_in_pdf=True,          # deprecated
     )
 
     return chunks
+
+def save_chunks_to_json(chunks: list[Element], filename: str):
+    """
+    Save chunks extracted from unstructured to a JSON file.
+    
+    Args:
+        chunks: List of Element objects from unstructured
+        filename: Name of the output JSON file
+    """
+    chunks_data = []
+    
+    for index, chunk in enumerate(chunks):
+        chunks_data.append(chunk.to_dict())
+    
+    # Save to JSON file
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(chunks_data, f, indent=2, ensure_ascii=False)
+    
+    print(f'Saved {len(chunks_data)} chunks to {filename}')
 
 
 def build_vectorstore(pdf_path: str) -> InMemoryVectorStore:
     """加载 PDF → 切块 → 建 InMemoryVectorStore。"""
     chunks = __extract_pdf_text(pdf_path)
+    
+    # Save chunks to JSON
+    save_chunks_to_json(chunks, 'chunks.json')
 
     print("--- Extracted chunks ---")
     for index, chunk in enumerate(chunks):
@@ -49,10 +68,14 @@ def build_vectorstore(pdf_path: str) -> InMemoryVectorStore:
         print("-----")
         print(f"Chunk {index}")
     print("------Image and table-----")
+
     elements = chunks[0].metadata.orig_elements
     chunk_images = [el for el in elements if 'Image' in str(type(el))]
-    chunk_images[0].to_dict()
-    print(chunk_images)
+    if chunk_images:
+        chunk_images[0].to_dict()
+        print(chunk_images)
+    else:
+        print("No images found in first chunk")
 
     tables = []
     texts = []
@@ -85,7 +108,10 @@ def build_vectorstore(pdf_path: str) -> InMemoryVectorStore:
         display(Image(data=image_data))
     
     print("------Images Display-----")
-    display_base64_image(images[0])
+    if images:
+        display_base64_image(images[0])
+    else:
+        print("No images found in chunks")
     print("------Image Display End-----")
     
     # 2. 创建 Embeddings（最新的 langchain_openai 写法）
@@ -144,17 +170,19 @@ def build_rag_chain(vector_store: InMemoryVectorStore):
 
 
 if __name__ == "__main__":
-    pdf_path = "week04.pdf"
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    pdf_path = os.path.join(script_dir, "exam21-final.pdf")
 
     # 1. 建向量库
     vectorstore = build_vectorstore(pdf_path)
 
     # 2. 构建 RAG chain
-    rag_chain, retriever = build_rag_chain(vectorstore)
-
-    
-    while True:
-        question = input("Question: ")
-        answer = rag_chain.invoke(question)
-        print("Answer:", answer)
+    # rag_chain, retriever = build_rag_chain(vectorstore)
+    # 
+    # 
+    # while True:
+    #     question = input("Question: ")
+    #     answer = rag_chain.invoke(question)
+    #     print("Answer:", answer)
 
