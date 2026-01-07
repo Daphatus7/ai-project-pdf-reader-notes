@@ -19,21 +19,22 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 def __extract_pdf_text(path: str) -> list[Element]:
     """用 unstructured 从 PDF 提取纯文本，并拼成一个长字符串。"""
-    chunks = partition_pdf(
+    elements = partition_pdf(
         filename=path,
         infer_table_structure=True,            # extract tables
         strategy="hi_res",                     # mandatory to infer tables
+        content_type="application/pdf",
+        skip_infer_table_types=False,
         extract_image_block_types=["Image","Table"],   # Add 'Table' to list to extract image of tables
         extract_images_in_pdf=True,
-        # image_output_dir_path=output_path,   # if None, images and tables will saved in base64
-        extract_image_block_to_payload=True,   # if true, will extract base64 for API usage
-        chunking_strategy="by_title",          # or 'basic'
-        max_characters=5000,                  # defaults to 500
-        # combine_text_under_n_chars=0,       # defaults to 0
-        new_after_n_chars=6000,
+        # extract_image_block_to_payload=True,   # if true, will extract base64 for API usage
+        # chunking_strategy="basic",          # or 'basic'
     )
+    tables = [el for el in elements if el.category == "Table"]
 
-    return chunks
+    print(tables[0].text)
+    print(tables[0].metadata.text_as_html)
+    return elements
 
 def save_chunks_to_json(chunks: list[Element], filename: str):
     """
@@ -54,9 +55,10 @@ def save_chunks_to_json(chunks: list[Element], filename: str):
     
     print(f'Saved {len(chunks_data)} chunks to {filename}')
 
-
 def build_vectorstore(pdf_path: str) -> InMemoryVectorStore:
     """加载 PDF → 切块 → 建 InMemoryVectorStore。"""
+
+    # raw text chunks - 包括对block 提供标签和
     chunks = __extract_pdf_text(pdf_path)
     
     # Save chunks to JSON
@@ -127,7 +129,6 @@ def build_vectorstore(pdf_path: str) -> InMemoryVectorStore:
     )
     return vector_store
 
-
 def build_rag_chain(vector_store: InMemoryVectorStore):
     """用 LCEL 搭一个标准 RAG chain（不依赖老的 RetrievalQA 等旧接口）。"""
     vector_retriever = vector_store.as_retriever(search_kwargs={"k": 4})
@@ -167,7 +168,6 @@ def build_rag_chain(vector_store: InMemoryVectorStore):
     )
 
     return rag_chain, vector_retriever
-
 
 if __name__ == "__main__":
     # Get the directory where this script is located
