@@ -178,7 +178,7 @@ if __name__ == "__main__":
     vectorstore = build_vectorstore(pdf_path)
 
     # 2. 构建 RAG chain
-    # rag_chain, retriever = build_rag_chain(vectorstore)
+    rag_chain, retriever = build_rag_chain(vectorstore)
     # 
     # 
     # while True:
