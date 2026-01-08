@@ -1993,6 +1993,7 @@
         "eng"
       ],
       "page_number": 4,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-4-1.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -2110,6 +2111,7 @@
         "eng"
       ],
       "page_number": 4,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-4-2.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -2387,6 +2389,7 @@
         "eng"
       ],
       "page_number": 5,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-5-3.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -2504,6 +2507,7 @@
         "eng"
       ],
       "page_number": 5,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-5-4.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -2820,6 +2824,7 @@
         "eng"
       ],
       "page_number": 6,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-6-5.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -2938,6 +2943,7 @@
         "eng"
       ],
       "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-7-6.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -3128,11 +3134,13 @@
         "layout_height": 2339
       },
       "last_modified": "2025-06-15T10:11:53",
+      "text_as_html": "<table><thead><tr><th>Answer:</th><th>Node</th><th>ot</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>L</th><th>16</th></tr></thead><tbody><tr><td></td><td>Pruned</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>",
       "filetype": "application/pdf",
       "languages": [
         "eng"
       ],
       "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/table-7-1.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -3167,11 +3175,13 @@
         "layout_height": 2339
       },
       "last_modified": "2025-06-15T10:11:53",
+      "text_as_html": "<table><thead><tr><th>Node</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th></tr></thead><tbody><tr><td>Pruned</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>",
       "filetype": "application/pdf",
       "languages": [
         "eng"
       ],
       "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/table-7-2.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -4744,6 +4754,7 @@
         "eng"
       ],
       "page_number": 11,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-11-7.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -4901,6 +4912,7 @@
         "eng"
       ],
       "page_number": 12,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-12-8.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -5137,6 +5149,7 @@
         "eng"
       ],
       "page_number": 13,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-13-9.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -5772,6 +5785,7 @@
         "eng"
       ],
       "page_number": 14,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-14-10.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -5889,6 +5903,7 @@
         "eng"
       ],
       "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-15-11.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -5967,6 +5982,7 @@
         "eng"
       ],
       "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-15-12.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -6045,6 +6061,7 @@
         "eng"
       ],
       "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-15-13.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -6163,6 +6180,7 @@
         "eng"
       ],
       "page_number": 16,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-16-14.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -6359,6 +6377,7 @@
         "eng"
       ],
       "page_number": 17,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-17-15.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -6795,6 +6814,7 @@
         "eng"
       ],
       "page_number": 19,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-19-16.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
@@ -6951,6 +6971,7 @@
         "eng"
       ],
       "page_number": 20,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/figures/figure-20-17.jpg",
       "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
       "filename": "exam21-final.pdf"
     }
