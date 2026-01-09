@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Iterable
 
-from chonkie import RecursiveChunker
+from chonkie import RecursiveChunker, Pipeline
 from dotenv import load_dotenv
 from unstructured.documents.elements import Element
 from unstructured.partition.pdf import partition_pdf
@@ -132,43 +132,29 @@ def save_lines(output_path: str, lines: list[str]) -> None:
     logger.info('Saved text-based chunks to %s', output_path)
 
 
-def process_pdf(pdf_path: str):
-    """
-    End-to-end pipeline: parse PDF, chonkie it, and emit JSON/Markdown/Text.
-
-    Returns:
-        j_chunks: chunk dictionaries for JSON.
-        m_chunks: chunk strings for Markdown.
-        t_chuncks: chunk strings for plain text.
-    """
+def process_pdf(currently_not_used: str):
     
     #load json elements
+    
+    #get raw text
+    raw_file=None
     with open("elements.json", "r", encoding="utf-8") as f:
-        elements = json.load(f)
-
-        #save as text
-        with open("pre_rag.json", "w", encoding="utf-8") as p:
-            for element in elements:
-                p.write(element["type"] + "\n\n")
-
+        raw_file = json.load(f)
+        with open("raw.txt", "w", encoding="utf-8") as r:
+            for element in raw_file:
+                r.write(element["text"] + "\n")
+                
+    
+    doc = (Pipeline()
+           .fetch_from("file", path="raw.txt")
+           .process_with("text")
+           .chunk_with("recursive", chunk_size=512)
+           .refine_with("overlap", context_size=100)
+           .run())
+    # 
+    with open("chonkie.json", "w", encoding="utf-8") as f:
+        json.dump([chunk.to_dict() for chunk in doc.chunks], f, indent=2)
         
-        
-        
-        # # Initialize the chunker
-        # chunker = RecursiveChunker(
-        #     tokenizer="character",
-        #     chunk_size = 2000,
-        # )
-        
-        # Chunk some text
-        # chunks = chunker(
-        #     "".join(elements[i].text or "" for i in range(len(elements)))
-        # )
-        # 
-        # #save as text
-        # with open("chunked.txt", "w", encoding="utf-8") as k:
-        #     for chunk in chunks:
-        #         k.write(chunk.text)
 def build_vectorstore(context) -> InMemoryVectorStore:
 
     embeddings = OpenAIEmbeddings(
@@ -224,18 +210,23 @@ def build_rag_chain(vector_store: InMemoryVectorStore):
     return rag_chain, vector_retriever
 
 if __name__ == '__main__':
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    pdf_path = os.path.join(script_dir, 'exam21-final.pdf')
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # pdf_path = os.path.join(script_dir, 'exam21-final.pdf')
 
-    process_pdf(pdf_path)
+    process_pdf("EllO")
     # 
-    # #get context chunks from json
-    # with open("chunks.json", "r", encoding="utf-8") as f:
-    #     context_chunks = json.load(f)
-    #     vectorstore = build_vectorstore(context_chunks)
-    #     
-    #     #store vectorstore as json
-    #     with open("vectorstore.json", "w", encoding="utf-8") as v:
-    #         json.dump(vectorstore.__dict__, v, ensure_ascii=False, indent=2)
-    # # 2. 构建 RAG chain
-    # #     rag_chain, retriever = build_rag_chain(vectorstore)
+    #get context chunks from json
+    with open("chunks.json", "r", encoding="utf-8") as f:
+        context_chunks = json.load(f)
+        vectorstore = build_vectorstore(context_chunks)
+
+        #store vectorstore as json
+        with open("vectorstore.json", "w", encoding="utf-8") as v:
+            json.dump(vectorstore.__dict__, v, ensure_ascii=False, indent=2)
+    # 2. 构建 RAG chain
+        rag_chain, retriever = build_rag_chain(vectorstore)
+
+        while True:
+            question = input("Question: ")
+            answer = rag_chain.invoke(question)
+            print("Answer:", answer)
