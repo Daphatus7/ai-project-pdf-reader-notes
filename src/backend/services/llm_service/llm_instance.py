@@ -112,12 +112,6 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
-
-def build_rag()-> None:
-    """Build a RAG tool for the agent."""
-    pass  # Placeholder for RAG construction logic
-
-
 def build_vector_store()->VectorStore:
     with open("./services/context_provider/chonkie.json", "r", encoding="utf-8") as f:
         context_chunks = json.load(f)
@@ -137,13 +131,28 @@ def build_vector_store()->VectorStore:
         return storage
     ...
 
+def make_retrieve_tool(agent_ref: "LlmAgent"):
+    @tool(response_format="content_and_artifact")
+    def retrieve_context(query: str):
+        """
+            Search the user context for records matching the query.
+        :param query: the user wants to know
+        :return: information content and source documents
+        """
+        if agent_ref.storage is None:
+            return "No vector store is initialized.", []
+        docs = agent_ref.storage.similarity_search(query=query, k=4)
+        for doc in docs:
+            logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
+        return docs
+    return retrieve_context
 
 class LlmAgent:
 
     @tool(response_format="content_and_artifact")
     def retrieve_context(self, query: str):
         """Retrieve information to help answer a query."""
-        retrieved_docs = self.storage.similarity_search(query, k=2)
+        retrieved_docs = self.storage.similarity_search(query=query, k=2)
         serialized = "\n\n".join(
             (f"Source: {doc.metadata}\nContent: {doc.page_content}")
             for doc in retrieved_docs
@@ -157,6 +166,7 @@ class LlmAgent:
             temperature=0.1,
         )
         self.storage = VectorStore
+        self.retrieve_context = make_retrieve_tool(self)
         self.tools = [self.retrieve_context]
         self.agent = create_agent(
             model=self.model,
@@ -173,12 +183,16 @@ class LlmAgent:
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
-        # todo system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
-        system_msg = SystemMessage(content=chat_request.system_message)
+        base_system = chat_request.system_message or "You are a helpful assistant."
+        system_content = (
+            f"{base_system}\n\nAlways call the retrieve_context tool before answering. "
+            "Use retrieved content and cite its metadata."
+        )
+        system_msg = SystemMessage(content=system_content)
         human_msg = _build_human_message(chat_request.contents)
         
         #通过用户的请求建立一个有效的vector store
-        build_vector_store()
+        self.storage = build_vector_store()
     
         accumulated_text = ""
         last_structured_update = None
