@@ -6,6 +6,8 @@ from typing import Iterable
 
 from chonkie import RecursiveChunker, Pipeline
 from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain_core.tools import tool
 from unstructured.documents.elements import Element
 from unstructured.partition.pdf import partition_pdf
 from langchain_core.documents import Document
@@ -169,13 +171,14 @@ def build_vectorstore(context) -> InMemoryVectorStore:
     )
     
     return vector_store
+
 def build_rag_chain(vector_store: InMemoryVectorStore):
-    """用 LCEL 搭一个标准 RAG chain（不依赖老的 RetrievalQA 等旧接口）。"""
+
     vector_retriever = vector_store.as_retriever(search_kwargs={"k": 4})
 
 
     llm = ChatOpenAI(
-        model="gpt-5-nano",  # 可以换成你想用的模型
+        model="gpt-5-nano",
         api_key=OPENAI_API_KEY,
         temperature=0.0,
     )
@@ -191,23 +194,7 @@ def build_rag_chain(vector_store: InMemoryVectorStore):
         """
     )
 
-    def format_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
-
-    # LCEL: input 是一个 string（问题）
-    # - retriever | format_docs 得到 context
-    # - RunnablePassthrough() 保留原始 question
-    rag_chain = (
-            {
-                "context": vector_retriever | format_docs,
-                "question": RunnablePassthrough(),
-            }
-            | prompt
-            | llm
-            | StrOutputParser()
-    )
-
-    return rag_chain, vector_retriever
+    return 
 
 if __name__ == '__main__':
     # script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -216,17 +203,54 @@ if __name__ == '__main__':
     process_pdf("EllO")
     # 
     #get context chunks from json
-    with open("chunks.json", "r", encoding="utf-8") as f:
+    with open("chonkie.json", "r", encoding="utf-8") as f:
         context_chunks = json.load(f)
-        vectorstore = build_vectorstore(context_chunks)
+
+        embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+            api_key=OPENAI_API_KEY,
+        )
+
+        # 3. 建立 InMemoryVectorStore
+        vector_store = InMemoryVectorStore.from_documents(
+            documents=[Document(page_content=str(chunk)) for chunk in context_chunks],
+            embedding=embeddings,
+        )
 
         #store vectorstore as json
-        with open("vectorstore.json", "w", encoding="utf-8") as v:
-            json.dump(vectorstore.__dict__, v, ensure_ascii=False, indent=2)
-    # 2. 构建 RAG chain
-        rag_chain, retriever = build_rag_chain(vectorstore)
-
+        vector_store.dump("vectorstore.json")
+        # Construct a tool for retrieving context
+        @tool(response_format="content_and_artifact")
+        def retrieve_context(query: str):
+            """Retrieve information to help answer a query."""
+            retrieved_docs = vector_store.similarity_search(query, k=2)
+            serialized = "\n\n".join(
+                (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+                for doc in retrieved_docs
+            )
+            return serialized, retrieved_docs
+        
+        tools = [retrieve_context]
+        # If desired, specify custom instructions
+        prompt = (
+            "You have access to a tool that retrieves context from a blog post. "
+            "Use the tool to help answer user queries."
+        )
+        agent = create_agent(model=
+                            ChatOpenAI(
+                                model="gpt-5-nano",
+                                api_key=OPENAI_API_KEY,
+                                temperature=0.0,), 
+                            tools = tools, 
+                            system_prompt=prompt)
+        
+            
+        # rag_chain, retriever = build_rag_chain(vectorstore)
+        # 
         while True:
             question = input("Question: ")
-            answer = rag_chain.invoke(question)
-            print("Answer:", answer)
+            for step in agent.stream(
+                    {"messages": [{"role": "user", 
+                                   "content": question}]},
+                        stream_mode="values",):
+                    step["messages"][-1].pretty_print()
