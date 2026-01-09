@@ -1,13 +1,16 @@
 import json
+import logging
 from dataclasses import dataclass, asdict
 from typing import Any
 
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model, wrap_tool_call, after_model
+from langchain_core.documents import Document
 from langchain_core.messages import RemoveMessage, HumanMessage, ToolMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
+from langchain_core.vectorstores import VectorStore, InMemoryVectorStore
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
 
@@ -113,10 +116,27 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
 def build_rag()-> None:
     """Build a RAG tool for the agent."""
     pass  # Placeholder for RAG construction logic
+
+
+def build_vector_store()->VectorStore:
+    with open("./services/context_provider/chonkie.json", "r", encoding="utf-8") as f:
+        context_chunks = json.load(f)
     
+        embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+        )
+    
+        # 3. 建立 InMemoryVectorStore
+        storage = InMemoryVectorStore.from_documents(
+            documents=[Document(page_content=str(chunk)) for chunk in context_chunks],
+            embedding=embeddings,
+        ) 
+        
+        logging.log(msg="Vector store built with context chunks.", level=logging.INFO)
+        
+        return storage
+    ...
 
-
- 
 
 class LlmAgent:
 
@@ -129,17 +149,18 @@ class LlmAgent:
             for doc in retrieved_docs
         )
         return serialized, retrieved_docs
-    
+
     def __init__(self):
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
         )
-        self.tools = [retrieve_context] 
+        self.storage = VectorStore
+        self.tools = [self.retrieve_context]
         self.agent = create_agent(
             model=self.model,
-            tools=tools,
+            tools=self.tools,
             middleware=[log_state, trim_messages],
             checkpointer=InMemorySaver(), # todo debug only - use redis instead
         )
@@ -155,6 +176,9 @@ class LlmAgent:
         # todo system_msg = SystemMessage(content=STRUCTURED_OUTPUT_SYSTEM_PROMPT)
         system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
+        
+        #通过用户的请求建立一个有效的vector store
+        build_vector_store()
     
         accumulated_text = ""
         last_structured_update = None
