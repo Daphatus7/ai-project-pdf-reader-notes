@@ -6,6 +6,7 @@ from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model, wrap_tool_call, after_model
 from langchain_core.messages import RemoveMessage, HumanMessage, ToolMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
@@ -77,18 +78,6 @@ def delete_messages(state):
         return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}
     return None
 
-# @wrap_tool_call
-# def handle_tool_errors(request, handler):
-#     """Handle tool execution errors with custom messages."""
-#     try:
-#         return handler(request)
-#     except Exception as e:
-#         # Return a custom error message to the model
-#         return ToolMessage(
-#             content=f"Tool error: Please check your input and try again. ({str(e)})",
-#             tool_call_id=request.tool_call["id"]
-#         )
-
 @before_model
 def log_state(state: AgentState, runtime: Runtime) -> None:
     """Log the agent state before model invocation."""
@@ -120,22 +109,43 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
+
+def build_rag()-> None:
+    """Build a RAG tool for the agent."""
+    pass  # Placeholder for RAG construction logic
+    
+
+
+ 
+
 class LlmAgent:
+
+    @tool(response_format="content_and_artifact")
+    def retrieve_context(self, query: str):
+        """Retrieve information to help answer a query."""
+        retrieved_docs = self.storage.similarity_search(query, k=2)
+        serialized = "\n\n".join(
+            (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+            for doc in retrieved_docs
+        )
+        return serialized, retrieved_docs
+    
     def __init__(self):
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
         )
-        
+        self.tools = [retrieve_context] 
         self.agent = create_agent(
             model=self.model,
+            tools=tools,
             middleware=[log_state, trim_messages],
             checkpointer=InMemorySaver(), # todo debug only - use redis instead
         )
         self.counter = 0
 
-   
+
 
     async def chat(self, chat_request: ChatRequest):
         self.counter += 1

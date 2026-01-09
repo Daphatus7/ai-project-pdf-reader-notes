@@ -74,11 +74,6 @@ class LlmService:
     
     
     async def achat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
-        """
-        Async streaming chat that yields text chunks.
-        """
-
-        # first, get context
         async for chunk in self.model.chat(request):
             yield chunk
 

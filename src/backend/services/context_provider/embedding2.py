@@ -212,18 +212,18 @@ if __name__ == '__main__':
         )
 
         # 3. 建立 InMemoryVectorStore
-        vector_store = InMemoryVectorStore.from_documents(
+        storage = InMemoryVectorStore.from_documents(
             documents=[Document(page_content=str(chunk)) for chunk in context_chunks],
             embedding=embeddings,
         )
 
         #store vectorstore as json
-        vector_store.dump("vectorstore.json")
+        storage.dump("vectorstore.json")
         # Construct a tool for retrieving context
         @tool(response_format="content_and_artifact")
         def retrieve_context(query: str):
             """Retrieve information to help answer a query."""
-            retrieved_docs = vector_store.similarity_search(query, k=2)
+            retrieved_docs = storage.similarity_search(query, k=2)
             serialized = "\n\n".join(
                 (f"Source: {doc.metadata}\nContent: {doc.page_content}")
                 for doc in retrieved_docs
