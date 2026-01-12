@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 import os
-from typing import Iterable
+from typing import Iterable, Any
 
 from chonkie import RecursiveChunker, Pipeline
 from dotenv import load_dotenv
@@ -132,34 +132,97 @@ def save_lines(output_path: str, lines: list[str]) -> None:
     with open(output_path, 'w', encoding='utf-8') as file:
         file.write('\n\n'.join(filter(None, lines)))
     logger.info('Saved text-based chunks to %s', output_path)
+
+def get_summary(content: str)->str:
     
-def chunker_page_strategy(blocks: list[dict])-> list[dict]:
-    #chunking strategy
 
-    result: list[dict] = []
-    index = 0
-    for block in blocks:
-        # merge contents in a single page to one json item
-        if block["metadata"]["page_number"] != index + 1: #old page
-            result[index]["content"]+=block["text"]
+def chunker_page_strategy(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Merge block-level extracts into one item per page.
+
+    Expected input shape (per block):
+      {
+        "text": str,
+        "metadata": {
+          "page_number": int,
+          "file_directory": str,
+          "last_modified": str | int | float,
+          "filetype": str,
+          ... (optional)
+        }
+      }
+
+    Output shape (per page):
+      {
+        "content": str,
+        "metadata": {
+          "source_id": str,
+          "page_id": str,
+          "source_name": str,
+          "file_directory": str,
+          "page_number": int,
+          "last_modified": Any,
+          "filetype": str
+        }
+      }
+    """
+    if not blocks:
+        return []
+
+    # Defensive: tolerate unsorted input; stable sort by page_number.
+    def _page_num(b: dict[str, Any]) -> int:
+        meta = b.get("metadata") or {}
+        p_number = meta.get("page_number")
+        if not isinstance(p_number, int):
+            raise ValueError(f"Invalid or missing metadata.page_number: {p_number!r}")
+        return p_number
+
+    blocks_sorted = sorted(blocks, key=_page_num)
+
+    result: list[dict[str, Any]] = []
+    current_page_number: int | None = None
+    current_page: dict[str, Any] | None = None
+
+    for block in blocks_sorted:
+        text = block.get("text", "")
+        if not isinstance(text, str):
+            raise ValueError(f"Invalid block.text (expected str): {text!r}")
+
+        md = block.get("metadata") or {}
+        page_number = _page_num(block)
+
+        # New page boundary
+        if current_page_number is None or page_number != current_page_number:
+            # flush previous page
+            if current_page is not None:
+                result.append(current_page)
+
+            # create a new page item
+            current_page_number = page_number
+            current_page = {
+                "content": text,
+                "metadata": {
+                    # caller should fill these (or pass them in via md)
+                    "source_id": md.get("source_id", ""),
+                    "page_id": md.get("page_id", ""),  # e.g. set later with uuid.uuid4().hex
+                    "source_name": md.get("source_name", "source_name"),
+                    "file_directory": md.get("file_directory", ""),
+                    "page_number": page_number,
+                    "last_modified": md.get("last_modified"),
+                    "filetype": md.get("filetype", ""),
+                },
+            }
         else:
-            if result[index] is not None: #new page
-                result[index] = {
-                    "source_id": "source_uuid",
-                    "content": block["text"], #pack all items within the page the content into one page dof document
-                    "metadata":{
-                        "source_name":"source_name",
-                        "file_directory": block["metadata"]["file_directory"],
-                        "page_number":block["metadata"]["page_number"],
-                        "last_modified": block["metadata"]["last_modified"],
-                        "filetype": block["metadata"]["filetype"]
-                    }
-                }
-            else:
-                #should be an error?
-                ...
-    return result
+            # Same page: append content
+            assert current_page is not None
+            current_page["content"] += text
 
+    # flush last page
+    if current_page is not None:
+        result.append(current_page)
+
+    return result
+    
 def process_pdf(currently_not_used: str):
     
     #load json elements
@@ -168,10 +231,9 @@ def process_pdf(currently_not_used: str):
     raw_file=None
     with open("elements.json", "r", encoding="utf-8") as f:
         raw_file = json.load(f)
-        with open("raw.txt", "w", encoding="utf-8") as r:
-            for element in raw_file:
-                r.write(element["text"] + "\n")
-                
+        with open("raw.json", "w", encoding="utf-8") as r:
+            cleaned_data = chunker_page_strategy(raw_file)
+            json.dump(cleaned_data, r, indent=2)
     
     doc = (Pipeline()
            .fetch_from("file", path="raw.txt")
