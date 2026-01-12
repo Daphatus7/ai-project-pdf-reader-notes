@@ -133,33 +133,32 @@ def save_lines(output_path: str, lines: list[str]) -> None:
         file.write('\n\n'.join(filter(None, lines)))
     logger.info('Saved text-based chunks to %s', output_path)
     
-def chunker_i(blocks: list[dict])-> list[dict]:
+def chunker_page_strategy(blocks: list[dict])-> list[dict]:
     #chunking strategy
 
     result: list[dict] = []
     index = 0
     for block in blocks:
         # merge contents in a single page to one json item
-        if result[index] is not None:
-            block[]
+        if block["metadata"]["page_number"] != index + 1: #old page
+            result[index]["content"]+=block["text"]
         else:
-            
-    
-    
-    return [
-        {   
-            #every page of the documents
-            "source_id": "source_uuid",
-            "content": "content", #pack all items within the page the content into one page dof document
-            "metadata":{
-                "source_name":"",
-                "source":"",
-                "page_number":"",
-                "last_modified": "2025-06-15T10:11:53",
-                "filetype": "application/pdf",
-            }
-        }
-    ]
+            if result[index] is not None: #new page
+                result[index] = {
+                    "source_id": "source_uuid",
+                    "content": block["text"], #pack all items within the page the content into one page dof document
+                    "metadata":{
+                        "source_name":"source_name",
+                        "file_directory": block["metadata"]["file_directory"],
+                        "page_number":block["metadata"]["page_number"],
+                        "last_modified": block["metadata"]["last_modified"],
+                        "filetype": block["metadata"]["filetype"]
+                    }
+                }
+            else:
+                #should be an error?
+                ...
+    return result
 
 def process_pdf(currently_not_used: str):
     
