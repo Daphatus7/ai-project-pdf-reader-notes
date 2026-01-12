@@ -1,6 +1,6 @@
 [
   {
-    "id": "chnk_2afd9eeb0baf4b66af790ce9499a2bc5",
+    "id": "chnk_21481ff776fb4989a182f7be2a1723a9",
     "text": "Note: Q1d, 2a, 2b, 3d are no longer covered in the syllabus and not examinable\nStudent Number:\nThe University of Melbourne\nSemester 1 Assessment 2021\nSchool of Computing and Information Systems\nCOMP30024 Artificial Intelligence\nTime for writing and upload: 3 hours 15 minutes.\nThis paper has 20 pages including this cover page.\nCommon Content Papers: None\nAuthorised Materials: Lecture notes, books, computer, on-line material\nInstructions to Students:\ne This paper counts for 70% of your final grade.\ne There are 7 questions, with marks as indicated. Attempt all questions.\ne Answer all the questions ",
     "start_index": 0,
     "end_index": 502,
@@ -9,7 +9,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_829723c2a03b4e36ac379fba5a2a4a6d",
+    "id": "chnk_56690fe8140741afad726c276a74cb92",
     "text": "e There are 7 questions, with marks as indicated. Attempt all questions.\ne Answer all the questions on the exam paper if possible, and then upload the com- pleted exam paper containing your solutions. If you are unable to print the exam paper or electronically edit the exam paper, you may write on your own blank paper and then upload images of your written answers.\ne You may upload your exam answers multiple times if you need to revise an answer at any time during the exam.\ne You must not communicate with other students or seek assistance from anyone else taking whilst tak",
     "start_index": 502,
     "end_index": 981,
@@ -18,7 +18,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_dc5b6f4c6822412895945024645fa3d0",
+    "id": "chnk_f7e1830362f844ffb711a525ca0f28ea",
     "text": "e You must not communicate with other students or seek assistance from anyone else taking whilst taking this exam, e.g. using messaging, chat rooms, email, telephone or face-to-face. Also, you must not assist anyone else taking the exam. You must not post answers to the questions or discussion of the questions online. Failure to comply with these instructions may be considered as academic misconduct.\ne You are free to use the course materials and your laptop/PC in this exam but note that there is a ",
     "start_index": 981,
     "end_index": 1385,
@@ -27,7 +27,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_f702d3cba2fd4635830a75418d022d62",
+    "id": "chnk_415d3f5d170b49df8c0d5e972ada3a01",
     "text": "e You are free to use the course materials and your laptop/PC in this exam but note that there is a strict time window for the exam hence you should be mindful of the time spent using such resources.\ne Answer the questions as clearly and precisely as you can.\ne Your writing should be clear. Unreadable answers will be deemed wrong. Excessively long answers or irrelevant information may be penalised.\ne For numerical methods, marks will be given for applying the correct method. Stu- dents will not be",
     "start_index": 1385,
     "end_index": 1787,
@@ -36,7 +36,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_ce42ffb3864740ffb95f2fde13fe7fd9",
+    "id": "chnk_ff28f13c5f764d05be6110f3b1e79303",
     "text": "e For numerical methods, marks will be given for applying the correct method. Stu- dents will not be heavily penalised for arithmetic errors.\nLibrary: This paper may NOT be reproduced and held by the Baillieu Library.\nQuestion 1 (10 marks)\nPick the most appropriate answer to each of the following questions. Please write your answer to each question in the boxes below. Each question is worth 2 marks.\nQuestion || (a) (b) | (c) (d) | (e) Answer\n(a) Which of the following statements is true in general:\n1. Depth-first search always expands at least as many nodes as A* search with an admissible heuristi",
     "start_index": 1787,
     "end_index": 2291,
@@ -45,7 +45,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_6e85df634f50427684d16648b15713dc",
+    "id": "chnk_311331e456244936ad138f8e044f70a6",
     "text": "1. Depth-first search always expands at least as many nodes as A* search with an admissible heuristic.\n2. A perfectly rational backgammon agent never loses.\n3. An advantage of Hill Climbing search is that it requires minimal memory.\n4. Bi-directional search is always more efficient than uni-directional search.\n(b) In a general CSP with n variables, each taking d possible values, what is the maxi- mum number o",
     "start_index": 2291,
     "end_index": 2603,
@@ -54,7 +54,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_23ab201e94474b7eab798244ac1e9e0a",
+    "id": "chnk_224e893f846342819f4e6114df9c663f",
     "text": "(b) In a general CSP with n variables, each taking d possible values, what is the maxi- mum number of times a backtracking search algorithm might have to backtrack, if it is running arc consistency and applying the Minimum Remaining Values (MRV) and (Least Constraining Value) LCV heuristics?\n1) 1 je) (\nnd?) 2. 0 (\nje) (n?d?)\n( O d\u201d)\nQuestion 1 (continued)\n(c) You are given a game-tree for which you are the maximizer, and in the nodes in which you don\u2019t g",
     "start_index": 2603,
     "end_index": 2961,
@@ -63,7 +63,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_ac6d27bd768346b3b9e390a0928a7c28",
+    "id": "chnk_54fe6f405b4f4624a9a9234840ba0000",
     "text": "(c) You are given a game-tree for which you are the maximizer, and in the nodes in which you don\u2019t get to make a decision an action is chosen uniformly at random amongst the available options. Your objective is to maximize the probability that you win $10 or more (rather than the usual objective to maximize your expected value). Note that Expectimax is a variant of Expectiminimax where nodes alternate between max nodes and chance nodes at different layers of the search tree (there are no min nodes). Then which of the following statements is true:\n",
     "start_index": 2961,
     "end_index": 3466,
@@ -72,7 +72,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_5ba1edc366f5489da72bbb40503dc8c0",
+    "id": "chnk_d4d9ae3504d94b228e6e95e91239ee8f",
     "text": "Then which of the following statements is true:\n1. Running Expectimax will result in finding the optimal strategy to maximize the probability of win",
     "start_index": 3466,
     "end_index": 3514,
@@ -81,7 +81,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_710f370777f740469ecefb1a368c47b9",
+    "id": "chnk_dc6654aedd184140b7b07058601c7072",
     "text": "1. Running Expectimax will result in finding the optimal strategy to maximize the probability of winning $10 or more.\n2. Running Minimax, where chance nodes are considered minimizers, will result in finding the optimal strategy to maximize the probability of winning $10 or more.\n3. Running Expectimax in a modified game tree where every pay-off of $10 or more is given a value of",
     "start_index": 3514,
     "end_index": 3794,
@@ -90,7 +90,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_452aaad25c7d4b7eb74c916d593a3b85",
+    "id": "chnk_ba9cb767e2044e30b2a0dba8d4a7faac",
     "text": "3. Running Expectimax in a modified game tree where every pay-off of $10 or more is given a value of 1, and every pay-off lower than $10 is given a value of 0 will result in finding the optimal strategy to maximize the probability of winning $10 or more.\n4. Running Minimax in a modified game tree where every pay-off of $10 or more is given a value of 1, and every pay-off lower than $10 is given a value of 0 will result in finding the optimal strategy to maximize the probability of winning $10 or more.\n(d) Consider that you need to run four auctions labelled (A), (B), (C) and (D), where the most impor",
     "start_index": 3794,
     "end_index": 4301,
@@ -99,7 +99,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_4b319aa73ee14883a8326f35a6158ab7",
+    "id": "chnk_d472a2086580487aa3cee4f21fb14cac",
     "text": "(d) Consider that you need to run four auctions labelled (A), (B), (C) and (D), where the most important property for each auction is as follows:\n(A) Hard to collude, (B) Winner pays second highest price, (C) Open-cry, (D) Decending\nWhich set of auction types below is the best match for these four auctions based on their respective desired properties?\n1. (A) Vickery, (B) Dutch, (C) English, (D) First-price sealed-bid\n2. (A) Vickery, (B) English, (C) Dutch, (D) First-price sealed-bid\n3. (A) First-price sealed-bid, (B) Dutch, (C) English, (D) Vickery\n4. (A) First-price sealed-bid, (B",
     "start_index": 4301,
     "end_index": 4789,
@@ -108,7 +108,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_d92c49e689e44cfaa2da548fad1eb11b",
+    "id": "chnk_c10080b9a38e4007827ef5185063d2cf",
     "text": "3. (A) First-price sealed-bid, (B) Dutch, (C) English, (D) Vickery\n4. (A) First-price sealed-bid, (B) Vickery, (C) English, (D) Dutch\nQuestion 1 (continued)\n(e) Figure 1-1 shows a robot arm that is made up of two sections Arm, and Arm",
     "start_index": 4789,
     "end_index": 4923,
@@ -117,7 +117,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_f0a48c8a7f0b462a983733db15549dc6",
+    "id": "chnk_95b463662f254de4bdecc96810a7e1c0",
     "text": "Question 1 (continued)\n(e) Figure 1-1 shows a robot arm that is made up of two sections Arm, and Armg. Arm, can rotate around the shoulder joint A, while Arma is connected to Arm, at the elbow joint B, and can rotate around the joint B. The configuration of the robot arm can be specified by the angle 6; between the horizontal axis and Army, and the angle 62 between Arm, and Arm. Both angles are measured in radians. There is also 1 fixed obstacle shown, which restricts the movement of the robot arm.\n\nFigure 1-1\nWhich of the following four figures best represents the configuration space for this rob",
     "start_index": 4923,
     "end_index": 5427,
@@ -126,7 +126,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_5da1f5c84d854146bad789c585ad96fa",
+    "id": "chnk_3d0267ae8b844624966bcbdee6437d91",
     "text": "\nFigure 1-1\nWhich of the following four figures best represents the configuration space for this robot? The figures are labelled (1) to (4).\n(1) (2) (3) (4) 2n 2n 2n 2n 6, 8, 8 8, bd m n bd 0 n an 0 T 2n 0 bd an 0 7 an 8, 8, % on\nFigure 1-2\nQuestion 2 (10 marks)\nFor each part of the following question you should write a brief answer in the box provided.\n(a) [2 marks] The following is the weight update rule for gradient decent learning as described in the lectures\nwi \u2014 wi \u2014 n(z\u2014 t) fils)\nwhere 77 is the learning rate, and w is the vector of weights in the evaluation function. Why it is ",
     "start_index": 5427,
     "end_index": 5919,
@@ -135,7 +135,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_3040727d9f264cddacc99f574dc2b25f",
+    "id": "chnk_717718127b1048909ba64ae090e12d0b",
     "text": "where 77 is the learning rate, and w is the vector of weights in the evaluation function. Why it is important to get the learning rate parameter 1 right?\nAnswer:\nAnswer:\n(b) [2 marks] In the weight update rule in part (a), what does a small difference between z and t indicate about the current weight w;?\nAnswer:\now\nQuestion 2 (continued)\n(c) [6 marks] For each of the following three environments, what is the most appropriate ype of agen",
     "start_index": 5919,
     "end_index": 6259,
@@ -144,7 +144,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_5fed144852354c3aa5e8af206dc574e7",
+    "id": "chnk_bd6288a2e4e34f699d359d886893ed39",
     "text": "(c) [6 marks] For each of the following three environments, what is the most appropriate ype of agent (simple reflex agent, model-based reflex agent, goal-based agent, or utility- yased agent)? Briefly justify your answer.\n(i) An automated system that translates text from one language to another, e.g., Google ranslate\n(ii) A movie recommendation system\n(iii) An automated taxi driver that is required to reach the airport on time\nAnswer:\n\nQuestion 3 (10 marks)\nConsider the 3-ply game tree shown in Figure 3-1. Each node has an identifier (e.g., the root of the",
     "start_index": 6259,
     "end_index": 6722,
@@ -153,7 +153,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_ec7fd866366843308a4bcb94f2b161cd",
+    "id": "chnk_83a0c444cf994feda8568b46dfb77e4f",
     "text": "Consider the 3-ply game tree shown in Figure 3-1. Each node has an identifier (e.g., the root of the tree is node 1; it has three successor nodes 2, 12 and 22), and each terminal node has an associated value (e.g., the value of node 4 is 8).\nMAX VALUE 8 6 1 5 7 4 6 0 2 4 7\nFigure 3-1\nIn the following questions, you are NOT required to redraw the search tree in your answer.\n(a) [1 mark] What is the minimax value at node 1 after applying the minimax algorithm to this search tree? Answer:\n(b) [4 marks] If the nodes are examined in the order shown by the identifier in each node in Figure ",
     "start_index": 6722,
     "end_index": 7213,
@@ -162,7 +162,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_bbace1284961490e9deae7a3295248c9",
+    "id": "chnk_2f287e1fbb7f4324bc86d0d4e026c9bd",
     "text": "(b) [4 marks] If the nodes are examined in the order shown by the identifier in each node in Figure 3-1, which nodes would be pruned if alpha-beta pruning is used? For each node that would be pruned, place a cross in the corresponding box below.\nNode 1/2 )3 }/4 1/5 |]6 |7 )8 |9 | 10) 11} 12] 13) 14} 15 Answer: 16 Pruned\nNode 17} 18} 19} 20} 21] 22) 23) 24) 25) 26) 27] 28) 29) 30] 31 Pruned\n(c) [2 marks] If we come up with the perfect ordering of the nodes, what is the maximum number of no",
     "start_index": 7213,
     "end_index": 7606,
@@ -171,7 +171,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_7e3ecbde4acb4e5db86b510e5c57d4e4",
+    "id": "chnk_64097b0e037f4fbf9dfc3568b23ab905",
     "text": "(c) [2 marks] If we come up with the perfect ordering of the nodes, what is the maximum number of nodes that we can prune? Answer:\nQuestion 3 (continued)\n(d) [3 marks] What are three properties that characterise an effective mechanism design for an auction? Note: you should briefly define each property that you give in your answer.\nWrite your answer in the space provided below. If you require more space, please use the ast page of",
     "start_index": 7606,
     "end_index": 7940,
@@ -180,7 +180,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_40e838124c304bf088a4c6702d1d4774",
+    "id": "chnk_84dc9a6012a7486e8fa7e84eb6019e0f",
     "text": "Write your answer in the space provided below. If you require more space, please use the ast page of the exam paper, and clearly indicate on this page that you have used the last age.\nAnswer:\nQuestion 4 (10 marks)\nIf a search problem has only a single goal state, it is common to perform bidirectional search. In b",
     "start_index": 7940,
     "end_index": 8154,
@@ -189,7 +189,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_02484eb6a9bb40a3a9390061cfbc47f3",
+    "id": "chnk_58f55aa5d6c04214bf70446d2a8f0b60",
     "text": "If a search problem has only a single goal state, it is common to perform bidirectional search. In bidirectional search you build two search trees at the same time: the \u201cforward\u201d search tree is the one we have always worked with in COMP30024, while the \u201cbackward\u201d search tree is the one that starts from the goal state, and calls a predecessor (rather than successor) function to work its way back to the start state. Both searches use the same cost function for transitioning between two states. There will now also be a backward heuristic, which for each state estimates the distance to the star",
     "start_index": 8154,
     "end_index": 8651,
@@ -198,7 +198,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_dcd71a2da2d44d87a33ba1626f7c60a5",
+    "id": "chnk_51c2e0fe98f8402c916181121e84e8f0",
     "text": "There will now also be a backward heuristic, which for each state estimates the distance to the start state. Bidirectional search can result in significant computational advantages: the size of the search tree built grows exponentially with the depth of the search tree. By growing trees from the start and goal towards each other, these two trees could meet in the middle. Thus, one ends up with a computational complexity of just twice that of searching a tree of half the",
     "start_index": 8651,
     "end_index": 9025,
@@ -207,7 +207,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_7199f3af5f974aebbd51944af6fcae3c",
+    "id": "chnk_f5ec2644742d4208851274dd8dd94e4c",
     "text": "Thus, one ends up with a computational complexity of just twice that of searching a tree of half the depth, which is a very significant saving.\nRecall the pseudo-code for a standard A* graph search\n",
     "start_index": 9025,
     "end_index": 9169,
@@ -216,7 +216,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_3481155188f0494698fc4c7f9abcd0c4",
+    "id": "chnk_0dd3e2ff1f1541ff8f19f39e3778f6a4",
     "text": "Recall the pseudo-code for a standard A* graph search\nAlgorithm A* Search\nFunction Astar-Graph-Search(problem) forward-closed + empty set forward-priority",
     "start_index": 9169,
     "end_index": 9223,
@@ -225,7 +225,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_efdcb42b5bd34e528c7ad3b5b42e1bf2",
+    "id": "chnk_6ab6ad77280441bc85d01d762be6c1ad",
     "text": "Algorithm A* Search\nFunction Astar-Graph-Search(problem) forward-closed + empty set forward-priority-queue + Insert(Make-Node(Start-State(problem)), forward-priority-queue) loop if forward-priority-queue is empty then return failure end if if forward-priority-queue is not empty then node + Pop(forward-priority-queue) if (State(node) == Goal-State(problem) ) then return node end if if State(node) is not in forward-closed then add State(node) to forward-closed forward-priority-queue + Insert-All(ExpandForward(node, problem), forward-priority-queue) end if end if loop\n",
     "start_index": 9223,
     "end_index": 9718,
@@ -234,7 +234,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_818fb2de6103494b9aa9d67c2db77078",
+    "id": "chnk_288b233fd25e4dfebee219cc36914b27",
     "text": "All(ExpandForward(node, problem), forward-priority-queue) end if end if loop\nend\nNow consider the following tentative pseudo-code for bidirectional A* search. We assume consiste",
     "start_index": 9718,
     "end_index": 9795,
@@ -243,7 +243,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_d637d3c7c05d4d6dbbddc6f34e309f5a",
+    "id": "chnk_90ee214c46544a87921ee124fe2d1c9a",
     "text": "end\nNow consider the following tentative pseudo-code for bidirectional A* search. We assume consistent forward heuristic, and a consistent backward heuristic. Concatenation is a function that builds a plan (i.e., a sequence of actions) that goes from the start state to the goal state by combining a forward partial plan and a backward partial plan that end the same state.\na\nin\nQuestion 4 (continued)\nAlgorithm Bidirectional A* Search\nFunction Bidirectional-Graph-Search(problem) forward-closed + empty set backward-closed <- empty set",
     "start_index": 9795,
     "end_index": 10231,
@@ -252,7 +252,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_c263166b9f384c4e83fd3d773f5222b8",
+    "id": "chnk_e6a3e147c78c4736b105d50dcbfc9bd3",
     "text": "Function Bidirectional-Graph-Search(problem) forward-closed + empty set backward-closed <- empty set forward-priority-queue + Insert (Make-Node(Start-State(problem)), forward-priority-queue) backward-priority-queue + Insert (Make-Node(Goal-State(problem)), backward-priority-queue) loop if forward-priority-queue is empty AND backward-priority-queue is empty then return failure end if\nif there exist a node nl in forward-priority-queue and a node n2 in backward priority queue such tha",
     "start_index": 10231,
     "end_index": 10617,
@@ -261,7 +261,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_5b603b71574a405682f2a8cef2e7318a",
+    "id": "chnk_2444a82795624352adfc98c03401f983",
     "text": "if there exist a node nl in forward-priority-queue and a node n2 in backward priority queue such that State(nl) == State(n2) then {IF no:1} return Concatenation of nl and n2 end if\nif forward-priority-queue is not empty then node + Pop if (State(noc end if forward-priority-queue) e) == Goal-State(problem) ) then return node\nif (State(noc e) is in backward-priority-queue ) then {IF no:2} return Concatenation of node and matching node in backward-priority-queue end if\nif (State(noc e) is in backward-closed ) then {IF no:3}\nreturn Concatenation of node and matching no",
     "start_index": 10617,
     "end_index": 11088,
@@ -270,7 +270,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_1577fcf5daf347f5a829e916befe4ae0",
+    "id": "chnk_f66df2b425244ceeb26795993d14b1f1",
     "text": "if (State(noc e) is in backward-closed ) then {IF no:3}\nreturn Concatenation of node and matching node in backward-closed\nend if if (State(noc e) is not in forward-closed ) then add State(node) to forward-closed forward-priority-queue\n+ Insert-All(ExpandForward(node, problem), forward-priority-queue)\nend if\nend if\n10\nQuestion 4 (continued)\nAlgorithm Bidirectional A* Search (continued)\nif backward-priority-queue is not empty then node \u00ab+ Pop(backward-priority-queue) if (State(node) ==",
     "start_index": 11088,
     "end_index": 11476,
@@ -279,7 +279,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_b87bc85035fc4657943f1ae53ac6741c",
+    "id": "chnk_0245c9c60fd74c039d867862d182d79b",
     "text": "if backward-priority-queue is not empty then node \u00ab+ Pop(backward-priority-queue) if (State(node) == Start-State(problem)) then return node end if\nif ( State(node) is in forward-priority-queue ) then {IF no:4} return Concatenation of node and matching node in forward-priority-queue end if\nif ( State(node) is in forward-closed ) then {IF no:5} return Concatenation of node and matching node in forward-closed end if\nif ( State(node) is not in backward-closed ) then\nadd State(node) to backward-closed backward-priority-queue\n+ Insert-All(ExpandBackward(node, problem",
     "start_index": 11476,
     "end_index": 11943,
@@ -288,7 +288,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_401a65d11a064f47b1e0a3fdb0f570f7",
+    "id": "chnk_29eb2c7587e34ffabd3046443e6cefec",
     "text": "add State(node) to backward-closed backward-priority-queue\n+ Insert-All(ExpandBackward(node, problem), backward-priority-queue) end if\nend if\nend loop\nThe IF statements labeled 1, 2, 3, 4, 5 are modifications to try to connect both search trees.\n(a) [2 marks] If we cut out all statements labeled 1, 2, 3, 4 or 5, will Bidirectional-Graph- Search return an optimal solution? Briefly justify your answer.\nAnswer:\n11\nQuestion 4 (continued)\n(b) [2 marks] If amongst the numbered statements we only retain 1, is Bidirectional-Graph- Search gu",
     "start_index": 11943,
     "end_index": 12381,
@@ -297,7 +297,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_f00dafaa8868443b9e8cfdba7770dad6",
+    "id": "chnk_8a9db667770f4fc19ea6645ebd1612f7",
     "text": "(b) [2 marks] If amongst the numbered statements we only retain 1, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.\nAnswer:\n(c) [2 marks] If amongst the numbered statements we only retain 2, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.\nAnswer:\n12\nQuestion 4 (continued)\n(d) [2 marks] If amongst the numbered statements we only retain 3, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.\nAnswer:\n(e) [2 marks] If amongst the numbered statements we only retain 5, is Bidirectional-Graph- S",
     "start_index": 12381,
     "end_index": 12882,
@@ -306,7 +306,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_82af0ab441e64fe5bc1a05af44761de2",
+    "id": "chnk_ca340ea855724f0baa02e7636303475e",
     "text": "Answer:\n(e) [2 marks] If amongst the numbered statements we only retain 5, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.\nAnswer:\n13\nQuestion 5 (10 marks)\nThere are five undergraduate CS classes and three lecturers who will be teaching these classes. A lecturer can only teach one class at a time. The classes are:\nClass 1 - Algorithms: meets from 8:00-9:00am\nClass 2 - Intro to AI: meets from 8:30-9:30am\nClass 3 - Databases: meets from 9:00-10:00am\nClass 4 - Operating Systems: meets from 9:00-10:00am\nClass 5 - Machine Learning: meets from 9:30-10:",
     "start_index": 12882,
     "end_index": 13372,
@@ -315,7 +315,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_f630b7ce04da4c92abb7bc205350a62e",
+    "id": "chnk_f35777c436d841489b11e37f53ef1d0c",
     "text": "Class 4 - Operating Systems: meets from 9:00-10:00am\nClass 5 - Machine Learning: meets from 9:30-10:30am\nand the instructors are:\ne Professor A, who is available to teach Classes 3 and 4.\ne Professor B, who is available to teach Classes 2, 3, 4, and 5.\ne Professor C, who is available to teach Classes 1, 2, 3, 4, 5.\n(a) [4 marks] Formulate this as a CSP problem in which there is one variable per class. State the va",
     "start_index": 13372,
     "end_index": 13689,
@@ -324,7 +324,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_527b165345ae413c84de8b3f63410e18",
+    "id": "chnk_ceef24fb3a2f440b88563470b2e03d7c",
     "text": "(a) [4 marks] Formulate this as a CSP problem in which there is one variable per class. State the variables and their domains, and the constraints. Constraints should be unary or binary and specified formally and precisely, but may be implicit rather than explicit.\nAnswer:\n14\nQuestion 5 (continued)\n(b) [2 marks] Draw the constraint graph associated with your CSP. Answer:\n(c) [2 marks] Show the domains of the variables after running arc-consistency on this initial graph ",
     "start_index": 13689,
     "end_index": 14063,
@@ -333,7 +333,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_0a7a2765269d4eee923ea1e5f9b499cd",
+    "id": "chnk_06cfb4e4f8ab446eb6b6721608e2caf4",
     "text": "(c) [2 marks] Show the domains of the variables after running arc-consistency on this initial graph (after having already enforced any unary constraints).\nAnswer:\n(d) [2 marks] Give one solution to this CSP.\nAnswer:\nQuestion 6 (10 marks)\nConsider the Bayes network shown in Figure 6-1 for a lift at a university, where S = Semester, C = C",
     "start_index": 14063,
     "end_index": 14301,
@@ -342,7 +342,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_6a20de3419c24b6c9f364d998eec9f30",
+    "id": "chnk_ed4903d7fa2949c8802904079b3eb41f",
     "text": "Consider the Bayes network shown in Figure 6-1 for a lift at a university, where S = Semester, C = Crowded, F = FaultyDoor and D = DelayedLift are all Boolean random variables, i.e., they take the value either true (t) or false (f). Also note that P(c) is shorthand for P(C = true) and P(-c) is shorthand for P(C = false).\nP(S) (s) 0.6 S P(C|S) S P(F|S) t O08 t O85 (c) (F) fo O05 f 02 P(D|CF) 0.9 ane tO aa nan oO co\nFigure 6-1\n16\nQuestion 6 (continued)\n10 marks] Calculate the value of P(f|d,s). If you cannot easily calculate the final value, try to si",
     "start_index": 14301,
     "end_index": 14756,
@@ -351,7 +351,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_0d7d8085e9494fb3be44f04f235c6050",
+    "id": "chnk_3e6893a9f36e486989323f9682d06efd",
     "text": "10 marks] Calculate the value of P(f|d,s). If you cannot easily calculate the final value, try to simplify the expression as best you can. Justify your answer mathematically and clearly show your calculations.\nAnswer:\n17\nQuestion 7 (10 marks)\nSomeone is trying to send you a message in a very simple language. The language uses only two charac",
     "start_index": 14756,
     "end_index": 14999,
@@ -360,7 +360,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_e0ffc7e0b4fc477fbc9110449e7b6101",
+    "id": "chnk_2cca9abd82ab4726a6985158f02c77fe",
     "text": "Someone is trying to send you a message in a very simple language. The language uses only two characters {A, B}. A message in the language is a string of A\u2019s and B\u2019s. Fur- thermore, messages in the language always start with the character A. For example, \u201cAB\u201d or \u201cAABA\u201d are both valid messages in the language.\nLet S; represent the character at position 7 in a message ($1 denotes the first character in the mes",
     "start_index": 14999,
     "end_index": 15310,
@@ -369,7 +369,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_721380254a4c4c21aaf3fe2117e1efb9",
+    "id": "chnk_03e476145b8e4176b2f3f5e0e9532736",
     "text": "Let S; represent the character at position 7 in a message ($1 denotes the first character in the message). For example, in the message \u201cAB\u201d, Sj = A and Sy = B. Each character in the message is generated at random (except for S,), where the probability of a particular character being generated depends only on the previous character in the message. These conditional probabilities P(S;+1|S;) are given as follows:\nP(Siz1 = AlS; = A) = 0.6, P(Siz1 = BIS; = A) = 0.4, P(Siz1 = AlS; = B) = 0.2, P(Siz1 = B\\S; = B) =0.",
     "start_index": 15310,
     "end_index": 15724,
@@ -378,7 +378,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_2f70d1109a7a438d88c8729885a72fa3",
+    "id": "chnk_596aefe5fe674aa0a6ccf09533e27e30",
     "text": "P(Siz1 = AlS; = A) = 0.6, P(Siz1 = BIS; = A) = 0.4, P(Siz1 = AlS; = B) = 0.2, P(Siz1 = B\\S; = B) =0.8\n[10 marks] When a message is sent to you, noise can cause some characters to be confused with each other. For example, the message \u201cABB\u201d might be received as \u201cBBB\u201d, where the first character was corrupted by noise and thus confused in the received message.\nLet S represent the character that is sent, and let R represent the character that is received. The ",
     "start_index": 15724,
     "end_index": 16083,
@@ -387,7 +387,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_fd57d8ae2495488a902e9b0ff9590623",
+    "id": "chnk_4937ab869f924320927aca497a7812b9",
     "text": "Let S represent the character that is sent, and let R represent the character that is received. The \u201cconfusion\u201d probability of S and R is defined by the probability distribution P.(R|S). These conditional probabilities are given as follows: P.(R = A|S = A) = 0.9, P.(R= B\\S = A) =0.1, P.(R= A|S = B) =0.1, P.(R = BIS = B) =0.9\nWhat is the most likely valid message to have been transmitted if you receive the message \u201cAB\"?\nJustify you answer mathematically and clearly show all your calculations and assumptions.\n18\nQuestio",
     "start_index": 16083,
     "end_index": 16506,
@@ -396,7 +396,7 @@
     "embedding": null
   },
   {
-    "id": "chnk_cc8abcf5cf3f4143bfe305ca24d87362",
+    "id": "chnk_ff09671b4b7d449c916125daa9cc5389",
     "text": "Justify you answer mathematically and clearly show all your calculations and assumptions.\n18\nQuestion 7 (continued) Answer:\nEND OF EXAM QUESTIONS\n19\nExtra space if needed to answer any question. If you write part of your answer here, please write the question number, and indicate at the corresponding question that you have used this space.\n\nLAST PAGE OF EXAM\n20\n",
     "start_index": 16506,
     "end_index": 16870,

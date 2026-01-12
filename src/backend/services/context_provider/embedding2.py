@@ -132,7 +132,34 @@ def save_lines(output_path: str, lines: list[str]) -> None:
     with open(output_path, 'w', encoding='utf-8') as file:
         file.write('\n\n'.join(filter(None, lines)))
     logger.info('Saved text-based chunks to %s', output_path)
+    
+def chunker_i(blocks: list[dict])-> list[dict]:
+    #chunking strategy
 
+    result: list[dict] = []
+    index = 0
+    for block in blocks:
+        # merge contents in a single page to one json item
+        if result[index] is not None:
+            block[]
+        else:
+            
+    
+    
+    return [
+        {   
+            #every page of the documents
+            "source_id": "source_uuid",
+            "content": "content", #pack all items within the page the content into one page dof document
+            "metadata":{
+                "source_name":"",
+                "source":"",
+                "page_number":"",
+                "last_modified": "2025-06-15T10:11:53",
+                "filetype": "application/pdf",
+            }
+        }
+    ]
 
 def process_pdf(currently_not_used: str):
     
@@ -219,38 +246,39 @@ if __name__ == '__main__':
 
         #store vectorstore as json
         storage.dump("vectorstore.json")
+        
         # Construct a tool for retrieving context
-        @tool(response_format="content_and_artifact")
-        def retrieve_context(query: str):
-            """Retrieve information to help answer a query."""
-            retrieved_docs = storage.similarity_search(query, k=2)
-            serialized = "\n\n".join(
-                (f"Source: {doc.metadata}\nContent: {doc.page_content}")
-                for doc in retrieved_docs
-            )
-            return serialized, retrieved_docs
-        
-        tools = [retrieve_context]
-        # If desired, specify custom instructions
-        prompt = (
-            "You have access to a tool that retrieves context from a blog post. "
-            "Use the tool to help answer user queries."
-        )
-        agent = create_agent(model=
-                            ChatOpenAI(
-                                model="gpt-5-nano",
-                                api_key=OPENAI_API_KEY,
-                                temperature=0.0,), 
-                            tools = tools, 
-                            system_prompt=prompt)
-        
-            
-        # rag_chain, retriever = build_rag_chain(vectorstore)
+        # @tool(response_format="content_and_artifact")
+        # def retrieve_context(query: str):
+        #     """Retrieve information to help answer a query."""
+        #     retrieved_docs = storage.similarity_search(query, k=2)
+        #     serialized = "\n\n".join(
+        #         (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+        #         for doc in retrieved_docs
+        #     )
+        #     return serialized, retrieved_docs
         # 
-        while True:
-            question = input("Question: ")
-            for step in agent.stream(
-                    {"messages": [{"role": "user", 
-                                   "content": question}]},
-                        stream_mode="values",):
-                    step["messages"][-1].pretty_print()
+        # tools = [retrieve_context]
+        # # If desired, specify custom instructions
+        # prompt = (
+        #     "You have access to a tool that retrieves context from a blog post. "
+        #     "Use the tool to help answer user queries."
+        # )
+        # agent = create_agent(model=
+        #                     ChatOpenAI(
+        #                         model="gpt-5-nano",
+        #                         api_key=OPENAI_API_KEY,
+        #                         temperature=0.0,), 
+        #                     tools = tools, 
+        #                     system_prompt=prompt)
+        # 
+        #     
+        # # rag_chain, retriever = build_rag_chain(vectorstore)
+        # # 
+        # while True:
+        #     question = input("Question: ")
+        #     for step in agent.stream(
+        #             {"messages": [{"role": "user", 
+        #                            "content": question}]},
+        #                 stream_mode="values",):
+        #             step["messages"][-1].pretty_print()
