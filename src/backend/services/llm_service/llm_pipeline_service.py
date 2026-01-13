@@ -26,8 +26,16 @@ class LlmServicePipe:
     
     def __init__(self):
         self.system_message = (
-            SystemMessage("you are an expert at summarise content, "
-                          "provide a brief summary for the content"))
+            SystemMessage("""
+                You are a summarization engine.
+                Rules:
+                - Keep things brief and concise in 50 words max lesser if possible.
+                - focus on summarizing purpose
+                - briefly generalise content
+                - Do NOT add any preface.
+                - Do NOT say "Here is a summary" or similar.
+                - Output only the summary content.
+            """)) # todo to be updated and improved in the future
         self.current_rate = 0
         self.current_token_per_minute = 0
         self.current_token_per_day = 0
@@ -60,18 +68,19 @@ class LlmServicePipe:
             self.system_message,
             HumanMessage(request),
         ]
-        return self.model.invoke(conversation)
-        
+        # max_tokens 应该在这里传递，而不是在 init 时
+        return await self.model.ainvoke(
+            conversation,
+            max_tokens=1500,
+        )
+
     async def process_request(self, request: str) -> dict:
         start = time.perf_counter()
-        done = await self.llm_call_summary(request)
+        msg = await self.llm_call_summary(request)
         elapsed = time.perf_counter() - start
-        logging.info("request %s finished in %.3f s", request, elapsed)
+        print(msg)
+        return {"value": msg, "elapsed": elapsed}
 
-        return {
-            "value": done,
-            "elapsed": elapsed,
-        }
 
     async def batch_llm_call(self, requests: list[str]) -> list[dict]:
         """
@@ -97,9 +106,11 @@ class LlmServicePipe:
         for task in done:
             idx = task_to_index[task]
             payload = task.result()   # {"value": ..., "elapsed": ...}
+            ai_message = payload["value"]  # AIMessage 对象
 
             results[idx] = {
-                "result": payload["value"],
+                "result": ai_message.content,  # 提取文本内容
+                "source": requests[idx],
                 "time": payload["elapsed"],
             }
 
@@ -121,7 +132,7 @@ async def main():
         items = json.load(f)
         result = await serv.batch_llm_call(
         #create alphabet from a to z
-            [items[0]["content"]]
+            [item["content"] for item in items]
         )
         with open("result.json", "w", encoding="utf-8") as result_file:
             json.dump(result, result_file, indent=2)
