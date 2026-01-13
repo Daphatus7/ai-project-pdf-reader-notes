@@ -6,12 +6,9 @@
 import asyncio
 import json
 import logging
-import os
 import time
-from typing import Any, Coroutine
 
 import dotenv
-from django.db.models.expressions import result
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_core.rate_limiters import InMemoryRateLimiter
@@ -20,6 +17,10 @@ RATE_PER_MINUTE = 5000.0
 SEC_PER_MINUTE = 60.0
 TOKEN_PER_MINUTE = 2000000
 TOKEN_PER_DAY = 20000000 
+
+class PipelineRequest:
+    content: str
+    instruction: str
 
 class LlmServicePipe:
 
@@ -91,11 +92,13 @@ class LlmServicePipe:
         start = time.perf_counter()
         msg = await self.llm_call_summary(request)
         elapsed = time.perf_counter() - start
-        print(msg)
         return {"value": msg, "elapsed": elapsed}
 
 
-    async def batch_llm_call(self, requests: list[str]) -> list[dict]:
+    async def batch_llm_call(self, requests: list[str]
+                             ,
+                             prompt: str
+                             ) -> list[dict]:
         """
         并发执行所有 async 请求，等全部完成后返回结果（顺序稳定）
         """
@@ -144,8 +147,15 @@ async def main():
     with open("../context_provider/raw.json", "r", encoding="utf-8") as f:
         items = json.load(f)
         
+        #get the summary for the entire thing, and use the
+        total_summary = await serv.batch_llm_call(
+            ["".join([item["content"] for item in items])]
+        )
+
+        with open("summary.json", "w", encoding="utf-8") as result_file:
+            json.dump(total_summary, result_file, indent=2)
         
-        
+        return
         response = await serv.batch_llm_call(
             [item["content"] for item in items]
         )
