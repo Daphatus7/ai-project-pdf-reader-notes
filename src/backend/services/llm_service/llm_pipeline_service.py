@@ -7,6 +7,7 @@ import asyncio
 import json
 import logging
 import time
+from dataclasses import dataclass
 
 import dotenv
 from langchain.chat_models import init_chat_model
@@ -16,28 +17,29 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 RATE_PER_MINUTE = 5000.0
 SEC_PER_MINUTE = 60.0
 TOKEN_PER_MINUTE = 2000000
-TOKEN_PER_DAY = 20000000 
+TOKEN_PER_DAY = 20000000
 
+@dataclass
 class PipelineRequest:
     content: str
     instruction: str
+
+system_message ="""
+                    You are a summarization engine.
+                    Rules:
+                    - Keep things brief and concise in 50 words max lesser if possible.
+                    - focus on summarizing purpose
+                    - briefly generalise content
+                    - Do NOT add any preface.
+                    - Do NOT say "Here is a summary" or similar.
+                    - Output only the summary content.
+                """ # todo to be updated and improved in the future
 
 class LlmServicePipe:
 
 
     
     def __init__(self):
-        self.system_message = (
-            SystemMessage("""
-                You are a summarization engine.
-                Rules:
-                - Keep things brief and concise in 50 words max lesser if possible.
-                - focus on summarizing purpose
-                - briefly generalise content
-                - Do NOT add any preface.
-                - Do NOT say "Here is a summary" or similar.
-                - Output only the summary content.
-            """)) # todo to be updated and improved in the future
         self.current_rate = 0
         self.current_token_per_minute = 0
         self.current_token_per_day = 0
@@ -65,11 +67,11 @@ class LlmServicePipe:
             If it does not, this will be sent to the batch_llm_call
         """
     
-    async def llm_call_summary(self, request:str)-> AIMessage:
+    async def llm_call_summary(self, request: PipelineRequest)-> AIMessage:
         conversation = [
-            self.system_message,
-            HumanMessage(request),
-        ]
+            SystemMessage(request.instruction),
+            HumanMessage(request.content),
+        ]   
 
         # 尝试最多 3 次
         max_attempts = 2
@@ -83,22 +85,20 @@ class LlmServicePipe:
             # 如果是最后一次尝试且仍然失败，返回原始请求
             if attempt == max_attempts - 1:
                 logging.warning(f"All {max_attempts} attempts failed, returning original request")
-                return AIMessage(content=request)
+                return AIMessage(content=request.content)
 
         # 理论上不会到这里，但为了类型安全
-        return AIMessage(content=request)
+        return AIMessage(content=request.content)
 
-    async def process_request(self, request: str) -> dict:
+    async def process_request(self, request: PipelineRequest) -> dict:
         start = time.perf_counter()
         msg = await self.llm_call_summary(request)
         elapsed = time.perf_counter() - start
         return {"value": msg, "elapsed": elapsed}
 
 
-    async def batch_llm_call(self, requests: list[str]
-                             ,
-                             prompt: str
-                             ) -> list[dict]:
+    async def batch_llm_call(self, requests: list[PipelineRequest]
+                            ) -> list[dict]:
         """
         并发执行所有 async 请求，等全部完成后返回结果（顺序稳定）
         """
@@ -126,7 +126,7 @@ class LlmServicePipe:
 
             results[idx] = {
                 "result": ai_message.content,  # 提取文本内容
-                "source": requests[idx],
+                "source": requests[idx].content,  # 提取原始内容字符串
                 "time": payload["elapsed"],
             }
 
@@ -149,11 +149,16 @@ async def main():
         
         #get the summary for the entire thing, and use the
         total_summary = await serv.batch_llm_call(
-            ["".join([item["content"] for item in items])]
+            [
+                PipelineRequest(
+                    "".join([item["content"] for item in items]),
+                    system_message
+                )
+            ]
         )
 
         with open("summary.json", "w", encoding="utf-8") as result_file:
-            json.dump(total_summary, result_file, indent=2)
+            json.dump(total_summary[0], result_file, indent=2)
         
         return
         response = await serv.batch_llm_call(
