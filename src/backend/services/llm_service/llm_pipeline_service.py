@@ -11,6 +11,7 @@ import time
 from typing import Any, Coroutine
 
 import dotenv
+from django.db.models.expressions import result
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_core.rate_limiters import InMemoryRateLimiter
@@ -50,8 +51,8 @@ class LlmServicePipe:
         self.model = init_chat_model(
             "gpt-5-nano",
             # Kwargs passed to the model:
-            temperature=0.2,
-            timeout=30,
+            temperature=0.3,
+            timeout=100,
             rate_limiter=self.rate_limiter
         )
     
@@ -68,11 +69,23 @@ class LlmServicePipe:
             self.system_message,
             HumanMessage(request),
         ]
-        # max_tokens 应该在这里传递，而不是在 init 时
-        return await self.model.ainvoke(
-            conversation,
-            max_tokens=1500,
-        )
+
+        # 尝试最多 3 次
+        max_attempts = 2
+        for attempt in range(max_attempts):
+            response = await self.model.ainvoke(conversation)
+
+            # 检查是否成功（内容非空）
+            if response.content:
+                return response
+
+            # 如果是最后一次尝试且仍然失败，返回原始请求
+            if attempt == max_attempts - 1:
+                logging.warning(f"All {max_attempts} attempts failed, returning original request")
+                return AIMessage(content=request)
+
+        # 理论上不会到这里，但为了类型安全
+        return AIMessage(content=request)
 
     async def process_request(self, request: str) -> dict:
         start = time.perf_counter()
@@ -130,12 +143,14 @@ async def main():
     #load json from file
     with open("../context_provider/raw.json", "r", encoding="utf-8") as f:
         items = json.load(f)
-        result = await serv.batch_llm_call(
-        #create alphabet from a to z
+        
+        
+        
+        response = await serv.batch_llm_call(
             [item["content"] for item in items]
         )
         with open("result.json", "w", encoding="utf-8") as result_file:
-            json.dump(result, result_file, indent=2)
+            json.dump(response, result_file, indent=2)
 if __name__ == "__main__":
     asyncio.run(main())
 
