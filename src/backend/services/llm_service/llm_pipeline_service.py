@@ -33,7 +33,7 @@ class LlmServicePipe:
         self.current_token_per_day = 0
         
         self.rate_limiter = InMemoryRateLimiter(
-            requests_per_second=SEC_PER_MINUTE/RATE_PER_MINUTE,  # <-- Super slow! We can only make a request once every 10 seconds!!
+            requests_per_second=RATE_PER_MINUTE/SEC_PER_MINUTE,  # <-- Super slow! We can only make a request once every 10 seconds!!
             check_every_n_seconds=0.1,  # Wake up every 100 ms to check whether allowed to make a request,
             max_bucket_size=10,  # Controls the maximum burst size.
         )
@@ -121,10 +121,10 @@ async def main():
         items = json.load(f)
         result = await serv.batch_llm_call(
         #create alphabet from a to z
-            [item["content"] for item in items]
+            [items[0]["content"]]
         )
-        for i in result:
-            print(i) 
+        with open("result.json", "w", encoding="utf-8") as result_file:
+            json.dump(result, result_file, indent=2)
 if __name__ == "__main__":
     asyncio.run(main())
 
