@@ -35,6 +35,8 @@ system_message ="""
                     - Output only the summary content.
                 """ # todo to be updated and improved in the future
 
+
+
 class LlmServicePipe:
 
 
@@ -54,7 +56,7 @@ class LlmServicePipe:
         self.model = init_chat_model(
             "gpt-5-nano",
             # Kwargs passed to the model:
-            temperature=0.3,
+            temperature=0.2,
             timeout=100,
             rate_limiter=self.rate_limiter
         )
@@ -147,22 +149,76 @@ async def main():
     with open("../context_provider/raw.json", "r", encoding="utf-8") as f:
         items = json.load(f)
         
-        #get the summary for the entire thing, and use the
-        total_summary = await serv.batch_llm_call(
-            [
-                PipelineRequest(
-                    "".join([item["content"] for item in items]),
-                    system_message
-                )
-            ]
-        )
-
-        with open("summary.json", "w", encoding="utf-8") as result_file:
-            json.dump(total_summary[0], result_file, indent=2)
+        # get the summary for the entire thing, and use the
+        # total_summary = await serv.batch_llm_call(
+        #     [
+        #         PipelineRequest(
+        #             "".join([item["content"] for item in items]),
+        #             system_message
+        #         )
+        #     ]
+        # )
+        # 
+        # with open("summary.json", "w", encoding="utf-8") as result_file:
+        #     json.dump(total_summary[0], result_file, indent=2)
+        # Final exam paper for COMP30024 AI (University of Melbourne, 2021). 7 questions (70% of grade), 3h15m. Topics cover search (DFS, A*, MRV/LCV, expectimax/minimax, alpha-beta), CSPs with arc-consistency and backtracking, bidirectional A*, auction/mechanism design, Bayesian networks, robotics configuration space, and a language/noise inference problem.
         
-        return
+        
+        
+        additional_context = """
+        Final exam paper for COMP30024 AI (University of Melbourne, 2021). 7 questions (70% of grade), 3h15m. Topics cover search (DFS, A*, MRV/LCV, expectimax/minimax, alpha-beta), CSPs with arc-consistency and backtracking, bidirectional A*, auction/mechanism design, Bayesian networks, robotics configuration space, and a language/noise inference problem.
+        """
+        # system_msg = f"""
+        #     You are a summarization engine. 
+        #     Rules:
+        #     - Keep things brief and concise in 50 words max lesser if possible.
+        #     - focus on summarizing purpose
+        #     - document important facts such as title, topics, bullet points, annotation, question number, and so on.
+        #     - Use ONLY information explicitly present in the input.
+        #     - Do NOT infer, deduce, extrapolate, or assume anything not stated.
+        #     - Do NOT generalize beyond the given facts.
+        #     - Do NOT add any preface.
+        #     - Do NOT say "Here is a summary" or similar.
+        #     - Output only the summary content.
+        #     And you are provided as knowledge context about the content, and use it for reference only. 
+        #     Do not summarise the content inside context.
+        #     <Context>
+        #     {additional_context}
+        #     <Context>
+        # """
+        system_msg = f"""
+        You are a summarization engine for Retrieval-Augmented Generation (RAG).
+        
+        Your task is to generate a concise, faithful summary of the INPUT TEXT.
+        You are also given CONTEXT for reference only — do NOT summarize or restate it.
+        
+        <REFERENCE CONTEXT>
+        {additional_context}
+        </REFERENCE CONTEXT>
+        
+        Rules:
+        - Summarize ONLY the input text, not the reference context.
+        - Output ONLY the summary text. No titles, no bullets, no quotes, no preface.
+        - Maximum 50 words. Prefer 20–40 words when possible.
+        - Focus on: purpose, scope, and key factual elements.
+        - Preserve explicit facts if present: titles, section names, numbers, dates, constraints, identifiers.
+        - Use ONLY information explicitly stated in the input.
+        - Do NOT infer, deduce, extrapolate, generalize, or add interpretation.
+        - Do NOT introduce examples, explanations, or implications.
+        - If the input is vague, summarize the topic and intent without inventing details.
+        - If information is missing or unclear, omit it — do not guess.
+        
+        Quality standard:
+        - The summary must be suitable for retrieval/navigation, not for reasoning.
+        - Prefer concrete terms from the text over abstract wording.
+        """
+
         response = await serv.batch_llm_call(
-            [item["content"] for item in items]
+            [ 
+                PipelineRequest(
+                            item["content"],
+                            system_msg)
+                for item in items]
         )
         with open("result.json", "w", encoding="utf-8") as result_file:
             json.dump(response, result_file, indent=2)

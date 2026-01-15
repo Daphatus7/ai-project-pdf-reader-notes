@@ -1,0 +1,176 @@
+# @file        sliding_window_chunking.py
+# @description 
+# @author      [Peiyu Wang]
+# @date        14/1/2026
+# @license     © 2026 . All rights reserved.
+import asyncio
+import json
+import os
+from typing import Any
+
+import dotenv
+from chonkie import NeuralChunker
+
+
+def process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
+    """
+    Merge block-level extracts into one item per page.
+
+    Expected input shape (per block):
+      {
+        "text": str,
+        "metadata": {
+          "page_number": int,
+          "file_directory": str,
+          "last_modified": str | int | float,
+          "filetype": str,
+          ... (optional)
+        }
+      }
+
+    Output shape (per page):
+      {
+        "content": str,
+        "metadata": {
+          "source_id": str,
+          "page_id": str,
+          "source_name": str,
+          "file_directory": str,
+          "page_number": int,
+          "last_modified": Any,
+          "filetype": str
+        }
+      }
+    """
+    if not blocks:
+        return []
+
+    # Defensive: tolerate unsorted input; stable sort by page_number.
+    def _page_num(b: dict[str, Any]) -> int:
+        meta = b.get("metadata") or {}
+        p_number = meta.get("page_number")
+        if not isinstance(p_number, int):
+            raise ValueError(f"Invalid or missing metadata.page_number: {p_number!r}")
+        return p_number
+
+    blocks_sorted = sorted(blocks, key=_page_num)
+
+    result: list[dict[str, Any]] = []
+    current_page_number: int | None = None
+    current_page: dict[str, Any] | None = None
+
+    for block in blocks_sorted:
+        text = block.get("text", "")
+        if not isinstance(text, str):
+            raise ValueError(f"Invalid block.text (expected str): {text!r}")
+
+        md = block.get("metadata") or {}
+        page_number = _page_num(block)
+
+        # New page boundary
+        if current_page_number is None or page_number != current_page_number:
+            # flush previous page
+            if current_page is not None:
+                result.append(current_page)
+
+            # create a new page item
+            current_page_number = page_number
+            current_page = {
+                "content": text,
+                "metadata": {
+                    # caller should fill these (or pass them in via md)
+                    "source_id": md.get("source_id", ""),
+                    "page_id": md.get("page_id", ""),  # e.g. set later with uuid.uuid4().hex
+                    "source_name": md.get("source_name", "source_name"),
+                    "file_directory": md.get("file_directory", ""),
+                    "page_number": page_number,
+                    "last_modified": md.get("last_modified"),
+                    "filetype": md.get("filetype", ""),
+                },
+            }
+        else:
+            # Same page: append content
+            assert current_page is not None
+            current_page["content"] += " " + text
+
+    # flush last page
+    if current_page is not None:
+        result.append(current_page)
+
+    return result
+
+def process_pdf(payload: list[dict])->list[dict]:
+    raw_file = payload
+
+    #clean data
+    cleaned_data = process_raw_to_internal_format(raw_file)
+    #3. Save progress
+    merged_data = ["".join(item["content"]) for item in cleaned_data]
+    with open("cleaned_data.json", "w", encoding="utf-8") as r:
+        json.dump(merged_data, r, indent=2)
+    
+        #4. 获取一个完整的content
+    # doc = (Pipeline()
+    #            .fetch_from("file", path="cleaned_data.json")
+    #            .process_with("text")
+    #            .chunk_with("recursive", chunk_size=512)
+    #            .refine_with("overlap", context_size=100)
+    #            .run())
+
+    chunker = NeuralChunker(
+        model="mirth/chonky_modernbert_base_1",  # Default model
+        device_map="cpu",                        # Device to run the model on ('cpu', 'cuda', etc.)
+        min_characters_per_chunk=10,             # Minimum characters for a chunk
+    )
+    chunk_content = ""
+    for item in merged_data:
+        chunk_content+=item + "\n"
+
+    chunked = chunker.chunk(chunk_content)
+
+    return_result = [
+        {
+            "content": c.text,
+            "metadata": {
+                "token_count": c.token_count,
+                "start_index": c.start_index,
+                "end_index": c.end_index
+            }
+        }
+        for c in chunked
+    ]
+    # i need to keep the page information
+    
+    # mapping the paragraph to pages
+    
+    
+    
+    with open("chonkie_content.json", "w", encoding="utf-8") as f:
+        json.dump(return_result, f, indent=2)
+        
+    #source tracing
+     
+        
+    return return_result 
+
+        
+    with open("chonkie_content.json", "w", encoding="utf-8") as f:
+        json.dump([chunk.to_dict()["text"] for chunk in doc.chunks], f, indent=2)   
+    return [chunk.to_dict() for chunk in doc.chunks]
+
+def chonkie_chunk(data: list[dict]) -> list[dict]:
+    return process_pdf(data)
+
+async def main():
+    # load pdf extracted raw data
+    data = None
+    with open("elements.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    output = chonkie_chunk(data)
+
+    with open("chonkie_chunk.json", "w", encoding="utf-8") as r:
+        json.dump(output, r, indent=2, ensure_ascii=False)
+
+if __name__ == "__main__":
+    asyncio.run(main())
