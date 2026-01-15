@@ -343,7 +343,7 @@ if __name__ == "__main__":
 
     ## Comment and uncomment the propositions to your hearts content
     
-    with open("../context_provider/raw.json", "r", encoding="utf-8") as f:
+    with open("../../context_provider/raw.json", "r", encoding="utf-8") as f:
         items = json.load(f)
         propositions = [item["content"] for item in items]
     

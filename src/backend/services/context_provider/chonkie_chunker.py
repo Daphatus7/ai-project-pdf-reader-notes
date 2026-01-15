@@ -3,16 +3,12 @@
 # @author      [Peiyu Wang]
 # @date        14/1/2026
 # @license     © 2026 . All rights reserved.
-import asyncio
 import json
-import os
 from typing import Any
-
-import dotenv
 from chonkie import NeuralChunker
 
 
-def process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
+def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
     """
     Merge block-level extracts into one item per page.
 
@@ -99,24 +95,19 @@ def process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
 
     return result
 
-def process_pdf(payload: list[dict])->list[dict]:
+def __process_pdf(payload: list[dict])->list[dict]:
     raw_file = payload
 
-    #clean data
-    cleaned_data = process_raw_to_internal_format(raw_file)
-    #3. Save progress
-    merged_data = ["".join(item["content"]) for item in cleaned_data]
-    with open("cleaned_data.json", "w", encoding="utf-8") as r:
-        json.dump(merged_data, r, indent=2)
+    #1. clean data
+    cleaned_data = __process_raw_to_internal_format(raw_file)
     
-        #4. 获取一个完整的content
-    # doc = (Pipeline()
-    #            .fetch_from("file", path="cleaned_data.json")
-    #            .process_with("text")
-    #            .chunk_with("recursive", chunk_size=512)
-    #            .refine_with("overlap", context_size=100)
-    #            .run())
+    #2. merge data into continuous text
+    merged_data = ["".join(item["content"]) for item in cleaned_data]
 
+    # with open("cleaned_data.json", "w", encoding="utf-8") as r:
+    #     json.dump(merged_data, r, indent=2)
+    
+    #3. chunking
     chunker = NeuralChunker(
         model="mirth/chonky_modernbert_base_1",  # Default model
         device_map="cpu",                        # Device to run the model on ('cpu', 'cuda', etc.)
@@ -139,6 +130,8 @@ def process_pdf(payload: list[dict])->list[dict]:
 
     chunked = chunker.chunk(chunk_content)
 
+
+    # todo potentially high cost process -- 2 for loops
     def get_page_numbers(chunk_start: int, chunk_end: int) -> list[int]:
         """
         Determine which pages a chunk spans based on its start and end indices.
@@ -170,34 +163,31 @@ def process_pdf(payload: list[dict])->list[dict]:
         for c in chunked
     ]
     
-    
-    
-    with open("chonkie_content.json", "w", encoding="utf-8") as f:
-        json.dump(return_result, f, indent=2)
-        
-    #source tracing
-     
-        
+    # with open("chonkie_content.json", "w", encoding="utf-8") as f:
+    #     json.dump(return_result, f, indent=2)
+
     return return_result 
 
-        
-    with open("chonkie_content.json", "w", encoding="utf-8") as f:
-        json.dump([chunk.to_dict()["text"] for chunk in doc.chunks], f, indent=2)   
-    return [chunk.to_dict() for chunk in doc.chunks]
+def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
+    """
+        the input is raw_extracted_text
+    :param raw_extracted_text: 
+    :return: 
+    """
+    return __process_pdf(raw_extracted_text)
 
-def chonkie_chunk(data: list[dict]) -> list[dict]:
-    return process_pdf(data)
 
-async def main():
-    # load pdf extracted raw data
-    data = None
-    with open("elements.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
 
-    output = chonkie_chunk(data)
-
-    with open("chonkie_chunk.json", "w", encoding="utf-8") as r:
-        json.dump(output, r, indent=2, ensure_ascii=False)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# async def main():
+#     # load pdf extracted raw data
+#     data = None
+#     with open("elements.json", "r", encoding="utf-8") as f:
+#         data = json.load(f)
+# 
+#     output = chonkie_chunk(data)
+# 
+#     with open("chonkie_chunk.json", "w", encoding="utf-8") as r:
+#         json.dump(output, r, indent=2, ensure_ascii=False)
+# 
+# if __name__ == "__main__":
+#     asyncio.run(main())

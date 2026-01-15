@@ -121,6 +121,7 @@ def build_vector_store()->VectorStore:
             "topics":"",
         }
     ]
+
     with open("./services/context_provider/chonkie.json", "r", encoding="utf-8") as f:
         context_chunks = json.load(f)
     
