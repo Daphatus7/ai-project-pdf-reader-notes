@@ -122,11 +122,40 @@ def process_pdf(payload: list[dict])->list[dict]:
         device_map="cpu",                        # Device to run the model on ('cpu', 'cuda', etc.)
         min_characters_per_chunk=10,             # Minimum characters for a chunk
     )
+    
+    # Build chunk_content and track page boundaries
     chunk_content = ""
-    for item in merged_data:
-        chunk_content+=item + "\n"
+    page_boundaries = []  # List of (start_index, end_index, page_index) tuples
+    current_index = 0
+    
+    for page_idx, item in enumerate(merged_data):
+        page_start = current_index
+        page_content = item + "\n"
+        page_end = current_index + len(page_content)
+        
+        page_boundaries.append((page_start, page_end, page_idx))
+        chunk_content += page_content
+        current_index = page_end
 
     chunked = chunker.chunk(chunk_content)
+
+    def get_page_numbers(chunk_start: int, chunk_end: int) -> list[int]:
+        """
+        Determine which pages a chunk spans based on its start and end indices.
+        
+        Args:
+            chunk_start: Start index of the chunk in the merged content
+            chunk_end: End index of the chunk in the merged content
+            
+        Returns:
+            List of page indices (0-based) that this chunk spans
+        """
+        page_numbers = []
+        for page_start, page_end, page_idx in page_boundaries:
+            # Check if chunk overlaps with this page
+            if chunk_start < page_end and chunk_end > page_start:
+                page_numbers.append(page_idx)
+        return page_numbers
 
     return_result = [
         {
@@ -134,14 +163,12 @@ def process_pdf(payload: list[dict])->list[dict]:
             "metadata": {
                 "token_count": c.token_count,
                 "start_index": c.start_index,
-                "end_index": c.end_index
+                "end_index": c.end_index,
+                "page_number": get_page_numbers(c.start_index, c.end_index)
             }
         }
         for c in chunked
     ]
-    # i need to keep the page information
-    
-    # mapping the paragraph to pages
     
     
     
