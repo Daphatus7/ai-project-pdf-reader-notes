@@ -127,34 +127,31 @@ def build_vector_store()->VectorStore:
         
         return storage
 
-def make_retrieve_tool(agent_ref: "LlmAgent"):
+
+
+class LlmAgent:
     @tool(response_format="content_and_artifact")
-    def retrieve_context(query: str):
+    def retrieve_context(self, query: str):
         """
             search stored documents for relevant context
         :param query: the user wants to know
         :return: information content and source documents
         """
-        if agent_ref.storage is None:
+        if self.storage is None:
             return "No vector store is initialized.", []
-        docs = agent_ref.storage.similarity_search(query=query, k=4)
+        docs = self.storage.similarity_search(query=query, k=4)
         for doc in docs:
             logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
         info_sources = [doc.metadata.get("source") for doc in docs]
         return docs, info_sources
-    return retrieve_context
-
-
-
-class LlmAgent:
-
+    
     def __init__(self):
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
         )
-        self.retrieve_context = make_retrieve_tool(self)
+        self.storage = build_vector_store()
         self.tools = [self.retrieve_context]
         self.agent = create_agent(
             model=self.model,
