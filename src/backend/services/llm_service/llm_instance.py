@@ -141,8 +141,19 @@ class LlmAgent:
         with open("services/context_provider/chonkie_content.json", "r", encoding="utf-8") as r:
             raw_docs = json.load(r)
         
+        # Convert dict format to LangChain Document objects
+        # chonkie_content.json format: [{"content": "...", "metadata": {...}}]
+        # Document format: Document(page_content="...", metadata={...})
+        documents = [
+            Document(
+                page_content=doc.get("content", ""),
+                metadata=doc.get("metadata", {})
+            )
+            for doc in raw_docs
+        ]
+        
         self.store_ids = self.storage.add_documents(
-            documents=raw_docs
+            documents=documents
         )
         print(self.store_ids)
         
