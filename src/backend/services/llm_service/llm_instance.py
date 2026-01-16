@@ -104,9 +104,6 @@ def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
         ]
     }
 
- 
-
-
 def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
