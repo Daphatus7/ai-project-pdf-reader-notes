@@ -108,26 +108,6 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
-def build_vector_store()->VectorStore:
-    with open("./services/context_provider/chonkie.json", "r", encoding="utf-8") as f:
-        context_chunks = json.load(f)
-    
-        embeddings = OpenAIEmbeddings(
-            model="text-embedding-3-small",
-        )
-    
-        # 3. 建立 InMemoryVectorStore
-        storage = InMemoryVectorStore.from_documents(
-            documents=[Document(page_content=str(chunk)) for chunk in context_chunks],
-            embedding=embeddings,
-        ) 
-        
-        
-        logging.log(msg=storage.embeddings, level=logging.INFO)
-        
-        return storage
-
-
 
 class LlmAgent:
     @tool(response_format="content_and_artifact")
@@ -151,7 +131,21 @@ class LlmAgent:
             model="gpt-5-nano",
             temperature=0.1,
         )
-        self.storage = build_vector_store()
+        
+        self.storage = InMemoryVectorStore(
+            embedding=OpenAIEmbeddings(model="text-embedding-3-large")
+        )
+        # todo add document to the vector store for testing
+        
+        raw_docs = None
+        with open("services/context_provider/chonkie_content.json", "r", encoding="utf-8") as r:
+            raw_docs = json.load(r)
+        
+        self.store_ids = self.storage.add_documents(
+            documents=raw_docs
+        )
+        print(self.store_ids)
+        
         self.tools = [self.retrieve_context]
         self.agent = create_agent(
             model=self.model,
