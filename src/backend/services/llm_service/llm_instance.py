@@ -113,9 +113,9 @@ def make_retrieve_tool(agent: "LlmAgent"):
         :return: information content and source documents
         """
         print("activated")
-        if storage is None:
+        if agent.storage is None:
             return "No vector store is initialized.", []
-        docs = storage.similarity_search(query=query, k=4)
+        docs = agent.storage.similarity_search(query=query, k=4)
         for doc in docs:
             logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
         info_sources = [doc.metadata.get("source") for doc in docs]
