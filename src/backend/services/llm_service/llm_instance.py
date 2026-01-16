@@ -104,27 +104,32 @@ def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
         ]
     }
 
+def make_retrieve_tool(agent: "LlmAgent"):
+    @tool
+    def retrieve_context(query: str):
+        """
+            search stored documents for relevant context
+        :param query: the user wants to know
+        :return: information content and source documents
+        """
+        print("activated")
+        if storage is None:
+            return "No vector store is initialized.", []
+        docs = storage.similarity_search(query=query, k=4)
+        for doc in docs:
+            logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
+        info_sources = [doc.metadata.get("source") for doc in docs]
+        return docs, info_sources
+    return retrieve_context
+
+
 def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
 
 class LlmAgent:
-    @tool(response_format="content_and_artifact")
-    def retrieve_context(self, query: str):
-        """
-            search stored documents for relevant context
-        :param query: the user wants to know
-        :return: information content and source documents
-        """
-        if self.storage is None:
-            return "No vector store is initialized.", []
-        docs = self.storage.similarity_search(query=query, k=4)
-        for doc in docs:
-            logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
-        info_sources = [doc.metadata.get("source") for doc in docs]
-        return docs, info_sources
-    
+        
     def __init__(self):
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
@@ -156,8 +161,10 @@ class LlmAgent:
             documents=documents
         )
         print(self.store_ids)
-        
-        self.tools = [self.retrieve_context]
+        self.retrieve_tool = make_retrieve_tool(self)
+        self.tools = [
+            self.retrieve_tool
+            ]
         self.agent = create_agent(
             model=self.model,
             tools=self.tools,
