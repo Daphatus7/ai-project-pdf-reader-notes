@@ -104,32 +104,30 @@ def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
         ]
     }
 
-def make_retrieve_tool(agent: "LlmAgent"):
-    @tool
-    def retrieve_context(query: str):
-        """
-            search stored documents for relevant context
-        :param query: the user wants to know
-        :return: information content and source documents
-        """
-        print("activated")
-        if agent.storage is None:
-            return "No vector store is initialized.", []
-        docs = agent.storage.similarity_search(query=query, k=4)
-        for doc in docs:
-            logging.log(msg=f"Retrieved doc metadata: {doc.metadata}", level=logging.INFO)
-        info_sources = [doc.metadata.get("source") for doc in docs]
-        return docs, info_sources
-    return retrieve_context
+ 
 
 
 def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
+def make_argument_retriever_tool(agent_ref):
+    @tool("argument_retriever")
+    def retrieve_context(query: str):
+        """search stored documents for relevant context"""
+        print("activated")
+        if agent_ref.storage is None:
+            return "No vector store is initialized.", []
+        docs = agent_ref.storage.similarity_search(query=query, k=4)
+        for doc in docs:
+            logging.info("Retrieved doc metadata: %s", doc.metadata)
+        info_sources = [doc.metadata.get("source") for doc in docs]
+        return docs, info_sources
+
+    return retrieve_context
 
 class LlmAgent:
-        
+    
     def __init__(self):
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
@@ -161,9 +159,9 @@ class LlmAgent:
             documents=documents
         )
         print(self.store_ids)
-        self.retrieve_tool = make_retrieve_tool(self)
+        self.retrieve_context = make_argument_retriever_tool(self)
         self.tools = [
-            self.retrieve_tool
+            self.retrieve_context
             ]
         self.agent = create_agent(
             model=self.model,
