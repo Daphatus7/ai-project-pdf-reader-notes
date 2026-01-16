@@ -40,7 +40,7 @@ system_message ="""
 class LlmServicePipe:
 
 
-    
+
     def __init__(self):
         self.current_rate = 0
         self.current_token_per_minute = 0
@@ -220,7 +220,7 @@ async def main():
                             system_msg)
                 for item in items]
         )
-        with open("result.json", "w", encoding="utf-8") as result_file:
+        with open("trash/result.json", "w", encoding="utf-8") as result_file:
             json.dump(response, result_file, indent=2)
 if __name__ == "__main__":
     asyncio.run(main())

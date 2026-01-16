@@ -134,7 +134,7 @@ def save_lines(output_path: str, lines: list[str]) -> None:
     logger.info('Saved text-based chunks to %s', output_path)
 
 def get_summary(content: str)->str:
-    
+    ...
 
 def chunker_page_strategy(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """

@@ -172,7 +172,7 @@ def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
     """
         the input is raw_extracted_text
     :param raw_extracted_text: 
-    :return: 
+    :return: chunked text
     """
     return __process_pdf(raw_extracted_text)
 

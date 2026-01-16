@@ -1,12 +1,11 @@
 import json
 import logging
-from dataclasses import dataclass, asdict
 from typing import Any
 
 from langchain.agents import create_agent, AgentState
-from langchain.agents.middleware import before_model, wrap_tool_call, after_model
+from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
-from langchain_core.messages import RemoveMessage, HumanMessage, ToolMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from langchain_core.vectorstores import VectorStore, InMemoryVectorStore
@@ -71,7 +70,6 @@ def _build_human_message(contents: list) -> HumanMessage:
             content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
     return HumanMessage(content=content_parts)
 
-
 def delete_messages(state):
     messages = state["messages"]
     if len(messages) > 2:
@@ -111,17 +109,6 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
 def build_vector_store()->VectorStore:
-    
-    #build chucks
-    
-    chuck_structure = [
-        {
-            "document_summary": "use llm to provide a brief summary of the document",
-            "key_words":"",
-            "topics":"",
-        }
-    ]
-
     with open("./services/context_provider/chonkie.json", "r", encoding="utf-8") as f:
         context_chunks = json.load(f)
     
@@ -139,7 +126,6 @@ def build_vector_store()->VectorStore:
         logging.log(msg=storage.embeddings, level=logging.INFO)
         
         return storage
-    ...
 
 def make_retrieve_tool(agent_ref: "LlmAgent"):
     @tool(response_format="content_and_artifact")
@@ -168,7 +154,6 @@ class LlmAgent:
             model="gpt-5-nano",
             temperature=0.1,
         )
-        self.storage = VectorStore
         self.retrieve_context = make_retrieve_tool(self)
         self.tools = [self.retrieve_context]
         self.agent = create_agent(
@@ -179,8 +164,6 @@ class LlmAgent:
         )
         self.counter = 0
 
-
-
     async def chat(self, chat_request: ChatRequest):
         self.counter += 1
         print(f"Agent called {self.counter} times")
@@ -189,10 +172,7 @@ class LlmAgent:
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
         system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
-        
-        #通过用户的请求建立一个有效的vector store
-        self.storage = build_vector_store()
-    
+            
         accumulated_text = ""
         last_structured_update = None
     
