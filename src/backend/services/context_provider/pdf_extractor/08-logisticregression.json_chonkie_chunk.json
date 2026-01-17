@@ -1,0 +1,279 @@
+[
+  {
+    "content": "Lecture 8: Iterative Optimization & Logistic Regression COMP90049 Introduction to Machine Learning Semester 2, 2025 Lea Frermmann, CIS Copyright @ University of Melbourne 2025. All rights reserved. No part of the publication may be reproduced in any form by print, photoprint, microfilm or any other means without written permission from the author. \n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 80,
+      "start_index": 0,
+      "end_index": 351,
+      "page_number": [
+        0
+      ]
+    }
+  },
+  {
+    "content": "Finding Optimal Points | Finding the parameters that optimize a target Ex1: Estimate the study time which leads to the best grade in COMP90049. Ex2: Find the shoe price which leads to maximum profit of our shoe shop. Ex3: Predicting housing prices from a weighted combination of house age and house location Ex4: Find the parameters 6 of a spam classifier which lead to the lowest error Ex5: Find the parameters @ of a spam classifier which lead to the highest data log likelihood ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 102,
+      "start_index": 351,
+      "end_index": 832,
+      "page_number": [
+        1
+      ]
+    }
+  },
+  {
+    "content": "\ninding Minima/ Maxi 1. Define your function of interest f(x) (e.g., data log likelihood) 2. Compute its first derivative wrt its input x 3. Set the derivative to zero 4. Solve for x \nClosed-form vs Iterative Optimization Closed-form solutions + Previously, we computed the closed form solution for the MLE of the binomial distribution + We follow our recipe, and arrive at a single solution Unfortunately, life is not always as easy * Often, no closed-form solution exists + Instead, we have to iteratively improve our estimate of 9 until we arrive ata satisfactory solution * Gradient descent is one popular iterative optimization method \n‘Descending’ the function to find the Optimum 25 6*2 BR ua (8) S @ao * 1-dimensional case: find parameter 6 that minimizes the function * follow the curvature of the line step by step we ——\n‘Descending’ the function to find the 105.0;) + 2-dimensional case: find parameters 0 =[0o, 61] that minimize the function J * follow the curvature step by step along the steepest way ‘Source: https://medium.com /binaryandmore/beginners-guide-to-deriving-and-implementing-backp ropagation-e3claSale536 Ne Andrew ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 285,
+      "start_index": 832,
+      "end_index": 1975,
+      "page_number": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  {
+    "content": "\nit Descent: Intuition Intuition * Descending a mountain (aka. our function) as fast as possible: at every position take the next step that takes you most directly into the valley * We compute a series of solutions 0, 62), 9), ... by ‘walking’ along the function and taking steps in the direction with the steepest local slope (or gradient). * each solution depends on the current location \nDetails Learn the model parameters 0 * such that we minimize the error * traverse over the loss function step by step (‘descending into a valley’) * we would like an algorithm that tells how to update our parameters 0€ O0+A0 \nGradient Descent: Details Learn the model parameters 0 such that we minimise the error traverse over the loss function step by step (‘descending into a valley’) we would like an algorithm that tells us how io update our parameters 0€ 60+h0 AQ is the derivative “4, tells us how much f changes in response to a change in 0. a measure of the slope or gradient of a function f at point 6 the gradient points to the greatest increase of a function 25 20 ~ 1s & 10 2 5 0 \nDetails Learn the model parameters 0 such that we minimise the error traverse over the loss function step by step (‘descending into a valley’) we would like an algorithm that tells us how to update our parameters 0€ 0+h0 if <0O:as6:7 f(6):\\ if >O0:asd:\\ f(6):N if ee =0: we are ata minimum so, to approach the minimum: of ~ 7 9 6t ott = gt  Learning Rate  7\nit Descent for multiple parameters Usually, our models have several parameters which need to be optimized to minimize the error We compute partial derivatives of f(0) wrt. individual 6 Partial derivatives measure change in a function of multiple parameters given a change in a single parameter, with all others held constant For example, for (1, 62) we can compute of and of 00, 062 We then update each parameter individually of A O4A01 with AO =-1 5 af 02 & 2+Ab2 with Ade =a ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 473,
+      "start_index": 1975,
+      "end_index": 3894,
+      "page_number": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    }
+  },
+  {
+    "content": "\nGradient Descent: Algorithm Recipe for Gradient Descent (single parameter) : Define objective function f(@) os : Initialize parameter 6© 2h eRr : for iteration t € {0,1,2,...7} do Compute the first derivative of f at that point 0( : -f, Update your parameter by subtracting the (scaled) derivative of (t+1) (t) ) +6 1560 + nis the step size or learning rate, a parameter + When to stop? Fix a number of iterations, or define other criteria \niteration 0 * 7 is learning rate, which defines how big a step to update * If7 is too small, the algorithm might be slow. * If7 is too large, you might miss the minimum. the 6 ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 165,
+      "start_index": 3894,
+      "end_index": 4512,
+      "page_number": [
+        10,
+        11,
+        12
+      ]
+    }
+  },
+  {
+    "content": "\nLearning rate > > SGD (learning_rate=0,01) SGD (leaming_rate=90.1) 100 100 eo step: 0: (-6.63, 43.953) so 4 step: 0: (-6.63, 43.953) 60 60-4 > 40 40 + 20 20 4 0 T T T T T T T 0+ T -10.0 -7.5 —5.0 —2.5 0.0 2.5 5.0 7.5 10.0 -10.0 —-7.5 —5.0 -2.5 0.0 25 5.0 7.5 10.0 * obhat.com : SGDilearning_rate=0.95} SGD(learning_rate=1.01 100 fleaming., 100 ( 9. a0 step: 0: (-6.63, 43.953) go 4 step: 0: (-6.63, 43.953) 60 607 > 40 40 5 20 20 4 a) 0+ -10.0 -7.5 —5.0 —2.5 0.0 2.5 5.0 7.5 10.0 -10.0 —-7.5 —5.0 -2.5 0.0 2.5 5.0 7.5 10.0 \nGradient Descent: Algorithm Recipe for Gradient Descent (multiple parameters) 1: Define objective function f(@) 2: Initialize parameters {00, oe, ...} 3: for iteration t € {0,1,2,...T} do 4: Initialize vector of gradients « [] 5: for parameter f € {1,2,3,...F} do 6 Compute the first derivative of f at that point 6° : Set ft 7: append a0! to gradients 8: Update all ‘parameters by subtracting the (scaled) gradient (44) () __ OF ) +6 1560 70) \nPossible issue: local maxima and minima! « A function is convex if a line between any two points of the function lies above the function + Aglobal maximum is the single highest value of the function + Aglobal minimum is the single lowest value of the function Local Maximum 4 _Global Maximum \\ Global Minimum” Local Minimum https://commons.wikimedia.org/wikiFile:Maxima and .Minima.svg  10\n. with an appropriate learning rate, GD will find the global minimum for differentiable convex functions . with an appropriate learning rate, GD will find a local minimum for differentiable non-convex functions   1\npollev.com/iml2025",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 549,
+      "start_index": 4512,
+      "end_index": 6105,
+      "page_number": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    }
+  },
+  {
+    "content": "  \nLogistic Regression\nQuick Refresher Recall Naive Bayes N M P(x,y) = P(y)P(xly) =] PU) TT Pomly’) i=1 m=1 * a probabilistic generative model of the joint probability P(x, * optimized to maximize the likelihood of the observed data * naive due to unrealistic feature indepencence assumptions For prediction, we apply Bayes Rule to obtain the conditional distribution P(x, y) = Ply)P(xly) = P(ylx) P(x) Plylx) = yen provabily Likelihood j= UGE Ply|x) © How about we model P(y/x) directly? > Logistic Regression y) a\nto Logistic Regressio! Logistic Regression on a high level ls a binary classification model ls a probabilistic discriminative model because it optimizes P(y/x) directly Learns to optimally discriminate between features that belong to different classes No model of Likelihoods (P(x/y)) > no conditional feature independence assumption \nLogistic Regression: Derivation | + Let's assume a binary classification task, y is true (1) or false(0). + We model probabilities P(y = 1/x;0) = p(x) as a function of observations x under parameters 0. [whatabout Ply = 0|x;6)? ] + We want to use a regression approach ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 311,
+      "start_index": 6105,
+      "end_index": 7225,
+      "page_number": [
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    }
+  },
+  {
+    "content": "\nLogistic Regression: Derivation | + Let's assume a binary classification task, y is true(1) or false(0). * We model probabilities P(y = 1/x;0) = p(x) as a function of observations x under parameters @. [what about Ply = 0|x;6)? ] + We want to use a regression approach How about: p(x) as a linear function of x. P(x) = 00 +1x1 +...0FXF Problem: probabilities are NOT bounded between 0 and 1 asf ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 120,
+      "start_index": 7225,
+      "end_index": 7621,
+      "page_number": [
+        21,
+        22
+      ]
+    }
+  },
+  {
+    "content": "\nLogistic Regression: Derivation | + Let's assume a binary classification task, y is true(1) or false(0). + We model probabilities P(y = 1/x;0) = p(x) as a function of observations x under parameters 0. [whatabout Ply = 0|x;6)? ] + We want to use a regression approach + How about oidjas-a linear function of. P(X) =00 +01x1 +...0FXF We need to modify p(x) such that it is bounded between 0 and 1. \nLogistic Regression: Derivation | + Let's assume a binary classification task, y is true(1) or false(0). « We model probabilities P(y = 1/x;0) = p(x) as a function of observations x under parameters 0. [What about Ply = 0|x;6)? ] + We want to use a regression approach » How about ptjas-a linear function efx, P(X) =00 +01x1 +...0FXF We need to modify p(x) such that it is bounded between 0 and 1. We will model the \"log odds\"  P(x) logs a(x) = 00+ 01X14 +..0FXp \nOdds vs Probab! * Both odds and probability are ways to express the likelihood of an event occurring + Probability: measure the chance of an event * Odds: compare the likelihood of the event happening versus not happening. 2 P(‘red') = z Odds('red’) = 2<1 @®ee2ee2e Odds(WOT 'red') = 5>1 Odds are against ‘red’ _ P(x) Odds = AD P('red’) 2 Z 2 V ye — — a odds('red') = 7 Gre) 1233 5 § f\nOdds function Odds against something: the probability of it happening (nominator) is less than the probability of it not happening (denominator) 0 <odds<1 Odds in favour of something: the probability of it happening is bigger than the probability of it not happening odds > 1 oe ot of v \nLogit function P(x) logy p(x) = 00 + 04X14 + ...06Xe . \nFind the probability using the odds log OD = 09 + 01X14 + ...06 Xp 1 POO = Tye Logistic or sigmoid (a) function  \nRegressing the Logit function P@) 1- P(x) logit P(x) = log = 09 + 04X41 +++ OpxXp =O-X If we rearrange and solve for P(x), we get 1 -—0 <xX< +00 P = —— @) 1+e-8* 0<P(x)<1 * we pass a regression model through the logistic function to obtain a valid probability prediction ° 1/(1+exp(-x)) ooo 9 SS & & © ° \nLogistic Regression: Interpretation A closer look at the logistic function Most inputs lead to P(y/x)=0 or P(y/x)=1. That is intended because all true labels are either 0 or 1. F O-X = Oy + 01x, ++ + Opxp = 0+) Opxp faa * @+-X>0Omeans y=1 ° . . 6-X ~Omeans yisuncertain + @+:X<Omeans y =0 10 =8 3 30.6 x toa < a 0.2\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 774,
+      "start_index": 7621,
+      "end_index": 9949,
+      "page_number": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    }
+  },
+  {
+    "content": "Logistic Regression: Prediction * The logistic function returns the probability of P(y = 1) given anin put x P(y = 1|x;6) = x = 9(x; 4) 1+e-% + We define a decision boundary, e.g., predict y =1 if P(y = 1|x;@) > 0.5 and y =0 otherwise 7 \\ < f 1.0 0.8 zg i 50.6 é ‘ yaa 404 = 0.2 0.0 i an ° -5 0) 5 10 a Decision Boundary 5 ; af SR iE 7 10\nc Regression: Example SS >50K ; x ° 20 <=50K 3) | 25 13 60 >50K 4 70 9 40 >50K 5 39 9 45 <=50K  13\nLogistic Regression: Example fo ae earn moe | stil 13 40 1 2 31 9 20 0 3 | 25 13 60 il 4 70 9 40 il 5 39 9 45 0 1 P(y = 1|x;6) =——+> (y = 1:8) = ay 1 1 4 4 e-OX 1 + e—(00+01XAge+O2 X Edun um +63 XH Sk) = 0(09 + 0, X Age + 82 X Edunym + 93 X Hrsyx)  13\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 294,
+      "start_index": 9949,
+      "end_index": 10639,
+      "page_number": [
+        31,
+        32,
+        33
+      ]
+    }
+  },
+  {
+    "content": "Logistic Regression: Example 1 P(y = 1|x;6) = 1+e —(89 +01 XAg e+ 02 XEdUnym+03XHrSwk) Let’s consider 8: (—18, 0.12,0.96,0.1) What is the label for this test data? fo [se pie ar 6 20 10 25 ?  13\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 87,
+      "start_index": 10639,
+      "end_index": 10834,
+      "page_number": [
+        34
+      ]
+    }
+  },
+  {
+    "content": "Testing the model 1 1t+e —(09+01 XAge+02 XEdUnym+93XHr Sw) P(y = 1|x;6) = 0: (—18, 0.12, 0.96, 0.1) fo) rp - 00 10S 1 + e—(-18+0.12x20+0.96 X10+0.1x25) = P(y =1|x;0) = fi o(3.5) ~ 0.03 <0.5 Predict y=1 if p(y=1|x;8) > 0.5 and y=0 otherwise Prediction: y = 0. The predicted class is <=50k oh\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 157,
+      "start_index": 10834,
+      "end_index": 11125,
+      "page_number": [
+        35
+      ]
+    }
+  },
+  {
+    "content": "Training the model But how do we find the 6? + We need to define an objective function to optimise. -> Minimise the Loss function + Given N independent training instances {X, Y}, we want to choose @ to minimise the negative likelihood of observing them N £(p) = — Pwix,0) =~] | Poi) i=1 Subject to, P(y = 1|x;@) = o(@-x) P(y = 0|x;0) = 1 -—o(6-x) \nMinimising the Loss Function * Given N independent training instances {X,Y}, we want to choose 6 to minimise the negative likelihood of observing them N | POila 8) WT a -| |e “x))(1 — o(@+x,))-% i=1 £(B) = -Pr1x,6) = -| N 6 = arg min (— | |ce -x))\"(1 — o(0- x) U i=1 Take a log log(£L(8)) = DM yi log(a(0 - x;)) + (1 — yJlog(1 - o(@- By) | \nTake 1* derivative of the Loss Function * Calculate the derivatives aoe) an => o(8 x) — yxy * Now we need to set the derivative equal to Zero and sole it for 6 Unfortunately, the problem is not analytically solvable ¢ ¢ Instead, we'll use the iterative model, Gradient Descent of ef 19 gtti = ot 0;** = OF nN TEAGi — vdxy at\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 350,
+      "start_index": 11125,
+      "end_index": 12139,
+      "page_number": [
+        36,
+        37,
+        38
+      ]
+    }
+  },
+  {
+    "content": "Logistic Regression is a binary classifier ¢ Logistic regression uses the logistic function (or sigmoid function) to model the probability that a given input belongs to a particular class (y=1). 1 efx 1L+e9x 9 e944 o(y = 1|x,0) It predicts the probability that the output belongs to the positive class. * * Ifthe predicted probability is greater than 0.5, the output is 1 (positive class); otherwise, it is classified as 0 (negative class). * During training, logistic regression learns the weights for each feature (00, 91, ..., 0) EA \nLogistic Regression in a Multiclass Classification 1. One-vs-all (One-vs-rest) Classification In this approach, we train a separate binary logistic regression classifier for each class. Each classifier distinguishes one class from all other classes. One-vs-all (one-vs-rest): A x _— x . % AA a x % ofp® => X; _ h Class 1: Green oy Class 2: Blue Class 3: Red ro = pe EE\nUsing Logistic Regression in a Multiclass Classification 2. Softmax Regression (Multinomial Logistic Regression) Softmax regression is an extension of logistic regression for multiclass classification. It generalizes the binary logistic regression model to handle multiple classes simultaneously. e oy = j|x,8) = =—_ Yi, e9* \nSoftmax Example Suppose we have a classification problem with 3 classes: A, B, and C. Given an input feature vector x, we want to compute the probabilities for each class using softmax regression. For simplicity, let's assume we have the following weights for each class: * Class A: 6, = [0.1,0.5,—0.2] * Class B: 6, = [—0.1, —0.3, 0.4] * Class C: @¢ = [0,0.1, 0.2] * Our input (test) instance is x= [1,2] 1. We first calculate the Logit for each class: * Class A: 6,.x = [0.1,0.5, —0.2].[1,1,2] = 0.2 Class B: 6g.x = [—0.1, —-0.3, 0.4].[1,1,2] = 0.4 * Class C: 6¢.x = [0, 0.1, 0.2].[1,1,2] = 0.5 \nSoftmax Example (Cont.)",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 558,
+      "start_index": 12139,
+      "end_index": 13992,
+      "page_number": [
+        39,
+        40,
+        41,
+        42,
+        43
+      ]
+    }
+  },
+  {
+    "content": " 2. Then we compute the exponential scores: * Class A: 04.x = e®? ~ 1.221 * Class B: @g.x = e°* = 1.491 * Class C: 6¢.x = e9 = 1.649 3. Finaly we compute the softmax probabilities: 1.221 * PQ =Alx) = DARE) Uae * PY = Bix) = 1221+1.49141.649 ~ Oak H * P(y = Alx) = ——S*\"_ —_ x 0.378 1.221+1.491+1.649 The class with the highest probability is Class C, so the model would predict Class C for this input. ",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 155,
+      "start_index": 13992,
+      "end_index": 14394,
+      "page_number": [
+        43
+      ]
+    }
+  },
+  {
+    "content": "\nDiscriminative vs Generative Models Naive Bayes: Generative Model learns the joint distribution of features and their classes p(features, dog) p(features, cat) + * could be used to generate new class members Logistic Regression: Discriminative Model + does not learn feature — class connections * only learns the boundary between classes, but nothing about the classes themselves p(cat | features) p(dog| features)  & =\nLogistic Regression: Final Th Pros * Probabilistic interpretation * Norestrictive assumptions on features * Often outperforms Naive Bayes * Particularly suited to frequency-based features Cons * Can only learn linear feature-data relationships + Some feature scaling issues * Often needs a lot of data to work well * Regularisation a nuisance, but important since overfitting canbe a big problem Ira ees 19\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 177,
+      "start_index": 14394,
+      "end_index": 15222,
+      "page_number": [
+        43,
+        44,
+        45
+      ]
+    }
+  },
+  {
+    "content": "References Cosma Shalizi. Advanced Data Analysis from an Elementary Point of View. Chapters 11.1 and 11.2. Online Draft. https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/AD AfaEPoV.pdf Dan Jurafsky and James H. Martin. Speech and Language Processing. Chapter 5. Online Draft V3.0. https://web.stanford.edu/~jurafsky/slp3/  21\n",
+    "metadata": {
+      "source_id": "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd",
+      "source_name": "logisticregression",
+      "source_dir": "file1",
+      "token_count": 105,
+      "start_index": 15222,
+      "end_index": 15544,
+      "page_number": [
+        46
+      ]
+    }
+  }
+]

@@ -5,11 +5,21 @@
 # @license     © 2026 . All rights reserved.
 import asyncio
 import json
+import uuid
 from typing import Any
 from chonkie import NeuralChunker
-
+from dataclasses import dataclass
 from src.backend.services.context_provider.pdf_extract import extract_pdf_elements
 
+
+@dataclass
+class RawContextPayload:
+    payload: list[dict]
+    name: str
+    id:str
+    dir:str
+    
+    
 
 def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
     """
@@ -98,11 +108,10 @@ def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
 
     return result
 
-def __process_pdf(payload: list[dict])->list[dict]:
-    raw_file = payload
-
+def __process_pdf(payload: RawContextPayload
+                  )->list[dict]:
     #1. clean data
-    cleaned_data = __process_raw_to_internal_format(raw_file)
+    cleaned_data = __process_raw_to_internal_format(payload.payload)
     
     #2. merge data into continuous text
     merged_data = ["".join(item["content"]) for item in cleaned_data]
@@ -157,6 +166,9 @@ def __process_pdf(payload: list[dict])->list[dict]:
         {
             "content": c.text,
             "metadata": {
+                "source_id": payload.id,
+                "source_name": payload.name,
+                "source_dir": payload.dir,
                 "token_count": c.token_count,
                 "start_index": c.start_index,
                 "end_index": c.end_index,
@@ -165,19 +177,16 @@ def __process_pdf(payload: list[dict])->list[dict]:
         }
         for c in chunked
     ]
-    
-    # with open("chonkie_content.json", "w", encoding="utf-8") as f:
-    #     json.dump(return_result, f, indent=2)
 
     return return_result 
 
-def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
+def chonkie_chunk(payload: RawContextPayload) -> list[dict]:
     """
         the input is raw_extracted_text
-    :param raw_extracted_text: 
+    :param payload: 
     :return: chunked text
     """
-    return __process_pdf(raw_extracted_text)
+    return __process_pdf(payload)
 
 
 # debug from extracted elements to chonkie chunked
@@ -198,14 +207,21 @@ def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
 # Debug, extract raw data from pdf to chonkie chunked content
 async def main():
     # load pdf extracted raw data
-    extracted = extract_pdf_elements("08-logisticregression.pdf")
+    extracted = extract_pdf_elements("exam21-final.pdf")
     #save to json for debug
-    with open("08-logisticregression.json", "w", encoding="utf-8") as f:
+    with open("exam21-final.json", "w", encoding="utf-8") as f:
         json.dump([el.to_dict() for el in extracted], f, indent=2)
 
-    output = chonkie_chunk([el.to_dict() for el in extracted])
+    output = chonkie_chunk(
+        payload = RawContextPayload(
+            payload=[el.to_dict() for el in extracted],
+            id= str(uuid.uuid4()),
+            dir= "file2",
+            name= "exam21-final"
+        )
+    )
 
-    with open("08-logisticregression.json_chonkie_chunk.json", "w", encoding="utf-8") as r:
+    with open("exam21-final.json_chonkie_chunk.json", "w", encoding="utf-8") as r:
         json.dump(output, r, indent=2, ensure_ascii=False)
 
 if __name__ == "__main__":

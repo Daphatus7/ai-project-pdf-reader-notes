@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
-from langchain_core.vectorstores import VectorStore, InMemoryVectorStore
+from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
@@ -115,7 +115,9 @@ def make_argument_retriever_tool(agent_ref):
         print("activated")
         if agent_ref.storage is None:
             return "No vector store is initialized.", []
-        docs = agent_ref.storage.similarity_search(query=query, k=4)
+        docs = agent_ref.storage.similarity_search(query=query, k=4, filter = {
+            "filter":{"source":"filename"}
+        })
         for doc in docs:
             logging.info("Retrieved doc metadata: %s", doc.metadata)
         info_sources = [doc.metadata.get("source") for doc in docs]
@@ -137,25 +139,26 @@ class LlmAgent:
         )
         # todo add document to the vector store for testing
         
-        raw_docs = None
+        raw_docs = []
         with open("services/context_provider/chonkie_content.json", "r", encoding="utf-8") as r:
-            raw_docs = json.load(r)
-        
+            raw_docs.append(json.load(r))   
+        with open("services/context_provider/08-logisticregression.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
+            raw_docs.append(json.load(r))
         # Convert dict format to LangChain Document objects
         # chonkie_content.json format: [{"content": "...", "metadata": {...}}]
         # Document format: Document(page_content="...", metadata={...})
-        documents = [
-            Document(
-                page_content=doc.get("content", ""),
-                metadata=doc.get("metadata", {})
-            )
-            for doc in raw_docs
-        ]
         
-        self.store_ids = self.storage.add_documents(
-            documents=documents
-        )
-        print(self.store_ids)
+        for raw_doc in raw_docs:
+            self.store_ids = self.storage.add_documents(
+                documents=[
+                    Document(
+                        page_content=doc.get("content", ""),
+                        metadata=doc.get("metadata", {})
+                    )
+                    for doc in raw_doc
+                ]
+            )
+        
         self.retrieve_context = make_argument_retriever_tool(self)
         self.tools = [
             self.retrieve_context
