@@ -40,6 +40,9 @@ class ChatRequest(BaseModel):
     system_message: Optional[str] = Field(
         default="You are a helpful assistant."
     )
+    # RAG filter fields
+    user_id: Optional[str] = Field(default=None, description="User ID for filtering documents")
+    source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
 
 class ChatResponse(BaseModel):

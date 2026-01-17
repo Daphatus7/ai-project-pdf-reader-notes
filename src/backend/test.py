@@ -33,6 +33,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from src.backend.schemas import ChatRequest, TextContent
 from src.backend.servers import services
 
+# Test filter values - match your document metadata
+TEST_USER_ID = "test-user-001"
+TEST_SOURCE_IDS = ["32963126-bef3-483c-aa40-f9248e88589d"]  # exam21-final.json source_id
+
 
 async def stream_chat(user_message: str):
     """
@@ -84,23 +88,25 @@ async def stream_chat(user_message: str):
         traceback.print_exc()
         return None
 
-async def test_chat(user_message: str):
+async def test_chat(user_message: str, use_filter: bool = True):
     """
    Send a chat message and stream the response.
 
    Args:
        user_message: The user's message
-       system_message: Optional system message to set context
+       use_filter: Whether to apply RAG filter (default True)
    """
     try:
         # Get LLM service
         llm_service = services.get('llm_service')
 
-        # Create chat request
+        # Create chat request with optional RAG filter
         chat_request = ChatRequest(
-            thread_id="1", # fix user thread for testing
+            thread_id="1",  # fix user thread for testing
             contents=[TextContent(type="text", text=user_message)],
-            system_message="You are a helpful assistant."
+            system_message="You are a helpful assistant.",
+            user_id=TEST_USER_ID if use_filter else None,
+            source_ids=TEST_SOURCE_IDS if use_filter else None,
         )
 
         # Print divider
@@ -118,11 +124,17 @@ async def test_chat(user_message: str):
 
 async def main():
     """Main interactive loop."""
+    use_filter = True  # RAG filter toggle
+
     print("LLM Streaming Chat Test")
     print("\nCommands:")
     print("  - Type your message to chat")
     print("  - 'quit', 'exit', or 'q' to exit")
     print("  - 'clear' to clear screen")
+    print("  - 'filter' to toggle RAG filter on/off")
+    print(f"\nRAG Filter: {'ON' if use_filter else 'OFF'}")
+    print(f"  user_id: {TEST_USER_ID}")
+    print(f"  source_ids: {TEST_SOURCE_IDS}")
 
     while True:
         try:
@@ -142,8 +154,13 @@ async def main():
                 os.system('clear' if os.name == 'posix' else 'cls')
                 continue
 
+            if user_input.lower() == 'filter':
+                use_filter = not use_filter
+                print(f"RAG Filter: {'ON' if use_filter else 'OFF'}")
+                continue
+
             # Process chat message
-            await test_chat(user_input)
+            await test_chat(user_input, use_filter=use_filter)
         except KeyboardInterrupt:
             print("\n\nInterrupted. Goodbye!")
             break

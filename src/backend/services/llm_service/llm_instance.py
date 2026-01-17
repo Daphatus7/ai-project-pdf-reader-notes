@@ -113,24 +113,46 @@ def make_argument_retriever_tool(agent_ref):
     @tool("argument_retriever")
     def retrieve_context(query: str):
         """search stored documents for relevant context"""
-        print("activated")
+        print("RAG retriever activated")
         if agent_ref.storage is None:
             return "No vector store is initialized.", []
-        docs = agent_ref.storage.similarity_search(query=query, k=4,   
-                                                   # filter={"source_id": "32963126-bef3-483c-aa40-f9248e88589d"}
-        filter=lambda d: d.metadata.get("source_id") == "32963126-bef3-483c-aa40-f9248e88589d",
 
+        # Build dynamic filter based on current context
+        def dynamic_filter(doc):
+            metadata = doc.metadata
+            # Filter by user_id if set
+            if agent_ref.current_user_id:
+                if metadata.get("user_id") != agent_ref.current_user_id:
+                    return False
+            # Filter by source_ids if set
+            if agent_ref.current_source_ids:
+                if metadata.get("source_id") not in agent_ref.current_source_ids:
+                    return False
+            return True
+
+        print(f"Filter context - user_id: {agent_ref.current_user_id}, source_ids: {agent_ref.current_source_ids}")
+
+        docs = agent_ref.storage.similarity_search(
+            query=query,
+            k=4,
+            filter=dynamic_filter
         )
+
         for doc in docs:
             logging.info("Retrieved doc metadata: %s", doc.metadata)
         info_sources = [doc.metadata.get("source") for doc in docs]
+        print(f"Retrieved {len(docs)} documents")
         return docs, info_sources
 
     return retrieve_context
 
 class LlmAgent:
-    
+
     def __init__(self):
+        # RAG filter context (set per request)
+        self.current_user_id: str | None = None
+        self.current_source_ids: list[str] | None = None
+
         # first make sure there is a valid session for the agent
         self.model = ChatOpenAI(
             model="gpt-5-nano",
@@ -240,12 +262,16 @@ class LlmAgent:
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
         print("----------------")
+
+        # Set RAG filter context for this request
+        self.current_user_id = chat_request.user_id
+        self.current_source_ids = chat_request.source_ids
+        print(f"RAG Filter - user_id: {self.current_user_id}, source_ids: {self.current_source_ids}")
+
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
         system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
 
-        accumulated_text = ""
-        last_structured_update = None
         response = self.agent.invoke(
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
             config
