@@ -243,12 +243,47 @@ class LlmAgent:
         config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
         system_msg = SystemMessage(content=chat_request.system_message)
         human_msg = _build_human_message(chat_request.contents)
-    
+
         accumulated_text = ""
         last_structured_update = None
         response = self.agent.invoke(
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
             config
         )
+
+        # Save messages to JSON (append to existing)
+        messages_data = []
+        for msg in response["messages"]:
+            msg_dict = {
+                "type": msg.__class__.__name__,
+                "content": msg.content,
+                "id": msg.id,
+                "additional_kwargs": msg.additional_kwargs,
+                "response_metadata": msg.response_metadata,
+            }
+            # Add usage metadata for AIMessage
+            if hasattr(msg, "usage_metadata") and msg.usage_metadata:
+                msg_dict["usage_metadata"] = msg.usage_metadata
+            if hasattr(msg, "tool_calls"):
+                msg_dict["tool_calls"] = msg.tool_calls
+            messages_data.append(msg_dict)
+
+        output_path = "services/llm_service/chat_messages.json"
+
+        # Load existing messages if file exists
+        existing_data = {"messages": []}
+        try:
+            with open(output_path, "r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass  # File doesn't exist or is invalid, start fresh
+
+        # Append new messages
+        existing_data["messages"].extend(messages_data)
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=2, default=str)
+        print(f"Appended {len(messages_data)} messages (total: {len(existing_data['messages'])}) to {output_path}")
+
         ai_msg = response["messages"][-1]
         print(ai_msg.content)
