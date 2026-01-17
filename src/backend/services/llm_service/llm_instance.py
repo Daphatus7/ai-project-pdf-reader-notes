@@ -250,4 +250,5 @@ class LlmAgent:
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
             config
         )
-        print(response)
+        ai_msg = response["messages"][-1]
+        print(ai_msg.content)
