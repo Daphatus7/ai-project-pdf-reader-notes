@@ -27,7 +27,6 @@ class Services:
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
         llm_service = LlmService()
-        llm_service.start()
         self.register('llm_service', llm_service)
         
         database = Database()

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from langchain.messages import SystemMessage, HumanMessage, AIMessage
 import dotenv
 import logging
-from typing import TypeVar, AsyncGenerator
+from typing import TypeVar, AsyncGenerator, Any
 from pydantic import BaseModel
 from src.backend.schemas import ChatRequest
 from src.backend.services.llm_service.llm_instance import LlmAgent
@@ -32,9 +32,6 @@ class LlmService:
     Structured output ensures the LLM returns responses conforming to a specified Pydantic schema.
     """
 
-    def start(self):
-        self.model = LlmAgent()
-
     def shut_down(self):
         pass
     def restart(self):
@@ -43,41 +40,17 @@ class LlmService:
     def __init__(self):
         super().__init__()
         dotenv.load_dotenv()
-        self.model = None
-    
-    def chat_v2(self, 
-                valid_payload: ChatRequest,
-                ):
-        """
-            当前假设 valid_payload 已经过验证且符合 ChatRequest 结构
-            目前并没有使用，在用astream 的方式
-        :param valid_payload: 
-        :return: 
-        """
-        try: 
-        #build system message
-            system_message = SystemMessage("You are a helpful assistant.")
-        
-            # parse user messages
-            # human_message = _build_human_message(contents=valid_payload.contents)
-            # 
-            # messages = [system_message, human_message]
-            # response = self.model.invoke(messages)
-            # return response
-            return None
-        except Exception as e:
-            logger.error(f'Error in chat endpoint: {e}', exc_info=True)
-            raise HTTPException(status_code=500, detail=f'Error processing chat request: {str(e)}')
+        self.model = LlmAgent()
 
     def get_usage(self):
-        return self.model.get_usage()
-    
+        ... #todo 
     
     async def achat(self, request: ChatRequest) -> AsyncGenerator[str, None]:
-        async for chunk in self.model.chat(request):
+        async for chunk in self.model.achat(request):
             yield chunk
-
-
+            
+    def chat(self, request: ChatRequest)-> Any:
+        return self.model.chat(request)
 # debug code
 # import asyncio
 # 

@@ -57,22 +57,24 @@ async def stream_chat(user_message: str):
         print("ChatGPT:", end=" ", flush=True)
 
         # Stream response
-        full_response = ""
-        async for chunk in llm_service.achat(chat_request):
-            # Parse SSE format: "data: {json}\n\n"
-            if isinstance(chunk, str):
-                # Remove SSE prefix and parse JSON
-                if chunk.startswith("data: "):
-                    json_str = chunk[6:].strip()
-                    try:
-                        data = json.loads(json_str)
-                        # Only process text chunks for streaming display
-                        if data.get("type") == "text":
-                            content = data.get("content", "")
-                            full_response += content
-                            print(content, end="", flush=True)
-                    except json.JSONDecodeError:
-                        pass  # Skip malformed chunks
+        # full_response = ""
+        # async for chunk in llm_service.chat(chat_request):
+        #     # Parse SSE format: "data: {json}\n\n"
+        #     if isinstance(chunk, str):
+        #         # Remove SSE prefix and parse JSON
+        #         if chunk.startswith("data: "):
+        #             json_str = chunk[6:].strip()
+        #             try:
+        #                 data = json.loads(json_str)
+        #                 # Only process text chunks for streaming display
+        #                 if data.get("type") == "text":
+        #                     content = data.get("content", "")
+        #                     full_response += content
+        #                     print(content, end="", flush=True)
+        #             except json.JSONDecodeError:
+        #                 pass  # Skip malformed chunks
+
+        full_response = llm_service.chat(chat_request)
 
         return full_response
 
@@ -82,6 +84,37 @@ async def stream_chat(user_message: str):
         traceback.print_exc()
         return None
 
+def test_chat(user_message: str):
+    """
+   Send a chat message and stream the response.
+
+   Args:
+       user_message: The user's message
+       system_message: Optional system message to set context
+   """
+    try:
+        # Get LLM service
+        llm_service = services.get('llm_service')
+    
+        # Create chat request
+        chat_request = ChatRequest(
+            thread_id="1", # fix user thread for testing
+            contents=[TextContent(type="text", text=user_message)],
+            system_message="You are a helpful assistant."
+        )
+    
+        # Print divider
+        print("ChatGPT:", end=" ", flush=True)
+    
+        full_response = llm_service.chat(chat_request)
+    
+        return full_response
+    
+    except Exception as e:
+        print(f"\n\nError during chat: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        return None
 
 async def main():
     """Main interactive loop."""
@@ -113,7 +146,7 @@ async def main():
                 continue
 
             # Process chat message
-            await stream_chat(user_input)
+            test_chat(user_input)
         except KeyboardInterrupt:
             print("\n\nInterrupted. Goodbye!")
             break

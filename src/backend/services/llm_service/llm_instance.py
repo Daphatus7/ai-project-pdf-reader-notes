@@ -1,5 +1,6 @@
 import json
 import logging
+from http.client import responses
 from typing import Any
 
 from langchain.agents import create_agent, AgentState
@@ -115,9 +116,11 @@ def make_argument_retriever_tool(agent_ref):
         print("activated")
         if agent_ref.storage is None:
             return "No vector store is initialized.", []
-        docs = agent_ref.storage.similarity_search(query=query, k=4, filter = {
-            "filter":{"source":"filename"}
-        })
+        docs = agent_ref.storage.similarity_search(query=query, k=4,   
+                                                   # filter={"source_id": "32963126-bef3-483c-aa40-f9248e88589d"}
+        filter=lambda d: d.metadata.get("source_id") == "32963126-bef3-483c-aa40-f9248e88589d",
+
+        )
         for doc in docs:
             logging.info("Retrieved doc metadata: %s", doc.metadata)
         info_sources = [doc.metadata.get("source") for doc in docs]
@@ -140,24 +143,48 @@ class LlmAgent:
         # todo add document to the vector store for testing
         
         raw_docs = []
-        with open("services/context_provider/chonkie_content.json", "r", encoding="utf-8") as r:
+        with open("services/context_provider/pdf_extractor/exam21-final.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
             raw_docs.append(json.load(r))   
-        with open("services/context_provider/08-logisticregression.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
+        with open("services/context_provider/pdf_extractor/08-logisticregression.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
             raw_docs.append(json.load(r))
         # Convert dict format to LangChain Document objects
         # chonkie_content.json format: [{"content": "...", "metadata": {...}}]
         # Document format: Document(page_content="...", metadata={...})
         
+        embedding_results = []
+        
         for raw_doc in raw_docs:
-            self.store_ids = self.storage.add_documents(
-                documents=[
-                    Document(
-                        page_content=doc.get("content", ""),
-                        metadata=doc.get("metadata", {})
-                    )
-                    for doc in raw_doc
-                ]
-            )
+            documents = [
+                Document(
+                    page_content=doc.get("content", ""),
+                    metadata=doc.get("metadata", {})
+                )
+                for doc in raw_doc
+            ]
+            
+            self.store_ids = self.storage.add_documents(documents=documents)
+            
+            # Get embeddings for the documents
+            embedding_model = OpenAIEmbeddings(model="text-embedding-3-large")
+            texts = [doc.page_content for doc in documents]
+            embeddings = embedding_model.embed_documents(texts)
+            
+            # Store embedding results with metadata
+            for idx, (doc, embedding, doc_id) in enumerate(zip(documents, embeddings, self.store_ids)):
+                embedding_results.append({
+                    "doc_id": doc_id,
+                    "content": doc.page_content,
+                    "metadata": doc.metadata,
+                    # "embedding": embedding,
+                    # "embedding_dimension": len(embedding)
+                })
+        
+        # Save embedding results to JSON file
+        output_path = "services/context_provider/embedding_results.json"
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(embedding_results, f, ensure_ascii=False, indent=2)
+        
+        logging.info(f"Saved {len(embedding_results)} embedding results to {output_path}")
         
         self.retrieve_context = make_argument_retriever_tool(self)
         self.tools = [
@@ -171,7 +198,7 @@ class LlmAgent:
         )
         self.counter = 0
 
-    async def chat(self, chat_request: ChatRequest):
+    async def achat(self, chat_request: ChatRequest):
         self.counter += 1
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
@@ -182,7 +209,7 @@ class LlmAgent:
             
         accumulated_text = ""
         last_structured_update = None
-    
+            
         async for chunk in self.agent.astream(
                 {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
                 config,
@@ -196,17 +223,33 @@ class LlmAgent:
                     if hasattr(last_msg_chunk, "content") and last_msg_chunk.content:
                         text_delta = last_msg_chunk.content
                         accumulated_text += text_delta
-    
+
                         # Yield text SSE chunk
                         yield f'data: {json.dumps({"type": "text", "content": text_delta})}\n\n'
-    
+
                         # Periodic structured update (adapt your _should_send_structured_update)
                         if _should_send_structured_update(len(accumulated_text), accumulated_text):
                             partial_output = {"content": accumulated_text, "content_type": "answer"}
                             if partial_output != last_structured_update:
                                 last_structured_update = partial_output
                                 yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
-    
+
         # Final structured + done
         yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
         yield f'data: {json.dumps({"type": "done"})}\n\n'
+    async def chat(self, chat_request: ChatRequest):
+        self.counter += 1
+        print(f"Agent called {self.counter} times")
+        print(f"agent has the context {self.agent.get_context_jsonschema()}")
+        print("----------------")
+        config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
+        system_msg = SystemMessage(content=chat_request.system_message)
+        human_msg = _build_human_message(chat_request.contents)
+    
+        accumulated_text = ""
+        last_structured_update = None
+        response = self.agent.invoke(
+            {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
+            config,
+        )
+        print(response)
