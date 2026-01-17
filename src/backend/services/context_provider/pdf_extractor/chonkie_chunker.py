@@ -3,9 +3,12 @@
 # @author      [Peiyu Wang]
 # @date        14/1/2026
 # @license     © 2026 . All rights reserved.
+import asyncio
 import json
 from typing import Any
 from chonkie import NeuralChunker
+
+from src.backend.services.context_provider.pdf_extract import extract_pdf_elements
 
 
 def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
@@ -177,7 +180,7 @@ def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
     return __process_pdf(raw_extracted_text)
 
 
-
+# debug from extracted elements to chonkie chunked
 # async def main():
 #     # load pdf extracted raw data
 #     data = None
@@ -191,3 +194,19 @@ def chonkie_chunk(raw_extracted_text: list[dict]) -> list[dict]:
 # 
 # if __name__ == "__main__":
 #     asyncio.run(main())
+
+# Debug, extract raw data from pdf to chonkie chunked content
+async def main():
+    # load pdf extracted raw data
+    extracted = extract_pdf_elements("08-logisticregression.pdf")
+    #save to json for debug
+    with open("08-logisticregression.json", "w", encoding="utf-8") as f:
+        json.dump([el.to_dict() for el in extracted], f, indent=2)
+
+    output = chonkie_chunk([el.to_dict() for el in extracted])
+
+    with open("08-logisticregression.json_chonkie_chunk.json", "w", encoding="utf-8") as r:
+        json.dump(output, r, indent=2, ensure_ascii=False)
+
+if __name__ == "__main__":
+    asyncio.run(main())
