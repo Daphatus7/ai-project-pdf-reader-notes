@@ -175,8 +175,6 @@ class LlmAgent:
                     "doc_id": doc_id,
                     "content": doc.page_content,
                     "metadata": doc.metadata,
-                    # "embedding": embedding,
-                    # "embedding_dimension": len(embedding)
                 })
         
         # Save embedding results to JSON file
@@ -250,6 +248,6 @@ class LlmAgent:
         last_structured_update = None
         response = self.agent.invoke(
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
-            config,
+            config
         )
         print(response)
