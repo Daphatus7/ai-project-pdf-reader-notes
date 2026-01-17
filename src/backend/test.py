@@ -84,7 +84,7 @@ async def stream_chat(user_message: str):
         traceback.print_exc()
         return None
 
-def test_chat(user_message: str):
+async def test_chat(user_message: str):
     """
    Send a chat message and stream the response.
 
@@ -95,21 +95,21 @@ def test_chat(user_message: str):
     try:
         # Get LLM service
         llm_service = services.get('llm_service')
-    
+
         # Create chat request
         chat_request = ChatRequest(
             thread_id="1", # fix user thread for testing
             contents=[TextContent(type="text", text=user_message)],
             system_message="You are a helpful assistant."
         )
-    
+
         # Print divider
         print("ChatGPT:", end=" ", flush=True)
-    
-        full_response = llm_service.chat(chat_request)
-    
+
+        full_response = await llm_service.chat(chat_request)
+
         return full_response
-    
+
     except Exception as e:
         print(f"\n\nError during chat: {e}", file=sys.stderr)
         import traceback
@@ -123,9 +123,6 @@ async def main():
     print("  - Type your message to chat")
     print("  - 'quit', 'exit', or 'q' to exit")
     print("  - 'clear' to clear screen")
-
-    # Optional: Set a custom system message
-    system_message = "You are a helpful assistant. Respond concisely and clearly."
 
     while True:
         try:
@@ -146,7 +143,7 @@ async def main():
                 continue
 
             # Process chat message
-            test_chat(user_input)
+            await test_chat(user_input)
         except KeyboardInterrupt:
             print("\n\nInterrupted. Goodbye!")
             break
