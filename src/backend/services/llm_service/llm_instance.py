@@ -287,3 +287,16 @@ class LlmAgent:
 
         ai_msg = response["messages"][-1]
         print(ai_msg.content)
+
+        # Print token usage from LangChain
+        if hasattr(ai_msg, "usage_metadata") and ai_msg.usage_metadata:
+            usage = ai_msg.usage_metadata
+            print("\n--- Token Usage ---")
+            print(f"Input tokens:  {usage.get('input_tokens', 'N/A')}")
+            print(f"Output tokens: {usage.get('output_tokens', 'N/A')}")
+            print(f"Total tokens:  {usage.get('total_tokens', 'N/A')}")
+            if usage.get('input_token_details'):
+                print(f"Input details: {usage['input_token_details']}")
+            if usage.get('output_token_details'):
+                print(f"Output details: {usage['output_token_details']}")
+            print("-------------------")
