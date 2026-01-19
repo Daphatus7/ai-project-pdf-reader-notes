@@ -88,15 +88,45 @@ def log_state(state: AgentState, runtime: Runtime) -> None:
 
 @before_model
 def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-    """Keep only the last few messages to fit context window."""
-    messages = state["messages"]
+    """Keep only the last few messages to fit context window.
 
-    if len(messages) <= 3:
+    IMPORTANT: Preserves tool_calls and tool response pairs to avoid OpenAI API errors.
+    """
+    messages = state["messages"]
+    max_messages = 3  # Keep last N messages (adjustable)
+
+    if len(messages) <= max_messages:
         return None  # No changes needed
 
-    first_msg = messages[0]
-    recent_messages = messages[-3:] if len(messages) % 2 == 0 else messages[-4:]
-    new_messages = [first_msg] + recent_messages
+    first_msg = messages[0]  # Keep system message
+
+    # Find a safe cut point that doesn't break tool call pairs
+    # Start from where we want to cut and move forward until we find a safe point
+    cut_index = len(messages) - max_messages
+
+    # Move cut_index forward if it would split a tool call sequence
+    while cut_index < len(messages) - 1:
+        msg = messages[cut_index]
+        # Check if this message is a tool response (ToolMessage)
+        # If so, we need to include the preceding AIMessage with tool_calls
+        if msg.__class__.__name__ == "ToolMessage":
+            cut_index -= 1
+            continue
+        # Check if previous message has tool_calls that we'd be cutting off
+        if cut_index > 0:
+            prev_msg = messages[cut_index - 1]
+            if hasattr(prev_msg, "tool_calls") and prev_msg.tool_calls:
+                # Previous message has tool_calls, check if current is its response
+                cut_index += 1
+                continue
+        break
+
+    # Ensure we don't cut too much
+    if cut_index >= len(messages) - 2:
+        return None  # Not safe to trim
+
+    recent_messages = messages[cut_index:]
+    new_messages = [first_msg] + list(recent_messages)
 
     return {
         "messages": [
