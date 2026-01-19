@@ -20,12 +20,8 @@ Commands:
 """
 
 import asyncio
-import json
 import sys
-from http.client import responses
 from pathlib import Path
-
-from humanfriendly.terminal import output
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -35,7 +31,7 @@ from src.backend.servers import services
 
 # Test filter values - match your document metadata
 TEST_USER_ID = "test-user-001"
-TEST_SOURCE_IDS = ["32963126-bef3-483c-aa40-f9248e88589d"]  # exam21-final.json source_id
+TEST_SOURCE_IDS = ["32963126-bef3-483c-aa40-f9248e88589d", "28665fec-a0d0-4b04-a9e5-a66a06cb2dbd"]  # exam21-final.json source_id
 
 
 async def stream_chat(user_message: str):
