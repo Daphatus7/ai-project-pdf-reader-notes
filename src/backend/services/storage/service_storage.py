@@ -5,7 +5,7 @@
 
 import logging
 import redis
-from langgraph.checkpoint.redis import RedisSaver
+from langgraph.checkpoint.redis import ShallowRedisSaver
 
 from src.backend.services.service import Service
 from src.backend.config.config import settings
@@ -17,14 +17,14 @@ class StorageService(Service):
 
     Provides:
     - Shared Redis connection pool
-    - LangGraph RedisSaver checkpointer
+    - LangGraph ShallowRedisSaver checkpointer (only keeps latest checkpoint per thread)
     - Future: Supabase vector store
     """
 
     def __init__(self):
         self._logger = logging.getLogger(__name__)
         self._redis_conn: redis.Redis | None = None
-        self._checkpointer: RedisSaver | None = None
+        self._checkpointer: ShallowRedisSaver | None = None
 
     def start(self):
         """Initialize Redis connection and checkpointer."""
@@ -43,10 +43,13 @@ class StorageService(Service):
         self._redis_conn.ping()
         self._logger.info("Redis connection established")
 
-        # Create checkpointer with shared connection
-        self._checkpointer = RedisSaver(redis_client=self._redis_conn)
-        self._checkpointer.setup()  # Create Redis indexes
-        self._logger.info("RedisSaver checkpointer initialized")
+        # Use ShallowRedisSaver: only keeps the latest checkpoint per thread
+
+        self._checkpointer = ShallowRedisSaver(
+            redis_client=self._redis_conn,
+        )
+        self._checkpointer.setup()
+        self._logger.info("ShallowRedisSaver checkpointer initialized with TTL=60min")
 
     def get(self):
         """Get the storage service instance."""
@@ -60,7 +63,7 @@ class StorageService(Service):
         return self._redis_conn
 
     @property
-    def checkpointer(self) -> RedisSaver:
+    def checkpointer(self) -> ShallowRedisSaver:
         """Get LangGraph checkpointer."""
         if self._checkpointer is None:
             raise RuntimeError("StorageService not started. Call start() first.")

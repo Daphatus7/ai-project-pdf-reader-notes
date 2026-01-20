@@ -312,7 +312,7 @@ class LlmAgent:
         existing_data["messages"].extend(messages_data)
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(existing_data, f, ensure_ascii=False, indent=2, defult=str)
+            json.dump(existing_data, f, ensure_ascii=False, indent=2)
         print(f"Appended {len(messages_data)} messages (total: {len(existing_data['messages'])}) to {output_path}")
         #   ^
         #   |
