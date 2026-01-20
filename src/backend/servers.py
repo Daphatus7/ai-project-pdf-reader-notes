@@ -4,6 +4,7 @@ Dependency injection container for the LLM backend service
 import logging
 from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
+from src.backend.services.storage import StorageService
 from src.backend.config.supabase import Database
 class Services:
     """Dependency injection container"""
@@ -26,12 +27,22 @@ class Services:
     
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
-        llm_service = LlmService()
-        self.register('llm_service', llm_service)
-        
+        # Initialize storage service first (other services depend on it)
+        storage_service = StorageService()
+        storage_service.start()
+        self.register('storage', storage_service)
+
+        # Initialize Supabase database
         database = Database()
         database.start()
         self.register('database', database)
+
+        # Initialize LLM service (uses storage service for checkpointer and Supabase for RAG)
+        llm_service = LlmService(
+            checkpointer=storage_service.checkpointer,
+            supabase=database.get()
+        )
+        self.register('llm_service', llm_service)
         
     def get(self, service_name: str) -> Any:
         """Get a service by name"""

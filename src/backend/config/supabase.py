@@ -6,6 +6,8 @@
 
 
 import os
+
+import dotenv
 from supabase import create_client, Client
 
 from src.backend.services.service import Service
@@ -32,4 +34,5 @@ class Database(Service):
         self.__database: Client = create_client(url, key)
 
     def __init__(self):
+        dotenv.load_dotenv() #todo fix this in production
         self.__database = None

@@ -1,6 +1,5 @@
 import json
 import logging
-from http.client import responses
 from typing import Any
 
 from langchain.agents import create_agent, AgentState
@@ -9,13 +8,13 @@ from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
-from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
+from supabase import Client
 
 from src.backend.schemas import ChatRequest
-from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.base import BaseCheckpointSaver
 from langchain.messages import RemoveMessage
 
 
@@ -144,111 +143,81 @@ def make_argument_retriever_tool(agent_ref):
     def retrieve_context(query: str):
         """search stored documents for relevant context"""
         print("RAG retriever activated")
-        if agent_ref.storage is None:
-            return "No vector store is initialized.", []
-
-        # Build dynamic filter based on current context
-        def dynamic_filter(doc):
-            metadata = doc.metadata
-            # Filter by user_id if set
-            if agent_ref.current_user_id:
-                if metadata.get("user_id") != agent_ref.current_user_id:
-                    return False
-            # Filter by source_ids if set
-            if agent_ref.current_source_ids:
-                if metadata.get("source_id") not in agent_ref.current_source_ids:
-                    return False
-            return True
+        if agent_ref.supabase is None:
+            return "No database connection.", []
 
         print(f"Filter context - user_id: {agent_ref.current_user_id}, source_ids: {agent_ref.current_source_ids}")
 
-        docs = agent_ref.storage.similarity_search(
-            query=query,
-            k=4,
-            filter=dynamic_filter
-        )
+        # Generate query embedding
+        query_embedding = agent_ref.embedding_model.embed_query(query)
 
-        for doc in docs:
-            logging.info("Retrieved doc metadata: %s", doc.metadata)
-        info_sources = [doc.metadata.get("source") for doc in docs]
-        print(f"Retrieved {len(docs)} documents")
+        # Call Supabase match_documents RPC
+        response = agent_ref.supabase.rpc(
+            "match_documents",
+            {
+                "query_embedding": query_embedding,
+                "match_count": 4,
+                "filter_user_id": agent_ref.current_user_id,
+                "filter_source_ids": agent_ref.current_source_ids,
+                "similarity_threshold": 0.0
+            }
+        ).execute()
+
+        # Convert to LangChain Document format
+        docs = []
+        for row in response.data:
+            extra_metadata = row["metadata"] if row["metadata"] is not None else {}
+            doc = Document(
+                page_content=row["content"],
+                metadata={
+                    "source_id": row["source_id"],
+                    "source_name": row["source_name"],
+                    "token_count": row["token_count"],
+                    "page_numbers": row["page_numbers"],
+                    "similarity": row["similarity"],
+                    **extra_metadata
+                }
+            )
+            docs.append(doc)
+            logging.info("Retrieved doc: %s (similarity: %.4f)", row["source_name"], row["similarity"])
+
+        info_sources = [doc.metadata.get("source_name") for doc in docs]
+        print(f"Retrieved {len(docs)} documents from Supabase")
         return docs, info_sources
 
     return retrieve_context
 
 class LlmAgent:
 
-    def __init__(self):
+    def __init__(self, checkpointer: BaseCheckpointSaver, supabase: Client = None):
         # RAG filter context (set per request)
         self.current_user_id: str | None = None
         self.current_source_ids: list[str] | None = None
+        self._checkpointer = checkpointer
+        self.supabase = supabase
 
-        # first make sure there is a valid session for the agent
+        # LLM model
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
         )
-        
-        self.storage = InMemoryVectorStore(
-            embedding=OpenAIEmbeddings(model="text-embedding-3-large")
-        )
-        # todo add document to the vector store for testing
-        
-        raw_docs = []
-        with open("services/context_provider/pdf_extractor/exam21-final.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
-            raw_docs.append(json.load(r))   
-        with open("services/context_provider/pdf_extractor/08-logisticregression.json_chonkie_chunk.json", "r", encoding="utf-8") as r:
-            raw_docs.append(json.load(r))
-        # Convert dict format to LangChain Document objects
-        # chonkie_content.json format: [{"content": "...", "metadata": {...}}]
-        # Document format: Document(page_content="...", metadata={...})
-        
-        embedding_results = []
-        
-        for raw_doc in raw_docs:
-            documents = [
-                Document(
-                    page_content=doc.get("content", ""),
-                    metadata=doc.get("metadata", {})
-                )
-                for doc in raw_doc
-            ]
-            
-            self.store_ids = self.storage.add_documents(documents=documents)
-            
-            # Get embeddings for the documents
-            embedding_model = OpenAIEmbeddings(model="text-embedding-3-large")
-            texts = [doc.page_content for doc in documents]
-            embeddings = embedding_model.embed_documents(texts)
-            
-            # Store embedding results with metadata
-            for idx, (doc, embedding, doc_id) in enumerate(zip(documents, embeddings, self.store_ids)):
-                embedding_results.append({
-                    "doc_id": doc_id,
-                    "content": doc.page_content,
-                    "metadata": doc.metadata,
-                })
-        
-        # Save embedding results to JSON file
-        output_path = "services/context_provider/embedding_results.json"
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(embedding_results, f, ensure_ascii=False, indent=2)
-        
-        logging.info(f"Saved {len(embedding_results)} embedding results to {output_path}")
-        
+
+        # Embedding model for query vectors
+        self.embedding_model = OpenAIEmbeddings(model="text-embedding-3-large")
+
+        # Setup retriever tool
         self.retrieve_context = make_argument_retriever_tool(self)
-        self.tools = [
-            self.retrieve_context
-            ]
+        self.tools = [self.retrieve_context]
+
         self.agent = create_agent(
             model=self.model,
             tools=self.tools,
             middleware=[log_state, trim_messages],
-            checkpointer=InMemorySaver(), # todo debug only - use redis instead
+            checkpointer=self._checkpointer,
         )
         self.counter = 0
-
     async def achat(self, chat_request: ChatRequest):
+        # TODO: Add RAG filter support (set current_user_id and current_source_ids)
         self.counter += 1
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
