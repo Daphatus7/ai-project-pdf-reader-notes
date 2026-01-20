@@ -276,6 +276,10 @@ class LlmAgent:
             config
         )
 
+        # todo hardcoded to be deleted
+        # -|
+        #  |
+        #  V
         # Save messages to JSON (append to existing)
         messages_data = []
         for msg in response["messages"]:
@@ -302,13 +306,18 @@ class LlmAgent:
                 existing_data = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             pass  # File doesn't exist or is invalid, start fresh
+        
 
         # Append new messages
         existing_data["messages"].extend(messages_data)
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(existing_data, f, ensure_ascii=False, indent=2, default=str)
+            json.dump(existing_data, f, ensure_ascii=False, indent=2, defult=str)
         print(f"Appended {len(messages_data)} messages (total: {len(existing_data['messages'])}) to {output_path}")
+        #   ^
+        #   |
+        #   |
+        # todo hardcoded to be deleted
 
         ai_msg = response["messages"][-1]
         print(ai_msg.content)
