@@ -31,6 +31,16 @@ def get_llm_service():
         logger.error(f'Failed to get LLM service: {e}')
         raise HTTPException(status_code=503, detail='LLM service not available')
 
+def get_rag_service():
+    """
+    
+    :return: 
+    """
+    try:
+        return services.get('rag_service')
+    except ValueError as e:
+        logger.error(f'Failed to get Rag service: {e}')
+        raise HTTPException(status_code=503, detail='Rag service not available')
 
 # Add more shared dependencies here as needed
 # Example: Authentication dependency

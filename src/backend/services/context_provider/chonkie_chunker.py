@@ -9,6 +9,10 @@ import uuid
 from typing import Any
 from chonkie import NeuralChunker
 from dataclasses import dataclass
+
+from humanfriendly.terminal import output
+
+from src.backend.schemas.rag import RagRequest
 from src.backend.services.context_provider.pdf_extract import extract_pdf_elements
 
 
@@ -180,49 +184,45 @@ def __process_pdf(payload: RawContextPayload
 
     return return_result 
 
-def chonkie_chunk(payload: RawContextPayload) -> list[dict]:
-    """
-        the input is raw_extracted_text
-    :param payload: 
-    :return: chunked text
-    """
-    return __process_pdf(payload)
-
-
-# debug from extracted elements to chonkie chunked
-# async def main():
-#     # load pdf extracted raw data
-#     data = None
-#     with open("elements.json", "r", encoding="utf-8") as f:
-#         data = json.load(f)
-# 
-#     output = chonkie_chunk(data)
-# 
-#     with open("chonkie_chunk.json", "w", encoding="utf-8") as r:
-#         json.dump(output, r, indent=2, ensure_ascii=False)
-# 
-# if __name__ == "__main__":
-#     asyncio.run(main())
-
-# Debug, extract raw data from pdf to chonkie chunked content
-async def main():
-    # load pdf extracted raw data
-    extracted = extract_pdf_elements("exam21-final.pdf")
-    #save to json for debug
-    with open("exam21-final.json", "w", encoding="utf-8") as f:
-        json.dump([el.to_dict() for el in extracted], f, indent=2)
-
-    output = chonkie_chunk(
-        payload = RawContextPayload(
+def chonkie_chunk(rag_request: RagRequest)-> list[dict]:
+    try:
+        if rag_request is not None:
+            # extract the file
+            extracted = extract_pdf_elements(rag_request.file_dir)
+            chonkie_output =  __process_pdf(payload = RawContextPayload(
             payload=[el.to_dict() for el in extracted],
             id= str(uuid.uuid4()),
             dir= "file2",
             name= "exam21-final"
-        )
-    )
+            ))
+            # todo, for debug purpose remove this in production
+            with open(f"pdf_extractor/{rag_request.name}.json", "w", encoding="utf-8") as r:
+                json.dump(chonkie_output, r, indent=2, ensure_ascii=False)
+            return chonkie_output
+        return None # should throw error and log this 
+    except:
+        
 
-    with open("exam21-final.json_chonkie_chunk.json", "w", encoding="utf-8") as r:
-        json.dump(output, r, indent=2, ensure_ascii=False)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# Debug, extract raw data from pdf to chonkie chunked content
+# async def main():
+#     # load pdf extracted raw data
+#     extracted = extract_pdf_elements("pdf_extractor/exam21-final.pdf")
+#     #save to json for debug
+#     with open("pdf_extractor/exam21-final.json", "w", encoding="utf-8") as f:
+#         json.dump([el.to_dict() for el in extracted], f, indent=2)
+# 
+#     output = chonkie_chunk(
+#         payload = RawContextPayload(
+#             payload=[el.to_dict() for el in extracted],
+#             id= str(uuid.uuid4()),
+#             dir= "file2",
+#             name= "exam21-final"
+#         )
+#     )
+# 
+#     with open("pdf_extractor/exam21-final.json_chonkie_chunk.json", "w", encoding="utf-8") as r:
+#         json.dump(output, r, indent=2, ensure_ascii=False)
+# 
+# if __name__ == "__main__":
+#     asyncio.run(main())

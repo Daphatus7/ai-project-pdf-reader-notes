@@ -7,7 +7,6 @@ import json
 from unstructured.documents.elements import Element
 from unstructured.partition.pdf import partition_pdf
 
-
 def __extract_pdf_text(path: str) -> list[Element]:
     """用 unstructured 从 PDF 提取纯文本，并拼成一个长字符串。"""
     elements = partition_pdf(
