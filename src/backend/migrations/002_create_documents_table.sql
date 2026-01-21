@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS documents (
     -- User isolation (critical for multi-tenant)
     user_id TEXT NOT NULL,
 
+    -- Project isolation (for multi-project support)
+    project_id TEXT NOT NULL,
+
     -- Source document info
     source_id UUID NOT NULL,
     source_name TEXT,
@@ -19,7 +22,7 @@ CREATE TABLE IF NOT EXISTS documents (
     content TEXT NOT NULL,
 
     -- Embedding vector (3072 dimensions for text-embedding-3-large)
-    embedding VECTOR(3072),
+    embedding VECTOR(1536),
 
     -- Chunk metadata
     token_count INTEGER,
@@ -46,10 +49,17 @@ CREATE INDEX IF NOT EXISTS idx_documents_source_id ON documents (source_id);
 -- Composite index for common query pattern
 CREATE INDEX IF NOT EXISTS idx_documents_user_source ON documents (user_id, source_id);
 
+-- Index for project filtering
+CREATE INDEX IF NOT EXISTS idx_documents_user_project ON documents (user_id, project_id);
+
 -- Vector similarity index (IVFFlat for approximate nearest neighbor)
 -- lists = sqrt(n) where n is expected number of rows, 100 is good for up to 10k docs
-CREATE INDEX IF NOT EXISTS idx_documents_embedding ON documents
-    USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+DROP INDEX IF EXISTS idx_documents_embedding;
+
+CREATE INDEX IF NOT EXISTS idx_documents_embedding
+    ON documents
+        USING hnsw (embedding vector_cosine_ops)
+    WITH (m = 16, ef_construction = 200);
 
 -- Trigger to auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()

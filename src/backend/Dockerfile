@@ -7,6 +7,9 @@ WORKDIR /app
 # Install system dependencies needed for health checks
 RUN apt-get update && apt-get install -y \
     curl \
+    libgl1 \
+    poppler-utils \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies once for caching

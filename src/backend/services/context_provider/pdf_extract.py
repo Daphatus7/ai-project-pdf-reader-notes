@@ -48,9 +48,7 @@ def save_chunks_to_json(chunks: list[Element], filename: str):
 def extract_pdf_elements(pdf_dir: str) -> list[Element]:
     """
     Parse a PDF into unstructured Element objects.
-
-    Assumes the PDF is readable on disk. Uses hi_res strategy to better
-    capture tables and images. Raises any parsing errors to the caller.
+    Uses 'fast' strategy to avoid heavy dependencies (cv2, detectron2).
     """
     elements = partition_pdf(
         filename=pdf_dir,
@@ -58,7 +56,9 @@ def extract_pdf_elements(pdf_dir: str) -> list[Element]:
         strategy='hi_res',
         content_type='application/pdf',
         skip_infer_table_types=False,
-        extract_image_block_types=['Image', 'Table'],
+        extract_image_block_types=[
+            #'Image', 
+            'Table'],
         extract_images_in_pdf=False,
     )
     return elements

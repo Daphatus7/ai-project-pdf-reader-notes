@@ -6,6 +6,7 @@ from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
 from src.backend.services.storage import StorageService
 from src.backend.config.supabase import Database
+from src.backend.services.context_provider.rag_service import RagService
 class Services:
     """Dependency injection container"""
     
@@ -43,6 +44,11 @@ class Services:
             supabase=database.get()
         )
         self.register('llm_service', llm_service)
+
+        # Initialize RAG service (for document upload and processing)
+        rag_service = RagService()
+        rag_service.start()
+        self.register('rag_service', rag_service)
         
     def get(self, service_name: str) -> Any:
         """Get a service by name"""

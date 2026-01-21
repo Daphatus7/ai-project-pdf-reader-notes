@@ -9,12 +9,14 @@ CREATE OR REPLACE FUNCTION match_documents(
     query_embedding VECTOR(3072),
     match_count INT DEFAULT 4,
     filter_user_id TEXT DEFAULT NULL,
+    filter_project_id TEXT DEFAULT NULL,
     filter_source_ids UUID[] DEFAULT NULL,
     similarity_threshold FLOAT DEFAULT 0.0
 )
 RETURNS TABLE (
     id UUID,
     user_id TEXT,
+    project_id TEXT,
     source_id UUID,
     source_name TEXT,
     content TEXT,
@@ -31,6 +33,7 @@ BEGIN
     SELECT
         d.id,
         d.user_id,
+        d.project_id,
         d.source_id,
         d.source_name,
         d.content,
@@ -42,6 +45,8 @@ BEGIN
     WHERE
         -- User filter (required for multi-tenant isolation)
         (filter_user_id IS NULL OR d.user_id = filter_user_id)
+        -- Project filter (optional)
+        AND (filter_project_id IS NULL OR d.project_id = filter_project_id)
         -- Source filter (optional)
         AND (filter_source_ids IS NULL OR d.source_id = ANY(filter_source_ids))
         -- Similarity threshold filter
