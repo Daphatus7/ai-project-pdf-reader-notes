@@ -31,17 +31,19 @@ ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 't
 
 # Chat Request/Response Models
 class ChatRequest(BaseModel):
-    """Request model for chat endpoint"""
-    thread_id: str
+    """Request model for chat endpoint
+        A stateless design model.
+        Gather all needed context for the api call.
+        project_id: the users project id
+    """
+    project_id: str #the user's project_id or folder id
+    thread_id: str# conversation thread for the user
+    # users query and any context send by the user
     contents: list[InputContent] = Field(
         ...,
         description="Ordered list of text and image inputs"
     )
-    system_message: Optional[str] = Field(
-        default="You are a helpful assistant."
-    )
     # RAG filter fields
-    user_id: Optional[str] = Field(default=None, description="User ID for filtering documents")
     source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
 

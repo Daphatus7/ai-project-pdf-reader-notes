@@ -7,7 +7,8 @@ from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import tool
+from langchain_core.tools import tool, InjectedToolArg
+from typing import Annotated
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
@@ -138,28 +139,40 @@ def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""
     return (chunk_count % 15 == 0 and len(text) > 50) or len(text) > 300
 
-def make_argument_retriever_tool(agent_ref):
-    @tool("argument_retriever")
-    def retrieve_context(query: str):
-        """search stored documents for relevant context"""
-        print("RAG retriever activated")
-        if agent_ref.supabase is None:
-            return "No database connection.", []
+def make_retriever_tool(supabase: Client, embedding_model: OpenAIEmbeddings):
+    """Create retriever tool with injected config for multi-user safety."""
 
-        print(f"Filter context - user_id: {agent_ref.current_user_id}, source_ids: {agent_ref.current_source_ids}")
+    @tool("argument_retriever")
+    def retrieve_context(
+        query: str,
+        config: Annotated[RunnableConfig, InjectedToolArg]
+    ) -> tuple[list[Document], list[str]]:
+        """Search stored documents for relevant context."""
+        print("RAG retriever activated")
+
+        if supabase is None:
+            return [], []
+
+        # 从 config 获取请求级别的上下文 (线程安全)
+        user_id = config["configurable"].get("user_id")
+        project_id = config["configurable"].get("project_id")
+        source_ids = config["configurable"].get("source_ids")
+
+        print(f"Filter context - user_id: {user_id}, project_id: {project_id}, source_ids: {source_ids}")
 
         # Generate query embedding
-        query_embedding = agent_ref.embedding_model.embed_query(query)
+        query_embedding = embedding_model.embed_query(query)
 
         # Call Supabase match_documents RPC
-        response = agent_ref.supabase.rpc(
+        response = supabase.rpc(
             "match_documents",
             {
                 "query_embedding": query_embedding,
                 "match_count": 4,
-                "filter_user_id": agent_ref.current_user_id,
-                "filter_source_ids": agent_ref.current_source_ids,
-                "similarity_threshold": 0.0
+                "filter_user_id": user_id,
+                "filter_project_id": project_id,
+                "filter_source_ids": source_ids,
+                "similarity_threshold": 0.5
             }
         ).execute()
 
@@ -188,13 +201,15 @@ def make_argument_retriever_tool(agent_ref):
     return retrieve_context
 
 class LlmAgent:
+    """
+    Multi-user safe LLM agent.
 
-    def __init__(self, checkpointer: BaseCheckpointSaver, supabase: Client = None):
-        # RAG filter context (set per request)
-        self.current_user_id: str | None = None
-        self.current_source_ids: list[str] | None = None
+    用户上下文通过 RunnableConfig 传递，而非实例变量，确保并发安全。
+    """
+
+    def __init__(self, checkpointer: BaseCheckpointSaver, supabase: Client | None = None):
         self._checkpointer = checkpointer
-        self.supabase = supabase
+        self._supabase = supabase
 
         # LLM model
         self.model = ChatOpenAI(
@@ -203,11 +218,11 @@ class LlmAgent:
         )
 
         # Embedding model for query vectors
-        self.embedding_model = OpenAIEmbeddings(model="text-embedding-3-large")
+        self._embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 
-        # Setup retriever tool
-        self.retrieve_context = make_argument_retriever_tool(self)
-        self.tools = [self.retrieve_context]
+        # Setup retriever tool (传入依赖，不传入请求级别的上下文)
+        self._retrieve_context = make_retriever_tool(self._supabase, self._embedding_model)
+        self.tools = [self._retrieve_context]
 
         self.agent = create_agent(
             model=self.model,
@@ -217,13 +232,21 @@ class LlmAgent:
         )
         self.counter = 0
     async def achat(self, chat_request: ChatRequest):
-        # TODO: Add RAG filter support (set current_user_id and current_source_ids)
         self.counter += 1
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
         print("----------------")
-        config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
-        system_msg = SystemMessage(content=chat_request.system_message)
+
+        # 通过 config 传递用户上下文 (线程安全，支持多用户并发)
+        config: RunnableConfig = {
+            "configurable": {
+                "user_id": chat_request.user_id,
+                "project_id": chat_request.project_id,
+                "thread_id": chat_request.thread_id,
+                "source_ids": chat_request.source_ids,
+            }
+        }
+        system_msg = SystemMessage(content="you are a helpful assistant")
         human_msg = _build_human_message(chat_request.contents)
             
         accumulated_text = ""
@@ -262,21 +285,26 @@ class LlmAgent:
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
         print("----------------")
 
-        # Set RAG filter context for this request
-        self.current_user_id = chat_request.user_id
-        self.current_source_ids = chat_request.source_ids
-        print(f"RAG Filter - user_id: {self.current_user_id}, source_ids: {self.current_source_ids}")
-
-        config: RunnableConfig = {"configurable": {"thread_id": chat_request.thread_id}}
-        system_msg = SystemMessage(content=chat_request.system_message)
+        # 通过 config 传递用户上下文 (线程安全，支持多用户并发)
+        config: RunnableConfig = {
+            "configurable": {
+                "thread_id": chat_request.thread_id,
+                "user_id": chat_request.user_id,
+                "project_id": chat_request.project_id,
+                "source_ids": chat_request.source_ids,
+            }
+        }
+        print(f"RAG Filter - user_id: {chat_request.user_id}, source_ids: {chat_request.source_ids}")
+        system_msg = SystemMessage(content="""you are a helpful assistant""") # 用户不允许编辑system message
         human_msg = _build_human_message(chat_request.contents)
 
+        # Run LLM call
         response = self.agent.invoke(
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
             config
         )
 
-        # todo hardcoded to be deleted
+        # todo debug text to be deleted
         # -|
         #  |
         #  V
@@ -317,7 +345,7 @@ class LlmAgent:
         #   ^
         #   |
         #   |
-        # todo hardcoded to be deleted
+        # todo debug text to be deleted
 
         ai_msg = response["messages"][-1]
         print(ai_msg.content)
