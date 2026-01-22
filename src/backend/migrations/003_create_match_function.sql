@@ -5,8 +5,20 @@
 -- Main search function for RAG
 -- Prefilters by user_id and source_ids BEFORE vector search (efficient)
 
+-- Drop ALL existing match_documents functions regardless of signature
+DO $$
+DECLARE
+    func_oid oid;
+BEGIN
+    FOR func_oid IN
+        SELECT oid FROM pg_proc WHERE proname = 'match_documents'
+    LOOP
+        EXECUTE 'DROP FUNCTION IF EXISTS ' || func_oid::regprocedure || ' CASCADE';
+    END LOOP;
+END $$;
+
 CREATE OR REPLACE FUNCTION match_documents(
-    query_embedding VECTOR(3072),
+    query_embedding VECTOR(1536),
     match_count INT DEFAULT 4,
     filter_user_id TEXT DEFAULT NULL,
     filter_project_id TEXT DEFAULT NULL,
@@ -59,59 +71,3 @@ $$;
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION match_documents TO authenticated;
 GRANT EXECUTE ON FUNCTION match_documents TO service_role;
-
--- Helper function: Get documents by source
-CREATE OR REPLACE FUNCTION get_documents_by_source(
-    p_user_id TEXT,
-    p_source_id UUID
-)
-RETURNS TABLE (
-    id UUID,
-    content TEXT,
-    token_count INTEGER,
-    page_numbers INTEGER[],
-    created_at TIMESTAMPTZ
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        d.id,
-        d.content,
-        d.token_count,
-        d.page_numbers,
-        d.created_at
-    FROM documents d
-    WHERE d.user_id = p_user_id
-      AND d.source_id = p_source_id
-    ORDER BY d.start_index;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION get_documents_by_source TO authenticated;
-GRANT EXECUTE ON FUNCTION get_documents_by_source TO service_role;
-
--- Helper function: Delete documents by source (for re-upload)
-CREATE OR REPLACE FUNCTION delete_documents_by_source(
-    p_user_id TEXT,
-    p_source_id UUID
-)
-RETURNS INTEGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-    deleted_count INTEGER;
-BEGIN
-    DELETE FROM documents
-    WHERE user_id = p_user_id AND source_id = p_source_id;
-
-    GET DIAGNOSTICS deleted_count = ROW_COUNT;
-    RETURN deleted_count;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION delete_documents_by_source TO authenticated;
-GRANT EXECUTE ON FUNCTION delete_documents_by_source TO service_role;
