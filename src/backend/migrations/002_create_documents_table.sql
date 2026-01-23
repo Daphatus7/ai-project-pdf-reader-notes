@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS documents (
     -- Content
     content TEXT NOT NULL,
 
-    -- Embedding vector (3072 dimensions for text-embedding-3-large)
+    -- Embedding vector (1536 dimensions for text-embedding-3-small)
     embedding VECTOR(1536),
 
     -- Chunk metadata
