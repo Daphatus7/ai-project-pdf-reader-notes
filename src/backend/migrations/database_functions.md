@@ -1,5 +1,7 @@
 # Functions needs to make
 
+This document provides core features need to be provided by the server
+
 ## Profiles
 1. LoadUserProfile: Load Profiles from server
 2. UpdateUserProfile: Update User Profile
