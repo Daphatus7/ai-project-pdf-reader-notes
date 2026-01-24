@@ -36,7 +36,7 @@ class Services:
         # Initialize Supabase database
         database = Database()
         database.start()
-        self.register('database', database)
+        self.register('database_service', database)
 
         # Initialize LLM service (uses storage service for checkpointer and Supabase for RAG)
         llm_service = LlmService(

@@ -1,5 +1,5 @@
-# @file        process.py
-# @description
+# @file        project.py
+# @description Fast API endpoints for projects and documents management
 # @author      [Peiyu Wang]
 # @date        21/1/2026
 # @license     © 2026 . All rights reserved.
@@ -16,21 +16,25 @@ from src.backend.schemas.project import GetDocument, GetDocumentResponse, GetDoc
 from src.backend.schemas.rag import RagRequest, UploadResponse
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix='/project', tags=['process'])
+router = APIRouter(prefix='/projects', tags=['process'])
 
 ALLOWED_TYPES = {'application/pdf'}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 
+# ==================== Projects Management ====================
 
 
 # Projects Management
-@router.get("/project/get")
+@router.get("/projects/get")
 async def get_projects(
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
-    user_id = user["sub"]  # Supabase user id
+    """
+    List all projects for the authenticated user.
+    """
+    user_id = user['sub']
     return await database_service.get_projects(user_id)
 
 @router.patch('/project/create',response_model=CreateProjectResponse)
@@ -46,41 +50,32 @@ async def create_project(
     )
     return CreateProjectResponse(response=response)
 
-@router.post("/projects", response_model=ProjectCreateResponse)
-async def create_project(
-        payload: CreateProjectRequest,
-        user=Depends(get_user),
-        database_service=Depends(get_database_service),
-):
-    user_id = user["sub"]
-    response = await database_service.create_project(
-        user_id=user_id,
-        name=payload.name,
-        description=payload.description,
-    )
-    return response
 
-
-@router.delete("/projects/{project_id}", response_model=ProjectDeleteResponse)
+@router.delete('/projects/{project_id}', response_model=ProjectDeleteResponse)
 async def delete_project(
-        project_id: str,
+        project_id: str = Path(..., description='Project ID to delete'),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
-    user_id = user["sub"]  # Supabase user id
-    return await database_service.delete_project(
-        user_id, 
-        project_id)
+    """
+    Delete a project and all associated documents.
+    """
+    user_id = user['sub']
+    return await database_service.delete_project(user_id, project_id)
 
 
-# Documents Management
-@router.get("/projects/{project_id}/documents", response_model=GetDocumentResponse)
+# ==================== Documents Management ====================
+
+@router.get('/projects/{project_id}/documents', response_model=GetDocumentResponse)
 async def list_documents(
-        project_id: str = Path(...),
+        project_id: str = Path(..., description='Project ID to list documents from'),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
-    user_id = user["sub"]
+    """
+    List all documents in a specific project.
+    """
+    user_id = user['sub']
     documents = await database_service.get_documents(
         user_id=user_id,
         project_id=project_id,
@@ -88,21 +83,27 @@ async def list_documents(
     return GetDocumentResponse(documents=documents)
 
 
-
-@router.post("/projects/{project_id}/documents/upload", response_model=UploadResponse)
+@router.post('/projects/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
-        project_id: str = Path(...),
-        file: UploadFile = File(...),
+        project_id: str = Path(..., description='Project ID to upload document to'),
+        file: UploadFile = File(..., description='PDF file to upload'),
         user=Depends(get_user),
-        source_name: str = Form(None),
+        source_name: str = Form(None, description='Optional custom name for the document'),
         rag_service=Depends(get_rag_service)
 ):
     """
     Upload a PDF file and process it into the vector database.
+    
+    File validation:
+    - Type: PDF only
+    - Size: Max 50MB
     """
     # Validate file type
     if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(status_code=400, detail=f"Invalid file type. Allowed: {ALLOWED_TYPES}")
+        raise HTTPException(
+            status_code=400,
+            detail=f'Invalid file type. Allowed: {ALLOWED_TYPES}'
+        )
 
     # Use filename if source_name not provided
     if not source_name:
@@ -147,23 +148,27 @@ async def upload_document(
 
 @router.delete("/documents", response_model=DeleteDocumentResponse)
 async def delete_document(
-        payload: DeleteDocumentRequest,
+        project_id: str = Path(..., description='Project ID'),
+        document_id: str = Path(..., description='Document ID to delete'),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
     """
-        # Todo
+    Delete a document from the project and vector database.
+    
+    TODO: Also delete associated vectors from the vector database.
+    - Could have been achieved with cascade delete in the database.
     """
     user_id = user["sub"] # 应该验证过了
     # 1) delete DB
     response = await database_service.delete_document(
         user_id=user_id,
-        document_id=payload.document_id,
-        project_id=payload.project_id,
+        document_id=document_id,
+        project_id=project_id,
     )
     
-    print(response) # ToDO debug, this to see what is actually being deleted
-    return DeleteDocumentResponse(response="Document deleted successfully")
+    logger.info(f'Document deleted: user={user_id}, project={project_id}, document={document_id}')
+    return DeleteDocumentResponse(response='Document deleted successfully')
 
 
 
