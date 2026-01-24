@@ -35,7 +35,6 @@ from src.backend.schemas.chat.llm import (
 
 from src.backend.schemas.users import (
     UserProfile,
-    UpdateUserRequest,
 )
 
 __all__ = [
@@ -60,5 +59,4 @@ __all__ = [
     'StructuredChatResponse',
     # User schemas
     'UserProfile',
-    'UpdateUserRequest',
 ]
