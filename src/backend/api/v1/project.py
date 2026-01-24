@@ -11,8 +11,16 @@ import tempfile
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Path
 
 from src.backend.api.deps import get_rag_service, get_database_service, get_user
-from src.backend.schemas.project import GetDocument, GetDocumentResponse, GetDocumentsRequest, ProjectCreateResponse, \
-    CreateProjectResponse, CreateProjectRequest, ProjectDeleteResponse, DeleteDocumentResponse, DeleteDocumentRequest
+from src.backend.schemas.project import (
+    ListProjectsResponse,
+    CreateProjectResponse,
+    CreateProjectRequest,
+    GetDocumentResponse,
+    GetDocumentsRequest,
+    ProjectDeleteResponse,
+    DeleteDocumentResponse,
+    DeleteDocumentRequest
+)
 from src.backend.schemas.rag import RagRequest, UploadResponse
 
 logger = logging.getLogger(__name__)
@@ -24,10 +32,8 @@ MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 # ==================== Projects Management ====================
 
-
-# Projects Management
-@router.get("/projects/get")
-async def get_projects(
+@router.get('', response_model=ListProjectsResponse)
+async def list_projects(
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
@@ -35,23 +41,27 @@ async def get_projects(
     List all projects for the authenticated user.
     """
     user_id = user['sub']
-    return await database_service.get_projects(user_id)
+    return await database_service.list_projects(user_id)
 
-@router.patch('/project/create',response_model=CreateProjectResponse)
+
+@router.post('', response_model=CreateProjectResponse)
 async def create_project(
         payload: CreateProjectRequest,
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
-    user_id = user["sub"]  # Supabase user id
-    response =  await database_service.create_project(
+    """
+    Create a new project for the authenticated user.
+    """
+    user_id = user['sub']
+    response = await database_service.create_project(
         user_id=user_id,
         payload=payload,
     )
     return CreateProjectResponse(response=response)
 
 
-@router.delete('/projects/{project_id}', response_model=ProjectDeleteResponse)
+@router.delete('/{project_id}', response_model=ProjectDeleteResponse)
 async def delete_project(
         project_id: str = Path(..., description='Project ID to delete'),
         user=Depends(get_user),
@@ -66,7 +76,7 @@ async def delete_project(
 
 # ==================== Documents Management ====================
 
-@router.get('/projects/{project_id}/documents', response_model=GetDocumentResponse)
+@router.get('/{project_id}/documents', response_model=GetDocumentResponse)
 async def list_documents(
         project_id: str = Path(..., description='Project ID to list documents from'),
         user=Depends(get_user),
@@ -83,7 +93,7 @@ async def list_documents(
     return GetDocumentResponse(documents=documents)
 
 
-@router.post('/projects/{project_id}/documents', response_model=UploadResponse)
+@router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
         project_id: str = Path(..., description='Project ID to upload document to'),
         file: UploadFile = File(..., description='PDF file to upload'),
@@ -146,10 +156,9 @@ async def upload_document(
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
 
-@router.delete("/documents", response_model=DeleteDocumentResponse)
+@router.delete('/documents', response_model=DeleteDocumentResponse)
 async def delete_document(
-        project_id: str = Path(..., description='Project ID'),
-        document_id: str = Path(..., description='Document ID to delete'),
+        payload: DeleteDocumentRequest,
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
@@ -159,15 +168,15 @@ async def delete_document(
     TODO: Also delete associated vectors from the vector database.
     - Could have been achieved with cascade delete in the database.
     """
-    user_id = user["sub"] # 应该验证过了
-    # 1) delete DB
+    user_id = user['sub']
+    
     response = await database_service.delete_document(
         user_id=user_id,
-        document_id=document_id,
-        project_id=project_id,
+        document_id=payload.document_id,
+        project_id=payload.project_id,
     )
     
-    logger.info(f'Document deleted: user={user_id}, project={project_id}, document={document_id}')
+    logger.info(f'Document deleted: user={user_id}, project={payload.project_id}, document={payload.document_id}')
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 
