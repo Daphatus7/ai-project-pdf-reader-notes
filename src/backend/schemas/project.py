@@ -4,6 +4,9 @@
 # @date        23/1/2026
 # @license     © 2026 . All rights reserved.
 from pydantic import BaseModel
+class ListProjectsResponse(BaseModel):
+    """Response model for listing projects"""
+    projects: list[dict]  # List of project details
 
 class CreateProjectRequest(BaseModel):
     """Request model for creating a project"""
@@ -43,6 +46,7 @@ class UploadDocumentResponse(BaseModel):
 class DeleteDocumentRequest(BaseModel):
     """Request model for deleting a document"""
     document_id: str
+    project_id: str
     
 class DeleteDocumentResponse(BaseModel):
     """Response model for document deletion"""
