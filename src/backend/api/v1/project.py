@@ -15,8 +15,7 @@ from src.backend.schemas.project import (
     ListProjectsResponse,
     CreateProjectResponse,
     CreateProjectRequest,
-    GetDocumentResponse,
-    GetDocumentsRequest,
+    ListDocumentsResponse,
     ProjectDeleteResponse,
     DeleteDocumentResponse,
     DeleteDocumentRequest
@@ -76,7 +75,7 @@ async def delete_project(
 
 # ==================== Documents Management ====================
 
-@router.get('/{project_id}/documents', response_model=GetDocumentResponse)
+@router.get('/{project_id}/documents', response_model=ListDocumentsResponse)
 async def list_documents(
         project_id: str = Path(..., description='Project ID to list documents from'),
         user=Depends(get_user),
@@ -90,7 +89,7 @@ async def list_documents(
         user_id=user_id,
         project_id=project_id,
     )
-    return GetDocumentResponse(documents=documents)
+    return ListDocumentsResponse(documents=documents)
 
 
 @router.post('/{project_id}/documents', response_model=UploadResponse)

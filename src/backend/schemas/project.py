@@ -30,7 +30,7 @@ class ProjectDeleteResponse(BaseModel):
 class GetDocumentsRequest(BaseModel):
     """Request model for getting documents"""
     project_id:  str  
-class GetDocumentResponse(BaseModel):
+class ListDocumentsResponse(BaseModel):
     """Response model for getting projects"""
     documents: list[dict]  # List of project details
 
