@@ -56,7 +56,7 @@ class RagService(Service):
                 "metadata": {}
             })
 
-        response = self.supabase.table("documents").insert(documents).execute()
+        response = self.supabase.table("documents_chunks").insert(documents).execute()
         inserted_count = len(response.data) if response.data else 0
         logger.info(f"Inserted {inserted_count} documents for user {rag_request.user_id}")
         return inserted_count
@@ -64,7 +64,7 @@ class RagService(Service):
     def delete(self, rag_delete: RagDeleteRequest) -> RagDeleteResponse:
         """Delete documents by source_id for a user."""
         try:
-            self.supabase.table("documents").delete().eq(
+            self.supabase.table("document_chunks").delete().eq(
                 "user_id", rag_delete.user_id
             ).eq(
                 "source_id", rag_delete.source_id
