@@ -17,7 +17,7 @@ from src.backend.schemas.auth import (
     UserResponse,
 )
 
-from src.backend.schemas.llm import (
+from src.backend.schemas.chat.llm import (
     TextContent,
     ImageContent,
     InputContent,

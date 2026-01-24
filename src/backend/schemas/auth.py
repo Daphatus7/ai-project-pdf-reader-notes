@@ -10,8 +10,6 @@ Request and response models for authentication endpoints including:
 from pydantic import BaseModel, Field
 
 
-
-
 class LoginRequest(BaseModel):
     """Login request model"""
     username: str
@@ -39,11 +37,6 @@ class UserResponse(BaseModel):
     email: str
     full_name: str | None = None
 
-class ChatInput(BaseModel):
-    message: str
-    thread_id: str | None = None
-    client_request_id: str | None = None
-
 class AuthContext(BaseModel):
     tenant_id: str | None = None
     user_id: str
@@ -52,6 +45,6 @@ class AuthContext(BaseModel):
 
 class UserRequest(BaseModel):
     auth: AuthContext
-    thread_id: str
-    message: str
     client_request_id: str | None = None
+    thread_id: str
+    query: str

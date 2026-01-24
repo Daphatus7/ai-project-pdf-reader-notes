@@ -33,7 +33,7 @@ TEST_PROJECT_ID = "test_project_rag"
 TEST_PDF_PATH = Path(__file__).parent.parent / "services/context_provider/pdf_extractor/exam21-final.pdf"
 
 # API endpoint
-UPLOAD_ENDPOINT = f"/api/v1/process/upload/{TEST_USER_ID}/{TEST_PROJECT_ID}"
+UPLOAD_ENDPOINT = f"/api/v1/project/upload/{TEST_USER_ID}/{TEST_PROJECT_ID}"
 
 
 async def test_upload_pdf():

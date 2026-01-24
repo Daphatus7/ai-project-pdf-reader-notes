@@ -113,3 +113,30 @@ class StructuredChatResponse(BaseModel):
     """Response model for structured chat endpoint"""
     structured_output: LLMStructuredOutput = Field(..., description='Structured LLM response')
     usage: Optional[dict] = Field(default=None, description='Token usage information if available')
+
+class GetThreadsRequest(BaseModel):
+    """Request model for fetching conversation threads"""
+    project_id: str
+    
+class GetThreadsResponse(BaseModel):
+    """Response model for fetching conversation threads"""
+    threads: list[dict]  # List of thread details
+    # ToDO data structure to be improved later
+
+class DeleteThreadRequest(BaseModel):
+    """Request model for deleting a conversation thread"""
+    thread_id: str
+    
+class DeleteThreadResponse(BaseModel):
+    """Response model for deleting a conversation thread"""
+    response: str  # keep it simple for now
+    
+class LoadThreadRequest(BaseModel):
+    """Request model for loading a conversation thread"""
+    thread_id: str
+
+class LoadThreadResponse(BaseModel):
+    """Response model for loading a conversation thread"""
+    thread_id: str
+    messages: list[dict] # to be enhanced in the future
+    # ToDO data structure to be improved later

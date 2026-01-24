@@ -50,41 +50,5 @@ class LlmService:
         async for chunk in self.model.achat(request):
             yield chunk
             
-    def chat(self, request: ChatRequest)-> Any:
-        return self.model.chat(request)
-# debug code
-# import asyncio
-# 
-# async def main():
-#     service = LlmService()
-#     #test multiple thread chat
-#     
-#     human_messages = [
-#         HumanMessage(content="What is the capital of France?"),
-#         HumanMessage(content="What is the capital of Germany?"),
-#         HumanMessage(content="What is the capital of Spain?")
-#     ]
-# 
-# 
-#     async def stream_one(service: LlmService, message: HumanMessage, idx: int):
-#         # label each stream so outputs are distinguishable
-#         prefix = f"[Q{idx}] "
-#     
-#         print(f"{prefix}START: {message.content}")
-#     
-#         async for chunk in service.multi_thread_stream_chat(human_message=message):
-#             # adjust attribute depending on your model: .content / .delta / .text
-#             text = getattr(chunk, "content", str(chunk))
-#             print(prefix + text, end="", flush=True)
-#     
-#         print(f"\n{prefix}END\n")
-# 
-#     tasks = [
-#         asyncio.create_task(stream_one(service, msg, i))
-#         for i, msg in enumerate(human_messages, start=1)
-#     ]
-#     
-#     await asyncio.gather(*tasks)
-# 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+    def chat(self, user_id, request: ChatRequest)-> Any:
+        return self.model.chat(user_id=user_id, request=request)

@@ -3,6 +3,6 @@
 # @author      [Peiyu Wang]
 # @date        2026-01-19
 
-from src.backend.services.storage.service_storage import StorageService
+from src.backend.services.storage.redis_storage import StorageService
 
 __all__ = ["StorageService"]

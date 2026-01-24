@@ -5,7 +5,7 @@ import logging
 from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
 from src.backend.services.storage import StorageService
-from src.backend.config.supabase import Database
+from src.backend.services.storage.supabase_storage import Database
 from src.backend.services.context_provider.rag_service import RagService
 class Services:
     """Dependency injection container"""

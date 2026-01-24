@@ -7,7 +7,10 @@ Provides common dependencies used across API endpoints:
 - Request validation
 """
 import logging
+import os
 from typing import Optional
+
+import jwt
 from fastapi import HTTPException,  Header
 
 from src.backend.servers import services
@@ -42,26 +45,35 @@ def get_rag_service():
         logger.error(f'Failed to get Rag service: {e}')
         raise HTTPException(status_code=503, detail='Rag service not available')
 
-# Add more shared dependencies here as needed
-# Example: Authentication dependency
-async def get_current_user(authorization: Optional[str] = Header(None)):
+def get_database_service():
     """
-    Get current authenticated user from Authorization header.
-
-    Args:
-        authorization: Bearer token from Authorization header
-    Returns:
-        User object if authenticated
-
-    Raises:
-        HTTPException: If authentication fails
+    
+    :return: 
     """
-    # TODO: Implement authentication logic
-    # For now, this is a placeholder
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        return services.get('database_service')
+    except ValueError as e:
+        logger.error(f'Failed to get database service: {e}')
+        raise HTTPException(status_code=503, detail='database service not available')
 
-    # Extract token and validate
-    # Return user object
-    pass
+
+# Authentication Dependency
+async def get_user(authorization: str = Header(...)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid auth header")
+
+    token = authorization.split(" ")[1]
+
+    try:
+        payload = jwt.decode(
+            token,
+            os.environ.get("SUPABASE_JWT_SECRET"),
+            algorithms=["HS256"],
+            audience="authenticated"
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    print(payload) # todo debug testing, remove in production
+    return payload  # 包含 user_id / email / role
 
