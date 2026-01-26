@@ -12,9 +12,10 @@ from typing import Optional
 
 import jwt
 from jwt import PyJWKClient
-from fastapi import HTTPException, Header
+from fastapi import HTTPException, Header, Depends
 
 from src.backend.servers import services
+from src.backend.schemas import ChatRequest
 
 logger = logging.getLogger(__name__)
 
@@ -100,4 +101,17 @@ async def get_user(authorization: str = Header(...)):
 
     logger.debug(f"Authenticated user: {payload.get('sub')}")
     return payload  # Contains user_id (sub), email, role
+
+
+# Composite dependency: inject user_id into ChatRequest
+async def get_chat_request(
+    payload: ChatRequest,
+    user: dict = Depends(get_user)
+) -> ChatRequest:
+    """
+    Composite dependency that injects authenticated user_id into ChatRequest.
+    This ensures user_id comes from the auth token, not from client input.
+    """
+    payload.user_id = user["sub"]
+    return payload
 

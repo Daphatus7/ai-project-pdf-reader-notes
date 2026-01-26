@@ -36,9 +36,9 @@ class ChatRequest(BaseModel):
         Gather all needed context for the api call.
         project_id: the users project id
     """
-    user_id: str  # the user's unique identifier
-    project_id: str #the user's project_id or folder id
-    thread_id: str# conversation thread for the user
+    user_id: Optional[str] = None  # injected by server from auth token
+    project_id: str  # the user's project_id or folder id
+    thread_id: str  # conversation thread for the user
     # users query and any context send by the user
     contents: list[InputContent] = Field(
         ...,

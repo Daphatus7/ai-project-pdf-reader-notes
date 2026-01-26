@@ -15,7 +15,7 @@ from src.backend.schemas import (
     ChatResponse,
 )
 
-from src.backend.api.deps import get_llm_service, get_user, get_database_service
+from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
 from src.backend.schemas.chat.llm import GetThreadsResponse, DeleteThreadResponse, LoadThreadResponse
 
 logger = logging.getLogger(__name__)
@@ -24,35 +24,23 @@ router = APIRouter(prefix='/llm', tags=['llm'])
 
 @router.post('/chat', response_model=ChatResponse)
 async def chat(
-        payload: ChatRequest,
-        user=Depends(get_user),
-        llm_service = Depends(get_llm_service)
+        request: ChatRequest = Depends(get_chat_request),
+        llm_service=Depends(get_llm_service)
 ):
-    response = llm_service.chat(user_id=user["sub"], request=payload)
+    response = llm_service.chat(request=request)
     return ChatResponse(response=response)
 
 
 @router.post('/achat', response_model=StreamingResponse)
 async def achat(
-                payload: ChatRequest,
-                user=Depends(get_user),
-                llm_service=Depends(get_llm_service)):
+        request: ChatRequest = Depends(get_chat_request),
+        llm_service=Depends(get_llm_service)
+):
     """
     Streaming structured chat endpoint.
     """
-
-    # todo workflow 
-    #  api -> 
-    #  verification(reject if not qualified) -> 
-    #  service provider (I want to use this service) -> 
-    #  api service
-
-    # todo: verify authentication and rate limiting
-
-    # todo: validate request
-
     return StreamingResponse(
-        llm_service.achat(payload),
+        llm_service.achat(request),
         media_type='text/event-stream',
         headers={
             'Cache-Control': 'no-cache',

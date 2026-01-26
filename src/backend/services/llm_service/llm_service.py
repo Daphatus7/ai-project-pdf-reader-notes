@@ -50,5 +50,5 @@ class LlmService:
         async for chunk in self.model.achat(request):
             yield chunk
             
-    def chat(self, user_id, request: ChatRequest)-> Any:
-        return self.model.chat(user_id=user_id, request=request)
+    def chat(self, request: ChatRequest) -> Any:
+        return self.model.chat(request=request)

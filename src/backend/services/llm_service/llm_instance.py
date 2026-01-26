@@ -279,7 +279,7 @@ class LlmAgent:
         # Final structured + done
         yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
         yield f'data: {json.dumps({"type": "done"})}\n\n'
-    async def chat(self, user_id, chat_request: ChatRequest):
+    async def chat(self, request: ChatRequest):
         self.counter += 1
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
@@ -288,15 +288,15 @@ class LlmAgent:
         # 通过 config 传递用户上下文 (线程安全，支持多用户并发)
         config: RunnableConfig = {
             "configurable": {
-                "user_id": user_id,
-                "project_id": chat_request.project_id,
-                "thread_id": chat_request.thread_id,
-                "source_ids": chat_request.source_ids,
+                "user_id": request.user_id,
+                "project_id": request.project_id,
+                "thread_id": request.thread_id,
+                "source_ids": request.source_ids,
             }
         }
-        print(f"RAG Filter - user_id: {user_id}, source_ids: {chat_request.source_ids}")
+        print(f"RAG Filter - user_id: {request.user_id}, source_ids: {request.source_ids}")
         system_msg = SystemMessage(content="""you are a helpful assistant""") # 用户不允许编辑system message
-        human_msg = _build_human_message(chat_request.contents)
+        human_msg = _build_human_message(request.contents)
 
         # Run LLM call
         response = self.agent.invoke(
