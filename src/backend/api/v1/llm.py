@@ -10,57 +10,33 @@ import logging
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
-from src.backend.auth.server_auth import verify_user_is_allowed
 from src.backend.schemas import (
     ChatRequest,
     ChatResponse,
 )
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service
-from src.backend.schemas.auth import UserRequest
 from src.backend.schemas.chat.llm import GetThreadsResponse, DeleteThreadResponse, LoadThreadResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/llm', tags=['llm'])
 
-# Chats
 @router.post('/chat', response_model=ChatResponse)
-async def chat(request: ChatRequest, 
-               user=Depends(get_user),
-               llm_service=Depends(get_llm_service)):
-    """
-    Simple chat endpoint for synchronous LLM interaction.
-
-    This endpoint accepts a user message and optional system message,
-    and returns the LLM's response. Easy to debug via API calls.
-    """
-
-    #todo verify authentication and rate limiting
-    
-    #todo send the request to the llm service
-
-    response = llm_service.chat_v2(user_id=user["sub"], request=request)  # just to verify the request is valid
-    logger.info(
-        f'Chat request processed successfully.'
-    )
-    return ChatResponse(response=response)
-
-@router.post('/chat_v2', response_model=ChatResponse)
-async def chat_v2(
+async def chat(
         payload: ChatRequest,
         user=Depends(get_user),
-        _: UserRequest = Depends(verify_user_is_allowed),
         llm_service = Depends(get_llm_service)
 ):
-    response = llm_service.chat_v2(user_id=user["sub"],request=payload)
+    response = llm_service.chat(user_id=user["sub"], request=payload)
     return ChatResponse(response=response)
 
 
-@router.post('/chat/structured/stream')
-async def structured_stream_chat(chat_request: ChatRequest,
-                                 use_request: UserRequest = Depends(verify_user_is_allowed),
-                                 llm_service=Depends(get_llm_service)):
+@router.post('/achat', response_model=StreamingResponse)
+async def achat(
+                payload: ChatRequest,
+                user=Depends(get_user),
+                llm_service=Depends(get_llm_service)):
     """
     Streaming structured chat endpoint.
     """
@@ -76,7 +52,7 @@ async def structured_stream_chat(chat_request: ChatRequest,
     # todo: validate request
 
     return StreamingResponse(
-        llm_service.achat(chat_request),
+        llm_service.achat(payload),
         media_type='text/event-stream',
         headers={
             'Cache-Control': 'no-cache',
