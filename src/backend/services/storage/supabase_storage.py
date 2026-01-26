@@ -258,18 +258,23 @@ class Database(Service):
         
     # ==================== Conversation Threads Operations ====================
 
-    async def get_conversation_threads(self, user_id: str) -> dict:
+    async def list_conversation_threads(self, user_id: str, request) -> dict:
         """
         Get all conversation threads for a specific user.
 
         Args:
             user_id: User's unique identifier
+            request: ListThreadsRequest (reserved for future use)
 
         Returns:
             Dictionary with list of thread dictionaries
         """
         try:
-            response = self.__database.table('threads').select('*').eq('user_id', user_id).order('updated_at', desc=True).execute()
+            response = (self.__database.table('threads')
+                        .select('*')
+                        .eq('user_id', user_id)
+                        .order('updated_at', desc=True)
+                        .execute())
             return {'threads': response.data}
         except Exception as e:
             logger.error(f'Failed to get conversation threads for user {user_id}: {e}')
@@ -307,20 +312,25 @@ class Database(Service):
             logger.error(f'Failed to create conversation thread for user {user_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to create conversation thread')
 
-    async def load_conversation_thread(self, user_id: str, thread_id: str) -> dict:
+    async def load_conversation_thread(self, user_id: str, request) -> dict:
         """
         Load a conversation thread with its messages.
 
         Args:
             user_id: User's unique identifier
-            thread_id: Thread's unique identifier
+            request: LoadThreadRequest with thread_id
 
         Returns:
-            Dictionary with thread_id and messages list
+            Dictionary with messages list
         """
+        thread_id = request.thread_id
         try:
             # Verify thread belongs to user
-            thread = self.__database.table('threads').select('id').eq('id', thread_id).eq('user_id', user_id).execute()
+            thread = (self.__database.table('threads')
+                      .select('id')
+                      .eq('id', thread_id)
+                      .eq('user_id', user_id)
+                      .execute())
 
             if not thread.data:
                 raise HTTPException(status_code=404, detail='Thread not found or access denied')
@@ -333,7 +343,7 @@ class Database(Service):
                                  .order('created_at', desc=False)
                                  .execute())
 
-            return {'thread_id': thread_id, 'messages': messages_response.data}
+            return {'messages': messages_response.data}
 
         except HTTPException:
             raise
@@ -341,26 +351,35 @@ class Database(Service):
             logger.error(f'Failed to load conversation thread {thread_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to load conversation thread')
 
-    async def delete_conversation_thread(self, user_id: str, thread_id: str) -> dict:
+    async def delete_conversation_thread(self, user_id: str, request) -> dict:
         """
         Delete a conversation thread.
 
         Args:
             user_id: User's unique identifier
-            thread_id: Thread's unique identifier
+            request: DeleteThreadRequest with thread_id
 
         Returns:
             Response dictionary with deletion status
         """
+        thread_id = request.thread_id
         try:
             # Verify thread belongs to user
-            thread = self.__database.table('threads').select('id').eq('id', thread_id).eq('user_id', user_id).execute()
+            thread = (self.__database.table('threads')
+                      .select('id')
+                      .eq('id', thread_id)
+                      .eq('user_id', user_id)
+                      .execute())
 
             if not thread.data:
                 raise HTTPException(status_code=404, detail='Thread not found or access denied')
 
-            # Delete thread (messages should cascade delete)
-            self.__database.table('threads').delete().eq('id', thread_id).eq('user_id', user_id).execute()
+            # Delete thread (messages will cascade delete)
+            (self.__database.table('threads')
+             .delete()
+             .eq('id', thread_id)
+             .eq('user_id', user_id)
+             .execute())
 
             logger.info(f'Thread deleted: user={user_id}, thread={thread_id}')
             return {'response': 'Thread deleted successfully'}

@@ -63,7 +63,6 @@ class ListThreadsResponse(BaseModel):
 
 class DeleteThreadRequest(BaseModel):
     """Request model for deleting a conversation thread"""
-    project_id: str
     thread_id: str
     
 class DeleteThreadResponse(BaseModel):
@@ -72,7 +71,6 @@ class DeleteThreadResponse(BaseModel):
     
 class LoadThreadRequest(BaseModel):
     """Request model for loading a conversation thread"""
-    project_id: str
     thread_id: str
 
 class LoadThreadResponse(BaseModel):
