@@ -13,7 +13,7 @@ Schemas are organized by feature domain (auth, llm, users, etc.).
 from src.backend.schemas.auth import (
     LoginRequest,
     RegisterRequest,
-    TokenResponse,
+    LoginResponse,
     UserResponse,
 )
 
@@ -41,7 +41,7 @@ __all__ = [
     # Auth schemas
     'LoginRequest',
     'RegisterRequest',
-    'TokenResponse',
+    'LoginResponse',
     'UserResponse',
     # LLM schemas
     'TextContent',

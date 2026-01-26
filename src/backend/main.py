@@ -1,6 +1,9 @@
 """
 FastAPI application entry point for LLM backend service
 """
+import dotenv
+dotenv.load_dotenv()
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI

@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 class LoginRequest(BaseModel):
     """Login request model"""
-    username: str
+    email: str
     password: str
 
 class RegisterRequest(BaseModel):
@@ -23,12 +23,18 @@ class RegisterRequest(BaseModel):
     full_name: str | None = None
 
 
-class TokenResponse(BaseModel):
+class LoginResponse(BaseModel):
     """Token response model"""
     access_token: str
     token_type: str = "bearer"
     expires_in: int | None = None
 
+class CreateProfileRequest(BaseModel):
+    """Update profile request model"""
+    display_name: str | None = None
+class CreateProfileResponse(BaseModel):
+    """Create profile response model"""
+    response: list[dict]
 
 class UserResponse(BaseModel):
     """User response model"""

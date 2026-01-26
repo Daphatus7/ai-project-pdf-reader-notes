@@ -8,50 +8,44 @@ Provides endpoints for:
 - Password reset
 """
 import logging
-from fastapi import APIRouter, HTTPException, Depends
 
+from accelerate.commands.config.update import description
+from fastapi import APIRouter, HTTPException, Depends
+from supabase_auth import AuthResponse
+
+from src.backend.api.deps import get_database_service, get_user
 from src.backend.schemas import (
     LoginRequest,
     RegisterRequest,
-    TokenResponse,
+    LoginResponse,
     UserResponse,
 )
+from src.backend.schemas.auth import CreateProfileRequest
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/auth', tags=['authentication'])
 
 
-@router.post('/login', response_model=TokenResponse)
-async def login(request: LoginRequest):
+@router.post('/login', response_model=AuthResponse)
+async def login(request: LoginRequest,
+                database_service=Depends(get_database_service)
+                ):
     """
-    Authenticate user and return access token.
-
-    Args:
-        request: Login credentials
-
-    Returns:
-        Access token and token type
-
-    Raises:
-        HTTPException: If authentication fails
+        User login endpoint.
     """
     try:
-        # TODO: Implement authentication logic
-        # 1. Validate credentials against database
-        # 2. Generate JWT token
-        # 3. Return token response
-
-        logger.info(f"Login attempt for user: {request.username}")
-
-        # Placeholder response
-        raise HTTPException(
-            status_code=501,
-            detail="Authentication not yet implemented"
+        #use the database service to authenticate user
+        resp=await database_service.login(
+            email=request.email,
+            password=request.password
         )
-
+        logger.info(f"User logged in: {request}")
+        return resp #TODO !!危险操作，，返回的内容太多了 记得删了 , dangerous operation, the returned content is too much, remember to delete it
     except Exception as e:
         logger.error(f"Error in login endpoint: {e}", exc_info=True)
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+        
 
 
 @router.post('/register', response_model=UserResponse)
@@ -89,7 +83,7 @@ async def register(request: RegisterRequest):
         raise HTTPException(status_code=400, detail="Registration failed")
 
 
-@router.post('/refresh', response_model=TokenResponse)
+@router.post('/refresh', response_model=LoginResponse)
 async def refresh_token(refresh_token: str):
     """
     Refresh access token using refresh token.
@@ -137,3 +131,28 @@ async def logout():
     except Exception as e:
         logger.error(f"Error in logout endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Logout failed")
+
+
+@router.post('/create-profile', response_model=CreateProfileRequest)
+async def create_profile(
+    request: CreateProfileRequest,
+    user=Depends(get_user),
+    database_service=Depends(get_database_service)
+):
+    """
+    create user profile information.
+
+    Returns:
+        create user information
+    """
+    try:
+        resp=await database_service.create_user_profile(
+            user['sub'],
+            display_name=request.display_name,
+        )
+        logger.info(f"User profile created: {user['sub']}")
+        return resp
+    except Exception as e:
+        logger.error(f"Error in create_profile endpoint: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Create profile failed")
+        

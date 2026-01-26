@@ -18,7 +18,6 @@ from src.backend.schemas.project import (
     ListDocumentsResponse,
     ProjectDeleteResponse,
     DeleteDocumentResponse,
-    DeleteDocumentRequest
 )
 from src.backend.schemas.rag import RagRequest, UploadResponse
 
@@ -40,7 +39,10 @@ async def list_projects(
     List all projects for the authenticated user.
     """
     user_id = user['sub']
-    return await database_service.list_projects(user_id)
+    response = await database_service.list_projects(user_id)
+    return ListProjectsResponse(
+        projects=response
+    )
 
 
 @router.post('', response_model=CreateProjectResponse)
@@ -91,7 +93,6 @@ async def list_documents(
     )
     return ListDocumentsResponse(documents=documents)
 
-
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
         project_id: str = Path(..., description='Project ID to upload document to'),
@@ -135,11 +136,11 @@ async def upload_document(
         rag_request = RagRequest(
             user_id=user["sub"],
             project_id=project_id,
-            source_name=source_name,
-            file_dir=temp_path
+            document_name=source_name,
+            document_dir=temp_path
         )
-
-        result = rag_service.process(rag_request)
+        #first need to create a table for the document
+        result = await rag_service.upload_document(rag_request)
         return result
 
     except HTTPException:
@@ -155,27 +156,28 @@ async def upload_document(
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
 
-@router.delete('/documents', response_model=DeleteDocumentResponse)
+@router.delete('/{project_id}/documents/{document_id}', response_model=DeleteDocumentResponse)
 async def delete_document(
-        payload: DeleteDocumentRequest,
+        project_id: str = Path(..., description='Project ID'),
+        document_id: str = Path(..., description='Document ID to delete'),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
     """
     Delete a document from the project and vector database.
-    
+
     TODO: Also delete associated vectors from the vector database.
     - Could have been achieved with cascade delete in the database.
     """
     user_id = user['sub']
-    
+
     response = await database_service.delete_document(
         user_id=user_id,
-        document_id=payload.document_id,
-        project_id=payload.project_id,
+        document_id=document_id,
+        project_id=project_id,
     )
-    
-    logger.info(f'Document deleted: user={user_id}, project={payload.project_id}, document={payload.document_id}')
+
+    logger.info(f'Document deleted: user={user_id}, project={project_id}, document={document_id}')
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 

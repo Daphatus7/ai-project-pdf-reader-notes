@@ -11,11 +11,27 @@ import os
 from typing import Optional
 
 import jwt
-from fastapi import HTTPException,  Header
+from jwt import PyJWKClient
+from fastapi import HTTPException, Header
 
 from src.backend.servers import services
 
 logger = logging.getLogger(__name__)
+
+# Initialize JWKS client for Supabase token verification
+_jwks_client: Optional[PyJWKClient] = None
+
+
+def get_jwks_client() -> PyJWKClient:
+    """Get or create the JWKS client for token verification."""
+    global _jwks_client
+    if _jwks_client is None:
+        supabase_url = os.environ.get("SUPABASE_URL")
+        if not supabase_url:
+            raise ValueError("SUPABASE_URL environment variable is not set")
+        jwks_url = f"{supabase_url}/auth/v1/.well-known/jwks.json"
+        _jwks_client = PyJWKClient(jwks_url, cache_keys=True)
+    return _jwks_client
 
 
 def get_llm_service():
@@ -65,15 +81,23 @@ async def get_user(authorization: str = Header(...)):
     token = authorization.split(" ")[1]
 
     try:
+        # Get the signing key from JWKS endpoint
+        jwks_client = get_jwks_client()
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
+
         payload = jwt.decode(
             token,
-            os.environ.get("SUPABASE_JWT_SECRET"),
-            algorithms=["HS256"],
+            signing_key.key,
+            algorithms=["ES256", "HS256"],
             audience="authenticated"
         )
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        logger.error(f"JWT verification failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        logger.error(f"Authentication error: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
-    print(payload) # todo debug testing, remove in production
-    return payload  # 包含 user_id / email / role
+    logger.debug(f"Authenticated user: {payload.get('sub')}")
+    return payload  # Contains user_id (sub), email, role
 

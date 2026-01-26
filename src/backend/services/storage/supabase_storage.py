@@ -235,8 +235,13 @@ class Database(Service):
         """
         try:
             # Verify document belongs to user and project
-            document = self.__database.table('documents').select('id').eq('id', document_id).eq('user_id', user_id).eq('project_id', project_id).execute()
-            
+            document = (self.__database.table('documents')
+                        .select('id')
+                        .eq('id', document_id)
+                        .eq('user_id', user_id)
+                        .eq('project_id', project_id)
+                        .execute())
+
             if not document.data:
                 raise HTTPException(status_code=404, detail='Document not found or access denied')
             
