@@ -260,14 +260,12 @@ class Database(Service):
         
     # ==================== Conversation Threads Operations ====================
 
-    async def list_conversation_threads(self, user_id: str, request) -> dict:
+    async def list_conversation_threads(self, user_id: str) -> dict:
         """
         Get all conversation threads for a specific user.
 
         Args:
             user_id: User's unique identifier
-            request: ListThreadsRequest (reserved for future use)
-
         Returns:
             Dictionary with list of thread dictionaries
         """
@@ -275,7 +273,6 @@ class Database(Service):
             response = (self.__database.table('threads')
                         .select('*')
                         .eq('user_id', user_id)
-                        .eq('id',request.thread_id)
                         .order('updated_at', desc=True)
                         .execute())
             return response.data

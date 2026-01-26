@@ -67,7 +67,6 @@ async def create_conversation_thread(
 # Get all conversation threads - use for loading previous conversations 
 @router.get('/thread/list', response_model=ListThreadsResponse)
 async def list_conversation_threads(
-        request: ListThreadsRequest = Depends(),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
@@ -75,7 +74,7 @@ async def list_conversation_threads(
         Get all conversation threads for the user.
     """
     user_id = user["sub"]  # Supabase user id
-    threads = await database_service.list_conversation_threads(user_id, request)
+    threads = await database_service.list_conversation_threads(user_id)
     return threads
 
 # Delete a conversation thread
