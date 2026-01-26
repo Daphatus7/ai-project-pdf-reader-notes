@@ -302,7 +302,9 @@ class Database(Service):
             if response.data:
                 thread_id = response.data[0]['id']
                 logger.info(f'Thread created: user={user_id}, thread={thread_id}')
-                return {'thread_id': thread_id, 'messages': []}
+                return {'thread_id': thread_id, 
+                        'title': thread_data['title'],
+                        'thread_summary': thread_data['thread_summary']}
             else:
                 raise HTTPException(status_code=500, detail='Failed to create conversation thread')
 

@@ -17,7 +17,7 @@ from src.backend.schemas import (
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
-    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest
+    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ async def achat(
     )
 
 #create a thread
-@router.post('/thread', response_model=LoadThreadResponse)
+@router.post('/thread', response_model=CreateThreadResponse)
 async def create_conversation_thread(
         user=Depends(get_user),
         database_service=Depends(get_database_service),
@@ -62,7 +62,7 @@ async def create_conversation_thread(
     response = await database_service.create_conversation_thread(
         user_id=user_id,
     )
-    return response
+    return CreateThreadResponse(**response)
 
 # Get all conversation threads - use for loading previous conversations 
 @router.get('/thread/list', response_model=ListThreadsResponse)

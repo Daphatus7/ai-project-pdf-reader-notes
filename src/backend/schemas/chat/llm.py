@@ -52,6 +52,15 @@ class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
     response: str = Field(..., description='LLM response message')
 
+class CreateThreadRequest(BaseModel):
+    """Request model for creating a conversation thread"""
+
+class CreateThreadResponse(BaseModel):
+    """Response model for creating a conversation thread"""
+    thread_id: str
+    title: str
+    thread_summary: Optional[str] = None
+
 class ListThreadsRequest(BaseModel):
     """Request model for fetching conversation threads"""
     project_id: str
