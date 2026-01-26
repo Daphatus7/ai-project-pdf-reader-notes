@@ -49,7 +49,7 @@ async def achat(
     )
 
 # Get all conversation threads - use for loading previous conversations 
-@router.get('/threads', response_model=GetThreadsResponse)
+@router.get('/thread', response_model=GetThreadsResponse)
 async def get_conversation_threads(
         user=Depends(get_user),
         database_service=Depends(get_database_service),
@@ -62,7 +62,7 @@ async def get_conversation_threads(
     return threads
 
 # Delete a conversation thread
-@router.delete('/threads/{thread_id}', response_model=DeleteThreadResponse)
+@router.delete('/thread/{thread_id}', response_model=DeleteThreadResponse)
 async def delete_conversation_thread(
         thread_id: str,
         user=Depends(get_user),
@@ -79,7 +79,7 @@ async def delete_conversation_thread(
     return response
 
 # load a conversation thread
-@router.get('/threads/{thread_id}', response_model=LoadThreadResponse)
+@router.get('/thread/{thread_id}', response_model=LoadThreadResponse)
 async def load_conversation_thread(
         thread_id: str,
         user=Depends(get_user),
@@ -95,7 +95,7 @@ async def load_conversation_thread(
     )
     return response
 #create a thread
-@router.post('/threads', response_model=LoadThreadResponse)
+@router.post('/thread', response_model=LoadThreadResponse)
 async def create_conversation_thread(
         user=Depends(get_user),
         database_service=Depends(get_database_service),

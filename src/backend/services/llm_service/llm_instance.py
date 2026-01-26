@@ -279,6 +279,7 @@ class LlmAgent:
         # Final structured + done
         yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
         yield f'data: {json.dumps({"type": "done"})}\n\n'
+        
     async def chat(self, request: ChatRequest):
         self.counter += 1
         print(f"Agent called {self.counter} times")

@@ -98,10 +98,9 @@ async def test_chat(user_message: str, use_filter: bool = True):
 
         # Create chat request with optional RAG filter
         chat_request = ChatRequest(
+            project_id="test-project-001",
             thread_id="1",  # fix user thread for testing
             contents=[TextContent(type="text", text=user_message)],
-            system_message="You are a helpful assistant.",
-            user_id=TEST_USER_ID if use_filter else None,
             source_ids=TEST_SOURCE_IDS if use_filter else None,
         )
 
