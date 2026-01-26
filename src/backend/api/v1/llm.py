@@ -28,7 +28,7 @@ async def chat(
         request: ChatRequest = Depends(get_chat_request),
         llm_service=Depends(get_llm_service)
 ):
-    response = llm_service.chat(request=request)
+    response = await llm_service.chat(request=request)
     return ChatResponse(response=response)
 
 
@@ -75,7 +75,7 @@ async def list_conversation_threads(
     """
     user_id = user["sub"]  # Supabase user id
     threads = await database_service.list_conversation_threads(user_id)
-    return threads
+    return ListThreadsResponse(threads=threads)
 
 # Delete a conversation thread
 @router.delete('/thread', response_model=DeleteThreadResponse)
@@ -103,8 +103,9 @@ async def load_conversation_thread(
     Load all conversation history for the thread.
     """
     user_id = user["sub"]
-    return await database_service.load_conversation_thread(
+    messages = await database_service.load_conversation_thread(
         user_id=user_id,
         request=request,
     )
+    return LoadThreadResponse(messages=messages)
 
