@@ -56,9 +56,9 @@ def extract_pdf_elements(pdf_dir: str) -> list[Element]:
         strategy='hi_res',
         content_type='application/pdf',
         skip_infer_table_types=False,
-        extract_image_block_types=[
-            #'Image', 
-            'Table'],
+        # extract_image_block_types=[
+        #     #'Image', 
+        #     'Table'],
         extract_images_in_pdf=False,
     )
     return elements
