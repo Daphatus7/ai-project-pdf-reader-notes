@@ -17,7 +17,6 @@ from src.backend.services.context_provider.pdf_extract import extract_pdf_elemen
 class RawContextPayload:
     payload: list[dict]
     name: str
-    id:str
     dir:str
     
     
@@ -167,8 +166,7 @@ def __process_pdf(payload: RawContextPayload
         {
             "content": c.text,
             "metadata": {
-                "source_id": payload.id,
-                "source_name": payload.name,
+                "document_id": "",
                 "source_dir": payload.dir,
                 "token_count": c.token_count,
                 "start_index": c.start_index,
@@ -190,16 +188,15 @@ def chonkie_chunk(rag_request: RagRequest) -> list[dict]:
         raise ValueError("rag_request cannot be None")
 
     # Extract the file
-    extracted = extract_pdf_elements(rag_request.file_dir)
+    extracted = extract_pdf_elements(rag_request.document_dir)
     if not extracted:
         raise ValueError("No content extracted from PDF")
 
     chonkie_output = __process_pdf(
         payload=RawContextPayload(
             payload=[el.to_dict() for el in extracted],
-            id=str(uuid.uuid4()),
-            dir=rag_request.file_dir,
-            name=rag_request.source_name
+            dir=rag_request.document_dir,
+            name=rag_request.document_name
         )
     )
 

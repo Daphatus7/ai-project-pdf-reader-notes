@@ -1,44 +1,54 @@
 # @file        auth.py
-# @description 
+# @description
 # @author      [Peiyu Wang]
 # @date        29/12/2025
 # @license     © 2025 . All rights reserved.
+import logging
+
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from jose import JWTError, jwt
-from src.backend.config.config import settings
-from src.backend.schemas.auth import UserRequest
+from src.backend.api.deps import get_jwks_client
+from src.backend.schemas.auth import AuthContext
+import jwt
 
+logger = logging.getLogger(__name__)
 security = HTTPBearer()
+
 
 async def verify_user_is_allowed(
         credentials: HTTPAuthorizationCredentials = Depends(security)
-) -> UserRequest:
-    # 
+) -> AuthContext:
     token = credentials.credentials
 
     try:
+        # Get the signing key from JWKS endpoint
+        jwks_client = get_jwks_client()
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
+
         payload = jwt.decode(
             token,
-            algorithms=["HS256"],
-            key=settings.jwt_secret_key,
+            signing_key.key,
+            algorithms=["ES256", "HS256"],
             audience="authenticated"
         )
-    except JWTError:
+    except jwt.PyJWTError as e:
+        logger.error(f"JWT verification failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        logger.error(f"Authentication error: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    # 从 app_metadata 获取租户信息
+    # Get tenant info from app_metadata
     app_metadata = payload.get("app_metadata", {})
 
-    return UserRequest(
+    return AuthContext(
         user_id=user_id,
-        access_token=token,
-        tenant_id=app_metadata.get("tenant_id", "default"),
+        tenant_id=app_metadata.get("tenant_id"),
         role=app_metadata.get("role", "user"),
         plan=app_metadata.get("plan")
     )

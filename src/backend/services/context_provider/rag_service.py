@@ -29,34 +29,42 @@ class RagService(Service):
 
     def validate_input(self, rag_request: RagRequest) -> bool:
         """Validate the input request. MVP: check file exists."""
-        if not rag_request.file_dir:
+        if not rag_request.document_dir:
             return False
-        if not os.path.exists(rag_request.file_dir):
+        if not os.path.exists(rag_request.document_dir):
             return False
         return True
 
-    def store(self, rag_request: RagRequest, chunks: list[dict]) -> int:
+    def store_to_vector(self, rag_request: RagRequest,
+                        document_id:str,
+                        chunks: list[dict]) -> int:
         """Store chunks with embeddings in Supabase. Returns count of inserted docs."""
+        # content the of the chunks is embedded
         texts = [c.get("content", "") for c in chunks]
         logger.info(f"Generating embeddings for {len(texts)} chunks...")
         embeddings = self.embedding_model.embed_documents(texts)
-
+        
+        #store to json for debugging 
+        with open("embeddings_debug.json", "w") as f:
+            import json
+            json.dump(chunks, f)
+        
         documents = []
         for chunk, emb in zip(chunks, embeddings):
             meta = chunk.get("metadata", {})
             documents.append({
-                "user_id": rag_request.user_id,
+                #id created by supabase
+                "document_id": document_id,
                 "project_id": rag_request.project_id,
-                "source_id": meta.get("source_id"),
-                "source_name": meta.get("source_name"),
                 "content": chunk.get("content", ""),
                 "embedding": emb,
                 "token_count": meta.get("token_count"),
+                "start_index": meta.get("start_index"),
+                "end_index": meta.get("end_index"),
                 "page_numbers": meta.get("page_number", []),
-                "metadata": {}
             })
 
-        response = self.supabase.table("documents_chunks").insert(documents).execute()
+        response = self.supabase.table("document_chunks").insert(documents).execute()
         inserted_count = len(response.data) if response.data else 0
         logger.info(f"Inserted {inserted_count} documents for user {rag_request.user_id}")
         return inserted_count
@@ -73,8 +81,29 @@ class RagService(Service):
         except Exception as e:
             logger.exception(f"Delete failed: {e}")
             return RagDeleteResponse(success=False, message=str(e))
+    
+    async def create_document_table(self, rag_request: RagRequest)-> None:
+        """
+            create a table for document summary
+        :param rag_request: 
+        :return: 
+        """
+        try:
+            response = self.supabase.table("documents").insert({
+                "user_id": rag_request.user_id,
+                "project_id": rag_request.project_id,
+                "document_name": rag_request.document_name,
+                "document_dir": rag_request.document_dir,
+                "description": "to be added in the future",
+            }).execute()
+            logger.info(f"Document table created for user {rag_request.user_id}, project {rag_request.project_id}")
+            return response
+        except Exception as e:
+            logger.exception(f"Failed to create document table: {e}")
+            raise e
+        
 
-    def process(self, rag_request: RagRequest) -> UploadResponse:
+    async def upload_document(self, rag_request: RagRequest) -> UploadResponse:
         """
         Process incoming pdf file and store to vector database.
         Returns UploadResponse with status.
@@ -107,7 +136,15 @@ class RagService(Service):
 
         # Store to vector database
         try:
-            inserted_count = self.store(rag_request, chunks)
+            try:
+                response = await self.create_document_table(rag_request)
+                document_id = response.data[0]['id']  #get document id
+            except:
+                raise Exception("Failed to create document table entry")
+                
+            inserted_count = self.store_to_vector(rag_request,
+                                                  document_id,
+                                                      chunks)
         except Exception as e:
             logger.exception(f"Storage failed: {e}")
             return UploadResponse(

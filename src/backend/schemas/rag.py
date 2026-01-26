@@ -13,8 +13,8 @@ class RagRequest(BaseModel):
     """
     user_id: str
     project_id: str
-    source_name: str
-    file_dir: str  # temp file path on server
+    document_name: str
+    document_dir: str  # temp file path on server
 
 
 class UploadResponse(BaseModel):

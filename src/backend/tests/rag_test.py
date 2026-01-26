@@ -198,12 +198,12 @@ def test_service_direct():
         req = RagRequest(
             user_id=TEST_USER_ID,
             project_id=TEST_PROJECT_ID,
-            source_name="exam21-final-direct-test",
-            file_dir=str(TEST_PDF_PATH)
+            document_name="exam21-final-direct-test",
+            document_dir=str(TEST_PDF_PATH)
         )
 
         print(f"[INFO] Processing {TEST_PDF_PATH.name}...")
-        result = service.process(req)
+        result = service.upload_document(req)
 
         print(f"\n[INFO] Result:")
         print(f"       success: {result.success}")

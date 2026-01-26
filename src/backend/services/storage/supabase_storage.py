@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 class Database(Service):
     """
-    Database service for managing projects and documents in Supabase.
-    
-    Provides CRUD operations for:
-    - Projects: User's organizational units
-    - Documents: PDF files associated with projects
+        Database service for managing projects and documents in Supabase.
+        
+        Provides CRUD operations for:
+        - Projects: User's organizational units
+        - Documents: PDF files associated with projects
     """
     
     def __init__(self):
@@ -58,6 +58,48 @@ class Database(Service):
 
         self.__database: Client = create_client(url, key)
         logger.info('Supabase database service started')
+        
+    async def login(self, email: str, password: str) -> dict:
+        """
+        Login a user using email and password.
+        
+        Args:
+            email: User's email
+            password: User's password
+        Returns:
+            dict: Authentication response containing access token and user info
+        """
+        try:
+            logger.info("Attempting to log in user with email: %s", email)
+            resp = self.__database.auth.sign_in_with_password({
+                'email': email,
+                'password': password,
+            })
+            return resp
+        except Exception as e:
+            logger.error(f'Login failed for email {email}: {e}')
+            raise HTTPException(status_code=500, detail='Login failed')
+        
+    async def create_user_profile(self, user_id: str, 
+                                  display_name: str,
+                                  ) -> None:
+        """
+            Create a user profile in the database.
+        :param user_id: 
+        :param display_name: 
+        :return: 
+        """
+        try:
+            
+            resp=self.__database.table('profiles').insert({
+                'id': user_id,
+                'display_name': display_name,
+            }).execute()
+            logger.info(f'User profile created for user {user_id}')
+            return resp
+        except Exception as e:
+            logger.error(f'Failed to create user profile for user {user_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to create user profile')
 
     # ==================== Projects Operations ====================
 
@@ -73,6 +115,7 @@ class Database(Service):
         """
         try:
             response = self.__database.table('projects').select('*').eq('user_id', user_id).execute()
+            #dump response to json
             return response.data
         except Exception as e:
             logger.error(f'Failed to get projects for user {user_id}: {e}')
