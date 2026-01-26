@@ -24,12 +24,12 @@ from src.backend.schemas.chat.llm import (
     ContentType,
     ChatRequest,
     ChatResponse,
-    CodeBlock,
-    MathExpression,
-    Section,
-    LLMStructuredOutput,
-    StructuredChatRequest,
-    StructuredChatResponse,
+    ListThreadsRequest,
+    ListThreadsResponse,
+    DeleteThreadRequest,
+    DeleteThreadResponse,
+    LoadThreadRequest,
+    LoadThreadResponse,
 )
 
 from src.backend.schemas.users import (
@@ -49,12 +49,12 @@ __all__ = [
     'ContentType',
     'ChatRequest',
     'ChatResponse',
-    'CodeBlock',
-    'MathExpression',
-    'Section',
-    'LLMStructuredOutput',
-    'StructuredChatRequest',
-    'StructuredChatResponse',
+    'ListThreadsRequest',
+    'ListThreadsResponse',
+    'DeleteThreadRequest',
+    'DeleteThreadResponse',
+    'LoadThreadRequest',
+    'LoadThreadResponse',
     # User schemas
     'UserProfile',
 ]

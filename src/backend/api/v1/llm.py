@@ -32,7 +32,7 @@ async def chat(
     return ChatResponse(response=response)
 
 
-@router.post('/achat', response_model=StreamingResponse)
+@router.post('/achat')
 async def achat(
         request: ChatRequest = Depends(get_chat_request),
         llm_service=Depends(get_llm_service)
@@ -67,7 +67,7 @@ async def create_conversation_thread(
 # Get all conversation threads - use for loading previous conversations 
 @router.get('/thread/list', response_model=ListThreadsResponse)
 async def list_conversation_threads(
-        request: ListThreadsRequest,
+        request: ListThreadsRequest = Depends(),
         user=Depends(get_user),
         database_service=Depends(get_database_service),
 ):
