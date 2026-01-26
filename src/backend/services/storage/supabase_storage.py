@@ -9,6 +9,8 @@ import os
 import dotenv
 from fastapi import HTTPException
 from supabase import create_client, Client
+
+from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 
 logger = logging.getLogger(__name__)
@@ -273,9 +275,10 @@ class Database(Service):
             response = (self.__database.table('threads')
                         .select('*')
                         .eq('user_id', user_id)
+                        .eq('id',request.thread_id)
                         .order('updated_at', desc=True)
                         .execute())
-            return {'threads': response.data}
+            return response.data
         except Exception as e:
             logger.error(f'Failed to get conversation threads for user {user_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to retrieve conversation threads')
@@ -293,8 +296,8 @@ class Database(Service):
         try:
             thread_data = {
                 'user_id': user_id,
-                'title': None,
-                'thread_summary': None,
+                'title': "New Conversation",
+                'thread_summary': "To be generated in the future",
             }
 
             response = self.__database.table('threads').insert(thread_data).execute()
@@ -312,7 +315,7 @@ class Database(Service):
             logger.error(f'Failed to create conversation thread for user {user_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to create conversation thread')
 
-    async def load_conversation_thread(self, user_id: str, request) -> dict:
+    async def load_conversation_thread(self, user_id: str, request: LoadThreadRequest) -> dict:
         """
         Load a conversation thread with its messages.
 
@@ -325,26 +328,13 @@ class Database(Service):
         """
         thread_id = request.thread_id
         try:
-            # Verify thread belongs to user
-            thread = (self.__database.table('threads')
-                      .select('id')
-                      .eq('id', thread_id)
-                      .eq('user_id', user_id)
-                      .execute())
-
-            if not thread.data:
-                raise HTTPException(status_code=404, detail='Thread not found or access denied')
-
             # Load messages for this thread
             messages_response = (self.__database.table('messages')
                                  .select('*')
                                  .eq('thread_id', thread_id)
-                                 .eq('user_id', user_id)
                                  .order('created_at', desc=False)
                                  .execute())
-
-            return {'messages': messages_response.data}
-
+            return messages_response.data
         except HTTPException:
             raise
         except Exception as e:
@@ -364,16 +354,6 @@ class Database(Service):
         """
         thread_id = request.thread_id
         try:
-            # Verify thread belongs to user
-            thread = (self.__database.table('threads')
-                      .select('id')
-                      .eq('id', thread_id)
-                      .eq('user_id', user_id)
-                      .execute())
-
-            if not thread.data:
-                raise HTTPException(status_code=404, detail='Thread not found or access denied')
-
             # Delete thread (messages will cascade delete)
             (self.__database.table('threads')
              .delete()
