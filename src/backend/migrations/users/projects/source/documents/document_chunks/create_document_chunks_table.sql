@@ -13,11 +13,6 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
 
-    -- Source document info
-    source_id UUID NOT NULL,
-    source_name TEXT,
-    source_dir TEXT,
-
     -- Content
     content TEXT NOT NULL,
 
@@ -29,9 +24,6 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     start_index INTEGER,
     end_index INTEGER,
     page_numbers INTEGER[],
-
-    -- Additional metadata (flexible JSON)
-    metadata JSONB DEFAULT '{}',
 
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),

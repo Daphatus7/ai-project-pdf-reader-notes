@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS documents (
     -- Source document info
     document_name TEXT,
     document_dir TEXT,
+    document_type TEXT,
     description TEXT NOT NULL,
     
     -- Timestamps

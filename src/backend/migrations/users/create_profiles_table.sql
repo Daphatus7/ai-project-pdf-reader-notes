@@ -1,15 +1,12 @@
 -- Migration: Create profiles table
 -- Description: User profile table for storing user basic information
 -- Date: 2026-01-23
-
 CREATE TABLE IF NOT EXISTS profiles (
     -- Primary key (matches auth.users.id)
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     
     -- User information
-    display_name TEXT NOT NULL,
-    user_id TEXT NOT NULL UNIQUE,
-    
+    display_name TEXT NOT NULL,    
     -- User preferences
     preference JSONB DEFAULT '{}',
     
