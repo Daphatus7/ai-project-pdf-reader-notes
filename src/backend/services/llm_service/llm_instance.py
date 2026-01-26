@@ -280,7 +280,7 @@ class LlmAgent:
         yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
         yield f'data: {json.dumps({"type": "done"})}\n\n'
         
-    async def chat(self, request: ChatRequest):
+    async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
         print(f"Agent called {self.counter} times")
         print(f"agent has the context {self.agent.get_context_jsonschema()}")
@@ -361,3 +361,4 @@ class LlmAgent:
             if usage.get('output_token_details'):
                 print(f"Output details: {usage['output_token_details']}")
             print("-------------------")
+        return ai_msg.content
