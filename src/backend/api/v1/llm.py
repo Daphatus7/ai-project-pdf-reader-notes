@@ -16,7 +16,8 @@ from src.backend.schemas import (
 )
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
-from src.backend.schemas.chat.llm import GetThreadsResponse, DeleteThreadResponse, LoadThreadResponse
+from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
+    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest
 
 logger = logging.getLogger(__name__)
 
@@ -48,52 +49,6 @@ async def achat(
         }
     )
 
-# Get all conversation threads - use for loading previous conversations 
-@router.get('/thread', response_model=GetThreadsResponse)
-async def get_conversation_threads(
-        user=Depends(get_user),
-        database_service=Depends(get_database_service),
-):
-    """
-    Get all conversation threads for the user.
-    """
-    user_id = user["sub"]  # Supabase user id
-    threads = await database_service.get_conversation_threads(user_id=user_id)
-    return threads
-
-# Delete a conversation thread
-@router.delete('/thread/{thread_id}', response_model=DeleteThreadResponse)
-async def delete_conversation_thread(
-        thread_id: str,
-        user=Depends(get_user),
-        database_service=Depends(get_database_service),
-):
-    """
-    Delete a conversation thread.
-    """
-    user_id = user["sub"]  # Supabase user id
-    response=await database_service.delete_conversation_thread(
-        user_id=user_id,
-        thread_id=thread_id,
-    )
-    return response
-
-# load a conversation thread
-@router.get('/thread/{thread_id}', response_model=LoadThreadResponse)
-async def load_conversation_thread(
-        thread_id: str,
-        user=Depends(get_user),
-        database_service=Depends(get_database_service),
-):
-    """
-    Load a conversation thread.
-    """
-    user_id = user["sub"]  # Supabase user id
-    response = await database_service.load_conversation_thread(
-        user_id=user_id,
-        thread_id=thread_id,
-    )
-    return response
 #create a thread
 @router.post('/thread', response_model=LoadThreadResponse)
 async def create_conversation_thread(
@@ -106,6 +61,54 @@ async def create_conversation_thread(
     user_id = user["sub"]  # Supabase user id
     response = await database_service.create_conversation_thread(
         user_id=user_id,
+    )
+    return response
+
+# Get all conversation threads - use for loading previous conversations 
+@router.get('/thread', response_model=ListThreadsResponse)
+async def list_conversation_threads(
+        request: ListThreadsRequest,
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+):
+    """
+        Get all conversation threads for the user.
+    """
+    user_id = user["sub"]  # Supabase user id
+    threads = await database_service.list_conversation_threads(user_id, request)
+    return threads
+
+# Delete a conversation thread
+@router.delete('/thread/{thread_id}', response_model=DeleteThreadResponse)
+async def delete_conversation_thread(
+        request: DeleteThreadRequest,
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+):
+    """
+        Delete a conversation thread.
+    """
+    user_id = user["sub"]  # Supabase user id
+    response=await database_service.delete_conversation_thread(
+        user_id=user_id,
+        request=request,
+    )
+    return response
+
+# load a conversation thread
+@router.get('/thread/{thread_id}', response_model=LoadThreadResponse)
+async def load_conversation_thread(
+        request: LoadThreadRequest,
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+):
+    """
+        Load all conversation history for the thread.
+    """
+    user_id = user["sub"]  # Supabase user id
+    response = await database_service.load_conversation_thread(
+        user_id=user_id,
+        request=request,
     )
     return response
 

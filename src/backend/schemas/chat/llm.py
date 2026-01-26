@@ -52,17 +52,18 @@ class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
     response: str = Field(..., description='LLM response message')
 
-class GetThreadsRequest(BaseModel):
+class ListThreadsRequest(BaseModel):
     """Request model for fetching conversation threads"""
     project_id: str
     
-class GetThreadsResponse(BaseModel):
+class ListThreadsResponse(BaseModel):
     """Response model for fetching conversation threads"""
     threads: list[dict]  # List of thread details
     # ToDO data structure to be improved later
 
 class DeleteThreadRequest(BaseModel):
     """Request model for deleting a conversation thread"""
+    project_id: str
     thread_id: str
     
 class DeleteThreadResponse(BaseModel):
@@ -71,10 +72,10 @@ class DeleteThreadResponse(BaseModel):
     
 class LoadThreadRequest(BaseModel):
     """Request model for loading a conversation thread"""
+    project_id: str
     thread_id: str
 
 class LoadThreadResponse(BaseModel):
     """Response model for loading a conversation thread"""
-    thread_id: str
     messages: list[dict] # to be enhanced in the future
     # ToDO data structure to be improved later
