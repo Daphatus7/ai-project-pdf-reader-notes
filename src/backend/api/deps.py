@@ -46,7 +46,7 @@ def get_llm_service():
         HTTPException: If LLM service is not available
     """
     try:
-        return services.get('llm_service')
+        return services.get_service('llm_service')
     except ValueError as e:
         logger.error(f'Failed to get LLM service: {e}')
         raise HTTPException(status_code=503, detail='LLM service not available')
@@ -57,7 +57,7 @@ def get_rag_service():
     :return: 
     """
     try:
-        return services.get('rag_service')
+        return services.get_service('rag_service')
     except ValueError as e:
         logger.error(f'Failed to get Rag service: {e}')
         raise HTTPException(status_code=503, detail='Rag service not available')
@@ -68,7 +68,7 @@ def get_database_service():
     :return: 
     """
     try:
-        return services.get('database_service')
+        return services.get_service('database_service')
     except ValueError as e:
         logger.error(f'Failed to get database service: {e}')
         raise HTTPException(status_code=503, detail='database service not available')
@@ -99,7 +99,7 @@ async def get_user(authorization: str = Header(...)):
         logger.error(f"Authentication error: {e}")
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-    logger.debug(f"Authenticated user: {payload.get('sub')}")
+    logger.debug(f"Authenticated user: {payload.get_service('sub')}")
     return payload  # Contains user_id (sub), email, role
 
 
