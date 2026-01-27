@@ -29,9 +29,9 @@ class Services:
     def _initialize_llm_services(self):
         """Initialize LLM-related services"""
         # Initialize storage service first (other services depend on it)
-        storage_service = StorageService()
-        storage_service.start()
-        self.register('storage', storage_service)
+        redis_storage = RedisStorage()
+        redis_storage.start()
+        self.register('storage', redis_storage)
 
         # Initialize Supabase database
         database = Database()
