@@ -34,9 +34,9 @@ class Services:
         self.register('storage', redis_storage)
 
         # Initialize Supabase database
-        database = Database()
-        database.start()
-        self.register('database_service', database)
+        supabase_storage = SupabaseStorage()
+        supabase_storage.start()
+        self.register('database_service', supabase_storage)
 
         # Initialize LLM service (uses storage service for checkpointer and Supabase for RAG)
         llm_service = LlmService(
