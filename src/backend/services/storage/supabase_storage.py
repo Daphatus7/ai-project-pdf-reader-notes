@@ -12,11 +12,12 @@ from supabase import create_client, Client
 
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
+from src.backend.config.config import settings
 
 logger = logging.getLogger(__name__)
 
 
-class Database(Service):
+class SupabaseStorage(Service):
     """
         Database service for managing projects and documents in Supabase.
         
@@ -368,3 +369,134 @@ class Database(Service):
         except Exception as e:
             logger.error(f'Failed to delete conversation thread {thread_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to delete conversation thread')
+
+    # ==================== Message Persistence Operations ====================
+
+    async def save_message(
+        self,
+        user_id: str,
+        thread_id: str,
+        role: str,
+        content: dict | str,
+        token_count: int
+    ) -> dict:
+        """
+        Save a single message to the database.
+
+        Args:
+            user_id: User's unique identifier
+            thread_id: Conversation thread ID
+            role: Message role ('user', 'assistant', 'system')
+            content: Message content (JSONB)
+            token_count: Token count for this message
+
+        Returns:
+            Created message record
+        """
+        try:
+            # Ensure content is in correct format for JSONB
+            if isinstance(content, str):
+                content = {"text": content}
+
+            message_data = {
+                'user_id': user_id,
+                'thread_id': thread_id,
+                'role': role,
+                'content': content,
+                'token_count': token_count,
+            }
+
+            response = self.__database.table('messages').insert(message_data).execute()
+
+            if response.data:
+                logger.info(f'Message saved: thread={thread_id}, role={role}, tokens={token_count}')
+                return response.data[0]
+            else:
+                raise HTTPException(status_code=500, detail='Failed to save message')
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to save message for thread {thread_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to save message')
+
+    async def load_recent_messages(
+        self,
+        thread_id: str,
+        max_messages: int | None = None,
+        max_tokens: int | None = None
+    ) -> list[dict]:
+        """
+        Load recent messages from a thread with dual limits.
+
+        Stops when either limit is reached (whichever comes first).
+        Returns messages in chronological order (oldest first).
+
+        Args:
+            thread_id: Conversation thread ID
+            max_messages: Maximum messages to load (default: settings.cold_start_max_messages)
+            max_tokens: Maximum total tokens (default: settings.cold_start_max_tokens)
+
+        Returns:
+            List of message dicts in chronological order
+        """
+        if max_messages is None:
+            max_messages = settings.cold_start_max_messages
+        if max_tokens is None:
+            max_tokens = settings.cold_start_max_tokens
+
+        try:
+            # Fetch messages ordered by newest first, limited by max_messages
+            response = (self.__database.table('messages')
+                        .select('id, user_id, role, content, token_count, created_at')
+                        .eq('thread_id', thread_id)
+                        .order('created_at', desc=True)
+                        .limit(max_messages)
+                        .execute())
+
+            if not response.data:
+                logger.info(f"No messages found for thread {thread_id}")
+                return []
+
+            # Apply token limit
+            selected_messages = []
+            total_tokens = 0
+
+            for msg in response.data:
+                msg_tokens = msg.get('token_count', 0)
+                if total_tokens + msg_tokens > max_tokens and selected_messages:
+                    break
+                selected_messages.append(msg)
+                total_tokens += msg_tokens
+
+            # Reverse to chronological order (oldest first)
+            selected_messages.reverse()
+
+            logger.info(
+                f'Cold start: loaded {len(selected_messages)} messages ({total_tokens} tokens) for thread={thread_id}'
+            )
+            return selected_messages
+
+        except Exception as e:
+            logger.error(f'Failed to load messages for thread {thread_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to load messages')
+
+    async def thread_exists(self, thread_id: str) -> bool:
+        """
+        Check if a thread exists in the database.
+
+        Args:
+            thread_id: Thread ID to check
+
+        Returns:
+            True if thread exists, False otherwise
+        """
+        try:
+            response = (self.__database.table('threads')
+                        .select('id')
+                        .eq('id', thread_id)
+                        .execute())
+            return len(response.data) > 0
+        except Exception as e:
+            logger.error(f'Failed to check thread existence {thread_id}: {e}')
+            return False

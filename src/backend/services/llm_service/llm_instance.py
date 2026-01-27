@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model
@@ -17,6 +17,11 @@ from supabase import Client
 from src.backend.schemas import ChatRequest
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langchain.messages import RemoveMessage
+from src.backend.services.llm_service.conversation_storage import ConversationStorage
+
+if TYPE_CHECKING:
+    from src.backend.services.storage.supabase_storage import SupabaseStorage
+    from src.backend.services.storage.redis_storage import RedisStorage
 
 
 STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
@@ -205,11 +210,28 @@ class LlmAgent:
     Multi-user safe LLM agent.
 
     用户上下文通过 RunnableConfig 传递，而非实例变量，确保并发安全。
+
+    Conversation Storage:
+    - Redis: Short-term via checkpointer (with TTL)
+    - Supabase: Long-term persistence
     """
 
-    def __init__(self, checkpointer: BaseCheckpointSaver, supabase: Client | None = None):
+    def __init__(
+        self,
+        checkpointer: BaseCheckpointSaver,
+        supabase_storage: "SupabaseStorage | None" = None,
+        redis_storage: "RedisStorage | None" = None
+    ):
         self._checkpointer = checkpointer
-        self._supabase = supabase
+
+        # Get Supabase client from database for RAG
+        self._supabase = supabase_storage.get() if supabase_storage else None
+
+        # Conversation storage manager
+        self._conversation_storage = ConversationStorage(
+            supabase_storage=supabase_storage,
+            redis_storage=redis_storage
+        )
 
         # LLM model
         self.model = ChatOpenAI(
@@ -220,73 +242,31 @@ class LlmAgent:
         # Embedding model for query vectors
         self._embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 
-        # Setup retriever tool (传入依赖，不传入请求级别的上下文)
+        # Setup retriever tool
         self._retrieve_context = make_retriever_tool(self._supabase, self._embedding_model)
         self.tools = [self._retrieve_context]
 
         self.agent = create_agent(
             model=self.model,
             tools=self.tools,
-            middleware=[log_state, trim_messages],
+            middleware=[
+                #log_state, 
+                trim_messages],
             checkpointer=self._checkpointer,
         )
         self.counter = 0
-    async def achat(self, chat_request: ChatRequest):
-        self.counter += 1
-        print(f"Agent called {self.counter} times")
-        print(f"agent has the context {self.agent.get_context_jsonschema()}")
-        print("----------------")
-
-        # 通过 config 传递用户上下文 (线程安全，支持多用户并发)
-        config: RunnableConfig = {
-            "configurable": {
-                "user_id": chat_request.user_id,
-                "project_id": chat_request.project_id,
-                "thread_id": chat_request.thread_id,
-                "source_ids": chat_request.source_ids,
-            }
-        }
-        system_msg = SystemMessage(content="you are a helpful assistant")
-        human_msg = _build_human_message(chat_request.contents)
-            
-        accumulated_text = ""
-        last_structured_update = None
-            
-        async for chunk in self.agent.astream(
-                {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
-                config,
-                stream_mode="updates"  # Streams deltas after each node (model/tools)
-        ):
-            # Extract text delta from latest model step
-            if "model" in chunk:  # Agent LLM node name
-                delta = chunk["model"].get("messages", [])
-                if isinstance(delta, list) and len(delta) > 0:
-                    last_msg_chunk = delta[-1]  # Latest AIMessageChunk
-                    if hasattr(last_msg_chunk, "content") and last_msg_chunk.content:
-                        text_delta = last_msg_chunk.content
-                        accumulated_text += text_delta
-
-                        # Yield text SSE chunk
-                        yield f'data: {json.dumps({"type": "text", "content": text_delta})}\n\n'
-
-                        # Periodic structured update (adapt your _should_send_structured_update)
-                        if _should_send_structured_update(len(accumulated_text), accumulated_text):
-                            partial_output = {"content": accumulated_text, "content_type": "answer"}
-                            if partial_output != last_structured_update:
-                                last_structured_update = partial_output
-                                yield f'data: {json.dumps({"type": "structured", "data": partial_output})}\n\n'
-
-        # Final structured + done
-        yield f'data: {json.dumps({"type": "structured", "data": {"content": accumulated_text, "content_type": "answer"}})}\n\n'
-        yield f'data: {json.dumps({"type": "done"})}\n\n'
-        
     async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
-        print(f"Agent called {self.counter} times")
-        print(f"agent has the context {self.agent.get_context_jsonschema()}")
-        print("----------------")
+        logging.info(f"Agent called {self.counter} times")
 
-        # 通过 config 传递用户上下文 (线程安全，支持多用户并发)
+        # 1. Refresh Redis TTL at request start
+        self._conversation_storage.refresh_ttl(request.thread_id)
+
+        # 2. Cold start: load from Supabase if thread not in Redis
+        history = await self._conversation_storage.cold_start_load(request.thread_id)
+        logging.info(f"we have history: {history}")
+    
+        # 3. Build messages
         config: RunnableConfig = {
             "configurable": {
                 "user_id": request.user_id,
@@ -295,70 +275,36 @@ class LlmAgent:
                 "source_ids": request.source_ids,
             }
         }
-        print(f"RAG Filter - user_id: {request.user_id}, source_ids: {request.source_ids}")
+        
         system_msg = SystemMessage(content="""you are a helpful assistant""") # 用户不允许编辑system message
         human_msg = _build_human_message(request.contents)
 
         # Run LLM call
         response = self.agent.invoke(
             {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
-            config
+            config=config
         )
 
-        # todo debug text to be deleted
-        # -|
-        #  |
-        #  V
-        # Save messages to JSON (append to existing)
-        messages_data = []
-        for msg in response["messages"]:
-            msg_dict = {
-                "type": msg.__class__.__name__,
-                "content": msg.content,
-                "id": msg.id,
-                "additional_kwargs": msg.additional_kwargs,
-                "response_metadata": msg.response_metadata,
-            }
-            # Add usage metadata for AIMessage
-            if hasattr(msg, "usage_metadata") and msg.usage_metadata:
-                msg_dict["usage_metadata"] = msg.usage_metadata
-            if hasattr(msg, "tool_calls"):
-                msg_dict["tool_calls"] = msg.tool_calls
-            messages_data.append(msg_dict)
-
-
-        # Load existing messages if file exists
-        existing_data = {"messages": []}
-        try:
-            with open("conversation.json", "r", encoding="utf-8") as f:
-                existing_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            pass  # File doesn't exist or is invalid, start fresh
-        
-
-        # Append new messages
-        existing_data["messages"].extend(messages_data)
-
-        with open("conversation.json", "w", encoding="utf-8") as f:
-            json.dump(existing_data, f, ensure_ascii=False, indent=2)
-        #   ^
-        #   |
-        #   |
-        # todo debug text to be deleted
-
         ai_msg = response["messages"][-1]
-        print(ai_msg.content)
 
-        # Print token usage from LangChain
+        # 5. Dual-write: persist to Supabase
+        human_content = human_msg.content
+        ai_content = ai_msg.content if isinstance(ai_msg.content, str) else str(ai_msg.content)
+
+        # Get token counts from usage_metadata
+        input_tokens = 0
+        output_tokens = 0
         if hasattr(ai_msg, "usage_metadata") and ai_msg.usage_metadata:
-            usage = ai_msg.usage_metadata
-            print("\n--- Token Usage ---")
-            print(f"Input tokens:  {usage.get('input_tokens', 'N/A')}")
-            print(f"Output tokens: {usage.get('output_tokens', 'N/A')}")
-            print(f"Total tokens:  {usage.get('total_tokens', 'N/A')}")
-            if usage.get('input_token_details'):
-                print(f"Input details: {usage['input_token_details']}")
-            if usage.get('output_token_details'):
-                print(f"Output details: {usage['output_token_details']}")
-            print("-------------------")
-        return ai_msg.content
+            input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
+            output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+
+        await self._conversation_storage.persist(
+            user_id=request.user_id,
+            thread_id=request.thread_id,
+            human_content=human_content,
+            ai_content=ai_content,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens
+        )
+
+        return ai_content

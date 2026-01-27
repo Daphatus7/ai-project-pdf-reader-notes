@@ -4,8 +4,8 @@ Dependency injection container for the LLM backend service
 import logging
 from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
-from src.backend.services.storage import StorageService
-from src.backend.services.storage.supabase_storage import Database
+from src.backend.services.storage import RedisStorage
+from src.backend.services.storage.supabase_storage import SupabaseStorage
 from src.backend.services.context_provider.rag_service import RagService
 class Services:
     """Dependency injection container"""
@@ -38,10 +38,11 @@ class Services:
         supabase_storage.start()
         self.register('database_service', supabase_storage)
 
-        # Initialize LLM service (uses storage service for checkpointer and Supabase for RAG)
+        # Initialize LLM service (uses storage service for checkpointer and database for persistence)
         llm_service = LlmService(
-            checkpointer=storage_service.checkpointer,
-            supabase=database.get()
+            checkpointer=redis_storage.checkpointer,
+            database=supabase_storage,
+            storage_service=redis_storage
         )
         self.register('llm_service', llm_service)
 
@@ -50,7 +51,7 @@ class Services:
         rag_service.start()
         self.register('rag_service', rag_service)
         
-    def get(self, service_name: str) -> Any:
+    def get_service(self, service_name: str) -> Any:
         """Get a service by name"""
         if not self._initialized:
             self.initialize()

@@ -99,7 +99,7 @@ async def get_user(authorization: str = Header(...)):
         logger.error(f"Authentication error: {e}")
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-    logger.debug(f"Authenticated user: {payload.get_service('sub')}")
+    logger.debug(f"Authenticated user: {payload.get('sub')}")
     return payload  # Contains user_id (sub), email, role
 
 

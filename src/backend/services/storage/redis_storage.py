@@ -11,7 +11,7 @@ from src.backend.services.service import Service
 from src.backend.config.config import settings
 
 
-class StorageService(Service):
+class RedisStorage(Service):
     """
     Unified storage service managing Redis connections.
 
@@ -76,3 +76,91 @@ class StorageService(Service):
             self._redis_conn.close()
             self._redis_conn = None
             self._checkpointer = None
+
+    # ==================== Thread TTL Management ====================
+
+    def _get_thread_keys(self, thread_id: str) -> list[bytes]:
+        """
+        Get all Redis keys associated with a thread.
+
+        ShallowRedisSaver uses keys with pattern: checkpoint:{thread_id}*
+        """
+        pattern = f"checkpoint:{thread_id}*"
+        keys = list(self._redis_conn.scan_iter(match=pattern))
+        return keys
+
+    def thread_exists_in_redis(self, thread_id: str) -> bool:
+        """
+        Check if a thread exists in Redis.
+
+        Args:
+            thread_id: Thread ID to check
+
+        Returns:
+            True if thread has data in Redis, False otherwise
+        """
+        if self._redis_conn is None:
+            return False
+        keys = self._get_thread_keys(thread_id)
+        logging.info(f"Thread {thread_id} has {len(keys)} keys in Redis")
+        return len(keys) > 0
+
+    def refresh_thread_ttl(self, thread_id: str) -> bool:
+        """
+        Refresh TTL for all keys associated with a thread.
+
+        Called at the start of each request to keep active threads alive.
+
+        Args:
+            thread_id: Thread ID to refresh
+
+        Returns:
+            True if TTL was refreshed, False if thread not found
+        """
+        if self._redis_conn is None:
+            return False
+
+        keys = self._get_thread_keys(thread_id)
+        if not keys:
+            logging.info(f"No keys found for thread {thread_id}, cannot refresh TTL")
+            return False
+
+        ttl_seconds = settings.redis_thread_ttl
+        for key in keys:
+            self._redis_conn.expire(key, ttl_seconds)
+
+        self._logger.debug(f"Refreshed TTL for thread {thread_id}: {len(keys)} keys, TTL={ttl_seconds}s")
+        return True
+
+    def set_thread_ttl(self, thread_id: str) -> bool:
+        """
+        Set initial TTL for a newly created thread.
+
+        Args:
+            thread_id: Thread ID to set TTL for
+
+        Returns:
+            True if TTL was set, False if thread not found
+        """
+        return self.refresh_thread_ttl(thread_id)
+
+    def delete_thread_from_redis(self, thread_id: str) -> int:
+        """
+        Delete all keys associated with a thread from Redis.
+
+        Args:
+            thread_id: Thread ID to delete
+
+        Returns:
+            Number of keys deleted
+        """
+        if self._redis_conn is None:
+            return 0
+
+        keys = self._get_thread_keys(thread_id)
+        if not keys:
+            return 0
+
+        deleted = self._redis_conn.delete(*keys)
+        self._logger.info(f"Deleted thread {thread_id} from Redis: {deleted} keys")
+        return deleted

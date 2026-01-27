@@ -31,24 +31,6 @@ async def chat(
     response = await llm_service.chat(request=request)
     return ChatResponse(response=response)
 
-
-@router.post('/achat')
-async def achat(
-        request: ChatRequest = Depends(get_chat_request),
-        llm_service=Depends(get_llm_service)
-):
-    """
-    Streaming structured chat endpoint.
-    """
-    return StreamingResponse(
-        llm_service.achat(request),
-        media_type='text/event-stream',
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-        }
-    )
-
 #create a thread
 @router.post('/thread', response_model=CreateThreadResponse)
 async def create_conversation_thread(
