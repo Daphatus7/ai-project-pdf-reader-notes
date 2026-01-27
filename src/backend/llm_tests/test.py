@@ -44,7 +44,7 @@ async def stream_chat(user_message: str):
     """
     try:
         # Get LLM service
-        llm_service = services.get('llm_service')
+        llm_service = services.get_service('llm_service')
 
         # Create chat request
         chat_request = ChatRequest(
@@ -94,7 +94,7 @@ async def test_chat(user_message: str, use_filter: bool = True):
    """
     try:
         # Get LLM service
-        llm_service = services.get('llm_service')
+        llm_service = services.get_service('llm_service')
 
         # Create chat request with optional RAG filter
         chat_request = ChatRequest(
