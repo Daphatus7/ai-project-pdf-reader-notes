@@ -252,6 +252,7 @@ class LlmAgent:
             middleware=[
                 #log_state, 
                 trim_messages],
+            system_prompt=SystemMessage("You are a helpful assistant."),  # Basic system prompt
             checkpointer=self._checkpointer,
         )
         self.counter = 0
@@ -272,7 +273,6 @@ class LlmAgent:
                 "user_id": request.user_id,
                 "project_id": request.project_id,
                 "thread_id": request.thread_id,
-                "source_ids": request.source_ids,
             }
         }
         
@@ -281,7 +281,7 @@ class LlmAgent:
 
         # Run LLM call
         response = self.agent.invoke(
-            {"messages": [system_msg, human_msg]},  # Input as dict with 'messages' key
+            {"messages": human_msg},  # todo weird bug why system_msg is not allowed here
             config=config
         )
 
