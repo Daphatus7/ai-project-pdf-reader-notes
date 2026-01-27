@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS messages (
     -- Message content
     role TEXT NOT NULL,
     content JSONB NOT NULL,
+    token_count INTEGER,
     
     -- Message threading
     parent_message_id UUID REFERENCES messages(id) ON DELETE SET NULL,
