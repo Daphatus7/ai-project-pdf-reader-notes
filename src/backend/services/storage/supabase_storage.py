@@ -461,6 +461,10 @@ class SupabaseStorage(Service):
             # Apply token limit
             selected_messages = []
             total_tokens = 0
+            #dump the response data to json
+            with open("debug_supabase_messages.json", "w") as f:
+                import json
+                json.dump(response.data, f, indent=4)
 
             for msg in response.data:
                 msg_tokens = msg.get('token_count', 0)
@@ -477,6 +481,8 @@ class SupabaseStorage(Service):
             )
             return selected_messages
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f'Failed to load messages for thread {thread_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to load messages')

@@ -1,5 +1,6 @@
 import json
 import logging
+from sys import thread_info
 from typing import Any, TYPE_CHECKING
 
 from langchain.agents import create_agent, AgentState
@@ -259,24 +260,36 @@ class LlmAgent:
     async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
         logging.info(f"Agent called {self.counter} times")
-
         # 1. Refresh Redis TTL at request start
-        self._conversation_storage.refresh_ttl(request.thread_id)
-
+        if not self._conversation_storage:
+            logging.error("|----- No conversation storage configured")
         # 2. Cold start: load from Supabase if thread not in Redis
-        history = await self._conversation_storage.cold_start_load(request.thread_id)
-        logging.info(f"we have history: {history}")
-    
+        
+        
+        history_to_add = await self._conversation_storage.cold_start_load(request.thread_id)
+        logging.info(history_to_add)
+        if history_to_add:
+            self.agent.update_state(
+                config={"configurable": {"thread_id": request.thread_id}},
+                values={"messages": history_to_add},
+                as_node="__start__"
+            )
+            
+            # todo Debug: log loaded messages delete later
+            current_history = self.agent.get_state(
+                config={"configurable": {"thread_id": request.thread_id}})
+            
+            for msg,idx in current_history :
+                logging.info(f"Cold start msg {idx}: {msg.content}")
+            
         # 3. Build messages
         config: RunnableConfig = {
             "configurable": {
-                "user_id": request.user_id,
-                "project_id": request.project_id,
                 "thread_id": request.thread_id,
             }
         }
         
-        system_msg = SystemMessage(content="""you are a helpful assistant""") # 用户不允许编辑system message
+        system_msg = SystemMessage(content="""you are a helpful assistant, keep everything brief""") # 用户不允许编辑system message
         human_msg = _build_human_message(request.contents)
 
         # Run LLM call
@@ -297,6 +310,8 @@ class LlmAgent:
         if hasattr(ai_msg, "usage_metadata") and ai_msg.usage_metadata:
             input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
             output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+
+        self._conversation_storage.refresh_ttl(request.thread_id)
 
         await self._conversation_storage.persist(
             user_id=request.user_id,

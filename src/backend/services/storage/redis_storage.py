@@ -79,6 +79,8 @@ class RedisStorage(Service):
 
     # ==================== Thread TTL Management ====================
 
+            
+    
     def _get_thread_keys(self, thread_id: str) -> list[bytes]:
         """
         Get all Redis keys associated with a thread.
@@ -100,9 +102,11 @@ class RedisStorage(Service):
             True if thread has data in Redis, False otherwise
         """
         if self._redis_conn is None:
+            logging.error("Redis connection not initialized")   
             return False
         keys = self._get_thread_keys(thread_id)
         logging.info(f"Thread {thread_id} has {len(keys)} keys in Redis")
+        
         return len(keys) > 0
 
     def refresh_thread_ttl(self, thread_id: str) -> bool:

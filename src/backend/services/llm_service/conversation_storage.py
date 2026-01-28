@@ -29,8 +29,8 @@ class ConversationStorage:
         supabase_storage: "SupabaseStorage | None" = None,
         redis_storage: "RedisStorage | None" = None
     ):
-        self._database = supabase_storage
-        self._storage_service = redis_storage
+        self._supabase_storage = supabase_storage
+        self._redis_storage = redis_storage
 
     def refresh_ttl(self, thread_id: str) -> bool:
         """
@@ -39,21 +39,22 @@ class ConversationStorage:
         Returns:
             True if TTL was refreshed, False otherwise
         """
-        if not self._storage_service:
+        if not self._redis_storage:
             return False
-        return self._storage_service.refresh_thread_ttl(thread_id)
+        return self._redis_storage.refresh_thread_ttl(thread_id)
 
     def thread_in_redis(self, thread_id: str) -> bool:
         """Check if thread exists in Redis."""
-        if not self._storage_service:
+        if not self._redis_storage:
+            logger.error("|----- No storage service configured, cannot check Redis")
             return False
-        return self._storage_service.thread_exists_in_redis(thread_id)
+        return self._redis_storage.thread_exists_in_redis(thread_id)
 
     async def thread_in_supabase(self, thread_id: str) -> bool:
         """Check if thread exists in Supabase."""
-        if not self._database:
+        if not self._supabase_storage:
             return False
-        return await self._database.thread_exists(thread_id)
+        return await self._supabase_storage.thread_exists(thread_id)
 
     async def cold_start_load(self, thread_id: str) -> list[dict] | None:
         """
@@ -66,13 +67,14 @@ class ConversationStorage:
         """        
         
         logger.info("Starting cold start load")
-        if not self._storage_service or not self._database:
+        if not self._redis_storage or not self._supabase_storage:
             logger.info("No storage/database configured, skipping cold start")
             return None
 
         # Already in Redis, no cold start needed
         if self.thread_in_redis(thread_id):
             logger.debug(f"Thread {thread_id} exists in Redis, skipping cold start")
+            #get the actual messages from redis   
             return None
 
         # Not in Supabase either, it's a new thread
@@ -81,7 +83,7 @@ class ConversationStorage:
             return None
 
         # Cold start: load from Supabase
-        messages = await self._database.load_recent_messages(thread_id)
+        messages = await self._supabase_storage.load_recent_messages(thread_id)
         logger.info(f"Cold start: loaded {len(messages)} messages for thread {thread_id}")
         return messages
 
@@ -107,26 +109,26 @@ class ConversationStorage:
             input_tokens: Token count for user message
             output_tokens: Token count for AI response
         """
-        if not self._database:
+        if not self._supabase_storage:
             logger.warning("No database configured, skipping persistence")
             return
 
         try:
             # Save user message
-            await self._database.save_message(
+            await self._supabase_storage.save_message(
                 user_id=user_id,
                 thread_id=thread_id,
                 role='user',
-                content={'text': human_content},
+                content=human_content,
                 token_count=input_tokens
             )
 
             # Save AI message
-            await self._database.save_message(
+            await self._supabase_storage.save_message(
                 user_id=user_id,
                 thread_id=thread_id,
                 role='assistant',
-                content={'text': ai_content},
+                content=ai_content,
                 token_count=output_tokens
             )
 

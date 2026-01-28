@@ -340,7 +340,7 @@ class LLMTests:
     
     async def chat(self, thread_id: str, user_message: str):
         """Send a chat message to the current thread"""
-        print(f'\n💬 Sending message to thread {thread_id}...')
+        print(f'\n💬 Sending message to thread {thread_id}')
         
         response = await self.client.post(
             '/api/v1/llm/chat',
