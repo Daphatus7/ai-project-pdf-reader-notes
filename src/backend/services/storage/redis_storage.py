@@ -47,9 +47,12 @@ class RedisStorage(Service):
 
         self._checkpointer = ShallowRedisSaver(
             redis_client=self._redis_conn,
+            ttl= {
+                "default": settings.redis_thread_ttl
+            }
         )
         self._checkpointer.setup()
-        self._logger.info("ShallowRedisSaver checkpointer initialized with TTL=60min")
+        self._logger.info("ShallowRedisSaver checkpointer initialized with TTL=10min")
 
     def get(self):
         """Get the storage service instance."""
