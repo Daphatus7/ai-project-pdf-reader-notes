@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect, useMemo, type MouseEvent as ReactMouseEvent } from 'react';
-import { Button } from './ui/button.tsx';
+import { Button } from '../ui/button.tsx';
 import {
   Upload,
   Scissors,
   X
 } from 'lucide-react';
-import { cn } from './ui/utils.ts';
+import { cn } from '../ui/utils.ts';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { ScreenshotCapture } from './screenshot/screenshot-capture.tsx';
-import { createPdfScreenshotCapture } from '../features/services/pdf-screenshot-capture.tsx';
+import { ScreenshotCapture } from '../screenshot/screenshot-capture.tsx';
+import { createPdfScreenshotCapture } from '../../features/services/pdf-screenshot-capture.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';

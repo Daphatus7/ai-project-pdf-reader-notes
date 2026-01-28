@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "./ui/button.tsx";
+import { Button } from "../ui/button.tsx";
 import { 
   FileText, 
   Settings, 
@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu.tsx";
+} from "../ui/dropdown-menu.tsx";
 import { PricingDialog } from "@@/frontend/features/pricing/PricingDialog.tsx";
 
 export function Header() {

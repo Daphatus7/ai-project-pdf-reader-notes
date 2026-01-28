@@ -3,8 +3,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
-import { cn } from './ui/utils.ts';
-import React, {type ReactNode, useState, useCallback, type JSX, useRef, useEffect} from 'react';
+import { cn } from '../ui/utils.ts';
+import React, {type ReactNode, useState, useCallback, type JSX, useRef} from 'react';
 
 interface MarkdownRendererProps {
 	content: string;

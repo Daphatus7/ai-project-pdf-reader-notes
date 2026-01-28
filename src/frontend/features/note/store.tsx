@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type {Note} from "@@/frontend/features/note/note.tsx";
-import initialNotesData from "@@/frontend/hardcoed_data.tsx";
+import initialNotesData from "@@/frontend/test/hardcoed_data.tsx";
 
 /***
  * use zustand to store global state

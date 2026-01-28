@@ -17,7 +17,7 @@ import {
 } from "../ui/tooltip.tsx";
 import type {Note} from "../../App.tsx";
 import {llmService, ApiError, type LLMStructuredOutput} from "../../api";
-import {MarkdownRenderer} from "../markdown-renderer.tsx";
+import {MarkdownRenderer} from "../renderer/markdown-renderer.tsx";
 import type {ContentInsertion, SectionType} from "../../features/types/content-insertion.ts";
 import {transformContentForInsertion} from "../../features/utils/content-transformer.ts";
 import {ResizablePanel} from "../ui/resizable.tsx";
