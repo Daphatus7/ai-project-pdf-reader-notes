@@ -280,7 +280,8 @@ class LlmAgent:
                 config={"configurable": {"thread_id": request.thread_id}})
             
             for idx, msg in enumerate(current_history.values.get("messages", [])):
-                logging.info(f"Cold start msg {idx}: {msg.content}")
+                content = getattr(msg, 'content', '')
+                logging.info(f"Cold start msg {idx}: {content}")
             
         # 3. Build messages
         config: RunnableConfig = {
