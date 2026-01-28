@@ -16,6 +16,7 @@ dist-ssr
 __pycache__
 *.pyc
 *.pyo
+*.pyd
 
 # Editor directories and files
 .vscode/*
