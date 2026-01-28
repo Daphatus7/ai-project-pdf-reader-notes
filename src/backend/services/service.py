@@ -1,22 +1,21 @@
+# @file        service.py
+# @description 
+# @author      [Peiyu Wang]
+# @date        30/12/2025
+# @license     © 2025 . All rights reserved.
 from abc import ABC, abstractmethod
 
 
 class Service(ABC):
-    """Base service class"""
     
-    def __init__(self):
-        pass
-    
+    #abstract base class for services
     @abstractmethod
     def start(self):
         pass
     
     @abstractmethod
-    def shut_down(self):
+    def get(self):
         pass
     
-    @abstractmethod
-    def restart(self):
-        pass
     
     

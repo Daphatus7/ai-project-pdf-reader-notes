@@ -4,7 +4,6 @@ import {Input} from "../ui/input.tsx";
 import {Avatar, AvatarFallback} from "../ui/avatar.tsx";
 import {
 	Image as ImageIcon,
-	Sparkles,
 	User,
 	FileText,
 	ChevronUp
@@ -17,7 +16,7 @@ import {
 	TooltipTrigger,
 } from "../ui/tooltip.tsx";
 import type {Note} from "../../App.tsx";
-import {llmApi, ApiError, type LLMStructuredOutput} from "../../features/services/api-services.tsx";
+import {llmService, ApiError, type LLMStructuredOutput} from "../../api";
 import {MarkdownRenderer} from "../MarkdownRenderer.tsx";
 import type {ContentInsertion, SectionType} from "../../features/types/content-insertion.ts";
 import {transformContentForInsertion} from "../../features/utils/content-transformer.ts";
@@ -249,7 +248,7 @@ export function LLMChat({
 			try {
 				const systemMessage = imageInstruction();
 				await consumeStructuredStream(
-					llmApi.sendMessageWithImages(imageContext.userPrompt,
+					llmService.sendMessageWithImages(imageContext.userPrompt,
 						imageContext.imageUrls,
 						systemMessage) as
 						AsyncGenerator<LLMStreamEvent, void, unknown>,
@@ -379,7 +378,7 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 		try {
 			const systemMessage = buildSystemMessage();
 			await consumeStructuredStream(
-				llmApi.sendMessage(messageText, systemMessage) as AsyncGenerator<LLMStreamEvent, void, unknown>,
+				llmService.sendMessage(messageText, systemMessage) as AsyncGenerator<LLMStreamEvent, void, unknown>,
 				aiMessageId
 			);
 		} catch (error) {

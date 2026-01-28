@@ -1,6 +1,9 @@
 """
 FastAPI application entry point for LLM backend service
 """
+import dotenv
+dotenv.load_dotenv()
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,9 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 import sys
-from config import settings
-from servers import services
-from api.routers.llm_call.llm_call import router
+from src.backend.servers import services
+from src.backend.config.config import settings
+from src.backend.api import v1_router
 
 # Configure logging
 logging.basicConfig(
@@ -63,7 +66,7 @@ app = FastAPI(
 )
 
 # Include routers
-app.include_router(router)
+app.include_router(v1_router)
 
 # Configure CORS
 app.add_middleware(
