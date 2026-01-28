@@ -9,7 +9,6 @@ Provides endpoints for:
 """
 import logging
 
-from accelerate.commands.config.update import description
 from fastapi import APIRouter, HTTPException, Depends
 from supabase_auth import AuthResponse
 
