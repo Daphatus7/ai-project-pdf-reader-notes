@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type {Note} from "@@/frontend/note.tsx";
+import type {Note} from "@@/frontend/features/note/note.tsx";
 import initialNotesData from "@@/frontend/hardcoed_data.tsx";
 
 /***

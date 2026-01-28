@@ -1,5 +1,5 @@
-import { Button } from './ui/button.tsx';
-import { cn } from './ui/utils.ts';
+import { Button } from '../ui/button.tsx';
+import { cn } from '../ui/utils.ts';
 
 interface ScreenshotWidgetProps {
   /**

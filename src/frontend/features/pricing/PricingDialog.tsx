@@ -1,13 +1,13 @@
-import { Button } from "./ui/button.tsx";
+import { Button } from "../../components/ui/button.tsx";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog.tsx";
+} from "../../components/ui/dialog.tsx";
 import { Check, X, Sparkles, Zap, Crown } from "lucide-react";
-import { cn } from "./ui/utils.ts";
+import { cn } from "../../components/ui/utils.ts";
 
 interface PricingDialogProps {
   open: boolean;

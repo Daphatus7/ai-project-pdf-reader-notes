@@ -17,7 +17,7 @@ import {
 } from "../ui/tooltip.tsx";
 import type {Note} from "../../App.tsx";
 import {llmService, ApiError, type LLMStructuredOutput} from "../../api";
-import {MarkdownRenderer} from "../MarkdownRenderer.tsx";
+import {MarkdownRenderer} from "../markdown-renderer.tsx";
 import type {ContentInsertion, SectionType} from "../../features/types/content-insertion.ts";
 import {transformContentForInsertion} from "../../features/utils/content-transformer.ts";
 import {ResizablePanel} from "../ui/resizable.tsx";
@@ -31,23 +31,9 @@ interface Message {
 	structuredOutput?: LLMStructuredOutput;
 }
 
-export interface ExternalContextItem {
-	id: string;
-	type: "image" | "text";
-	content: string;
-	name: string;
-	userMessage: string;
-	preview?: string;
-}
-
 interface BaseContextItem {
 	id: string;
 	name?: string;
-}
-
-export interface TextContextItem extends BaseContextItem {
-	type: "text" ;
-	message: string; // Text content
 }
 
 export interface ImageContextItem extends BaseContextItem {
@@ -119,7 +105,7 @@ const mockMessages: Message[] = [
  * @param externalContextItems - External context items (e.g., screenshots)
  * @param onContentInsert - Callback when content should be inserted into notes
  */
-export function LLMChat({
+export function Llm_chat({
 							note,
 							defaultSize = 50,
 							minSize = 15,
@@ -526,83 +512,7 @@ If you’d like, I can tailor this to a specific framework (e.g., PyTorch or Ten
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
-										{/*显示 context items*/}
-
-										{/*{allContextItems.length > 0 && (*/}
-										{/*	<div className="flex items-center -space-x-2">*/}
-										{/*		{allContextItems.slice(0, 3).map((item, index) => (*/}
-										{/*			<TooltipProvider key={item.id}>*/}
-										{/*				<Tooltip>*/}
-										{/*					<TooltipTrigger asChild>*/}
-										{/*						<div*/}
-										{/*							className="relative group"*/}
-										{/*							style={{ zIndex: allContextItems.length - index }}*/}
-										{/*						>*/}
-										{/*							<div*/}
-										{/*								className={cn(*/}
-										{/*									"h-7 w-7 rounded-md border-2 border-background flex items-center justify-center cursor-pointer transition-all",*/}
-										{/*									"bg-muted hover:border-primary hover:shadow-md hover:scale-110"*/}
-										{/*								)}*/}
-										{/*							>*/}
-										{/*								{item.type === "image" ? (*/}
-										{/*									<div className="w-full h-full rounded-sm overflow-hidden">*/}
-										{/*										<img*/}
-										{/*											src={item.content}*/}
-										{/*											alt={item.name || "Context"}*/}
-										{/*											className="w-full h-full object-cover"*/}
-										{/*										/>*/}
-										{/*									</div>*/}
-										{/*								) : (*/}
-										{/*									<FileText className="w-3.5 h-3.5 text-primary" />*/}
-										{/*								)}*/}
-										{/*							</div>*/}
-
-										{/*							/!* Delete button on hover - only for manual context items *!/*/}
-										{/*							{contextItems.find(ci => ci.id === item.id) && (*/}
-										{/*								<button*/}
-										{/*									onClick={() => removeContext(item.id)}*/}
-										{/*									className={cn(*/}
-										{/*										"absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground",*/}
-										{/*										"flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity",*/}
-										{/*										"hover:bg-destructive/90 shadow-sm"*/}
-										{/*									)}*/}
-										{/*								>*/}
-										{/*									<X className="w-2.5 h-2.5" />*/}
-										{/*								</button>*/}
-										{/*							)}*/}
-										{/*						</div>*/}
-										{/*					</TooltipTrigger>*/}
-										{/*					<TooltipContent side="top" className="max-w-xs">*/}
-										{/*						{item.type === "image" ? (*/}
-										{/*							<div>*/}
-										{/*								<p className="text-xs mb-1">{item.name}</p>*/}
-										{/*								<img*/}
-										{/*									src={item.content}*/}
-										{/*									alt={item.name || "Context"}*/}
-										{/*									className="max-h-32 rounded"*/}
-										{/*								/>*/}
-										{/*							</div>*/}
-										{/*						) : (*/}
-										{/*							<div>*/}
-										{/*								<p className="text-xs mb-1">{item.name}</p>*/}
-										{/*								<p className="text-xs text-muted-foreground max-w-xs">*/}
-										{/*									{item.content.length > 100*/}
-										{/*										? item.content.slice(0, 100) + "..."*/}
-										{/*										: item.content}*/}
-										{/*								</p>*/}
-										{/*							</div>*/}
-										{/*						)}*/}
-										{/*					</TooltipContent>*/}
-										{/*				</Tooltip>*/}
-										{/*			</TooltipProvider>*/}
-										{/*		))}*/}
-										{/*		{allContextItems.length > 3 && (*/}
-										{/*			<div className="h-7 w-7 rounded-md border-2 border-background bg-muted flex items-center justify-center text-xs">*/}
-										{/*				+{allContextItems.length - 3}*/}
-										{/*			</div>*/}
-										{/*		)}*/}
-										{/*	</div>*/}
-										{/*)}*/}
+										
 									</div>
 								</div>
 							</div>

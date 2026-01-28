@@ -8,8 +8,7 @@ import {
 import { cn } from './ui/utils.ts';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { ScreenshotCapture } from './ScreenshotCapture.tsx';
-import { downloadDataUrlAsFile, sanitizeFilename } from '../features/utils/download.ts';
+import { ScreenshotCapture } from './screenshot/screenshot-capture.tsx';
 import { createPdfScreenshotCapture } from '../features/services/pdf-screenshot-capture.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -26,7 +25,7 @@ interface PDFReaderProps {
 }
 
 
-export function PDFReader({ onScreenshotCapture }: PDFReaderProps) {
+export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 	const [openPDFs, setOpenPDFs] = useState<PDFDocument[]>([]);
 	const [activePDF, setActivePDF] = useState<string>('');
 	const [screenshotMode, setScreenshotMode] = useState(false);

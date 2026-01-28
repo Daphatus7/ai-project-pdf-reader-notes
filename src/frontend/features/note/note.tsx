@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Header } from "@@/frontend/components/Header.tsx";
-import { NoteSidebar } from "@@/frontend/components/NoteSidebar/NoteSidebar.tsx";
-import { PDFSection } from "@@/frontend/components/PDFSection.tsx";
-import {type ImageContextItem, LLMChat} from "@@/frontend/components/Chat/LLMChat.tsx";
+import { Header } from "@@/frontend/components/header.tsx";
+import { NoteSidebar } from "@@/frontend/components/NoteSidebar/note-sidebar.tsx";
+import { PdfSection } from "@@/frontend/components/pdf-section.tsx";
+import {type ImageContextItem, Llm_chat} from "@@/frontend/components/chat/llm_chat.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -13,7 +13,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NoteTakerHandle } from "@@/frontend/features/types/content-insertion.ts";
 import { Button } from "@@/frontend/components/ui/button.tsx";
 import NoteTaker from "@@/frontend/components/note-taker.tsx";
-import {useNotesStore} from "@@/frontend/store.tsx";
+import {useNotesStore} from "@@/frontend/features/note/store.tsx";
 
 export interface Note {
 	id: string;
@@ -210,13 +210,13 @@ export default function NotePage() {
 						</div>
 					) : (
 						<ResizablePanelGroup direction="vertical">
-							<PDFSection onScreenshotCapture={handleScreenshotCapture} />
+							<PdfSection onScreenshotCapture={handleScreenshotCapture} />
 						</ResizablePanelGroup>
 					)}
 				</ResizablePanel>
 				<ResizableHandle withHandle />
 
-				<LLMChat
+				<Llm_chat
 					note={selectedNote}
 					externalContextItems={screenshots}
 					imageContextItem={pendingImageAnalysis}

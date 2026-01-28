@@ -9,7 +9,7 @@ import {
 	Download,
 	MoreVertical,
 	GripVertical,
-	Search, Edit, EditIcon
+	Search, EditIcon
 } from "lucide-react";
 import {
 	DropdownMenu,

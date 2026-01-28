@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu.tsx";
-import { PricingDialog } from "./PricingDialog.tsx";
+import { PricingDialog } from "@@/frontend/features/pricing/PricingDialog.tsx";
 
 export function Header() {
   const [pricingOpen, setPricingOpen] = useState(false);

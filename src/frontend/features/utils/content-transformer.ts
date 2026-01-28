@@ -174,29 +174,6 @@ function ensureLink(content: string): string {
 	return trimmed;
 }
 
-/**
- * Ensures content is formatted as an image.
- * 
- * @param content - Raw image content (alt text or markdown)
- * @param src - Optional image source URL
- * @returns Formatted image markdown
- */
-function ensureImage(content: string, src?: string): string {
-	const trimmed = content.trim();
-	
-	// Check if already in markdown image format
-	if (/^!\[.*\]\(.*\)$/.test(trimmed)) {
-		return trimmed;
-	}
-	
-	// If we have src, format as image
-	if (src) {
-		return `![${trimmed}](${src})`;
-	}
-	
-	// Just alt text, return as markdown image without src
-	return `![${trimmed}]()`;
-}
 
 /**
  * Transforms raw content into properly formatted markdown

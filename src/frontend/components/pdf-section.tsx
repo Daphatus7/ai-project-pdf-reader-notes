@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { ResizablePanel } from "@@/frontend/components/ui/resizable.tsx";
 import { type ImperativePanelHandle } from "react-resizable-panels";
 import { ChevronDown } from "lucide-react";
-import { PDFReader } from "./PDFReader.tsx";
+import { PdfReader } from "./pdf-reader.tsx";
 
 interface PDFSectionProps {
 	defaultSize?: number;
@@ -13,7 +13,7 @@ interface PDFSectionProps {
 
 const VERTICAL_COLLAPSE_THRESHOLD = 18;
 
-export function PDFSection({
+export function PdfSection({
 	defaultSize = 50,
 	minSize = 15,
 	collapsedSize = 3,
@@ -52,7 +52,7 @@ export function PDFSection({
 					</div>
 				)}
 				<div className={isPDFCollapsed ? "hidden" : "h-full"}>
-					<PDFReader onScreenshotCapture={onScreenshotCapture} />
+					<PdfReader onScreenshotCapture={onScreenshotCapture} />
 				</div>
 			</div>
 		</ResizablePanel>
