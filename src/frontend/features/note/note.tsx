@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@@/frontend/components/header/header.tsx";
 import { NoteSidebar } from "@@/frontend/components/note-sidebar/note-sidebar.tsx";
-import { PdfSection } from "@@/frontend/components/pdf/pdf-section.tsx";
+import { PdfSection } from "@@/frontend/components/reader/pdf-section.tsx";
 import {type ImageContextItem, Llm_chat} from "@@/frontend/components/chat/llm_chat.tsx";
 import {
 	ResizableHandle,

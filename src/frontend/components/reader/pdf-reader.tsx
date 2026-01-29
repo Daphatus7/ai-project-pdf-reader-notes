@@ -24,7 +24,6 @@ interface PDFReaderProps {
 	onScreenshotCapture?: (imageDataUrl: string, name: string) => void;
 }
 
-
 export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 	const [openPDFs, setOpenPDFs] = useState<PDFDocument[]>([]);
 	const [activePDF, setActivePDF] = useState<string>('');
@@ -70,6 +69,18 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 
 	return (
 		<div className="h-full flex flex-col bg-background">
+			{/* Hidden file input - always rendered */}
+			<input
+				ref={fileInputRef}
+				type="file"
+				accept="application/pdf"
+				className="hidden"
+				onChange={(e) => {
+					onPick(e.target.files?.[0] ?? undefined);
+					e.target.value = '';
+				}}
+			/>
+
 			{/* PDF Tabs */}
 			{openPDFs.length > 0 ? (
 				<>
@@ -106,8 +117,6 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 							</Button>
 						</div>
 					</div>
-					{/* PDF Controls */}
-					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20"></div>
 					{/* PDF Viewer */}
 					<div
 						className='relative h-full'
@@ -162,13 +171,6 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 				<div className="flex-1 flex items-center justify-center">
 					<div className="text-center space-y-4">
 						<Upload className="w-16 h-16 mx-auto text-muted-foreground" />
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept="application/pdf"
-							style={{ display: 'none' }}
-							onChange={(e) => onPick(e.target.files?.[0] ?? undefined)}
-						/>
 						<div>
 							<h3 className="mb-2">No PDF Open</h3>
 							<p className="text-sm text-muted-foreground mb-4">
