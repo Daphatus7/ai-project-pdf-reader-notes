@@ -80,6 +80,7 @@
             "react-hotkeys-hook": "^5.2.1",
             "react-markdown": "*",
             "react-resizable-panels": "^2.1.7",
+            "react-router-dom": "^7.13.0",
             "recharts": "^2.15.2",
             "rehype-katex": "^7.0.1",
             "remark-gfm": "*",
