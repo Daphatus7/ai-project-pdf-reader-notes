@@ -5,6 +5,7 @@
 
   export default defineConfig({
     plugins: [react()],
+    envDir: './src/frontend',
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
