@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
-import AuthSwitch from "./auth/AuthSwitch.tsx";
+import AuthSwitch from "@@/frontend/features/auth/AuthSwitch.tsx";
 
 const LandingPage = lazy(() => import("./pages/landing-page/landing-page"));
 const LoginPage = lazy(() => import("./pages/login-page/login-page"));

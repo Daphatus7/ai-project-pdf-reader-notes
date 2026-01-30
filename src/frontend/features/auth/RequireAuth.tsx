@@ -4,7 +4,7 @@
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './AuthProvider.tsx';
 
 interface RequireAuthProps {
 	children: React.ReactNode;

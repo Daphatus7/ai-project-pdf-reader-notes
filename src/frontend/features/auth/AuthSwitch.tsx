@@ -3,7 +3,7 @@
  * @description 根据登录状态显示不同内容
  */
 
-import { useAuth } from './AuthProvider';
+import { useAuth } from './AuthProvider.tsx';
 
 interface AuthSwitchProps {
 	authenticated: React.ReactNode;
