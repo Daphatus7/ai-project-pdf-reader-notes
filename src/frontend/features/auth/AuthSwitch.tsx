@@ -4,6 +4,7 @@
  */
 
 import { useAuth } from './AuthProvider.tsx';
+import React from "react";
 
 interface AuthSwitchProps {
 	authenticated: React.ReactNode;
