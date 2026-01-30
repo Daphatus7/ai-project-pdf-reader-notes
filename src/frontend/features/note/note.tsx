@@ -13,7 +13,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NoteTakerHandle } from "@@/frontend/features/types/content-insertion.ts";
 import { Button } from "@@/frontend/components/ui/button.tsx";
 import NoteTaker from "@@/frontend/components/note/note-taker.tsx";
-import {useNotesStore} from "@@/frontend/features/note/store.tsx";
+import {useNotesStore} from "@@/frontend/store.tsx";
 
 export interface Note {
 	id: string;

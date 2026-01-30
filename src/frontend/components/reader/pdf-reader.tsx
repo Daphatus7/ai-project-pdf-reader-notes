@@ -61,7 +61,8 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 
 			const next = prev.filter(p => p.pdfUrl !== pdfId);
 			if (activePDF === pdfId) {
-				setActivePDF(next.length ? next[Math.max(0, prev.findIndex(p=>p.pdfUrl===pdfId)-1)]?.pdfUrl ?? '' : '');
+				setActivePDF(next.length ? next[
+					Math.max(0, prev.findIndex(p=>p.pdfUrl===pdfId)-1)]?.pdfUrl ?? '' : '');
 			}
 			return next;
 		});
