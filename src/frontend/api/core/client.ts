@@ -5,6 +5,7 @@
 
 import { apiConfig } from './config';
 import { ApiError } from './errors';
+import { supabase } from '../services/supabase';
 
 /**
  * Base fetch wrapper with error handling
@@ -15,8 +16,11 @@ export async function request<T>(
 ): Promise<T> {
   const url = `${apiConfig.baseUrl}${endpoint}`;
 
+  const{ data: { session } } = await supabase.auth.getSession();
+  
   const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', 
+	  ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
   };
 
   const config: RequestInit = {

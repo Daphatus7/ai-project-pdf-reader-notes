@@ -2,4 +2,4 @@ This Figma Make file includes components from [shadcn/ui](https://ui.shadcn.com/
 
 This Figma Make file includes photos from [Unsplash](https://unsplash.com) used under [license](https://unsplash.com/license).
 
-Include TipTap Note, react-pdf-reader(pending removal)
+Include TipTap MyNotePage, react-pdf-reader(pending removal)

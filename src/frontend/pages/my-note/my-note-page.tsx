@@ -15,22 +15,13 @@ import { Button } from "@@/frontend/components/ui/button.tsx";
 import NoteTaker from "@@/frontend/components/note/note-taker.tsx";
 import {useNotesStore} from "@@/frontend/store.tsx";
 
-export interface Note {
+export interface MyNotePage {
 	id: string;
 	title: string;
 	preview: string;
 	updatedAt: string;
 	content: string;
 }
-
-export interface imageContext {
-	id: string;
-	name: string;
-	imageUrl: string;
-	userMessage: string
-}
-
-
 
 /**
  * NotePage component - Main note-taking interface.
@@ -46,9 +37,9 @@ export interface imageContext {
  */
 export default function NotePage() {
 	
-	const initialNotes: Note[] = useNotesStore.getState().notes;
+	const initialNotes: MyNotePage[] = useNotesStore.getState().notes;
 	
-	const [notes, setNotes] = useState<Note[]>(initialNotes);
+	const [notes, setNotes] = useState<MyNotePage[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
 	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
 	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
@@ -74,7 +65,7 @@ export default function NotePage() {
 	}
 
 	const handleAddNewNote = () => {
-		const newNote: Note = {
+		const newNote: MyNotePage = {
 			id: crypto.randomUUID(),
 			title: "New Note",
 			preview: "",

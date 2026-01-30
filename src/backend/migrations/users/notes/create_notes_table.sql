@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS notes (
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     
-    -- Note content
+    -- MyNotePage content
     title TEXT NOT NULL,
     content_markdown TEXT NOT NULL DEFAULT '',
     summary TEXT,

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type {Note} from "@@/frontend/features/note/note.tsx";
+import type {MyNotePage} from "@@/frontend/pages/my-note/my-note-page.tsx";
 import initialNotesData from "@@/frontend/test/hardcoed_data.tsx";
 
 /***
@@ -7,15 +7,15 @@ import initialNotesData from "@@/frontend/test/hardcoed_data.tsx";
  */
 
 interface StoreState {
-  notes: Note[];
-  setNotes: (notes: Note[]) => void;
+  notes: MyNotePage[];
+  setNotes: (notes: MyNotePage[]) => void;
   selectedNoteId: string;
   setSelectedNoteId: (id: string) => void;
 }
 
 export const useNotesStore = create<StoreState>((set) => ({
   notes: initialNotesData,
-  setNotes: (notes: Note[]) => set({ notes }),
+  setNotes: (notes: MyNotePage[]) => set({ notes }),
   selectedNoteId: '1',
   setSelectedNoteId: (id: string) => set({ selectedNoteId: id }),
 }));

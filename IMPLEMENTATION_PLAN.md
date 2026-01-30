@@ -239,7 +239,7 @@ POST   /api/notes/{id}/export  # 导出为Markdown
 
 **数据模型增强**:
 ```python
-class Note:
+class MyNotePage:
     id: UUID
     title: str
     content: str (Tiptap JSON格式)
