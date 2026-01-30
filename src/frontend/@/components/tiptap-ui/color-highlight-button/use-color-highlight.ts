@@ -5,18 +5,18 @@ import { type Editor } from "@tiptap/react"
 import { useHotkeys } from "react-hotkeys-hook"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
-import { useIsMobile } from "@@/frontend/@/hooks/use-mobile.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useIsMobile } from "@/frontend/@/hooks/use-mobile.ts"
 
 // --- Lib ---
 import {
   isMarkInSchema,
   isNodeTypeSelected,
   isExtensionAvailable,
-} from "@@/frontend/@/lib/tiptap-utils.ts"
+} from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Icons ---
-import { HighlighterIcon } from "@@/frontend/@/components/tiptap-icons/highlighter-icon.tsx"
+import { HighlighterIcon } from "@/frontend/@/components/tiptap-icons/highlighter-icon.tsx"
 
 export const COLOR_HIGHLIGHT_SHORTCUT_KEY = "mod+shift+h"
 export const HIGHLIGHT_COLORS = [

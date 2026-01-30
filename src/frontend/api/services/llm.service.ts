@@ -15,7 +15,6 @@ import type {
   ChatResponse,
   StreamChatRequest,
   StructuredChatRequest,
-  StructuredChatResponse,
   StructuredImageChatRequest,
 } from '../types/llm';
 
@@ -60,82 +59,6 @@ export const llmService = {
   async *chatStream(request: StreamChatRequest): AsyncGenerator<string, void, unknown> {
     yield* streamRequest(apiConfig.endpoints.llm.chatStream, request);
   },
-
-  /**
-   * Async chat endpoint
-   */
-  async chatAsync(request: ChatRequest): Promise<ChatResponse> {
-    return post<ChatResponse>(apiConfig.endpoints.llm.chatAsync, request);
-  },
-
-  /**
-   * Structured output chat endpoint
-   *
-   * Returns responses conforming to the LLMStructuredOutput schema,
-   * making it easier to parse and display markdown, LaTeX, and GFM content
-   *
-   * @param request - The structured chat request
-   * @returns Structured response with content, type, sections, key points, etc.
-   */
-  async chatStructured(request: StructuredChatRequest): Promise<StructuredChatResponse> {
-    return post<StructuredChatResponse>(apiConfig.endpoints.llm.chatStructured, request);
-  },
-
-  /**
-   * Synchronous structured output chat endpoint
-   * Useful for debugging and simpler use cases
-   *
-   * @param request - The structured chat request
-   * @returns Structured response with content, type, sections, key points, etc.
-   */
-  async chatStructuredSync(request: StructuredChatRequest): Promise<StructuredChatResponse> {
-    return post<StructuredChatResponse>(apiConfig.endpoints.llm.chatStructuredSync, request);
-  },
-
-  /**
-   * Streaming structured output chat endpoint
-   *
-   * Streams both text chunks and structured output updates
-   * Yields objects with type 'text', 'structured', 'done', or 'error'
-   *
-   * @param request - The structured chat request
-   * @returns Async generator yielding stream events
-   */
-  async *chatStructuredStream(request: StructuredChatRequest):
-    AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
-    for await (const chunk of streamRequest(apiConfig.endpoints.llm.chatStructuredStream, request)) {
-      try {
-        const parsed = JSON.parse(chunk);
-        yield parsed;
-      } catch {
-        // If parsing fails, treat as plain text (backward compatibility)
-        yield { type: 'text', content: chunk };
-      }
-    }
-  },
-
-  /**
-   * Streaming structured output chat with image support
-   */
-  async *chatStructuredStreamImage(request: StructuredImageChatRequest):
-    AsyncGenerator<{ type: string; content?: string; data?: unknown; message?: string }, void, unknown> {
-    // Convert to StructuredChatRequest format for backend compatibility
-    const structuredRequest: StructuredChatRequest = {
-      contents: request.contents,
-      system_message: request.system_message,
-      expected_content_type: request.expected_content_type
-    };
-    for await (const chunk of streamRequest(apiConfig.endpoints.llm.chatStructuredStream, structuredRequest)) {
-      try {
-        const parsed = JSON.parse(chunk);
-        yield parsed;
-      } catch {
-        // If parsing fails, treat as plain text (backward compatibility)
-        yield { type: 'text', content: chunk };
-      }
-    }
-  },
-
   /**
    * Simplified method to send text message with images
    * Converts data URLs to InputContent format automatically

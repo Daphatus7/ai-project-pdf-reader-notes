@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ResizablePanel } from "@@/frontend/components/ui/resizable.tsx";
+import { ResizablePanel } from "@/frontend/components/ui/resizable.tsx";
 import { type ImperativePanelHandle } from "react-resizable-panels";
 import { ChevronDown } from "lucide-react";
 import { PdfReader } from "./pdf-reader.tsx";

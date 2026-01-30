@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from "react"
 import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Lib ---
-import { isNodeTypeSelected } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { isNodeTypeSelected } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Icons ---
-import { Redo2Icon } from "@@/frontend/@/components/tiptap-icons/redo2-icon.tsx"
-import { Undo2Icon } from "@@/frontend/@/components/tiptap-icons/undo2-icon.tsx"
+import { Redo2Icon } from "@/frontend/@/components/tiptap-icons/redo2-icon.tsx"
+import { Undo2Icon } from "@/frontend/@/components/tiptap-icons/undo2-icon.tsx"
 
 export type UndoRedoAction = "undo" | "redo"
 

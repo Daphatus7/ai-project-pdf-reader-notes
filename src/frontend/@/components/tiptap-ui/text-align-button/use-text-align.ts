@@ -3,19 +3,19 @@ import type { ChainedCommands } from "@tiptap/react"
 import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Lib ---
 import {
   isExtensionAvailable,
   isNodeTypeSelected,
-} from "@@/frontend/@/lib/tiptap-utils.ts"
+} from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Icons ---
-import { AlignCenterIcon } from "@@/frontend/@/components/tiptap-icons/align-center-icon.tsx"
-import { AlignJustifyIcon } from "@@/frontend/@/components/tiptap-icons/align-justify-icon.tsx"
-import { AlignLeftIcon } from "@@/frontend/@/components/tiptap-icons/align-left-icon.tsx"
-import { AlignRightIcon } from "@@/frontend/@/components/tiptap-icons/align-right-icon.tsx"
+import { AlignCenterIcon } from "@/frontend/@/components/tiptap-icons/align-center-icon.tsx"
+import { AlignJustifyIcon } from "@/frontend/@/components/tiptap-icons/align-justify-icon.tsx"
+import { AlignLeftIcon } from "@/frontend/@/components/tiptap-icons/align-left-icon.tsx"
+import { AlignRightIcon } from "@/frontend/@/components/tiptap-icons/align-right-icon.tsx"
 
 export type TextAlign = "left" | "center" | "right" | "justify"
 

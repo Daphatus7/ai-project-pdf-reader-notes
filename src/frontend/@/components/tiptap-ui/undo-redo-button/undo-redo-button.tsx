@@ -3,25 +3,25 @@
 import { forwardRef, useCallback } from "react"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { parseShortcutKeys } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Tiptap UI ---
 import type {
   UndoRedoAction,
   UseUndoRedoConfig,
-} from "@@/frontend/@/components/tiptap-ui/undo-redo-button/index.tsx"
+} from "@/frontend/@/components/tiptap-ui/undo-redo-button/index.tsx"
 import {
   UNDO_REDO_SHORTCUT_KEYS,
   useUndoRedo,
-} from "@@/frontend/@/components/tiptap-ui/undo-redo-button/index.tsx"
+} from "@/frontend/@/components/tiptap-ui/undo-redo-button/index.tsx"
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Badge } from "@@/frontend/@/components/tiptap-ui-primitive/badge"
+import type { ButtonProps } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Badge } from "@/frontend/@/components/tiptap-ui-primitive/badge"
 
 export interface UndoRedoButtonProps
   extends Omit<ButtonProps, "type">,

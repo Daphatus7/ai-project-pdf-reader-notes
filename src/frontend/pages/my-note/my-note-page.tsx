@@ -1,19 +1,19 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Header } from "@@/frontend/components/header/header.tsx";
-import { NoteSidebar } from "@@/frontend/components/note-sidebar/note-sidebar.tsx";
-import { PdfSection } from "@@/frontend/components/reader/pdf-section.tsx";
-import {type ImageContextItem, Llm_chat} from "@@/frontend/components/chat/llm_chat.tsx";
+import {NoteSidebar} from "@/frontend/components/note-sidebar/note-sidebar.tsx";
+import {type ImageContextItem, Llm_chat} from "@/frontend/components/chat/llm_chat.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from "@@/frontend/components/ui/resizable.tsx";
+} from "@/frontend/components/ui/resizable.tsx";
 import {PanelLeftOpen, Menu, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
-import type { ContentInsertion, NoteTakerHandle } from "@@/frontend/features/types/content-insertion.ts";
-import { Button } from "@@/frontend/components/ui/button.tsx";
-import NoteTaker from "@@/frontend/components/note/note-taker.tsx";
-import {useNotesStore} from "@@/frontend/store.tsx";
+import type { ContentInsertion, NoteTakerHandle } from "@/frontend/features/types/content-insertion.ts";
+import { Button } from "@/frontend/components/ui/button.tsx";
+import NoteTaker from "@/frontend/components/note/note-taker.tsx";
+import {useNotesStore} from "@/frontend/store.tsx";
+import {Header} from "@/frontend/components/header/header.tsx";
+import {PdfSection} from "@/frontend/components/reader/pdf-section.tsx";
 
 export interface MyNotePage {
 	id: string;

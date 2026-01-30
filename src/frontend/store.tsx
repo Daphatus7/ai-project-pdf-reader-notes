@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type {MyNotePage} from "@@/frontend/pages/my-note/my-note-page.tsx";
-import initialNotesData from "@@/frontend/test/hardcoed_data.tsx";
+import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
+import initialNotesData from "@/frontend/test/hardcoed_data.tsx";
 
 /***
  * use zustand to store global state

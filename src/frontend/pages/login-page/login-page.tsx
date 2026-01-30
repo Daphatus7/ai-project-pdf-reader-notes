@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "../../api/services/supabase";
+import { loginViaApi, loginWithDebugCredentials } from "../../api/services/auth.service";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
@@ -17,17 +17,27 @@ const LoginPage = () => {
 		setError(null);
 		setLoading(true);
 
-		const { error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
-
-		setLoading(false);
-
-		if (error) {
-			setError(error.message);
-		} else {
+		try {
+			await loginViaApi(email, password);
 			navigate(from, { replace: true });
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Login failed");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleDebugLogin = async () => {
+		setError(null);
+		setLoading(true);
+
+		try {
+			await loginWithDebugCredentials();
+			navigate(from, { replace: true });
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Debug login failed");
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -116,6 +126,18 @@ const LoginPage = () => {
 							>
 								{loading ? "Signing in..." : "Sign in"}
 							</button>
+
+							{import.meta.env.DEV && (
+								<button
+									type="button"
+									onClick={handleDebugLogin}
+									disabled={loading}
+									className="w-full text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+								>
+									{loading ? "Signing in..." : "Debug Login (Dev Only)"}
+								</button>
+							)}
+
 							<p className="text-sm font-light text-gray-500 dark:text-gray-400">
 								Don't have an account yet?{" "}
 								<a

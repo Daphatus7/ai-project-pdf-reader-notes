@@ -1,8 +1,8 @@
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
 
 // --- Icons ---
-import { MoonStarIcon } from "@@/frontend/@/components/tiptap-icons/moon-star-icon.tsx"
-import { SunIcon } from "@@/frontend/@/components/tiptap-icons/sun-icon.tsx"
+import { MoonStarIcon } from "@/frontend/@/components/tiptap-icons/moon-star-icon.tsx"
+import { SunIcon } from "@/frontend/@/components/tiptap-icons/sun-icon.tsx"
 import { useEffect, useState } from "react"
 
 export function ThemeToggle() {

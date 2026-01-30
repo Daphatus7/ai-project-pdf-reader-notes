@@ -15,7 +15,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "../ui/tooltip.tsx";
-import type {Note} from "../../App.tsx";
 import {llmService, ApiError, type LLMStructuredOutput} from "../../api";
 import {MarkdownRenderer} from "../renderer/markdown-renderer.tsx";
 import type {ContentInsertion, SectionType} from "../../features/types/content-insertion.ts";
