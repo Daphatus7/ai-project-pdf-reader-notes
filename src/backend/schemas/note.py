@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 class CreateNoteRequest(BaseModel):
     """Request model for creating a note"""
-    project_id: str | None = None
     title: str = "Untitled Note"
     content_markdown: str = ""
     summary: str | None = None

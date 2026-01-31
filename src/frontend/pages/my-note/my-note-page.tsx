@@ -11,7 +11,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NoteTakerHandle } from "@/frontend/features/types/content-insertion.ts";
 import { Button } from "@/frontend/components/ui/button.tsx";
 import NoteTaker from "@/frontend/components/note/note-taker.tsx";
-import {useNotesStore} from "@/frontend/store.tsx";
+import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfSection} from "@/frontend/components/reader/pdf-section.tsx";
 

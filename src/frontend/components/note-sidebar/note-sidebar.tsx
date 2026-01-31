@@ -20,13 +20,17 @@ import {
 import { cn } from "../ui/utils.ts";
 import { useDrag, useDrop } from "react-dnd";
 import type { Identifier, XYCoord } from "dnd-core";
+import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
+import type {Note} from "@/frontend/api/types/note.ts";
 
 interface NoteSidebarProps {
-	notes: Note[];
-	setNotes: (notes: Note[]) => void;
+	notes: MyNotePage[];
+	setNotes: (notes: MyNotePage[]) => void;
 	selectedNoteId: string;
 	onSelectNote: (id: string) => void;
 	onAddNote?: () => void;
+	onDeleteNote?: (id: string) => void;
+	onEditNoteName?: (id: string, newTitle: string) => void;
 }
 
 const ITEM_TYPE = "NOTE";
@@ -222,20 +226,28 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEdi
 	);
 }
 
-export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onAddNote }: NoteSidebarProps) {
+export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onAddNote, onDeleteNote, onEditNoteName }: NoteSidebarProps) {
 	const handleDelete = (id: string) => {
-		const filtered = notes.filter((note) => note.id !== id);
-		setNotes(filtered);
-		if (selectedNoteId === id) {
-			onSelectNote(filtered[0]?.id || "");
+		if (onDeleteNote) {
+			onDeleteNote(id);
+		} else {
+			const filtered = notes.filter((note) => note.id !== id);
+			setNotes(filtered);
+			if (selectedNoteId === id) {
+				onSelectNote(filtered[0]?.id || "");
+			}
 		}
 	};
 
 	const handleEditName = (id: string, newTitle: string) => {
-		const updated = notes.map((note) =>
-			note.id === id ? { ...note, title: newTitle } : note
-		);
-		setNotes(updated);
+		if (onEditNoteName) {
+			onEditNoteName(id, newTitle);
+		} else {
+			const updated = notes.map((note) =>
+				note.id === id ? { ...note, title: newTitle } : note
+			);
+			setNotes(updated);
+		}
 	};
 
 	const moveNote = (dragIndex: number, hoverIndex: number) => {

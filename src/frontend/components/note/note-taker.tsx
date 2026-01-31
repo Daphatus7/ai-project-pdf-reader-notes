@@ -22,9 +22,11 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/frontend/components/ui
 import {SimpleEditor} from "@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
 import TextAlign from "@tiptap/extension-text-align";
 import {ImageUploadNode} from "@/frontend/@/components/tiptap-node/image-upload-node";
+import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
+import type {Note} from "@/frontend/api/types/note.ts";
 
 interface NoteTakerProps {
-	note?: Note
+	note?: MyNotePage
 }
 
 type ViewMode = 'markdown' | 'preview' | 'editor'
