@@ -12,7 +12,8 @@ from typing import Optional
 
 import jwt
 from jwt import PyJWKClient
-from fastapi import HTTPException, Header, Depends
+from fastapi import HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.backend.servers import services
 from src.backend.schemas import ChatRequest
@@ -21,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize JWKS client for Supabase token verification
 _jwks_client: Optional[PyJWKClient] = None
+
+# Security scheme for Swagger UI
+security = HTTPBearer()
 
 
 def get_jwks_client() -> PyJWKClient:
@@ -75,11 +79,8 @@ def get_database_service():
 
 
 # Authentication Dependency
-async def get_user(authorization: str = Header(...)):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid auth header")
-
-    token = authorization.split(" ")[1]
+async def get_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
 
     try:
         # Get the signing key from JWKS endpoint
