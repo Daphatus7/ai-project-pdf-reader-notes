@@ -506,3 +506,191 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to check thread existence {thread_id}: {e}')
             return False
+
+    # ==================== Notes Operations ====================
+
+    async def list_notes(self, user_id: str) -> list[dict]:
+        """
+        Get all notes for a specific user.
+
+        Args:
+            user_id: User's unique identifier
+
+        Returns:
+            List of note dictionaries ordered by updated_at desc
+        """
+        try:
+            response = (self.__database.table('notes')
+                        .select('*')
+                        .eq('user_id', user_id)
+                        .order('updated_at', desc=True)
+                        .execute())
+            return response.data
+        except Exception as e:
+            logger.error(f'Failed to get notes for user {user_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to retrieve notes')
+
+    async def get_note(self, user_id: str, note_id: str) -> dict:
+        """
+        Get a single note by ID.
+
+        Args:
+            user_id: User's unique identifier
+            note_id: Note's unique identifier
+
+        Returns:
+            Note dictionary
+
+        Raises:
+            HTTPException 404 if note not found
+        """
+        try:
+            response = (self.__database.table('notes')
+                        .select('*')
+                        .eq('id', note_id)
+                        .eq('user_id', user_id)
+                        .execute())
+
+            if not response.data:
+                raise HTTPException(status_code=404, detail='Note not found')
+
+            return response.data[0]
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to get note {note_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to retrieve note')
+
+    async def create_note(self, user_id: str, payload) -> dict:
+        """
+        Create a new note for a user.
+
+        Args:
+            user_id: User's unique identifier
+            payload: CreateNoteRequest
+
+        Returns:
+            Created note dictionary
+        """
+        try:
+            note_data = {
+                'user_id': user_id,
+                'project_id': payload.project_id,
+                'title': payload.title,
+                'content_markdown': payload.content_markdown,
+                'summary': payload.summary,
+                'metadata': payload.metadata or {},
+                'version': 1,
+            }
+
+            response = self.__database.table('notes').insert(note_data).execute()
+
+            if response.data:
+                logger.info(f'Note created: user={user_id}, note={response.data[0]["id"]}')
+                return response.data[0]
+            else:
+                raise HTTPException(status_code=500, detail='Failed to create note')
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to create note for user {user_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to create note')
+
+    async def update_note(self, user_id: str, note_id: str, payload) -> dict:
+        """
+        Update a note with optimistic locking.
+
+        Args:
+            user_id: User's unique identifier
+            note_id: Note's unique identifier
+            payload: UpdateNoteRequest
+
+        Returns:
+            Updated note dictionary
+
+        Raises:
+            HTTPException 404 if note not found
+            HTTPException 409 if version conflict (optimistic lock failure)
+        """
+        try:
+            # Build update dict with only provided fields
+            update_data = {}
+            if payload.title is not None:
+                update_data['title'] = payload.title
+            if payload.content_markdown is not None:
+                update_data['content_markdown'] = payload.content_markdown
+            if payload.summary is not None:
+                update_data['summary'] = payload.summary
+            if payload.metadata is not None:
+                update_data['metadata'] = payload.metadata
+
+            # Increment version for optimistic locking
+            update_data['version'] = payload.version + 1
+
+            # Update only if version matches (optimistic locking)
+            response = (self.__database.table('notes')
+                        .update(update_data)
+                        .eq('id', note_id)
+                        .eq('user_id', user_id)
+                        .eq('version', payload.version)
+                        .execute())
+
+            if not response.data:
+                # Check if note exists but version mismatched
+                existing = (self.__database.table('notes')
+                           .select('id, version')
+                           .eq('id', note_id)
+                           .eq('user_id', user_id)
+                           .execute())
+
+                if existing.data:
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f'Version conflict. Current version: {existing.data[0]["version"]}'
+                    )
+                else:
+                    raise HTTPException(status_code=404, detail='Note not found')
+
+            logger.info(f'Note updated: user={user_id}, note={note_id}')
+            return response.data[0]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to update note {note_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to update note')
+
+    async def delete_note(self, user_id: str, note_id: str) -> dict:
+        """
+        Delete a note.
+
+        Args:
+            user_id: User's unique identifier
+            note_id: Note's unique identifier
+
+        Returns:
+            Response dictionary with deletion status
+        """
+        try:
+            # Verify note belongs to user
+            note = (self.__database.table('notes')
+                    .select('id')
+                    .eq('id', note_id)
+                    .eq('user_id', user_id)
+                    .execute())
+
+            if not note.data:
+                raise HTTPException(status_code=404, detail='Note not found')
+
+            # Delete note
+            self.__database.table('notes').delete().eq('id', note_id).execute()
+
+            logger.info(f'Note deleted: user={user_id}, note={note_id}')
+            return {'message': 'Note deleted successfully'}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to delete note {note_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to delete note')
