@@ -19,7 +19,7 @@ from src.backend.schemas import (
     LoginResponse,
     UserResponse,
 )
-from src.backend.schemas.auth import CreateProfileRequest
+from src.backend.schemas.auth import CreateProfileRequest, CreateProfileResponse, RegisterResponse
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +47,10 @@ async def login(request: LoginRequest,
         
 
 
-@router.post('/register', response_model=UserResponse)
-async def register(request: RegisterRequest):
+@router.post('/register', response_model=RegisterResponse)
+async def register(request: RegisterRequest,
+                   database_service=Depends(get_database_service)
+                   ):
     """
     Register a new user account.
 
@@ -60,35 +62,35 @@ async def register(request: RegisterRequest):
 
     Raises:
         HTTPException: If registration fails
+        :param request: 
+        :param database_service: 
     """
     try:
-        # TODO: Implement registration logic
-        # 1. Validate email and username are unique
-        # 2. Hash password
-        # 3. Create user in database
-        # 4. Send verification email (optional)
-        # 5. Return user response
+        register_resp = await database_service.register(request)
+        logger.info(f"User registered: {request.email}")
 
-        logger.info(f"Registration attempt for user: {request.username}")
+        user = register_resp.user
+        user_metadata = user.user_metadata or {}
 
-        # Placeholder response
-        raise HTTPException(
-            status_code=501,
-            detail="Registration not yet implemented"
+        return RegisterResponse(
+            id=user.id,
+            email=user.email,
+            username=user_metadata.get('username', request.username),
+            full_name=user_metadata.get('full_name', request.full_name),
+            status="pending_verification" if not user.email_confirmed_at else "active"
         )
-
     except Exception as e:
         logger.error(f"Error in register endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=400, detail="Registration failed")
 
 
 @router.post('/refresh', response_model=LoginResponse)
-async def refresh_token(refresh_token: str):
+async def refresh_token(token: str):
     """
     Refresh access token using refresh token.
 
     Args:
-        refresh_token: Valid refresh token
+        token: Valid refresh token
 
     Returns:
         New access token
@@ -132,25 +134,25 @@ async def logout():
         raise HTTPException(status_code=500, detail="Logout failed")
 
 
-@router.post('/create-profile', response_model=CreateProfileRequest)
+@router.post('/create-profile', response_model=CreateProfileResponse)
 async def create_profile(
     request: CreateProfileRequest,
     user=Depends(get_user),
     database_service=Depends(get_database_service)
 ):
     """
-    create user profile information.
+    Create user profile information.
 
     Returns:
-        create user information
+        Created user profile information
     """
     try:
-        resp=await database_service.create_user_profile(
+        resp = await database_service.create_user_profile(
             user['sub'],
             display_name=request.display_name,
         )
         logger.info(f"User profile created: {user['sub']}")
-        return resp
+        return CreateProfileResponse(response=resp.data)
     except Exception as e:
         logger.error(f"Error in create_profile endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Create profile failed")

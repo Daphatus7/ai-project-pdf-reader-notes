@@ -22,6 +22,13 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: str | None = None
 
+class RegisterResponse(BaseModel):
+    """Registration response model"""
+    id: str
+    email: str
+    username: str
+    full_name: str | None = None
+    status: str
 
 class LoginResponse(BaseModel):
     """Token response model"""
