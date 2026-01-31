@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS notes (
     
     -- Foreign keys
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     
     -- MyNotePage content
     title TEXT NOT NULL,
