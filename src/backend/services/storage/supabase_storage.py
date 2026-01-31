@@ -10,6 +10,7 @@ import dotenv
 from fastapi import HTTPException
 from supabase import create_client, Client
 
+from src.backend.schemas import RegisterRequest
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 from src.backend.config.config import settings
@@ -61,6 +62,26 @@ class SupabaseStorage(Service):
 
         self.__database: Client = create_client(url, key)
         logger.info('Supabase database service started')
+    
+    async def register(self, request) -> dict:
+        try:
+            logger.info(f"Attempting to register {request.email}")
+            resp = self.__database.auth.sign_up({
+                "email": request.email,
+                "password": request.password,
+                "options": {
+                    "data": {
+                        "username": request.username,
+                        "full_name": request.full_name,
+                    }
+                }
+            })
+            return resp
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f'Register failed for email {request.email}: {e}')
+            raise HTTPException(status_code=500, detail='Register failed')   
         
     async def login(self, email: str, password: str) -> dict:
         """
@@ -94,12 +115,14 @@ class SupabaseStorage(Service):
         """
         try:
             
-            resp=self.__database.table('profiles').insert({
+            resp = self.__database.table('profiles').upsert({
                 'id': user_id,
                 'display_name': display_name,
             }).execute()
             logger.info(f'User profile created for user {user_id}')
             return resp
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f'Failed to create user profile for user {user_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to create user profile')
@@ -575,13 +598,20 @@ class SupabaseStorage(Service):
         try:
             note_data = {
                 'user_id': user_id,
-                'project_id': payload.project_id,
                 'title': payload.title,
                 'content_markdown': payload.content_markdown,
                 'summary': payload.summary,
                 'metadata': payload.metadata or {},
                 'version': 1,
             }
+            logger.info(
+                f"user_id: {user_id}\n"
+                f"title: {payload.title}\n"
+                f"content_markdown: {payload.content_markdown}\n"
+                f"summary: {payload.summary}\n"
+                f"metadata: {payload.metadata}\n"
+                f"version: 1\n"
+            )
 
             response = self.__database.table('notes').insert(note_data).execute()
 
