@@ -37,7 +37,7 @@ class ChatRequest(BaseModel):
         project_id: the users project id
     """
     user_id: Optional[str] = None  # injected by server from auth token
-    project_id: str  # the user's project_id or folder id
+    # project_id: str  # the user's project_id or folder id
     thread_id: str  # conversation thread for the user
     # users query and any context send by the user
     contents: list[InputContent] = Field(
