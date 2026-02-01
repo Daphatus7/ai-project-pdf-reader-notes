@@ -207,13 +207,17 @@ export default function NotePage() {
 						</ResizablePanelGroup>
 					)}
 				</ResizablePanel>
-				<ResizableHandle withHandle />
 				
-				<LLMChatFeature
-				
-				/>
-				
-				<ResizableHandle withHandle />
+				<ResizableHandle  />
+
+				<ResizablePanel
+					defaultSize={34}
+					minSize={15}
+				>
+					<LLMChatFeature />
+				</ResizablePanel>
+
+				<ResizableHandle  />
 
 				{/* Right Sidebar - Markdown Editor */}
 
