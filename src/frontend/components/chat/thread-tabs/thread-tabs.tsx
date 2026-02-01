@@ -9,48 +9,48 @@ import type { ThreadTabsProps } from '@/frontend/features/llm-chat/types';
 
 
 export function ThreadTabs({
-	threads,
-	activeThreadId,
-	onSelectThread,
-	onCreateThread,
-	onDeleteThread,
-}: ThreadTabsProps) {
+							   threads,
+							   activeThreadId,
+							   onSelectThread,
+							   onCreateThread,
+						   }: ThreadTabsProps) {
 	return (
-		<div className="flex items-center gap-1 px-2 py-2 bg-gray-50 border-b border-gray-200 overflow-x-auto">
+		<div className="flex justify-between"
+		>
 			{/* Thread tabs */}
-			{threads.map((thread) => (
-				<div
-					key={thread.id}
-					className={`flex items-center gap-2 px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
-						activeThreadId === thread.id
-							? 'bg-blue-500 text-white'
-							: 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-					}`}
-					onClick={() => onSelectThread(thread.id)}
-				>
-					<span className="text-sm truncate max-w-[120px]">{thread.title}</span>
-					{threads.length > 1 && (
-						<button
-							onClick={(e) => {
-								e.stopPropagation();
-								onDeleteThread(thread.id);
-							}}
-							className={`text-xs px-1 rounded hover:bg-opacity-20 ${
-								activeThreadId === thread.id
-									? 'hover:bg-white'
-									: 'hover:bg-gray-300'
-							}`}
-						>
-							×
-						</button>
-					)}
-				</div>
-			))}
+			<div className="flex flex-row">
+			{threads.map((thread) => {
+				// 1. 判断当前这个 thread 是否是被选中的那个
+				const isActive = thread.id === activeThreadId;
+
+				return (
+					<button
+						// 2. 必须要有唯一的 key (通常是 ID)
+						key={thread.id}
+
+						// 3. 点击时，调用父组件传下来的回调，把 ID 传回去
+						onClick={() => onSelectThread(thread.id)}
+
+						// 4. 根据是否 Active 动态切换样式
+						// whitespace-nowrap 防止标题过长换行
+						className={`
+                      px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap
+                      ${isActive
+							? "bg-white text-gray-900 shadow-sm border border-gray-200" // 激活状态：白底、深字、带边框
+							: "text-gray-500 hover:bg-gray-200 hover:text-gray-700 border border-transparent" // 未激活：灰字、悬停变灰
+						}
+                   `}
+					>
+						{/* 5. 显示标题，如果没有标题则显示默认文案 */}
+						{thread.title || 'new chat'}
+					</button>
+				);
+			})}
+			</div>
 
 			{/* Add new thread button */}
 			<button
 				onClick={onCreateThread}
-				className="flex items-center justify-center w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
 			>
 				+
 			</button>

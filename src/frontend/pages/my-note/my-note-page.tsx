@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import {NoteSidebar} from "@/frontend/components/note-sidebar/note-sidebar.tsx";
-import {type ImageContextItem, Llm_chat} from "@/frontend/components/chat/llm_chat.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -14,6 +13,7 @@ import NoteTaker from "@/frontend/components/note/note-taker.tsx";
 import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfSection} from "@/frontend/components/reader/pdf-section.tsx";
+import {LLMChatFeature} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 
 export interface MyNotePage {
 	id: string;
@@ -41,28 +41,28 @@ export default function NotePage() {
 	
 	const [notes, setNotes] = useState<MyNotePage[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
-	const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
-	const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
+	// const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
+	// const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
 
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 
-	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-		const newScreenshot: ImageContextItem = {
-			id: crypto.randomUUID(),
-			type: "image",
-			name: name,
-			userPrompt: "Explain the image",
-			imageUrls:[imageDataUrl]
-		};
-
-		// Make the screenshot available as context immediately
-		setScreenshots(prev => [...prev, newScreenshot]);
-		// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
-		setPendingImageAnalysis(newScreenshot);
-	}
+	// const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
+	// 	const newScreenshot: ImageContextItem = {
+	// 		id: crypto.randomUUID(),
+	// 		type: "image",
+	// 		name: name,
+	// 		userPrompt: "Explain the image",
+	// 		imageUrls:[imageDataUrl]
+	// 	};
+	//
+	// 	// Make the screenshot available as context immediately
+	// 	setScreenshots(prev => [...prev, newScreenshot]);
+	// 	// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
+	// 	setPendingImageAnalysis(newScreenshot);
+	// }
 
 	const handleAddNewNote = () => {
 		const newNote: MyNotePage = {
@@ -201,17 +201,16 @@ export default function NotePage() {
 						</div>
 					) : (
 						<ResizablePanelGroup direction="vertical">
-							<PdfSection onScreenshotCapture={handleScreenshotCapture} />
+							{/*<PdfSection */}
+							{/*	onScreenshotCapture={handleScreenshotCapture} */}
+							{/*/>*/}
 						</ResizablePanelGroup>
 					)}
 				</ResizablePanel>
 				<ResizableHandle withHandle />
-
-				<Llm_chat
-					note={selectedNote}
-					externalContextItems={screenshots}
-					imageContextItem={pendingImageAnalysis}
-					onContentInsert={handleContentInsert}
+				
+				<LLMChatFeature
+				
 				/>
 				
 				<ResizableHandle withHandle />

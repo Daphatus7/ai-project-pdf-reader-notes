@@ -1,25 +1,29 @@
 /**
- * AI Chat Bubble Component
- * Provide chat bubble for AI messages in the chat interface
- *
  * @file        ai-chat-bubble.tsx
- * @description
- *	- provide AI chat bubble component for chat interface
+ * @description AI message bubble component with selectable content
  * @author      [Peiyu Wang]
- * @created    Saturday
- * @license     © 2026 . All rights reserved.
+ * @license     © 2026. All rights reserved.
  */
 
-export interface AIChatBubbleProps {
-	// 	use DI to insert the message content
-	//messages
-	//DI insert for notes, leave a function here
-}
+import type { AIChatBubbleProps } from '@/frontend/features/llm-chat/types';
 
-export function AIChatBubble({ message }: { message: string }) {
+export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
+	const handleClick = () => {
+		if (onSelectContent) {
+			onSelectContent(message.content);
+		}
+	};
+
 	return (
-		<div className="max-w-xl bg-gray-100 text-gray-800 p-4 rounded-lg shadow-md self-start mb-2">
-			<p>{message}</p>
+		<div className="flex justify-start">
+			<div
+				className={`max-w-[80%] bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
+					onSelectContent ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
+				}`}
+				onClick={handleClick}
+			>
+				<p className="text-sm whitespace-pre-wrap">{message.content}</p>
+			</div>
 		</div>
 	);
 }

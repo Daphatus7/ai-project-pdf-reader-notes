@@ -1,30 +1,49 @@
 /**
- * @file        chat-bar.ts
- * @description
- * 	- provide chat bar component for chat interface
- *
+ * @file        chat-bar.tsx
+ * @description Chat input bar component
  * @author      [Peiyu Wang]
- * @created    Saturday
- * @license     © 2026 . All rights reserved.
+ * @license     © 2026. All rights reserved.
  */
 
-export interface ChatPanelProps {
-	// 给用户提供输入消息的界面
-	// 展示context 等等, 提供一个外界可以对内输入的接口
-}
+import { useState } from 'react';
+import type { ChatBarProps } from '@/frontend/features/llm-chat/types';
 
+export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...' }: ChatBarProps) {
+	const [input, setInput] = useState('');
 
-export function ChatBar() {
+	const handleSend = () => {
+		if (!input.trim() || isLoading) return;
+		onSend(input.trim());
+		setInput('');
+	};
+
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			handleSend();
+		}
+	};
+
 	return (
-		<div className="w-full h-16 border-t border-gray-300 flex items-center px-4 bg-white">
-			<input
-				type="text"
-				placeholder="Type your message..."
-				className="flex-grow h-10 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-			<button className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-				Send
-			</button>
+		<div className="border-t border-gray-200 p-4 bg-white">
+			<div className="flex gap-2">
+				<input
+					type="text"
+					value={input}
+					onChange={(e) => setInput(e.target.value)}
+					onKeyPress={handleKeyPress}
+					placeholder={placeholder}
+					disabled={isLoading}
+					className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+				/>
+				<button
+					onClick={handleSend}
+					disabled={isLoading || !input.trim()}
+					className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+				>
+					{isLoading ? 'Sending...' : 'Send'}
+				</button>
+			</div>
 		</div>
 	);
 }
