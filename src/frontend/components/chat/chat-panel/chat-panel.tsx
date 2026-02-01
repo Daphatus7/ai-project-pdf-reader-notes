@@ -13,7 +13,7 @@ import {ThreadTabs} from "@/frontend/components/chat/thread-tabs/thread-tabs.tsx
 export function ChatPanel({threadProp, messages, isLoading, onSendMessage, onSelectContent }: 
 						  ChatPanelProps) {
 	return (
-		<div className="flex flex-col h-full bg-white">
+		<div className="flex justify-between flex-col h-full bg-white">
 			{/* Messages area */}
 			<ChatBubbles messages={messages} onSelectContent={onSelectContent} />
 			

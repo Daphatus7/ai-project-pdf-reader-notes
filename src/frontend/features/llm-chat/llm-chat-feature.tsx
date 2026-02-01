@@ -8,7 +8,7 @@
 import { useEffect, useCallback } from 'react';
 import type { Message, LLMChatFeatureProps } from './types';
 import { useThreads } from '@/frontend/components/chat/thread-tabs/use-threads';
-import { useChat, createMessage } from './use-chat';
+import { useChat, createMessage } from '../../components/chat/use-chat.ts';
 import { ChatPanel } from '@/frontend/components/chat/chat-panel/chat-panel';
 
 // ============ Feature Component ============
@@ -45,20 +45,18 @@ export function LLMChatFeature({ onInjectMessage, onSelectContent }: LLMChatFeat
 
 	// ---- Render ----
 	return (
-		<div>
-			<ChatPanel
-				threadProp={{
-					threads: threads,
-					activeThreadId: activeThreadId,
-					onSelectThread: selectThread,
-					onCreateThread: createThread,
-					onDeleteThread: deleteThread
-				}}
-				messages={activeMessages}
-				isLoading={isLoading}
-				onSendMessage={sendMessage}
-				onSelectContent={onSelectContent}
-			/>
-		</div>
+		<ChatPanel
+			threadProp={{
+				threads: threads,
+				activeThreadId: activeThreadId,
+				onSelectThread: selectThread,
+				onCreateThread: createThread,
+				onDeleteThread: deleteThread
+			}}
+			messages={activeMessages}
+			isLoading={isLoading}
+			onSendMessage={sendMessage}
+			onSelectContent={onSelectContent}
+		/>
 	);
 }
