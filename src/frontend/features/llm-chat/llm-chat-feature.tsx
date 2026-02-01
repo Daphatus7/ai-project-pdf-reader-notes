@@ -5,19 +5,11 @@
  * @license     © 2026. All rights reserved.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import type { Message, LLMChatFeatureProps } from './types';
 import { useThreads } from '@/frontend/components/chat/thread-tabs/use-threads';
+import { useChat, createMessage } from './use-chat';
 import { ChatPanel } from '@/frontend/components/chat/chat-panel/chat-panel';
-
-// ============ Helper ============
-
-const createMessage = (role: 'user' | 'assistant', content: string): Message => ({
-	id: `msg-${Date.now()}`,
-	role,
-	content,
-	timestamp: Date.now(),
-});
 
 // ============ Feature Component ============
 
@@ -34,25 +26,10 @@ export function LLMChatFeature({ onInjectMessage, onSelectContent }: LLMChatFeat
 	} = useThreads();
 	
 	const {
+		isLoading,
 		sendMessage,
 		selectMessage,
-	} = useChat()
-
-	const [isLoading, setIsLoading] = useState(false);
-
-	// ---- Message Actions ----
-	const handleSendMessage = useCallback((content: string) => {
-		if (!activeThreadId || !content.trim()) return;
-
-		addMessage(createMessage('user', content));
-
-		// Simulate AI response (TODO: replace with actual API call)
-		setIsLoading(true);
-		setTimeout(() => {
-			addMessage(createMessage('assistant', `This is a mock response to: "${content}"\n\nIn the real implementation, this will call the LLM API.`));
-			setIsLoading(false);
-		}, 1000);
-	}, [activeThreadId, addMessage]);
+	} = useChat(activeThreadId, addMessage);
 
 	// ---- External Interface: Inject Message ----
 	const injectMessage = useCallback((content: string, role: 'user' | 'assistant' = 'user') => {
@@ -79,7 +56,7 @@ export function LLMChatFeature({ onInjectMessage, onSelectContent }: LLMChatFeat
 				}}
 				messages={activeMessages}
 				isLoading={isLoading}
-				onSendMessage={handleSendMessage}
+				onSendMessage={sendMessage}
 				onSelectContent={onSelectContent}
 			/>
 		</div>
