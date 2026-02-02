@@ -26,6 +26,23 @@ class ImageContent(BaseModel):
 
 InputContent = Union[TextContent, ImageContent]
 
+
+# Output Content Models (mirror input structure for API symmetry)
+class TextOutput(BaseModel):
+    """Text content in AI response"""
+    type: Literal["text"] = "text"
+    text: str
+
+
+class ImageOutput(BaseModel):
+    """Image content in AI response (e.g., generated images)"""
+    type: Literal["image"] = "image"
+    data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
+    mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
+
+
+OutputContent = Union[TextOutput, ImageOutput]
+
 ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
 
 
@@ -49,7 +66,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
-    response: list[dict]
+    contents: list[OutputContent]
 
 
 # threads

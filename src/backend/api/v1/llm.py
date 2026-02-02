@@ -27,8 +27,8 @@ async def chat(
         request: ChatRequest = Depends(get_chat_request),
         llm_service=Depends(get_llm_service)
 ):
-    response = await llm_service.chat(request=request)
-    return ChatResponse(response=response)
+    contents = await llm_service.chat(request=request)
+    return ChatResponse(contents=contents)
 
 #create a thread
 @router.post('/thread', response_model=CreateThreadResponse)
@@ -98,5 +98,7 @@ async def load_conversation_thread(
         user_id=user_id,
         request=request,
     )
-    return LoadThreadResponse(messages=messages)
+    return LoadThreadResponse(
+        thread_id=request.thread_id,
+        messages=messages)
 

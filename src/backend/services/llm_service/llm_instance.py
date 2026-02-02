@@ -66,6 +66,46 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 6. BLOCKQUOTES: Use > for notes
 
 CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
+def _parse_ai_response(ai_msg) -> list[dict]:
+    """Parse AI message into structured output contents.
+
+    Converts OpenAI response format to our OutputContent structure.
+    Supports text and image outputs for multimodal responses.
+    """
+    contents = []
+
+    if isinstance(ai_msg.content, str):
+        # Simple text response
+        contents.append({"type": "text", "text": ai_msg.content})
+    elif isinstance(ai_msg.content, list):
+        # Multimodal response (OpenAI format)
+        for item in ai_msg.content:
+            if isinstance(item, dict):
+                if item.get("type") == "text":
+                    contents.append({"type": "text", "text": item["text"]})
+                elif item.get("type") == "image_url":
+                    # Extract base64 from data URL
+                    url = item["image_url"]["url"]
+                    if url.startswith("data:"):
+                        parts = url.split(";base64,", 1)
+                        if len(parts) == 2:
+                            mime_type = parts[0].replace("data:", "")
+                            data = parts[1]
+                            contents.append({
+                                "type": "image",
+                                "data": data,
+                                "mime_type": mime_type
+                            })
+            elif hasattr(item, "text"):
+                # LangChain text content object
+                contents.append({"type": "text", "text": item.text})
+    else:
+        # Fallback: convert to string
+        contents.append({"type": "text", "text": str(ai_msg.content)})
+
+    return contents
+
+
 def _build_human_message(contents: list) -> HumanMessage:
     """Build HumanMessage from request contents."""
     content_parts = []
@@ -300,9 +340,15 @@ class LlmAgent:
 
         ai_msg = response["messages"][-1]
 
+        # Parse AI response into structured output contents
+        output_contents = _parse_ai_response(ai_msg)
+
         # 5. Dual-write: persist to Supabase
         human_content = human_msg.content
-        ai_content = ai_msg.content if isinstance(ai_msg.content, str) else str(ai_msg.content)
+        # For storage, extract text content only
+        ai_content = " ".join(
+            item["text"] for item in output_contents if item["type"] == "text"
+        )
 
         # Get token counts from usage_metadata
         input_tokens = 0
@@ -322,4 +368,4 @@ class LlmAgent:
             output_tokens=output_tokens
         )
 
-        return ai_content
+        return output_contents
