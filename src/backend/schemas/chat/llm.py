@@ -47,11 +47,12 @@ class ChatRequest(BaseModel):
     # RAG filter fields
     source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
-
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
-    response: str = Field(..., description='LLM response message')
+    response: list[dict]
 
+
+# threads
 class CreateThreadRequest(BaseModel):
     """Request model for creating a conversation thread"""
 

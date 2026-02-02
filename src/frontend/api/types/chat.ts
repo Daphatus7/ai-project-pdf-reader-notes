@@ -29,5 +29,5 @@ export interface ChatRequest {
  * Chat response
  */
 export interface ChatResponse {
-	response: string;
+	response: Record<string, unknown>[];
 }

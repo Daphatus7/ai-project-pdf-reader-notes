@@ -8,7 +8,6 @@ Provides endpoints for:
 """
 import logging
 from fastapi import APIRouter, Depends
-from fastapi.responses import StreamingResponse
 
 from src.backend.schemas import (
     ChatRequest,
