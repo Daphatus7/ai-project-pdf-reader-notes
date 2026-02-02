@@ -17,7 +17,7 @@ from src.backend.schemas import (
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
-    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse
+    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse, ThreadInfo
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,17 @@ async def list_conversation_threads(
     """
     user_id = user["sub"]  # Supabase user id
     threads = await database_service.list_conversation_threads(user_id)
-    return ListThreadsResponse(threads=threads)
+    return ListThreadsResponse(threads=
+        [
+            ThreadInfo(
+                thread_id=thread["id"],
+                title=thread["title"],
+                thread_summary=thread["thread_summary"],
+                created_at=thread["created_at"],
+                updated_at=thread["updated_at"]
+            ) for thread in threads
+        ]
+    )
 
 # Delete a conversation thread
 @router.delete('/thread', response_model=DeleteThreadResponse)
