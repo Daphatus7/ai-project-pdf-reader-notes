@@ -64,10 +64,17 @@ class CreateThreadResponse(BaseModel):
 class ListThreadsRequest(BaseModel):
     """Request model for fetching conversation threads"""
     project_id: str
-    
+
+class ThreadInfo(BaseModel):
+    thread_id: str
+    title: str
+    thread_summary: str
+    created_at: str
+    updated_at: str
+
 class ListThreadsResponse(BaseModel):
     """Response model for fetching conversation threads"""
-    threads: list[dict]  # List of thread details
+    threads: list[ThreadInfo]  # List of thread details
     # ToDO data structure to be improved later
 
 class DeleteThreadRequest(BaseModel):
