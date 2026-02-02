@@ -5,74 +5,93 @@
  * @license     © 2026. All rights reserved.
  */
 
-import { useState, useCallback } from 'react';
-import type { Thread, Message } from '@/frontend/features/llm-chat/types';
+import { useState, useCallback, useEffect } from 'react';
+import { llmService } from '@/frontend/api/services/llm.service';
+import type {ChatMessage, Thread} from "@/frontend/api/types/llm.ts";
 
-// ============ Helpers ============
-
-const createThread = (id: string, title: string): Thread => ({
-	id,
-	title,
-	createdAt: Date.now(),
-	updatedAt: Date.now(),
-});
-
-const createWelcomeMessage = (): Message => ({
-	id: `msg-${Date.now()}`,
-	role: 'assistant',
-	content: "Hello! I'm your AI assistant. How can I help you today?",
-	timestamp: Date.now(),
-});
-
-// ============ Initial Data ============
-
-const INITIAL_THREAD_ID = 'thread-1';
-const INITIAL_THREADS: Thread[] = [createThread(INITIAL_THREAD_ID, 'Chat 1')];
-const INITIAL_MESSAGES: Record<string, Message[]> = {
-	[INITIAL_THREAD_ID]: [createWelcomeMessage()],
-};
 
 // ============ Hook ============
 
 export function useThreads() {
-	const [threads, setThreads] = useState<Thread[]>(INITIAL_THREADS);
-	const [activeThreadId, setActiveThreadId] = useState<string | null>(INITIAL_THREADS[0]?.id || null);
-	const [messagesByThread, setMessagesByThread] = useState<Record<string, Message[]>>(INITIAL_MESSAGES);
+	const [threads, setThreads] = useState<Thread[]>([]);
+	const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+	const [messagesByThread, setMessagesByThread] = useState<Record<string, ChatMessage[]>>({});
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const activeMessages = activeThreadId ? (messagesByThread[activeThreadId] || []) : [];
+
+	// Load threads on mount
+	useEffect(() => {
+		const loadThreads = async () => {
+			setIsLoading(true);
+			try {
+				const response = await llmService.listThreads();
+				setThreads(response.threads);
+				if (response.threads.length > 0) {
+					setActiveThreadId(response.threads[0].thread_id);
+				}
+			} catch (err) {
+				setError(err instanceof Error ? err.message : 'Failed to load threads');
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		loadThreads();
+	}, []);
+
+	// Load messages when active thread changes
+	useEffect(() => {
+		if (!activeThreadId || messagesByThread[activeThreadId]) return;
+
+		const loadMessages = async () => {
+			try {
+				const response = await llmService.loadThread(activeThreadId);
+				setMessagesByThread(prev => ({ ...prev, [activeThreadId]: response.messages }));
+			} catch (err) {
+				setError(err instanceof Error ? err.message : 'Failed to load messages');
+			}
+		};
+		loadMessages();
+	}, [activeThreadId, messagesByThread]);
 
 	const selectThread = useCallback((threadId: string) => {
 		setActiveThreadId(threadId);
 	}, []);
 
-	const createNewThread = useCallback(() => {
-		const newThreadId = `thread-${Date.now()}`;
-		setThreads(prev => [...prev, createThread(newThreadId, `Chat ${prev.length + 1}`)]);
-		setMessagesByThread(prev => ({ ...prev, [newThreadId]: [createWelcomeMessage()] }));
-		setActiveThreadId(newThreadId);
+	const createNewThread = useCallback(async () => {
+		try {
+			const response = await llmService.createThread();
+			setThreads(prev => [...prev, response]);
+			setMessagesByThread(prev => ({ ...prev, [response.thread_id]: [] }));
+			setActiveThreadId(response.thread_id);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to create thread');
+		}
 	}, []);
 
-	const deleteThread = useCallback((threadId: string) => {
-		setThreads(prev => {
-			const newThreads = prev.filter(t => t.id !== threadId);
-
-			if (newThreads.length === 0) {
-				const newThreadId = `thread-${Date.now()}`;
-				setActiveThreadId(newThreadId);
-				setMessagesByThread({ [newThreadId]: [createWelcomeMessage()] });
-				return [createThread(newThreadId, 'Chat 1')];
-			}
-
-			setActiveThreadId(curr => curr === threadId ? newThreads[0].id : curr);
+	const deleteThread = useCallback(async (threadId: string) => {
+		try {
+			await llmService.deleteThread(threadId);
+			setThreads(prev => {
+				const newThreads = prev.filter(t => t.thread_id !== threadId);
+				if (newThreads.length === 0) {
+					setActiveThreadId(null);
+				} else if (activeThreadId === threadId) {
+					setActiveThreadId(newThreads[0].thread_id);
+				}
+				return newThreads;
+			});
 			setMessagesByThread(prev => {
 				const { [threadId]: _, ...rest } = prev;
 				return rest;
 			});
-			return newThreads;
-		});
-	}, []);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to delete thread');
+		}
+	}, [activeThreadId]);
 
-	const addMessage = useCallback((message: Message) => {
+	const addMessage = useCallback((message: ChatMessage) => {
 		if (!activeThreadId) return;
 		setMessagesByThread(prev => ({
 			...prev,
@@ -85,6 +104,8 @@ export function useThreads() {
 		activeThreadId,
 		activeMessages,
 		messagesByThread,
+		isLoading,
+		error,
 		selectThread,
 		createThread: createNewThread,
 		deleteThread,

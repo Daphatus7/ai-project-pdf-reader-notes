@@ -6,9 +6,9 @@
  */
 
 import { useRef, useEffect } from 'react';
-import type { ChatBubblesProps } from '@/frontend/features/llm-chat/types';
 import { ChatBubble } from './chat-bubble';
 import { AIChatBubble } from './ai-chat-bubble';
+import type {ChatBubblesProps} from "@/frontend/api/types/llm.ts";
 
 export function ChatBubbles({ messages, onSelectContent }: ChatBubblesProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,7 @@ export function ChatBubbles({ messages, onSelectContent }: ChatBubblesProps) {
 	}, [messages]);
 
 	// DEBUG: Check if messages are being passed correctly
-	console.log('ChatBubbles messages:', messages);
+	console.log('ChatBubbles messages:', messages[0]);
 
 	return (
 		<div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 border border-red-500">

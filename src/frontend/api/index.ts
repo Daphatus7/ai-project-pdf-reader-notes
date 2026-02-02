@@ -21,9 +21,4 @@ export type {
 	Section,
 	ChatRequest,
 	ChatResponse,
-	StreamChatRequest,
-	LLMStructuredOutput,
-	StructuredChatRequest,
-	StructuredChatResponse,
-	StructuredImageChatRequest,
 } from './types/llm';

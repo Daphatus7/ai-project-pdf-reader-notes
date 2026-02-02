@@ -4,8 +4,8 @@
  * @author      [Peiyu Wang]
  * @license     © 2026. All rights reserved.
  */
+import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
 
-import type { AIChatBubbleProps } from '@/frontend/features/llm-chat/types';
 
 export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	const handleClick = () => {
@@ -22,7 +22,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 				}`}
 				onClick={handleClick}
 			>
-				<p className="text-sm whitespace-pre-wrap">{message.content}</p>
+				<p className="text-sm whitespace-pre-wrap">{message.content[0]}</p>
 			</div>
 		</div>
 	);

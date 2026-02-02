@@ -6,10 +6,10 @@
  */
 
 import { useEffect, useCallback } from 'react';
-import type { Message, LLMChatFeatureProps } from './types';
 import { useThreads } from '@/frontend/components/chat/thread-tabs/use-threads';
 import { useChat, createMessage } from '../../components/chat/use-chat.ts';
 import { ChatPanel } from '@/frontend/components/chat/chat-panel/chat-panel';
+import type {LLMChatFeatureProps} from "@/frontend/api/types/llm.ts";
 
 // ============ Feature Component ============
 

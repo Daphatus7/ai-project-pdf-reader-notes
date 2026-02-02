@@ -16,7 +16,9 @@ export const apiConfig = {
 		},
 		llm: {
 			chat: '/api/v1/llm/chat',
-			chatStream: '/api/v1/llm/chat/',
+			thread: '/api/v1/llm/thread',
+			threadList: '/api/v1/llm/thread/list',
+			threadLoad: '/api/v1/llm/thread/load',
 		},
 	},
 } as const;

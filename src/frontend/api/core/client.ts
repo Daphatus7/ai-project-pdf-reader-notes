@@ -76,6 +76,25 @@ export async function post<T>(endpoint: string, data: unknown): Promise<T> {
 }
 
 /**
+ * GET request helper
+ */
+export async function get<T>(endpoint: string): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'GET',
+  });
+}
+
+/**
+ * DELETE request helper
+ */
+export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'DELETE',
+    ...(data && { body: JSON.stringify(data) }),
+  });
+}
+
+/**
  * Streaming request helper
  * Returns an async generator that yields Server-Sent Events (SSE) data
  */

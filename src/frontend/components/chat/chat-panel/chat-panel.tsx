@@ -5,10 +5,10 @@
  * @license     © 2026. All rights reserved.
  */
 
-import type { ChatPanelProps } from '@/frontend/features/llm-chat/types';
 import { ChatBubbles } from '../chat-bubble/chat-bubbles';
 import { ChatBar } from '../chat-bar/chat-bar';
 import {ThreadTabs} from "@/frontend/components/chat/thread-tabs/thread-tabs.tsx";
+import type {ChatPanelProps} from "@/frontend/api/types/llm.ts";
 
 export function ChatPanel({threadProp, messages, isLoading, onSendMessage, onSelectContent }: 
 						  ChatPanelProps) {

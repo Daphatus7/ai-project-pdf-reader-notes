@@ -3,7 +3,7 @@
  * @description 全局 Auth 上下文，让任何组件都能访问用户状态
  */
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../../api/services/supabase.ts';
 import type { Session, User } from '@supabase/supabase-js';
 

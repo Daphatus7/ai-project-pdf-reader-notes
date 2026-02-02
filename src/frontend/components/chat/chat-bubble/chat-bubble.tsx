@@ -4,8 +4,8 @@
  * @author      [Peiyu Wang]
  * @license     © 2026. All rights reserved.
  */
+import type {ChatBubbleProps} from "@/frontend/api/types/llm.ts";
 
-import type { ChatBubbleProps } from '@/frontend/features/llm-chat/types';
 
 export function ChatBubble({ message }: ChatBubbleProps) {
 	return (
@@ -13,7 +13,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
 			<div className="max-w-[80%] bg-blue-500 px-4 py-2 rounded-lg">
 				<p
 				className="text-sm"
-				>{message.content}</p>
+				>{message.content[0]}</p>
 			</div>
 		</div>
 	);

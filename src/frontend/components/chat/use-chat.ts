@@ -7,6 +7,7 @@
 
 import { useState, useCallback } from 'react';
 import type { Message } from '../../features/llm-chat/types.ts';
+import { llmService } from '../../api/services/llm.service.ts';
 
 // ============ Helpers ============
 
@@ -21,27 +22,37 @@ export const createMessage = (role: 'user' | 'assistant', content: string): Mess
 
 export function useChat(activeThreadId: string | null, addMessage: (message: Message) => void) {
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-	const sendMessage = useCallback((content: string) => {
+	const sendMessage = useCallback(async (content: string) => {
 		if (!activeThreadId || !content.trim()) return;
 
+		setError(null);
 		addMessage(createMessage('user', content));
-
-		// Simulate AI response (TODO: replace with actual API call)
 		setIsLoading(true);
-		setTimeout(() => {
-			addMessage(createMessage('assistant', `This is a mock response to: "${content}"\n\nIn the real implementation, this will call the LLM API.`));
+
+		try {
+			const response = await llmService.chat({
+				thread_id: activeThreadId,
+				contents: [{ type: 'text', text: content }],
+				source_ids: [],
+			});
+			addMessage(createMessage('assistant', response.response));
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
+			setError(errorMessage);
+		} finally {
 			setIsLoading(false);
-		}, 1000);
+		}
 	}, [activeThreadId, addMessage]);
 
 	const selectMessage = useCallback((messageId: string) => {
-		// TODO: implement message selection logic
 		console.log('Selected message:', messageId);
 	}, []);
 
 	return {
 		isLoading,
+		error,
 		sendMessage,
 		selectMessage,
 	};
