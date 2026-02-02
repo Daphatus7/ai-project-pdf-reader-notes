@@ -7,7 +7,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { useThreads } from '@/frontend/components/chat/thread-tabs/use-threads';
-import { useChat, createMessage } from '../../components/chat/use-chat.ts';
+import { useChat, createUserMessage, createAssistantMessage } from '../../components/chat/use-chat.ts';
 import { ChatPanel } from '@/frontend/components/chat/chat-panel/chat-panel';
 import type {LLMChatFeatureProps} from "@/frontend/api/types/llm.ts";
 
@@ -24,17 +24,20 @@ export function LLMChatFeature({ onInjectMessage, onSelectContent }: LLMChatFeat
 		deleteThread,
 		addMessage,
 	} = useThreads();
-	
+
 	const {
 		isLoading,
 		sendMessage,
-		selectMessage,
 	} = useChat(activeThreadId, addMessage);
 
 	// ---- External Interface: Inject Message ----
 	const injectMessage = useCallback((content: string, role: 'user' | 'assistant' = 'user') => {
 		if (!activeThreadId) return;
-		addMessage(createMessage(role, content));
+		if (role === 'user') {
+			addMessage(createUserMessage([{ type: 'text', text: content }]));
+		} else {
+			addMessage(createAssistantMessage([{ type: 'text', text: content }]));
+		}
 	}, [activeThreadId, addMessage]);
 
 	useEffect(() => {

@@ -25,3 +25,27 @@ export interface ImageContent {
  * Union type for all input content types
  */
 export type InputContent = TextContent | ImageContent;
+
+// ============ Output Content Types (API Response) ============
+
+/**
+ * Text content in AI response
+ */
+export interface TextOutput {
+  type: 'text';
+  text: string;
+}
+
+/**
+ * Image content in AI response (e.g., generated images)
+ */
+export interface ImageOutput {
+  type: 'image';
+  data: string; // Base64-encoded image (no data URI prefix)
+  mime_type: 'image/png' | 'image/jpeg' | 'image/webp';
+}
+
+/**
+ * Union type for all output content types
+ */
+export type OutputContent = TextOutput | ImageOutput;

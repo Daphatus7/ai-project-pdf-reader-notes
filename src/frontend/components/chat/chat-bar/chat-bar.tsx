@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import type { ChatBarProps } from '@/frontend/features/llm-chat/types';
+import type {ChatBarProps} from "@/frontend/api/types/llm.ts";
 
 export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...' }: ChatBarProps) {
 	const [input, setInput] = useState('');

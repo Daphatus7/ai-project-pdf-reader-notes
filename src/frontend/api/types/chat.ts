@@ -1,10 +1,21 @@
-import type {InputContent} from "@/frontend/api";
+import type {InputContent, OutputContent} from "@/frontend/api";
+/**
+ * @file        chat.ts
+ * @description Chat types matching backend Pydantic models
+ *
+ * @author      [Peiyu Wang]
+ * @created    Monday
+ * @license     © 2026 . All rights reserved.
+ */
 
+/**
+ * Chat message with multimodal content support
+ */
 export interface ChatMessage {
 	id: string;
 	role: 'user' | 'assistant';
 	/** Array of content items - supports text, images, or mixed */
-	content: any | null;
+	contents: InputContent[] | OutputContent[];
 	timestamp: number;
 }
 
@@ -18,16 +29,8 @@ export interface ChatRequest {
 }
 
 /**
- * @file        chat.ts
- * @description
- *
- * @author      [Peiyu Wang]
- * @created    Monday
- * @license     © 2026 . All rights reserved.
- */
-/**
- * Chat response
+ * Chat response - matches backend ChatResponse schema
  */
 export interface ChatResponse {
-	response: Record<string, unknown>[];
+	contents: OutputContent[];
 }

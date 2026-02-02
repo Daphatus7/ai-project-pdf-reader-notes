@@ -1,16 +1,56 @@
 /**
  * @file        ai-chat-bubble.tsx
- * @description AI message bubble component with selectable content
+ * @description AI message bubble component with multimodal content support
  * @author      [Peiyu Wang]
  * @license     © 2026. All rights reserved.
  */
 import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
+import type {OutputContent} from "@/frontend/api";
 
+/**
+ * Render a single output content item (text or image)
+ */
+function renderOutputItem(item: OutputContent, index: number) {
+	if (item.type === 'text') {
+		return (
+			<p key={index} className="text-sm whitespace-pre-wrap">
+				{item.text}
+			</p>
+		);
+	}
+	if (item.type === 'image') {
+		const src = `data:${item.mime_type};base64,${item.data}`;
+		return (
+			<img
+				key={index}
+				src={src}
+				alt="AI generated image"
+				className="max-w-full rounded mt-2"
+			/>
+		);
+	}
+	return null;
+}
+
+/**
+ * Extract text content for selection callback
+ */
+function extractTextContent(contents: OutputContent[]): string {
+	return contents
+		.filter((item): item is OutputContent & { type: 'text' } => item.type === 'text')
+		.map(item => item.text)
+		.join('\n');
+}
 
 export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
+	// Handle both old format (content) and new format (contents)
+	const rawContents = message.contents;
+	const contents: OutputContent[] = Array.isArray(rawContents) ? rawContents : [];
+
 	const handleClick = () => {
 		if (onSelectContent) {
-			onSelectContent(message.content);
+			const textContent = extractTextContent(contents);
+			onSelectContent(textContent);
 		}
 	};
 
@@ -22,7 +62,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 				}`}
 				onClick={handleClick}
 			>
-				<p className="text-sm whitespace-pre-wrap">{message.content[0]}</p>
+				{contents.map((item, index) => renderOutputItem(item, index))}
 			</div>
 		</div>
 	);

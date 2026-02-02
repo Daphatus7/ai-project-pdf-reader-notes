@@ -11,7 +11,7 @@ export { apiConfig } from './core/config';
 export { llmService, convertDataUrlsToContents } from './services/llm.service';
 
 // Common Types
-export type { TextContent, ImageContent, InputContent } from './types/common';
+export type { TextContent, ImageContent, InputContent, TextOutput, ImageOutput, OutputContent } from './types/common';
 
 // LLM Types
 export type {
@@ -23,6 +23,3 @@ export type {
 	
 } from './types/llm';
 
-
-export {ChatResponse} from "@/frontend/api/types/chat.ts";
-export {ChatRequest} from "@/frontend/api/types/chat.ts";

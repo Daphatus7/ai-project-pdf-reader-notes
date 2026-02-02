@@ -6,13 +6,15 @@ import type {InputContent} from "@/frontend/api";
 import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage} from "@/frontend/api/types/chat.ts";
 
+import type {OutputContent} from "@/frontend/api/types/common.ts";
+
 // ============ Message Types ============
 
 /**
  * A single content item in a chat message
  * Can be text, image, or other content types
  */
-export type MessageContent = InputContent;
+export type MessageContent = InputContent | OutputContent;
 
 // ============ Thread Types ============
 

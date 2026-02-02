@@ -297,6 +297,15 @@ class LlmAgent:
             checkpointer=self._checkpointer,
         )
         self.counter = 0
+    
+    def toHistoryMessage(self, history: list[dict]):
+        return [
+            #return either ai message or human message based on content inside the history
+            HumanMessage(content=msg["content"]) 
+            if msg["role"] == "human" else SystemMessage(content=msg["content"])
+            for msg in history
+        ]
+    
     async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
         logging.info(f"Agent called {self.counter} times")
@@ -311,7 +320,7 @@ class LlmAgent:
         if history_to_add:
             self.agent.update_state(
                 config={"configurable": {"thread_id": request.thread_id}},
-                values={"messages": history_to_add},
+                values={"messages": self.toHistoryMessage(history_to_add)},
                 as_node="__start__"
             )
             

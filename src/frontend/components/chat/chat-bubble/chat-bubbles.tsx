@@ -17,10 +17,7 @@ export function ChatBubbles({ messages, onSelectContent }: ChatBubblesProps) {
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
-
-	// DEBUG: Check if messages are being passed correctly
-	console.log('ChatBubbles messages:', messages[0]);
-
+	
 	return (
 		<div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 border border-red-500">
 			{messages.map((message) =>

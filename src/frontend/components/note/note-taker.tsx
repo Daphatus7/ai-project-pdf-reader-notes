@@ -22,12 +22,10 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/frontend/components/ui
 import {SimpleEditor} from "@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
 import TextAlign from "@tiptap/extension-text-align";
 import {ImageUploadNode} from "@/frontend/@/components/tiptap-node/image-upload-node";
-import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
-import type {Note} from "@/frontend/api/types/note.ts";
+import type {Note} from "@/frontend/components/note/type.ts";
+import type {NoteTakerProps} from "@/frontend/components/note/type.ts";
 
-interface NoteTakerProps {
-	note?: MyNotePage
-}
+
 
 type ViewMode = 'markdown' | 'preview' | 'editor'
 
@@ -243,9 +241,9 @@ export const NoteTaker =
 	const loadNoteContent = (note: Note) => {
 		if (!editor) return;
 		isPushing.current = true;
-		editor.commands.setContent(note.content, { contentType: 'markdown' });
+		editor.commands.setContent(note.content_markdown, { contentType: 'markdown' });
 		isPushing.current = false;
-		setSerializedContent(note.content);
+		setSerializedContent(note.content_markdown);
 	}
 	
 	const [activeView, setActiveView] = useState<ViewMode>('editor');

@@ -14,14 +14,10 @@ import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfSection} from "@/frontend/components/reader/pdf-section.tsx";
 import {LLMChatFeature} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
+import type {Note} from "@/frontend/components/note/type.ts";
+import * as crypto from "node:crypto";
 
-export interface MyNotePage {
-	id: string;
-	title: string;
-	preview: string;
-	updatedAt: string;
-	content: string;
-}
+
 
 /**
  * NotePage component - Main note-taking interface.
@@ -37,9 +33,9 @@ export interface MyNotePage {
  */
 export default function NotePage() {
 	
-	const initialNotes: MyNotePage[] = useNotesStore.getState().notes;
+	const initialNotes: Note[] = useNotesStore.getState().notes;
 	
-	const [notes, setNotes] = useState<MyNotePage[]>(initialNotes);
+	const [notes, setNotes] = useState<Note[]>(initialNotes);
 	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
 	// const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
 	// const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
@@ -65,12 +61,16 @@ export default function NotePage() {
 	// }
 
 	const handleAddNewNote = () => {
-		const newNote: MyNotePage = {
+		const newNote: Note = {
+			created_at: "", 
+			metadata: {}, 
+			user_id: "", 
+			version: 0,
 			id: crypto.randomUUID(),
 			title: "New Note",
-			preview: "",
-			updatedAt: "Just now",
-			content: "",
+			summary: "",
+			updated_at: "Just now",
+			content_markdown: ""
 		};
 		setNotes(prevNotes => [newNote, ...prevNotes]);
 		setSelectedNoteId(newNote.id);

@@ -20,12 +20,11 @@ import {
 import { cn } from "../ui/utils.ts";
 import { useDrag, useDrop } from "react-dnd";
 import type { Identifier, XYCoord } from "dnd-core";
-import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
-import type {Note} from "@/frontend/api/types/note.ts";
+import type {Note} from "@/frontend/components/note/type.ts";
 
 interface NoteSidebarProps {
-	notes: MyNotePage[];
-	setNotes: (notes: MyNotePage[]) => void;
+	notes: Note[];
+	setNotes: (notes: Note[]) => void;
 	selectedNoteId: string;
 	onSelectNote: (id: string) => void;
 	onAddNote?: () => void;
@@ -216,11 +215,11 @@ function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEdi
 			</div>
 
 			<p className="text-xs text-muted-foreground pl-10 line-clamp-2 mb-1">
-				{note.preview}
+				{note.summary}
 			</p>
 
 			<p className="text-xs text-muted-foreground pl-10">
-				{note.updatedAt}
+				{note.updated_at}
 			</p>
 		</div>
 	);

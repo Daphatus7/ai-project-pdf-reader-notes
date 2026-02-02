@@ -21,6 +21,7 @@ import type {ContentInsertion, SectionType} from "../../features/types/content-i
 import {transformContentForInsertion} from "../../features/utils/content-transformer.ts";
 import {ResizablePanel} from "../ui/resizable.tsx";
 import type {ImperativePanelHandle} from "react-resizable-panels";
+import type {Note} from "@/frontend/components/note/type.ts";
 
 interface Message {
 	id: string;

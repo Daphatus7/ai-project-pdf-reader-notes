@@ -8,16 +8,15 @@
 
 import { post, get, del } from '../core/client';
 import { apiConfig } from '../core/config';
-import type { InputContent } from '../types/common';
 import type {
 	DeleteThreadRequest,
 	DeleteThreadResponse, ListThreadsResponse,
 	LoadThreadRequest,
 	LoadThreadResponse, Thread
 } from "@/frontend/api/types/thread.ts";
-import type {ChatResponse} from "@/frontend/api";
+import type {InputContent} from "@/frontend/api";
 
-import type {ChatRequest} from "@/frontend/api/types/chat.ts";
+import type {ChatRequest, ChatResponse} from "@/frontend/api/types/chat.ts";
 
 /**
  * Converts data URLs to InputContent array
@@ -51,21 +50,23 @@ export const llmService = {
 	 * Send a chat message and get response
 	 */
 	async chat(request: ChatRequest): Promise<ChatResponse> {
-		return post<ChatResponse>(apiConfig.endpoints.llm.chat, request);
+		const resp = await post<ChatResponse>(apiConfig.endpoints.llm.chat, request);
+		console.log(resp);
+		return resp;
 	},
 
 	/**
 	 * Create a new conversation thread
 	 */
 	async createThread(): Promise<Thread> {
-		return post<Thread>(apiConfig.endpoints.llm.thread, {});
+		return await post<Thread>(apiConfig.endpoints.llm.thread, {});
 	},
 
 	/**
 	 * List all conversation threads for the user
 	 */
 	async listThreads(): Promise<ListThreadsResponse> {
-		return get<ListThreadsResponse>(apiConfig.endpoints.llm.threadList);
+		return await get<ListThreadsResponse>(apiConfig.endpoints.llm.threadList);
 	},
 
 	/**
@@ -73,7 +74,9 @@ export const llmService = {
 	 */
 	async loadThread(threadId: string): Promise<LoadThreadResponse> {
 		const request: LoadThreadRequest = { thread_id: threadId };
-		return post<LoadThreadResponse>(apiConfig.endpoints.llm.threadLoad, request);
+		const resp = await post<LoadThreadResponse>(apiConfig.endpoints.llm.threadLoad, request);
+		console.log(resp);
+		return resp;
 	},
 
 	/**

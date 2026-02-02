@@ -10,7 +10,7 @@ import type {
   ListNotesResponse,
   NoteResponse,
   DeleteNoteResponse,
-} from '../types/note';
+} from '../../components/note/type.ts';
 
 const NOTES_BASE = '/api/v1/notes';
 
