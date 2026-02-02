@@ -19,6 +19,10 @@ export type {
 	CodeBlock,
 	MathExpression,
 	Section,
-	ChatRequest,
-	ChatResponse,
+	
+	
 } from './types/llm';
+
+
+export {ChatResponse} from "@/frontend/api/types/chat.ts";
+export {ChatRequest} from "@/frontend/api/types/chat.ts";

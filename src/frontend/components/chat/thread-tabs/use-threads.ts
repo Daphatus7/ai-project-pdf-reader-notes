@@ -7,7 +7,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { llmService } from '@/frontend/api/services/llm.service';
-import type {ChatMessage, Thread} from "@/frontend/api/types/llm.ts";
+import type {Thread} from "@/frontend/api/types/thread.ts";
+import type {ChatMessage} from "@/frontend/api/types/chat.ts";
 
 
 // ============ Hook ============

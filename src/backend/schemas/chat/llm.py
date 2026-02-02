@@ -91,5 +91,6 @@ class LoadThreadRequest(BaseModel):
 
 class LoadThreadResponse(BaseModel):
     """Response model for loading a conversation thread"""
+    thread_id: str
     messages: list[dict] # to be enhanced in the future
     # ToDO data structure to be improved later

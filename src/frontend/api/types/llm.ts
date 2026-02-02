@@ -1,7 +1,10 @@
 /**
  * LLM Chat Feature Types
  * @description Type definitions for LLM chat feature
- */ import type {InputContent} from "@/frontend/api";
+ */
+import type {InputContent} from "@/frontend/api";
+import type {Thread} from "@/frontend/api/types/thread.ts";
+import type {ChatMessage} from "@/frontend/api/types/chat.ts";
 
 // ============ Message Types ============
 
@@ -11,23 +14,7 @@
  */
 export type MessageContent = InputContent;
 
-export interface ChatMessage {
-	id: string;
-	role: 'user' | 'assistant';
-	/** Array of content items - supports text, images, or mixed */
-	content: any|null;
-	timestamp: number;
-}
-
 // ============ Thread Types ============
-
-export interface Thread {
-	thread_id: string;
-	title: string;
-	thread_summary?: string;
-	createdAt: string;
-	updatedAt: string;
-}
 
 // ============ Component Props Types ============
 
@@ -111,57 +98,6 @@ export interface MathExpression {
 export interface Section {
 	heading: string;
 	content: string;
-}
-
-/**
- * Chat request - matches backend ChatRequest schema
- */
-export interface ChatRequest {
-	thread_id: string;
-	contents: InputContent[];
-	source_ids?: string[];
-}
-
-/**
- * Chat response
- */
-export interface ChatResponse {
-	response: string;
-}
-
-/**
- * List threads response
- */
-export interface ListThreadsResponse {
-	threads: Thread[];
-}
-
-/**
- * Delete thread request
- */
-export interface DeleteThreadRequest {
-	thread_id: string;
-}
-
-/**
- * Delete thread response
- */
-export interface DeleteThreadResponse {
-	response: string;
-}
-
-/**
- * Load thread request
- */
-export interface LoadThreadRequest {
-	thread_id: string;
-}
-
-/**
- * Load thread response
- */
-export interface LoadThreadResponse {
-	messages: ChatMessage[];
 }
 
 

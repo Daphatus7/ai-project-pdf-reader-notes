@@ -10,15 +10,14 @@ import { post, get, del } from '../core/client';
 import { apiConfig } from '../core/config';
 import type { InputContent } from '../types/common';
 import type {
-	ChatRequest,
-	ChatResponse,
-	Thread,
-	ListThreadsResponse,
 	DeleteThreadRequest,
-	DeleteThreadResponse,
+	DeleteThreadResponse, ListThreadsResponse,
 	LoadThreadRequest,
-	LoadThreadResponse,
-} from '../types/llm';
+	LoadThreadResponse, Thread
+} from "@/frontend/api/types/thread.ts";
+import type {ChatResponse} from "@/frontend/api";
+
+import type {ChatRequest} from "@/frontend/api/types/chat.ts";
 
 /**
  * Converts data URLs to InputContent array
