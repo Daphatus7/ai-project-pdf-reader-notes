@@ -11,7 +11,6 @@ import type {ChatContent} from "@/frontend/api";
  * Render a single content item (text or image)
  */
 function renderContentItem(item: ChatContent, index: number) {
-	console.log(item)
 	if (item.type === 'text') {
 		return (
 			<p key={index} className="text-sm whitespace-pre-wrap">

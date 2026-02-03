@@ -49,7 +49,7 @@ async def stream_chat(user_message: str):
         # Create chat request
         chat_request = ChatRequest(
             thread_id="1", # fix user thread for testing
-            contents=[TextContent(type="text", text=user_message)],
+            content=[TextContent(type="text", text=user_message)],
             system_message="You are a helpful assistant."
         )
 
@@ -100,7 +100,7 @@ async def test_chat(user_message: str, use_filter: bool = True):
         chat_request = ChatRequest(
             project_id="test-project-001",
             thread_id="1",  # fix user thread for testing
-            contents=[TextContent(type="text", text=user_message)],
+            content=[TextContent(type="text", text=user_message)],
             source_ids=TEST_SOURCE_IDS if use_filter else None,
         )
 

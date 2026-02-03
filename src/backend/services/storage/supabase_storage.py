@@ -400,7 +400,7 @@ class SupabaseStorage(Service):
         user_id: str,
         thread_id: str,
         role: str,
-        content: dict | str,
+        content: list[dict],
         token_count: int
     ) -> dict:
         """
@@ -410,16 +410,13 @@ class SupabaseStorage(Service):
             user_id: User's unique identifier
             thread_id: Conversation thread ID
             role: Message role ('user', 'assistant', 'system')
-            content: Message content (JSONB)
+            content: Message content as list of ChatContent dicts [{type, text/data, ...}]
             token_count: Token count for this message
 
         Returns:
             Created message record
         """
         try:
-            # Ensure content is in correct format for JSONB
-            if isinstance(content, str):
-                content = {"text": content}
 
             message_data = {
                 'user_id': user_id,

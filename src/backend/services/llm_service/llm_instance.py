@@ -320,7 +320,7 @@ class LlmAgent:
                 if msg["role"] not in ("assistant", "user"):
                     logging.warning(f"Skipping unsupported role in history: {msg['role']}")
                 elif msg["role"] == "assistant":
-                    to_history.append(AIMessage(content=msg["content"]['text']))
+                    to_history.append(AIMessage(content=msg["content"][0]['text']))
                 elif msg["role"] == "user":
                     to_history.append(HumanMessage(content=msg["content"][0]['text']))
                 else:
@@ -335,6 +335,8 @@ class LlmAgent:
             # todo Debug: log loaded messages delete later
             current_history = self.agent.get_state(
                 config={"configurable": {"thread_id": request.thread_id}})
+            if len(current_history) == 0:
+                logging.warning("No messages loaded into agent state after cold start.")
             for (msg,idx) in current_history :
                 logging.info(f"Cold start msg {idx}: {msg.content}")
             
@@ -346,7 +348,7 @@ class LlmAgent:
         }
         
         system_msg = SystemMessage(content="""you are a helpful assistant, keep everything brief""") # 用户不允许编辑system message
-        human_msg = _build_human_message(request.contents)
+        human_msg = _build_human_message(request.content)
 
         # Run LLM call
         response = self.agent.invoke(

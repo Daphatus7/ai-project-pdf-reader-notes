@@ -36,7 +36,7 @@ class ChatRequest(BaseModel):
     # project_id: str  # the user's project_id or folder id
     thread_id: str  # conversation thread for the user
     # users query and any context send by the user
-    contents: list[dict]
+    content: list[dict]
     # RAG filter fields
     source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
