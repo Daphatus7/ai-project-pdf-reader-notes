@@ -1,4 +1,4 @@
-import type {ChatMessage, ChatResponse} from "@/frontend/api/types/chat.ts";
+import type {ChatResponse} from "@/frontend/api/types/chat.ts";
 
 /**
  * @file        thread.ts

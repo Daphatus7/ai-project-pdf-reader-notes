@@ -335,8 +335,7 @@ class LlmAgent:
             # todo Debug: log loaded messages delete later
             current_history = self.agent.get_state(
                 config={"configurable": {"thread_id": request.thread_id}})
-            
-            for msg,idx in current_history :
+            for (msg,idx) in current_history :
                 logging.info(f"Cold start msg {idx}: {msg.content}")
             
         # 3. Build Configuration
@@ -392,7 +391,7 @@ class LlmAgent:
         return ChatResponse(
             id=resp['id'],
             role=resp['role'],
-            contents=[{"type": "text", 
+            content=[{"type": "text", 
                        "text": ai_msg.content}],
             created_at=resp["created_at"]
         )

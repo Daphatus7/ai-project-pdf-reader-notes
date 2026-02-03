@@ -44,7 +44,7 @@ class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
     id: str
     role: str
-    contents: list[dict] # create
+    content: list[dict] # create
     """
         example:
              contents=[{"type": "text", 

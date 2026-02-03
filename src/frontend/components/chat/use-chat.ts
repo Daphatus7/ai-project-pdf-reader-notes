@@ -26,19 +26,19 @@ export function useChat(
 		const userContents = [{ type: 'text' as const, text: content }];
 
 		// Add user message immediately (optimistic update)
-		addUserMessage({ contents: userContents });
+		addUserMessage({ content: userContents });
 		setIsLoading(true);
 
 		try {
 			const response = await llmService.chat({
 				thread_id: activeThreadId,
-				contents: userContents,
+				content: userContents,
 				source_ids: [],
 			});
 			// Add AI message with backend ID
 			addAIMessage({
 				id: response.id,
-				contents: response.contents,
+				content: response.content,
 			});
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Failed to send message';

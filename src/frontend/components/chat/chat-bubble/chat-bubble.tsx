@@ -33,7 +33,7 @@ function renderContentItem(item: ChatContent, index: number) {
 }
 
 export function ChatBubble({ message }: ChatBubbleProps) {
-	const rawContents = message.contents;
+	const rawContents = message.content;
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	return (

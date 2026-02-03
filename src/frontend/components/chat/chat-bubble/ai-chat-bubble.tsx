@@ -44,7 +44,7 @@ function extractTextContent(contents: ChatContent[]): string {
 }
 
 export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
-	const rawContents = message.contents;
+	const rawContents = message.content;
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	const handleClick = () => {

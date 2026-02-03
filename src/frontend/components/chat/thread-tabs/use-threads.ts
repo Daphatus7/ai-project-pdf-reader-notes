@@ -97,7 +97,7 @@ export function useThreads() {
 		const chatMessage: ChatMessage = {
 			id: `temp-${Date.now()}`,
 			role: 'user',
-			contents: message.contents,
+			content: message.content,
 		};
 		setMessagesByThread(prev => ({
 			...prev,
@@ -110,7 +110,7 @@ export function useThreads() {
 		const chatMessage: ChatMessage = {
 			id: message.id,
 			role: 'assistant',
-			contents: message.contents,
+			content: message.content,
 		}
 		console.log(chatMessage)
 		setMessagesByThread(prev => ({
