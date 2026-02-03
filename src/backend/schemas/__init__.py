@@ -18,12 +18,7 @@ from src.backend.schemas.auth import (
 )
 
 from src.backend.schemas.chat.llm import (
-    TextContent,
-    ImageContent,
-    InputContent,
-    TextOutput,
     ImageOutput,
-    OutputContent,
     ContentType,
     ChatRequest,
     ChatResponse,
@@ -45,14 +40,6 @@ __all__ = [
     'RegisterRequest',
     'LoginResponse',
     'UserResponse',
-    # LLM schemas - Input
-    'TextContent',
-    'ImageContent',
-    'InputContent',
-    # LLM schemas - Output
-    'TextOutput',
-    'ImageOutput',
-    'OutputContent',
     'ContentType',
     'ChatRequest',
     'ChatResponse',

@@ -11,27 +11,8 @@ from typing import Union, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-# Content Models
-class TextContent(BaseModel):
-    type: Literal["text"] = "text"
-    text: str
-
-
-class ImageContent(BaseModel):
-    type: Literal["image"] = "image"
-    data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
-    mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
-    name: Optional[str] = None
-
-
-InputContent = Union[TextContent, ImageContent]
-
 
 # Output Content Models (mirror input structure for API symmetry)
-class TextOutput(BaseModel):
-    """Text content in AI response"""
-    type: Literal["text"] = "text"
-    text: str
 
 
 class ImageOutput(BaseModel):
@@ -40,8 +21,6 @@ class ImageOutput(BaseModel):
     data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
     mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
 
-
-OutputContent = Union[TextOutput, ImageOutput]
 
 ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
 
@@ -57,16 +36,23 @@ class ChatRequest(BaseModel):
     # project_id: str  # the user's project_id or folder id
     thread_id: str  # conversation thread for the user
     # users query and any context send by the user
-    contents: list[InputContent] = Field(
-        ...,
-        description="Ordered list of text and image inputs"
-    )
+    contents: list[dict]
     # RAG filter fields
     source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
-    contents: list[OutputContent]
+    id: str
+    role: str
+    contents: list[dict] # create
+    """
+        example:
+             contents=[{"type": "text", 
+                       "text": ai_msg.content}],
+        
+    """
+    created_at: str
+    
 
 
 # threads

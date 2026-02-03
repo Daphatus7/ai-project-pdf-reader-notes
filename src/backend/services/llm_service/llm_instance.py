@@ -15,9 +15,10 @@ from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
 from supabase import Client
 
-from src.backend.schemas import ChatRequest
+from src.backend.schemas import ChatRequest, ChatResponse
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langchain.messages import RemoveMessage
+
 from src.backend.services.llm_service.conversation_storage import ConversationStorage
 
 if TYPE_CHECKING:
@@ -108,11 +109,12 @@ def _parse_ai_response(ai_msg) -> list[dict]:
 
 def _build_human_message(contents: list) -> HumanMessage:
     """Build HumanMessage from request contents."""
+    
     content_parts = []
     for item in contents:
-        if item.type == "text":
-            content_parts.append({"type": "text", "text": item.text})
-        elif item.type == "image":
+        if item.get('type') == "text":
+            content_parts.append({"type": "text", "text": item['text']})
+        elif item.get('type') == "image":
             data_url = f"data:{item.mime_type};base64,{item.data}"
             content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
     return HumanMessage(content=content_parts)
@@ -298,13 +300,6 @@ class LlmAgent:
         )
         self.counter = 0
     
-    def toHistoryMessage(self, history: list[dict]):
-        return [
-            #return either ai message or human message based on content inside the history
-            HumanMessage(content=msg["content"]) 
-            if msg["role"] == "user" else AIMessage(content=msg["content"])
-            for msg in history
-        ]
     
     async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
@@ -316,10 +311,24 @@ class LlmAgent:
         # 2. Cold start: load from Supabase if thread not in Redis
         history_to_add = await self._conversation_storage.cold_start_load(request.thread_id)
         logging.info(history_to_add)
+    
+        
         if history_to_add:
+            to_history = []
+            for msg in history_to_add:
+                logging.info(f"{msg}")
+                if msg["role"] not in ("assistant", "user"):
+                    logging.warning(f"Skipping unsupported role in history: {msg['role']}")
+                elif msg["role"] == "assistant":
+                    to_history.append(AIMessage(content=msg["content"]['text']))
+                elif msg["role"] == "user":
+                    to_history.append(HumanMessage(content=msg["content"][0]['text']))
+                else:
+                    logging.error(f"Unexpected role encountered: {msg['role']}")
+
             self.agent.update_state(
                 config={"configurable": {"thread_id": request.thread_id}},
-                values={"messages": self.toHistoryMessage(history_to_add)},
+                values={"messages": to_history},
                 as_node="__start__"
             )
             
@@ -343,37 +352,47 @@ class LlmAgent:
         # Run LLM call
         response = self.agent.invoke(
             {"messages": human_msg},  # todo weird bug why system_msg is not allowed here
-            config=config
+            config=config,
         )
 
         ai_msg = response["messages"][-1]
 
         # Parse AI response into structured output contents
-        output_contents = _parse_ai_response(ai_msg)
+        logging.info(f"ai message + {ai_msg}")
 
-        # 5. Dual-write: persist to Supabase
-        human_content = human_msg.content
-        # For storage, extract text content only
-        ai_content = " ".join(
-            item["text"] for item in output_contents if item["type"] == "text"
-        )
 
         # Get token counts from usage_metadata
-        input_tokens = 0
-        output_tokens = 0
-        if hasattr(ai_msg, "usage_metadata") and ai_msg.usage_metadata:
-            input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
-            output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+        input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
+        logging.info(f"input tokens: {input_tokens}")
+        output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+        logging.info(f"output tokens: {output_tokens}")
 
         self._conversation_storage.refresh_ttl(request.thread_id)
 
+        # store both human and ai messages
         await self._conversation_storage.persist(
+            #store chat
             user_id=request.user_id,
             thread_id=request.thread_id,
-            human_content=human_content,
-            ai_content=ai_content,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens
+            role= "user",
+            content=human_msg.content,
+            token_count=input_tokens
         )
 
-        return output_contents
+        resp = await self._conversation_storage.persist(
+            #store ai
+            user_id=request.user_id,
+            thread_id=request.thread_id,
+            role= "assistant",
+            content=ai_msg.content,
+            token_count=output_tokens
+        )
+
+        #only need to return ai response
+        return ChatResponse(
+            id=resp['id'],
+            role=resp['role'],
+            contents=[{"type": "text", 
+                       "text": ai_msg.content}],
+            created_at=resp["created_at"]
+        )

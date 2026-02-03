@@ -3,7 +3,7 @@
 # @date        2026-01-27
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Coroutine
 
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -91,11 +91,10 @@ class ConversationStorage:
         self,
         user_id: str,
         thread_id: str,
-        human_content: str,
-        ai_content: str,
-        input_tokens: int = 0,
-        output_tokens: int = 0
-    ) -> None:
+        role: str,
+        content: str,
+        token_count: int = 0
+    ) -> dict | None:
         """
         Persist human and AI messages to Supabase.
 
@@ -104,35 +103,24 @@ class ConversationStorage:
         Args:
             user_id: User's unique identifier
             thread_id: Conversation thread ID
-            human_content: User's message text
-            ai_content: AI's response text
-            input_tokens: Token count for user message
-            output_tokens: Token count for AI response
+            content: content
+            token_count: Token count for message
         """
         if not self._supabase_storage:
             logger.warning("No database configured, skipping persistence")
-            return
+            return None
 
         try:
-            # Save user message
-            await self._supabase_storage.save_message(
+            # Save Content
+            resp = await self._supabase_storage.save_message(
                 user_id=user_id,
                 thread_id=thread_id,
-                role='user',
-                content=human_content,
-                token_count=input_tokens
+                role=role,
+                content=content,
+                token_count=token_count
             )
-
-            # Save AI message
-            await self._supabase_storage.save_message(
-                user_id=user_id,
-                thread_id=thread_id,
-                role='assistant',
-                content=ai_content,
-                token_count=output_tokens
-            )
-
+            
             logger.info(f"Persisted messages to Supabase: thread={thread_id}")
-
+            return resp
         except Exception as e:
             logger.error(f"Failed to persist to Supabase: {e}")
