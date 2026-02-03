@@ -1,4 +1,4 @@
-import type {ChatMessage} from "@/frontend/api/types/chat.ts";
+import type {ChatMessage, ChatResponse} from "@/frontend/api/types/chat.ts";
 
 /**
  * @file        thread.ts
@@ -50,5 +50,5 @@ export interface LoadThreadRequest {
 
 export interface LoadThreadResponse {
 	thread_id: string;
-	messages: ChatMessage[];
+	messages: ChatResponse[];
 }

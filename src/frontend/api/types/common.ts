@@ -3,7 +3,7 @@
  */
 
 /**
- * Text content for API requests
+ * Text content - used for both user input and AI response
  */
 export interface TextContent {
   type: 'text';
@@ -11,7 +11,7 @@ export interface TextContent {
 }
 
 /**
- * Image content for API requests
+ * Image content - used for both user input and AI response
  * Base64-encoded image (no data URI prefix)
  */
 export interface ImageContent {
@@ -22,26 +22,8 @@ export interface ImageContent {
 }
 
 /**
- * Union type for all input content types
+ * Unified content type for all chat messages (user and assistant)
+ * The message role determines the source, content structure is the same
  */
 export type ChatContent = TextContent | ImageContent;
-
-// ============ Output Content Types (API Response) ============
-
-/**
- * Text content in AI response
- */
-export interface TextOutput {
-  type: 'text';
-  text: string;
-}
-
-/**
- * Image content in AI response (e.g., generated images)
- */
-export interface ImageOutput {
-  type: 'image';
-  data: string; // Base64-encoded image (no data URI prefix)
-  mime_type: 'image/png' | 'image/jpeg' | 'image/webp';
-}
 

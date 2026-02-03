@@ -7,14 +7,15 @@
 
 import { useState, useCallback } from 'react';
 import { llmService } from '../../api/services/llm.service.ts';
-import type {ChatMessage} from '../../api/types/chat.ts';
-
-// ============ Helpers ============
-
+import type {UserMessage, AIMessage} from '../../api/types/chat.ts';
 
 // ============ Hook ============
 
-export function useChat(activeThreadId: string, addMessage: (userMessage: ChatMessage) => void) {
+export function useChat(
+	activeThreadId: string | null,
+	addUserMessage: (message: UserMessage) => void,
+	addAIMessage: (message: AIMessage) => void
+) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -22,12 +23,10 @@ export function useChat(activeThreadId: string, addMessage: (userMessage: ChatMe
 		if (!activeThreadId || !content.trim()) return;
 
 		setError(null);
-		const userContents = [{ type: 'text', text: content }];
-		const chatMessage : ChatMessage = {
-			role: 'user',
-			contents: userMessage.contents
-		};
-		addMessage(chatMessage);
+		const userContents = [{ type: 'text' as const, text: content }];
+
+		// Add user message immediately (optimistic update)
+		addUserMessage({ contents: userContents });
 		setIsLoading(true);
 
 		try {
@@ -36,20 +35,18 @@ export function useChat(activeThreadId: string, addMessage: (userMessage: ChatMe
 				contents: userContents,
 				source_ids: [],
 			});
-			const response_message: ChatMessage = {
-				id: 'msg-' + Date.now(),
-				role: 'assistant',
+			// Add AI message with backend ID
+			addAIMessage({
+				id: response.id,
 				contents: response.contents,
-				timestamp: Date.now(),
-			}; 
-			addMessage(response_message);
+			});
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
 			setError(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [activeThreadId, addMessage]);
+	}, [activeThreadId, addUserMessage, addAIMessage]);
 
 	const selectMessage = useCallback((messageId: string) => {
 		console.log('Selected message:', messageId);

@@ -14,15 +14,15 @@ import type {
 	LoadThreadRequest,
 	LoadThreadResponse, Thread
 } from "@/frontend/api/types/thread.ts";
-import type {InputContent} from "@/frontend/api";
+import type {ChatContent} from "@/frontend/api";
 
 import type {ChatRequest, ChatResponse} from "@/frontend/api/types/chat.ts";
 
 /**
- * Converts data URLs to InputContent array
+ * Converts data URLs to ChatContent array
  */
-export function convertDataUrlsToContents(messageText: string, imageUrls: string[]): InputContent[] {
-	const contents: InputContent[] = [
+export function convertDataUrlsToContents(messageText: string, imageUrls: string[]): ChatContent[] {
+	const contents: ChatContent[] = [
 		{ type: 'text', text: messageText }
 	];
 
@@ -75,6 +75,7 @@ export const llmService = {
 	async loadThread(threadId: string): Promise<LoadThreadResponse> {
 		const request: LoadThreadRequest = { thread_id: threadId };
 		const resp = await post<LoadThreadResponse>(apiConfig.endpoints.llm.threadLoad, request);
+		console.log(resp);
 		return resp;
 	},
 

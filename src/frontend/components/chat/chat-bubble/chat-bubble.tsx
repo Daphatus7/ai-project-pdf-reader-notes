@@ -5,12 +5,12 @@
  * @license     © 2026. All rights reserved.
  */
 import type {ChatBubbleProps} from "@/frontend/api/types/llm.ts";
-import type {InputContent} from "@/frontend/api";
+import type {ChatContent} from "@/frontend/api";
 
 /**
  * Render a single content item (text or image)
  */
-function renderContentItem(item: InputContent, index: number) {
+function renderContentItem(item: ChatContent, index: number) {
 	if (item.type === 'text') {
 		return (
 			<p key={index} className="text-sm whitespace-pre-wrap">
@@ -34,7 +34,7 @@ function renderContentItem(item: InputContent, index: number) {
 
 export function ChatBubble({ message }: ChatBubbleProps) {
 	const rawContents = message.contents;
-	const contents: InputContent[] = Array.isArray(rawContents) ? rawContents : [];
+	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	return (
 		<div className="flex justify-end">

@@ -5,12 +5,12 @@
  * @license     © 2026. All rights reserved.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useThreads } from '@/frontend/components/chat/thread-tabs/use-threads';
 import { useChat } from '../../components/chat/use-chat.ts';
 import { ChatPanel } from '@/frontend/components/chat/chat-panel/chat-panel';
 import type {LLMChatFeatureProps} from "@/frontend/api/types/llm.ts";
-import type {ChatMessage} from "@/frontend/api/types/chat.ts";
+import type {UserMessage} from "@/frontend/api/types/chat.ts";
 
 // ============ Feature Component ============
 
@@ -23,19 +23,20 @@ export function LLMChatFeature({ onInjectMessage, onSelectContent }: LLMChatFeat
 		selectThread,
 		createThread,
 		deleteThread,
-		addMessage,
+		addUserMessage,
+		addAIMessage,
 	} = useThreads();
 
 	const {
 		isLoading,
 		sendMessage,
-	} = useChat(activeThreadId, addMessage);
+	} = useChat(activeThreadId, addUserMessage, addAIMessage);
 
-	// ---- External Interface: Inject Message ----
-	const injectMessage = (chatMessage: ChatMessage) => {
+	// ---- External Interface: Inject User Message ----
+	const injectMessage = useCallback((message: UserMessage) => {
 		if (!activeThreadId) return;
-		addMessage((chatMessage));
-	};
+		addUserMessage(message);
+	}, [activeThreadId, addUserMessage]);
 
 	useEffect(() => {
 		if (onInjectMessage) {

@@ -5,12 +5,13 @@
  * @license     © 2026. All rights reserved.
  */
 import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
-import type {OutputContent} from "@/frontend/api";
+import type {ChatContent} from "@/frontend/api";
 
 /**
- * Render a single output content item (text or image)
+ * Render a single content item (text or image)
  */
-function renderOutputItem(item: OutputContent, index: number) {
+function renderContentItem(item: ChatContent, index: number) {
+	console.log(item)
 	if (item.type === 'text') {
 		return (
 			<p key={index} className="text-sm whitespace-pre-wrap">
@@ -35,17 +36,16 @@ function renderOutputItem(item: OutputContent, index: number) {
 /**
  * Extract text content for selection callback
  */
-function extractTextContent(contents: OutputContent[]): string {
+function extractTextContent(contents: ChatContent[]): string {
 	return contents
-		.filter((item): item is OutputContent & { type: 'text' } => item.type === 'text')
+		.filter((item): item is ChatContent & { type: 'text' } => item.type === 'text')
 		.map(item => item.text)
 		.join('\n');
 }
 
 export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
-	// Handle both old format (content) and new format (contents)
 	const rawContents = message.contents;
-	const contents: OutputContent[] = Array.isArray(rawContents) ? rawContents : [];
+	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	const handleClick = () => {
 		if (onSelectContent) {
@@ -62,7 +62,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 				}`}
 				onClick={handleClick}
 			>
-				{contents.map((item, index) => renderOutputItem(item, index))}
+				{contents.map((item, index) => renderContentItem(item, index))}
 			</div>
 		</div>
 	);

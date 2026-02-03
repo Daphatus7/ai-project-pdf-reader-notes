@@ -3,7 +3,7 @@
  * @description Type definitions for LLM chat feature
  */
 import type {Thread} from "@/frontend/api/types/thread.ts";
-import type {ChatMessage} from "@/frontend/api/types/chat.ts";
+import type {ChatMessage, UserMessage} from "@/frontend/api/types/chat.ts";
 
 // ============ Message Types ============
 
@@ -55,8 +55,8 @@ export interface AIChatBubbleProps {
 // ============ Feature Props Types ============
 
 export interface LLMChatFeatureProps {
-	/** External interface to inject messages */
-	onInjectMessage?: (handler: ChatMessage) => void;
+	/** External interface to inject user messages */
+	onInjectMessage?: (handler: (message: UserMessage) => void) => void;
 	/** Callback when user selects content from AI response */
 	onSelectContent?: (content: string) => void;
 }

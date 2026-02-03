@@ -8,7 +8,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { llmService } from '@/frontend/api/services/llm.service';
 import type {Thread} from "@/frontend/api/types/thread.ts";
-import type {ChatMessage} from "@/frontend/api/types/chat.ts";
+import type {ChatMessage, UserMessage, AIMessage} from "@/frontend/api/types/chat.ts";
 
 
 // ============ Hook ============
@@ -92,11 +92,30 @@ export function useThreads() {
 		}
 	}, [activeThreadId]);
 
-	const addMessage = useCallback((message: ChatMessage) => {
+	const addUserMessage = useCallback((message: UserMessage) => {
 		if (!activeThreadId) return;
+		const chatMessage: ChatMessage = {
+			id: `temp-${Date.now()}`,
+			role: 'user',
+			contents: message.contents,
+		};
 		setMessagesByThread(prev => ({
 			...prev,
-			[activeThreadId]: [...(prev[activeThreadId] || []), message],
+			[activeThreadId]: [...(prev[activeThreadId] || []), chatMessage],
+		}));
+	}, [activeThreadId]);
+
+	const addAIMessage = useCallback((message: AIMessage) => {
+		if (!activeThreadId) return;
+		const chatMessage: ChatMessage = {
+			id: message.id,
+			role: 'assistant',
+			contents: message.contents,
+		}
+		console.log(chatMessage)
+		setMessagesByThread(prev => ({
+			...prev,
+			[activeThreadId]: [...(prev[activeThreadId] || []), chatMessage],
 		}));
 	}, [activeThreadId]);
 
@@ -110,7 +129,8 @@ export function useThreads() {
 		selectThread,
 		createThread: createNewThread,
 		deleteThread,
-		addMessage,
+		addUserMessage,
+		addAIMessage,
 		setMessagesByThread,
 	};
 }
