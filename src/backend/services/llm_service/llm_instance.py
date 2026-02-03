@@ -6,7 +6,7 @@ from typing import Any, TYPE_CHECKING
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool, InjectedToolArg
 from typing import Annotated
@@ -302,7 +302,7 @@ class LlmAgent:
         return [
             #return either ai message or human message based on content inside the history
             HumanMessage(content=msg["content"]) 
-            if msg["role"] == "human" else SystemMessage(content=msg["content"])
+            if msg["role"] == "user" else AIMessage(content=msg["content"])
             for msg in history
         ]
     
@@ -312,9 +312,8 @@ class LlmAgent:
         # 1. Refresh Redis TTL at request start
         if not self._conversation_storage:
             logging.error("|----- No conversation storage configured")
+            
         # 2. Cold start: load from Supabase if thread not in Redis
-        
-        
         history_to_add = await self._conversation_storage.cold_start_load(request.thread_id)
         logging.info(history_to_add)
         if history_to_add:
@@ -331,7 +330,7 @@ class LlmAgent:
             for msg,idx in current_history :
                 logging.info(f"Cold start msg {idx}: {msg.content}")
             
-        # 3. Build messages
+        # 3. Build Configuration
         config: RunnableConfig = {
             "configurable": {
                 "thread_id": request.thread_id,
