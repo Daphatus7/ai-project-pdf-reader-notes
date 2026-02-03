@@ -7,34 +7,14 @@
 
 import { useState, useCallback } from 'react';
 import { llmService } from '../../api/services/llm.service.ts';
-import type { ChatMessage } from '../../api/types/chat.ts';
-import type { InputContent, OutputContent } from '../../api/types/common.ts';
+import type {ChatMessage} from '../../api/types/chat.ts';
 
 // ============ Helpers ============
 
-/**
- * Create a user message with InputContent array
- */
-export const createUserMessage = (contents: InputContent[]): ChatMessage => ({
-	id: `msg-${Date.now()}`,
-	role: 'user',
-	contents: contents,
-	timestamp: Date.now(),
-});
-
-/**
- * Create an assistant message with OutputContent array
- */
-export const createAssistantMessage = (contents: OutputContent[]): ChatMessage => ({
-	id: `msg-${Date.now()}-ai`,
-	role: 'assistant',
-	contents: contents,
-	timestamp: Date.now(),
-});
 
 // ============ Hook ============
 
-export function useChat(activeThreadId: string | null, addMessage: (message: ChatMessage) => void) {
+export function useChat(activeThreadId: string, addMessage: (userMessage: ChatMessage) => void) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -42,8 +22,12 @@ export function useChat(activeThreadId: string | null, addMessage: (message: Cha
 		if (!activeThreadId || !content.trim()) return;
 
 		setError(null);
-		const userContents: InputContent[] = [{ type: 'text', text: content }];
-		addMessage(createUserMessage(userContents));
+		const userContents = [{ type: 'text', text: content }];
+		const chatMessage : ChatMessage = {
+			role: 'user',
+			contents: userMessage.contents
+		};
+		addMessage(chatMessage);
 		setIsLoading(true);
 
 		try {
@@ -52,7 +36,13 @@ export function useChat(activeThreadId: string | null, addMessage: (message: Cha
 				contents: userContents,
 				source_ids: [],
 			});
-			addMessage(createAssistantMessage(response.contents));
+			const response_message: ChatMessage = {
+				id: 'msg-' + Date.now(),
+				role: 'assistant',
+				contents: response.contents,
+				timestamp: Date.now(),
+			}; 
+			addMessage(response_message);
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
 			setError(errorMessage);

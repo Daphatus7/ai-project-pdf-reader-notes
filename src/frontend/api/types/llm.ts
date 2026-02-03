@@ -2,11 +2,8 @@
  * LLM Chat Feature Types
  * @description Type definitions for LLM chat feature
  */
-import type {InputContent} from "@/frontend/api";
 import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage} from "@/frontend/api/types/chat.ts";
-
-import type {OutputContent} from "@/frontend/api/types/common.ts";
 
 // ============ Message Types ============
 
@@ -14,7 +11,6 @@ import type {OutputContent} from "@/frontend/api/types/common.ts";
  * A single content item in a chat message
  * Can be text, image, or other content types
  */
-export type MessageContent = InputContent | OutputContent;
 
 // ============ Thread Types ============
 
@@ -60,7 +56,7 @@ export interface AIChatBubbleProps {
 
 export interface LLMChatFeatureProps {
 	/** External interface to inject messages */
-	onInjectMessage?: (handler: (content: string, role?: 'user' | 'assistant') => void) => void;
+	onInjectMessage?: (handler: ChatMessage) => void;
 	/** Callback when user selects content from AI response */
 	onSelectContent?: (content: string) => void;
 }

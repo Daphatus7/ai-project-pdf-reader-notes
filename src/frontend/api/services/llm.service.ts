@@ -75,7 +75,6 @@ export const llmService = {
 	async loadThread(threadId: string): Promise<LoadThreadResponse> {
 		const request: LoadThreadRequest = { thread_id: threadId };
 		const resp = await post<LoadThreadResponse>(apiConfig.endpoints.llm.threadLoad, request);
-		console.log(resp);
 		return resp;
 	},
 

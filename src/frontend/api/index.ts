@@ -11,7 +11,7 @@ export { apiConfig } from './core/config';
 export { llmService, convertDataUrlsToContents } from './services/llm.service';
 
 // Common Types
-export type { TextContent, ImageContent, InputContent, TextOutput, ImageOutput, OutputContent } from './types/common';
+export type { TextContent, ImageContent, TextOutput, ImageOutput } from './types/common';
 
 // LLM Types
 export type {

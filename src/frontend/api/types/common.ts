@@ -24,7 +24,7 @@ export interface ImageContent {
 /**
  * Union type for all input content types
  */
-export type InputContent = TextContent | ImageContent;
+export type ChatContent = TextContent | ImageContent;
 
 // ============ Output Content Types (API Response) ============
 
@@ -45,7 +45,3 @@ export interface ImageOutput {
   mime_type: 'image/png' | 'image/jpeg' | 'image/webp';
 }
 
-/**
- * Union type for all output content types
- */
-export type OutputContent = TextOutput | ImageOutput;

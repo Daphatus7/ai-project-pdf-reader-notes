@@ -1,4 +1,4 @@
-import type {InputContent, OutputContent} from "@/frontend/api";
+import type {ChatContent} from "@/frontend/api/types/common.ts";
 /**
  * @file        chat.ts
  * @description Chat types matching backend Pydantic models
@@ -12,11 +12,9 @@ import type {InputContent, OutputContent} from "@/frontend/api";
  * Chat message with multimodal content support
  */
 export interface ChatMessage {
-	id: string;
 	role: 'user' | 'assistant';
 	/** Array of content items - supports text, images, or mixed */
-	contents: InputContent[] | OutputContent[];
-	timestamp: number;
+	contents: ChatContent[];
 }
 
 /**
@@ -24,7 +22,7 @@ export interface ChatMessage {
  */
 export interface ChatRequest {
 	thread_id: string;
-	contents: InputContent[];
+	contents: ChatContent[];
 	source_ids?: string[];
 }
 
@@ -32,5 +30,5 @@ export interface ChatRequest {
  * Chat response - matches backend ChatResponse schema
  */
 export interface ChatResponse {
-	contents: OutputContent[];
+	message: ChatMessage;
 }
