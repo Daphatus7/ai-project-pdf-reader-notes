@@ -152,7 +152,7 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 									}}
 								/>
 							) : (
-								<div style={{ padding: 16, color: '#666' }}>Choose a PDF to view</div>
+								<div>Choose a PDF to view</div>
 							)}
 						</Worker>
 

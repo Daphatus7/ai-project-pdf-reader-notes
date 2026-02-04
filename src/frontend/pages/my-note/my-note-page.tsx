@@ -134,6 +134,10 @@ export default function NotePage() {
 			);
 		}
 	}
+	
+	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
+		// Currently not implemented
+	}
 
 	return (
 		<div className="h-screen w-screen flex flex-col bg-background">
@@ -201,9 +205,9 @@ export default function NotePage() {
 						</div>
 					) : (
 						<ResizablePanelGroup direction="vertical">
-							{/*<PdfSection */}
-							{/*	onScreenshotCapture={handleScreenshotCapture} */}
-							{/*/>*/}
+							<PdfSection 
+								onScreenshotCapture={handleScreenshotCapture} 
+							/>
 						</ResizablePanelGroup>
 					)}
 				</ResizablePanel>

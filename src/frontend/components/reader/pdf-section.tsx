@@ -14,7 +14,7 @@ interface PDFSectionProps {
 const VERTICAL_COLLAPSE_THRESHOLD = 18;
 
 export function PdfSection({
-	defaultSize = 50,
+	defaultSize = 33,
 	minSize = 15,
 	collapsedSize = 3,
 	onScreenshotCapture,
