@@ -135,7 +135,7 @@ export default function NotePage() {
 		}
 	}
 	
-	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
+	const handleAskAI = (imageDataUrl: string, name: string) => {
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 
@@ -214,7 +214,7 @@ export default function NotePage() {
 					) : (
 						<ResizablePanelGroup direction="vertical">
 							<PdfReader
-								onScreenshotCapture={handleScreenshotCapture}
+								onScreenshotCapture={handleAskAI}
 								onSaveToNote={handleSaveToNote}
 								onDownload={handleDownload}
 							/>
