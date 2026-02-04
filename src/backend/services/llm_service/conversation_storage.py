@@ -3,15 +3,16 @@
 # @date        2026-01-27
 
 import logging
-from typing import TYPE_CHECKING, Any, Coroutine
-
-from langchain_core.messages import HumanMessage, AIMessage
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.backend.services.storage.supabase_storage import SupabaseStorage
     from src.backend.services.storage.redis_storage import RedisStorage
 
 logger = logging.getLogger(__name__)
+
+
+
 
 
 class ConversationStorage:
@@ -86,6 +87,8 @@ class ConversationStorage:
         messages = await self._supabase_storage.load_recent_messages(thread_id)
         logger.info(f"Cold start: loaded {len(messages)} messages for thread {thread_id}")
         return messages
+
+    
 
     async def persist(
         self,

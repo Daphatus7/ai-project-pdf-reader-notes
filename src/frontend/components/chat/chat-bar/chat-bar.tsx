@@ -13,7 +13,9 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 
 	const handleSend = () => {
 		if (!input.trim() || isLoading) return;
-		onSend(input.trim());
+		
+		// pack to chat content format
+		onSend([{ type: 'text', text: input.trim() }]);
 		setInput('');
 	};
 

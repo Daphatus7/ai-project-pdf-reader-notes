@@ -39,7 +39,7 @@ export interface ChatBubblesProps {
 }
 
 export interface ChatBarProps {
-	onSend: (content: string) => void;
+	onSend: (content: ChatContent[]) => void;
 	isLoading: boolean;
 	placeholder?: string;
 }

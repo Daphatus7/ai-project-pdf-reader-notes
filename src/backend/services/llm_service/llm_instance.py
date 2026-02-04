@@ -23,6 +23,57 @@ if TYPE_CHECKING:
     from src.backend.services.storage.redis_storage import RedisStorage
 
 
+import logging
+from typing import Any, Optional, Sequence
+
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+
+logger = logging.getLogger(__name__)
+
+SUPPORTED_ROLES = {"assistant", "user"}
+
+MAX_MESSAGES = 50          # 总历史条数上限（按你业务调）
+MAX_CHARS_PER_MSG = 4000   # 单条消息最大字符数（按你业务调）
+
+def _extract_text(msg: dict[str, Any]) -> Optional[str]:
+    """
+    支持两类常见结构：
+    1) msg["content"] = [{"type":"text","text":"..."}, ...]
+    2) msg["content"] = "..."
+    解析不到就返回 None。
+    """
+    content = msg.get("content")
+
+    if isinstance(content, str):
+        text = content.strip()
+        return text or None
+
+    if isinstance(content, Sequence) and not isinstance(content, (str, bytes)):
+        # 找第一段 type=text 且有 text 的 block
+        for block in content:
+            if isinstance(block, dict):
+                if block.get("type") == "text" and isinstance(block.get("text"), str):
+                    text = block["text"].strip()
+                    return text or None
+        return None
+
+    return None
+
+def _sanitize_text(text: str) -> str:
+    # 1) 基础清理
+    text = text.replace("\x00", "")  # 去掉 NUL
+    text = text.strip()
+
+    # 2) 截断，避免 token/内存爆炸
+    if len(text) > MAX_CHARS_PER_MSG:
+        text = text[:MAX_CHARS_PER_MSG] + "…(truncated)"
+    return text
+
+def _to_lc_message(role: str, text: str) -> BaseMessage:
+    if role == "assistant":
+        return AIMessage(content=text)
+    return HumanMessage(content=text)
+
 STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
 
 FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
@@ -292,7 +343,7 @@ class LlmAgent:
             middleware=[
                 #log_state, 
                 trim_messages],
-            system_prompt=SystemMessage("You are a helpful assistant."),  # Basic system prompt
+            system_prompt=SystemMessage(STRUCTURED_OUTPUT_SYSTEM_PROMPT),  # Basic system prompt
             checkpointer=self._checkpointer,
         )
         self.counter = 0
@@ -308,34 +359,43 @@ class LlmAgent:
         # 2. Cold start: load from Supabase if thread not in Redis
         history_to_add = await self._conversation_storage.cold_start_load(request.thread_id)
         logging.info(history_to_add)
-    
-        
-        if history_to_add:
-            to_history = []
-            for msg in history_to_add:
-                logging.info(f"{msg}")
-                if msg["role"] not in ("assistant", "user"):
-                    logging.warning(f"Skipping unsupported role in history: {msg['role']}")
-                elif msg["role"] == "assistant":
-                    to_history.append(AIMessage(content=msg["content"][0]['text']))
-                elif msg["role"] == "user":
-                    to_history.append(HumanMessage(content=msg["content"][0]['text']))
-                else:
-                    logging.error(f"Unexpected role encountered: {msg['role']}")
 
-            self.agent.update_state(
-                config={"configurable": {"thread_id": request.thread_id}},
-                values={"messages": to_history},
-                as_node="__start__"
-            )
-            
-            # todo Debug: log loaded messages delete later
-            current_history = self.agent.get_state(
-                config={"configurable": {"thread_id": request.thread_id}})
-            if len(current_history) == 0:
-                logging.warning("No messages loaded into agent state after cold start.")
-            for (msg,idx) in current_history :
-                logging.info(f"Cold start msg {idx}: {msg.content}")
+
+        if history_to_add:
+            to_history: list[BaseMessage] = []
+        
+            # 限制最大条数（取最近 MAX_MESSAGES 条）
+            trimmed = history_to_add[-MAX_MESSAGES:] if len(history_to_add) > MAX_MESSAGES else history_to_add
+        
+            for i, msg in enumerate(trimmed):
+                if not isinstance(msg, dict):
+                    logger.warning("Skipping non-dict history item at index=%s", i)
+                    continue
+        
+                role = msg.get("role")
+                if role not in SUPPORTED_ROLES:
+                    logger.warning("Skipping unsupported role=%r at index=%s", role, i)
+                    continue
+        
+                text = _extract_text(msg)
+                if not text:
+                    logger.warning("Skipping empty/unparseable content role=%s index=%s", role, i)
+                    continue
+        
+                safe_text = _sanitize_text(text)
+                to_history.append(_to_lc_message(role, safe_text))
+        
+                # 安全日志：不打印全文
+                logger.debug("History accepted index=%s role=%s chars=%s", i, role, len(safe_text))
+        
+            if to_history:
+                self.agent.update_state(
+                    config={"configurable": {"thread_id": request.thread_id}},
+                    values={"messages": to_history},
+                    as_node="__start__",
+                )
+            else:
+                logger.info("No valid history messages to inject (all skipped).")
             
         # 3. Build Configuration
         config: RunnableConfig = {
