@@ -13,7 +13,7 @@ import NoteTaker from "@/frontend/components/note/note-taker.tsx";
 import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
-import {LLMChatFeature} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
+import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 import type {Note} from "@/frontend/components/note/type.ts";
 import * as crypto from "node:crypto";
 
@@ -136,6 +136,10 @@ export default function NotePage() {
 	}
 	
 	const handleAskAI = (imageDataUrl: string, name: string) => {
+		
+		chatRef.current?.injectMessage(
+			
+		);
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 
@@ -146,6 +150,8 @@ export default function NotePage() {
 	const handleDownload = (imageDataUrl: string, name: string) => {
 		console.log('[NotePage] Download:', name);
 	}
+
+	const chatRef = useRef<LLMChatFeatureHandle>(null);
 
 	return (
 		<div className="h-screen w-screen flex flex-col bg-background">
@@ -228,7 +234,9 @@ export default function NotePage() {
 					defaultSize={34}
 					minSize={15}
 				>
-					<LLMChatFeature />
+					<LLMChatFeature
+						ref={chatRef}
+					/>
 				</ResizablePanel>
 
 				<ResizableHandle  />
