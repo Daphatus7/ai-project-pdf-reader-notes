@@ -49,7 +49,7 @@ export function ScreenshotOverlay({
           data-screenshot-ignore
         >
           <button
-            className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            className="px-3 py-1 text-sm bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50"
             onClick={onAskAI}
             disabled={isCapturing}
           >
