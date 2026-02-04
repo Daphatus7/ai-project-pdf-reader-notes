@@ -12,7 +12,7 @@ import { Button } from "@/frontend/components/ui/button.tsx";
 import NoteTaker from "@/frontend/components/note/note-taker.tsx";
 import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
-import {PdfSection} from "@/frontend/components/reader/pdf-section.tsx";
+import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
 import {LLMChatFeature} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 import type {Note} from "@/frontend/components/note/type.ts";
 import * as crypto from "node:crypto";
@@ -213,7 +213,7 @@ export default function NotePage() {
 						</div>
 					) : (
 						<ResizablePanelGroup direction="vertical">
-							<PdfSection
+							<PdfReader
 								onScreenshotCapture={handleScreenshotCapture}
 								onSaveToNote={handleSaveToNote}
 								onDownload={handleDownload}
