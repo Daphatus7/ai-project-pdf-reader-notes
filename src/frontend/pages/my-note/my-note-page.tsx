@@ -136,7 +136,7 @@ export default function NotePage() {
 	}
 	
 	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-		// Currently not implemented
+		console.log('[NotePage] Screenshot received:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 
 	return (

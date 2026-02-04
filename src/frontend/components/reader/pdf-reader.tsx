@@ -7,7 +7,11 @@ import { ScreenshotOverlay } from '../screenshot/ScreenshotOverlay';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 
-export function PdfReader() {
+interface PdfReaderProps {
+  onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+}
+
+export function PdfReader({ onScreenshotCapture }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +23,7 @@ export function PdfReader() {
   const handleAskAI = async () => {
     if (!containerRef.current) return;
     const dataUrl = await screenshot.capture(containerRef.current);
-    screenshot.download(dataUrl, `screenshot-${Date.now()}.png`);
+    onScreenshotCapture(dataUrl, `screenshot-${Date.now()}.png`);
     screenshot.deactivate();
   };
 
