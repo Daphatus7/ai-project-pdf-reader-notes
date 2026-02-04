@@ -4,6 +4,7 @@ import { useChat } from "@/frontend/components/chat/use-chat";
 import { ChatPanel } from "@/frontend/components/chat/chat-panel/chat-panel";
 import type { LLMChatFeatureProps } from "@/frontend/api/types/llm";
 import type { UserMessage } from "@/frontend/api/types/chat";
+import {send} from "vite";
 
 export type LLMChatFeatureHandle = {
 	injectMessage: (message: UserMessage) => void;
@@ -32,7 +33,7 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 			() => ({
 				injectMessage: (message: UserMessage) => {
 					if (!activeThreadId) return;
-					addUserMessage(message);
+					sendMessage(message);
 				},
 			}),
 			[activeThreadId, addUserMessage]

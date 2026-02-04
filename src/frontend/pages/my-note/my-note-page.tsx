@@ -136,10 +136,30 @@ export default function NotePage() {
 	}
 	
 	const handleAskAI = (imageDataUrl: string, name: string) => {
-		
-		chatRef.current?.injectMessage(
-			
-		);
+		// Extract base64 data and mime type from data URL
+		const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
+		if (!match) {
+			console.error('[NotePage] Invalid image data URL format');
+			return;
+		}
+
+		const mimeType = match[1] as 'image/png' | 'image/jpeg' | 'image/webp';
+		const base64Data = match[2];
+
+		chatRef.current?.injectMessage({
+			content: [
+				{
+					type: 'image',
+					data: base64Data,
+					mime_type: mimeType,
+					name: name,
+				},
+				{
+					type: 'text',
+					text: 'Please explain this screenshot.',
+				},
+			],
+		});
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 

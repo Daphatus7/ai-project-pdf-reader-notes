@@ -8,6 +8,7 @@
 import { useState, useCallback } from 'react';
 import { llmService } from '../../api/services/llm.service.ts';
 import type {UserMessage, AIMessage} from '../../api/types/chat.ts';
+import type {ChatContent} from "@/frontend/api";
 
 // ============ Hook ============
 
@@ -19,14 +20,16 @@ export function useChat(
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const sendMessage = useCallback(async (content: string) => {
-		if (!activeThreadId || !content.trim()) return;
+	const sendMessage = useCallback(async (content: ChatContent[]) => {
+		if (!activeThreadId) return;
 
 		setError(null);
-		const userContents = [{ type: 'text' as const, text: content }];
+		
+		
+		
 
 		// Add user message immediately (optimistic update)
-		addUserMessage({ content: userContents });
+		addUserMessage(userContent);
 		setIsLoading(true);
 
 		try {
