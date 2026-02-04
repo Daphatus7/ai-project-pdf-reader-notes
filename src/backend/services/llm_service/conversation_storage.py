@@ -92,7 +92,7 @@ class ConversationStorage:
         user_id: str,
         thread_id: str,
         role: str,
-        content: str,
+        content: list[dict],
         token_count: int = 0
     ) -> dict | None:
         """
@@ -105,6 +105,7 @@ class ConversationStorage:
             thread_id: Conversation thread ID
             content: content
             token_count: Token count for message
+            :param role: 
         """
         if not self._supabase_storage:
             logger.warning("No database configured, skipping persistence")

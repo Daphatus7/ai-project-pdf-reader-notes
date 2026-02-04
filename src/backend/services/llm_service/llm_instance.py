@@ -385,10 +385,11 @@ class LlmAgent:
             user_id=request.user_id,
             thread_id=request.thread_id,
             role= "assistant",
-            content=ai_msg.content,
+            content=[{"type": "text",
+                      "text": ai_msg.content}],
             token_count=output_tokens
         )
-
+        logging.info(f"store-----:{resp}")
         #only need to return ai response
         return ChatResponse(
             id=resp['id'],
