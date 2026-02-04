@@ -15,11 +15,12 @@ from pydantic import BaseModel, Field
 # Output Content Models (mirror input structure for API symmetry)
 
 
-class ImageOutput(BaseModel):
-    """Image content in AI response (e.g., generated images)"""
+class ImageContent(BaseModel):
+    """Image content for both user input and AI response"""
     type: Literal["image"] = "image"
     data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
     mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
+    name: Optional[str] = Field(default=None, description="Optional filename for display")
 
 
 ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']

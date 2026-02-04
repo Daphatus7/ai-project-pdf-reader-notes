@@ -18,7 +18,6 @@ from src.backend.schemas.auth import (
 )
 
 from src.backend.schemas.chat.llm import (
-    ImageOutput,
     ContentType,
     ChatRequest,
     ChatResponse,

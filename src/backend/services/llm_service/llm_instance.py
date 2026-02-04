@@ -1,8 +1,5 @@
-import json
 import logging
-from sys import thread_info
 from typing import Any, TYPE_CHECKING
-
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
@@ -115,7 +112,7 @@ def _build_human_message(contents: list) -> HumanMessage:
         if item.get('type') == "text":
             content_parts.append({"type": "text", "text": item['text']})
         elif item.get('type') == "image":
-            data_url = f"data:{item.mime_type};base64,{item.data}"
+            data_url = f"data:{item['mime_type']};base64,{item['data']}"
             content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
     return HumanMessage(content=content_parts)
 
