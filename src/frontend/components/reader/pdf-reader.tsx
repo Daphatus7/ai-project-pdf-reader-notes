@@ -1,4 +1,4 @@
-import { Viewer, Worker } from '@react-pdf-viewer/core';
+import {RotateDirection, Viewer, Worker} from '@react-pdf-viewer/core';
 import { toolbarPlugin, ToolbarSlot } from '@react-pdf-viewer/toolbar';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -57,7 +57,7 @@ export function PdfReader({ onScreenshotCapture }: PDFReaderProps) {
 
 							{/* Actions */}
 							<div className="flex items-center gap-1">
-								<Rotate />
+								<Rotate direction={RotateDirection.Backward} />
 								<EnterFullScreen />
 								<Download />
 								<Print />
