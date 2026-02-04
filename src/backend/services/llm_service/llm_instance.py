@@ -109,7 +109,7 @@ def _parse_ai_response(ai_msg) -> list[dict]:
 
 def _build_human_message(contents: list) -> HumanMessage:
     """Build HumanMessage from request contents."""
-    
+    logging.info(contents)
     content_parts = []
     for item in contents:
         if item.get('type') == "text":

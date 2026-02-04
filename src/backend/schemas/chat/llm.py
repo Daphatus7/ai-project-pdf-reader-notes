@@ -53,8 +53,6 @@ class ChatResponse(BaseModel):
     """
     created_at: str
     
-
-
 # threads
 class CreateThreadRequest(BaseModel):
     """Request model for creating a conversation thread"""
