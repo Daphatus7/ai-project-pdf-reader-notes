@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { RotateDirection, Viewer, Worker } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type ToolbarSlot } from '@react-pdf-viewer/toolbar';
-import { useScreenshot } from '../../hooks/useScreenshot';
+import { useScreenshot } from './useScreenshot.tsx';
 import { ScreenshotOverlay } from '../screenshot/ScreenshotOverlay';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
