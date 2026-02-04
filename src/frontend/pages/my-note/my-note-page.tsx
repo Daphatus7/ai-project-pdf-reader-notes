@@ -146,20 +146,18 @@ export default function NotePage() {
 		const mimeType = match[1] as 'image/png' | 'image/jpeg' | 'image/webp';
 		const base64Data = match[2];
 
-		chatRef.current?.injectMessage({
-			content: [
-				{
-					type: 'image',
-					data: base64Data,
-					mime_type: mimeType,
-					name: name,
-				},
-				{
-					type: 'text',
-					text: 'Please explain this screenshot.',
-				},
-			],
-		});
+		chatRef.current?.injectMessage([
+			{
+				type: 'image',
+				data: base64Data,
+				mime_type: mimeType,
+				name: name,
+			},
+			{
+				type: 'text',
+				text: 'Please explain this screenshot.',
+			},
+		]);
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 

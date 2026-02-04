@@ -4,6 +4,7 @@
  */
 import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage, UserMessage} from "@/frontend/api/types/chat.ts";
+import type {ChatContent} from "@/frontend/api";
 
 // ============ Message Types ============
 
@@ -28,7 +29,7 @@ export interface ChatPanelProps {
 	threadProp: ThreadTabsProps;
 	messages: ChatMessage[];
 	isLoading: boolean;
-	onSendMessage: (content: string) => void;
+	onSendMessage: (content: ChatContent[]) => void;
 	onSelectContent?: (content: string) => void;
 }
 

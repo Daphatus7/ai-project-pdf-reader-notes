@@ -24,18 +24,15 @@ export function useChat(
 		if (!activeThreadId) return;
 
 		setError(null);
-		
-		
-		
 
 		// Add user message immediately (optimistic update)
-		addUserMessage(userContent);
+		addUserMessage({ content });
 		setIsLoading(true);
 
 		try {
 			const response = await llmService.chat({
 				thread_id: activeThreadId,
-				content: userContents,
+				content,
 				source_ids: [],
 			});
 			// Add AI message with backend ID
