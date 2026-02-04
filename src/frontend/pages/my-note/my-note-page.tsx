@@ -136,7 +136,15 @@ export default function NotePage() {
 	}
 	
 	const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-		console.log('[NotePage] Screenshot received:', name, imageDataUrl.slice(0, 50) + '...');
+		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
+	}
+
+	const handleSaveToNote = (imageDataUrl: string, name: string) => {
+		console.log('[NotePage] Save to Note:', name);
+	}
+
+	const handleDownload = (imageDataUrl: string, name: string) => {
+		console.log('[NotePage] Download:', name);
 	}
 
 	return (
@@ -205,8 +213,10 @@ export default function NotePage() {
 						</div>
 					) : (
 						<ResizablePanelGroup direction="vertical">
-							<PdfSection 
-								onScreenshotCapture={handleScreenshotCapture} 
+							<PdfSection
+								onScreenshotCapture={handleScreenshotCapture}
+								onSaveToNote={handleSaveToNote}
+								onDownload={handleDownload}
 							/>
 						</ResizablePanelGroup>
 					)}

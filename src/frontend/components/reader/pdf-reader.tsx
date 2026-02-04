@@ -9,9 +9,11 @@ import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 
 interface PdfReaderProps {
   onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+  onSaveToNote?: (imageDataUrl: string, name: string) => void;
+  onDownload?: (imageDataUrl: string, name: string) => void;
 }
 
-export function PdfReader({ onScreenshotCapture }: PdfReaderProps) {
+export function PdfReader({ onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -20,12 +22,16 @@ export function PdfReader({ onScreenshotCapture }: PdfReaderProps) {
 
   const screenshot = useScreenshot();
 
-  const handleAskAI = async () => {
+  const captureAndCall = async (callback: (dataUrl: string, name: string) => void) => {
     if (!containerRef.current) return;
     const dataUrl = await screenshot.capture(containerRef.current);
-    onScreenshotCapture(dataUrl, `screenshot-${Date.now()}.png`);
+    callback(dataUrl, `screenshot-${Date.now()}.png`);
     screenshot.deactivate();
   };
+
+  const handleAskAI = () => captureAndCall(onScreenshotCapture);
+  const handleSaveToNote = onSaveToNote ? () => captureAndCall(onSaveToNote) : undefined;
+  const handleDownload = onDownload ? () => captureAndCall(onDownload) : undefined;
 
   return (
     <div className="flex flex-col h-full">
@@ -95,6 +101,8 @@ export function PdfReader({ onScreenshotCapture }: PdfReaderProps) {
             isSelecting={screenshot.isSelecting}
             isCapturing={screenshot.isCapturing}
             onAskAI={handleAskAI}
+            onSaveToNote={handleSaveToNote}
+            onDownload={handleDownload}
             onCancel={screenshot.deactivate}
           />
         )}

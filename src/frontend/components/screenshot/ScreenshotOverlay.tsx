@@ -10,6 +10,8 @@ interface ScreenshotOverlayProps {
   isSelecting: boolean;
   isCapturing: boolean;
   onAskAI: () => void;
+  onSaveToNote?: () => void;
+  onDownload?: () => void;
   onCancel: () => void;
 }
 
@@ -18,6 +20,8 @@ export function ScreenshotOverlay({
   isSelecting,
   isCapturing,
   onAskAI,
+  onSaveToNote,
+  onDownload,
   onCancel,
 }: ScreenshotOverlayProps) {
   return (
@@ -55,6 +59,24 @@ export function ScreenshotOverlay({
           >
             {isCapturing ? 'Capturing...' : 'Ask AI'}
           </button>
+          {onSaveToNote && (
+            <button
+              className="px-3 py-1 text-sm bg-green-500 rounded hover:bg-green-600 disabled:opacity-50"
+              onClick={onSaveToNote}
+              disabled={isCapturing}
+            >
+              Save to Note
+            </button>
+          )}
+          {onDownload && (
+            <button
+              className="px-3 py-1 text-sm bg-purple-500 rounded hover:bg-purple-600 disabled:opacity-50"
+              onClick={onDownload}
+              disabled={isCapturing}
+            >
+              Download
+            </button>
+          )}
           <button
             className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
             onClick={onCancel}
