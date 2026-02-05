@@ -85,6 +85,16 @@ export async function get<T>(endpoint: string): Promise<T> {
 }
 
 /**
+ * PUT request helper
+ */
+export async function put<T>(endpoint: string, data: unknown): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
  * DELETE request helper
  */
 export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
@@ -92,80 +102,4 @@ export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
     method: 'DELETE',
     ...(data && { body: JSON.stringify(data) }),
   });
-}
-
-/**
- * Streaming request helper
- * Returns an async generator that yields Server-Sent Events (SSE) data
- */
-export async function* streamRequest(
-  endpoint: string,
-  data: unknown
-): AsyncGenerator<string, void, unknown> {
-  const url = `${apiConfig.baseUrl}${endpoint}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    let errorMessage = `HTTP error! status: ${response.status}`;
-    try {
-      const errorData = await response.json();
-      if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
-        errorMessage = String(errorData.detail);
-      }
-    } catch {
-      errorMessage = response.statusText || errorMessage;
-    }
-    throw new ApiError(errorMessage, response.status);
-  }
-
-  if (!response.body) {
-    throw new ApiError('Response body is null');
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const text = line.slice(6);
-
-          if (text.startsWith('[ERROR]')) {
-            throw new ApiError(text.slice(8));
-          }
-
-          yield text;
-        }
-      }
-    }
-
-    // Handle any remaining data in buffer
-    if (buffer.startsWith('data: ')) {
-      const text = buffer.slice(6);
-      if (!text.startsWith('[ERROR]')) {
-        yield text;
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
 }

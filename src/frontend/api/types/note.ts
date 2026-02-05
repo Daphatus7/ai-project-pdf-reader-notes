@@ -18,7 +18,6 @@ export interface Note {
 // === Request Types ===
 
 export interface CreateNoteRequest {
-  project_id?: string;
   title?: string;
   content_markdown?: string;
   summary?: string;
@@ -39,7 +38,11 @@ export interface ListNotesResponse {
   notes: Note[];
 }
 
-export interface NoteResponse {
+export interface CreateNoteResponse {
+  note: Note;
+}
+
+export interface UpdateNoteResponse {
   note: Note;
 }
 
