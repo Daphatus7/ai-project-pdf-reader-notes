@@ -6,6 +6,7 @@
  */
 import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
 import type {ChatContent} from "@/frontend/api";
+import {MarkdownRenderer} from "@/frontend/components/renderer/markdown-renderer.tsx";
 
 /**
  * Render a single content item (text or image)
@@ -13,9 +14,11 @@ import type {ChatContent} from "@/frontend/api";
 function renderContentItem(item: ChatContent, index: number) {
 	if (item.type === 'text') {
 		return (
-			<p key={index} className="text-sm whitespace-pre-wrap">
-				{item.text}
-			</p>
+			<MarkdownRenderer
+				key={index}
+				content={item.text}
+				className="text-sm"
+			/>
 		);
 	}
 	if (item.type === 'image') {
@@ -56,7 +59,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`max-w-[80%] bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
+				className={`max-w-[80%] max-h-[500px] overflow-y-auto bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
 					onSelectContent ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
 				}`}
 				onClick={handleClick}
