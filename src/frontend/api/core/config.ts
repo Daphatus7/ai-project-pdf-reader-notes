@@ -20,5 +20,8 @@ export const apiConfig = {
 			threadList: '/api/v1/llm/thread/list',
 			threadLoad: '/api/v1/llm/thread/load',
 		},
+		notes: {
+			base: '/api/v1/notes',
+		},
 	},
 } as const;

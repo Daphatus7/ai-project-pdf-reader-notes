@@ -6,6 +6,9 @@
 from datetime import datetime
 from pydantic import BaseModel
 
+"""
+    The note design seems bad, but hopefully it can achieve the intended functional needs.
+"""
 
 class CreateNoteRequest(BaseModel):
     """Request model for creating a note"""

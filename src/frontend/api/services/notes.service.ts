@@ -2,59 +2,48 @@
  * Notes API service for CRUD operations
  */
 
-import { request, post } from '../core/client';
 import type {
-  Note,
-  CreateNoteRequest,
-  UpdateNoteRequest,
-  ListNotesResponse,
-  NoteResponse,
-  DeleteNoteResponse,
+	Note,
+	CreateNoteRequest,
+	UpdateNoteRequest,
+	ListNotesResponse,
+	NoteResponse,
+	DeleteNoteResponse,
 } from '../../components/note/type.ts';
+import {apiConfig} from "@/frontend/api";
 
-const NOTES_BASE = '/api/v1/notes';
 
 export const notesService = {
-  /**
-   * List all notes for the authenticated user
-   */
-  async listNotes(): Promise<Note[]> {
-    const response = await request<ListNotesResponse>(NOTES_BASE);
-    return response.notes;
-  },
+	/**
+	 * List all notes for the authenticated user
+	 */
+	async listNotes(): Promise<Note[]> {
+	},
 
-  /**
-   * Get a single note by ID
-   */
-  async getNote(noteId: string): Promise<Note> {
-    return request<Note>(`${NOTES_BASE}/${noteId}`);
-  },
+	/**
+	 * Get a single note by ID
+	 */
+	async getNote(noteId: string): Promise<Note> {
+	},
 
-  /**
-   * Create a new note
-   */
-  async createNote(data: CreateNoteRequest): Promise<Note> {
-    const response = await post<NoteResponse>(NOTES_BASE, data);
-    return response.note;
-  },
+	/**
+	 * Create a new note
+	 */
+	async createNote(data: CreateNoteRequest): Promise<Note> {
 
-  /**
-   * Update a note (requires version for optimistic locking)
-   */
-  async updateNote(noteId: string, data: UpdateNoteRequest): Promise<Note> {
-    const response = await request<NoteResponse>(`${NOTES_BASE}/${noteId}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-    return response.note;
-  },
+	},
 
-  /**
-   * Delete a note
-   */
-  async deleteNote(noteId: string): Promise<DeleteNoteResponse> {
-    return request<DeleteNoteResponse>(`${NOTES_BASE}/${noteId}`, {
-      method: 'DELETE',
-    });
-  },
+	/**
+	 * Update a note (requires version for optimistic locking)
+	 */
+	async updateNote(noteId: string, data: UpdateNoteRequest): Promise<Note> {
+
+	},
+
+	/**
+	 * Delete a note
+	 */
+	async deleteNote(noteId: string): Promise<DeleteNoteResponse> {
+
+	},
 };
