@@ -15,7 +15,8 @@ function renderContentItem(item: ChatContent, index: number) {
 	if (item.type === 'text') {
 		return (
 			<MarkdownRenderer
-				content ={item.text}
+				key={index}
+				content={item.text}
 			/>
 		);
 	}
