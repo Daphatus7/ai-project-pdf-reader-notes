@@ -397,22 +397,8 @@ export const NoteTaker =
 
 					{/* Editor view */}
 					<TabsContent value="editor" className="h-full m-0">
-						{/*<ScrollArea className="h-full">*/}
-						{/*	{editor && <EditorContent editor={editor} />}*/}
-						{/*</ScrollArea>*/}
 						<SimpleEditor editor={editor} />
 					</TabsContent>
-
-					{/*/!* Preview view *!/*/}
-					{/*<TabsContent value="preview" className="h-full m-0">*/}
-					{/*	<ScrollArea className="h-full">*/}
-					{/*		/!*<div className="p-4 prose prose-sm max-w-none">*!/*/}
-					{/*		/!*	<ReactMarkdown>{editor.getMarkdown()}</ReactMarkdown>*!/*/}
-					{/*		/!*</div>*!/*/}
-					{/*	/!*	the preview should be readonly while preserve the original content, including visual representation *!/*/}
-					{/*		*/}
-					{/*	</ScrollArea>*/}
-					{/*</TabsContent>*/}
 				</div>
 			</Tabs>
 		</div>

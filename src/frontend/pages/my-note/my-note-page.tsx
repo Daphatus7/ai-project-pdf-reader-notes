@@ -219,7 +219,7 @@ export default function NotePage() {
 				<ResizablePanel
 					ref={centerPanelRef}
 					defaultSize={33}
-					minSize={10}
+					minSize={2}
 					collapsible
 					collapsedSize={2}
 					onCollapse={() => setIsCenterCollapsed(true)}
@@ -255,7 +255,6 @@ export default function NotePage() {
 					<LLMChatFeature
 						ref={chatRef}
 						onSelectContent={(content) => {
-							console.log('[NotePage] Content selected:', content);
 							handleContentInsert({
 								content,
 								sectionType: 'paragraph',
