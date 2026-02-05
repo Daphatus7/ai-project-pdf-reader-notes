@@ -254,6 +254,14 @@ export default function NotePage() {
 				>
 					<LLMChatFeature
 						ref={chatRef}
+						onSelectContent={(content) => {
+							console.log('[NotePage] Content selected:', content);
+							handleContentInsert({
+								content,
+								sectionType: 'paragraph',
+								source: 'markdown-renderer',
+							});
+						}}
 					/>
 				</ResizablePanel>
 

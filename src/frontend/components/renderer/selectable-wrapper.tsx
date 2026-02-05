@@ -48,11 +48,6 @@ export function SelectableWrapper({
 		onSelect(sectionType, text, html);
 	}, [children, sectionType, onSelect]);
 
-	// No selection mode - render without interaction
-	if (!onSelect) {
-		return React.createElement(Component, { className }, children);
-	}
-
 	return React.createElement(
 		Component,
 		{

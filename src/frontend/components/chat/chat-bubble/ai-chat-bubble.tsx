@@ -11,12 +11,17 @@ import {MarkdownRenderer} from "@/frontend/components/renderer/markdown-renderer
 /**
  * Render a single content item (text or image)
  */
-function renderContentItem(item: ChatContent, index: number) {
+function renderContentItem(
+	item: ChatContent,
+	index: number,
+	onSelectContent?: (content: string) => void
+) {
 	if (item.type === 'text') {
 		return (
 			<MarkdownRenderer
 				key={index}
 				content={item.text}
+				onSectionClick={onSelectContent ? (_type, content) => onSelectContent(content) : undefined}
 			/>
 		);
 	}
@@ -48,7 +53,8 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	const rawContents = message.content;
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
-	const handleClick = () => {
+	const handleClick = (e: React.MouseEvent) => {
+		console.log("AIChatBubble outer div clicked");
 		if (onSelectContent) {
 			const textContent = extractTextContent(contents);
 			onSelectContent(textContent);
@@ -63,7 +69,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 				}`}
 				onClick={handleClick}
 			>
-				{contents.map((item, index) => renderContentItem(item, index))}
+				{contents.map((item, index) => renderContentItem(item, index, onSelectContent))}
 			</div>
 		</div>
 	);
