@@ -22,8 +22,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/frontend/components/ui
 import {SimpleEditor} from "@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx";
 import TextAlign from "@tiptap/extension-text-align";
 import {ImageUploadNode} from "@/frontend/@/components/tiptap-node/image-upload-node";
-import type {Note} from "@/frontend/api/note/type.ts";
-import type {NoteTakerProps} from "@/frontend/api/note/type.ts";
+import type {Note} from "@/frontend/api/types/note.ts";
+import type {NoteTakerProps} from "@/frontend/api/types/note.ts";
 
 
 

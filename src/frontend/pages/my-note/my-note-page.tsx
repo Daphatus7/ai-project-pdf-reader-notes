@@ -14,7 +14,7 @@ import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
-import type {Note} from "@/frontend/api/note/type.ts";
+import type {Note} from "@/frontend/api/types/note.ts";
 import * as crypto from "node:crypto";
 
 
