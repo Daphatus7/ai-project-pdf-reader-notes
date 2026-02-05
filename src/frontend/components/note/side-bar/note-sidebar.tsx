@@ -1,54 +1,18 @@
-import {useEffect, useRef, useState } from "react";
-import { Button } from "../ui/button.tsx";
-import { Input } from "../ui/input.tsx";
-import { ScrollArea } from "../ui/scroll-area.tsx";
+import {useEffect, useRef, useState} from "react";
+import {Button} from "../../ui/button.tsx";
+import {Input} from "../../ui/input.tsx";
+import {ScrollArea} from "../../ui/scroll-area.tsx";
+import {Download, EditIcon, FileText, GripVertical, MoreVertical, Plus, Search, Trash2} from "lucide-react";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "../../ui/dropdown-menu.tsx";
+import {cn} from "../../ui/utils.ts";
+import {useDrag, useDrop} from "react-dnd";
+import type {Identifier, XYCoord} from "dnd-core";
 import {
-	Plus,
-	FileText,
-	Trash2,
-	Download,
-	MoreVertical,
-	GripVertical,
-	Search, EditIcon
-} from "lucide-react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu.tsx";
-import { cn } from "../ui/utils.ts";
-import { useDrag, useDrop } from "react-dnd";
-import type { Identifier, XYCoord } from "dnd-core";
-import type {Note} from "@/frontend/api/types/note.ts";
-
-interface NoteSidebarProps {
-	notes: Note[];
-	setNotes: (notes: Note[]) => void;
-	selectedNoteId: string;
-	onSelectNote: (id: string) => void;
-	onAddNote?: () => void;
-	onDeleteNote?: (id: string) => void;
-	onEditNoteName?: (id: string, newTitle: string) => void;
-}
-
-const ITEM_TYPE = "NOTE";
-
-interface DragItem {
-	index: number;
-	id: string;
-	type: string;
-}
-
-interface NoteItemProps {
-	note: Note;
-	index: number;
-	isSelected: boolean;
-	onSelect: (id: string) => void;
-	onDelete: (id: string) => void;
-	moveNote: (dragIndex: number, hoverIndex: number) => void;
-	onEditName?: (id: string, newTitle: string) => void;
-}
+	type DragItem,
+	ITEM_TYPE,
+	type NoteItemProps,
+	type NoteSidebarProps
+} from "@/frontend/components/note/side-bar/type.ts";
 
 function NoteItem({ note, index, isSelected, onSelect, onDelete, moveNote, onEditName }: NoteItemProps) {
 	const ref = useRef<HTMLDivElement>(null);

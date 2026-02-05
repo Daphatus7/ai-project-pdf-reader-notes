@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import {NoteSidebar} from "@/frontend/components/note-sidebar/note-sidebar.tsx";
+import {NoteSidebar} from "@/frontend/components/note/side-bar/note-sidebar.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -9,7 +9,7 @@ import {PanelLeftOpen, Menu, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NoteTakerHandle } from "@/frontend/features/types/content-insertion.ts";
 import { Button } from "@/frontend/components/ui/button.tsx";
-import NoteTaker from "@/frontend/components/note/note-taker.tsx";
+import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
@@ -288,7 +288,7 @@ export default function NotePage() {
 							</div>
 						)}
 						<div className={isRightCollapsed ? "hidden" : "h-full"}>
-							<NoteTaker
+							<NotePad
 
 								note={selectedNote}
 								ref={noteTakerRef} />
