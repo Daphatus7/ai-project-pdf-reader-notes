@@ -20,7 +20,10 @@ export function ChatBubbles({ messages, onSelectContent }: ChatBubblesProps) {
 	
 	
 	return (
-		<div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 border border-red-500">
+		<div
+			className="flex-1 overflow-y-auto px-4 py-4 space-y-3 border border-red-500"
+			style={{ contain: 'strict' }}
+		>
 			{messages.map((message) =>
 				message.role === 'assistant' ? (
 					<AIChatBubble

@@ -9,14 +9,15 @@
  */
 export function preprocessMathPipes(content: string): string {
 	return content
-		// Inline math: $...$
-		.replace(/\$([^$]+)\$/g, (_, math: string) => {
-			const escaped = math.replace(/(?<!\\)\|/g, '\\vert ');
-			return `$${escaped}$`;
-		})
-		// Display math: $$...$$
-		.replace(/\$\$([\s\S]*?)\$\$/g, (_, math: string) => {
-			const escaped = math.replace(/(?<!\\)\|/g, '\\vert ');
-			return `$$${escaped}$$`;
-		});
+		// 可能没用的代码 @ToDO
+		// // Inline math: $...$
+		// .replace(/\$([^$]+)\$/g, (_, math: string) => {
+		// 	const escaped = math.replace(/(?<!\\)\|/g, '\\vert ');
+		// 	return `$${escaped}$`;
+		// })
+		// // Display math: $$...$$
+		// .replace(/\$\$([\s\S]*?)\$\$/g, (_, math: string) => {
+		// 	const escaped = math.replace(/(?<!\\)\|/g, '\\vert ');
+		// 	return `$$${escaped}$$`;
+		// });
 }

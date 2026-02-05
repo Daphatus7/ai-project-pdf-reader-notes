@@ -6,9 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
 import { useMemo } from 'react';
-import { cn } from '../ui/utils';
 import { createMarkdownComponents, type SectionClickHandler } from './markdown-components';
 import { preprocessMathPipes } from './preprocess';
 
