@@ -20,7 +20,7 @@ import {
 import { cn } from "../ui/utils.ts";
 import { useDrag, useDrop } from "react-dnd";
 import type { Identifier, XYCoord } from "dnd-core";
-import type {Note} from "@/frontend/components/note/type.ts";
+import type {Note} from "@/frontend/api/note/type.ts";
 
 interface NoteSidebarProps {
 	notes: Note[];

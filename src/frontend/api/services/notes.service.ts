@@ -9,7 +9,7 @@ import type {
 	ListNotesResponse,
 	NoteResponse,
 	DeleteNoteResponse,
-} from '../../components/note/type.ts';
+} from '../note/type.ts';
 import {apiConfig} from "@/frontend/api";
 
 
