@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import {NoteSidebar} from "@/frontend/components/note/side-bar/note-sidebar.tsx";
+import {NoteSidebar} from "@/frontend/components/note/sidebar/note-sidebar.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
