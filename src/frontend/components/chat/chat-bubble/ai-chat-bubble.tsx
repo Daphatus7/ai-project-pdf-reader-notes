@@ -15,9 +15,7 @@ function renderContentItem(item: ChatContent, index: number) {
 	if (item.type === 'text') {
 		return (
 			<MarkdownRenderer
-				key={index}
-				content={item.text}
-				className="text-sm"
+				content ={item.text}
 			/>
 		);
 	}
@@ -59,7 +57,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`max-w-[80%] max-h-[500px] overflow-y-auto bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
+				className={`max-w-[80%] bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
 					onSelectContent ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
 				}`}
 				onClick={handleClick}
