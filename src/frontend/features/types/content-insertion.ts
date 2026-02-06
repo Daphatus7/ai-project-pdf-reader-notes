@@ -75,7 +75,7 @@ export interface NotePadHandler {
 	 * @param content - Markdown content to insert
 	 * @param position - Where to insert: 'cursor' (current cursor position) or 'end' (end of document)
 	 */
-	insertContent: (content: any, position?: 'cursor' | 'end') => void;
+	insertContent: (content: ContentInsertion, position?: 'cursor' | 'end') => void;
 	
 	/**
 	 * Focuses the editor.
@@ -87,7 +87,7 @@ export interface NotePadHandler {
 	 * 
 	 * @returns Editor instance or null if not initialized
 	 */
-	getEditor: () => any | null;
+	getEditor: () => unknown | null;
 	
 	/**
 	 * Gets the current markdown content from the editor.

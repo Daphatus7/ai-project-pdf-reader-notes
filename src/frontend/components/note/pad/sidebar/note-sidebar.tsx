@@ -1,10 +1,10 @@
 import {useEffect} from "react";
-import {Button} from "../../ui/button.tsx";
-import {Input} from "../../ui/input.tsx";
-import {ScrollArea} from "../../ui/scroll-area.tsx";
+import {Button} from "../../../ui/button.tsx";
+import {Input} from "../../../ui/input.tsx";
+import {ScrollArea} from "../../../ui/scroll-area.tsx";
 import {Plus, Search} from "lucide-react";
-import {type NoteSidebarProps} from "@/frontend/components/note/sidebar/type.ts";
-import {SidebarItem} from "@/frontend/components/note/sidebar/item/sidebar-item.tsx";
+import {type NoteSidebarProps} from "@/frontend/components/note/pad/sidebar/type.ts";
+import {SidebarItem} from "@/frontend/components/note/pad/sidebar/item/sidebar-item.tsx";
 
 export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onAddNote, onDeleteNote, onEditNoteName }: NoteSidebarProps) {
 	const handleDelete = (id: string) => {

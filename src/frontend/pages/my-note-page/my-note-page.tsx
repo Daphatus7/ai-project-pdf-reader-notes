@@ -6,7 +6,7 @@ import {
 } from "@/frontend/components/ui/resizable.tsx";
 import {PanelLeftOpen, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
-import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
+import type { ContentInsertion } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
@@ -27,8 +27,6 @@ import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm
 export default function NotePage() {
 	
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
-
-	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
 	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
@@ -50,18 +48,18 @@ export default function NotePage() {
 	 *  todo 把这个搬进到note-pad 里面
 	 */
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
-		
-		
-		if (!noteTakerRef.current) {
-			console.warn('[NotePage] NoteTaker ref not available, cannot insert content');
-			return;
-		}
-
-		// Insert content at cursor position
-		noteTakerRef.current.insertContent(insertion, 'cursor');
-
-		// Focus the editor after insertion
-		noteTakerRef.current.focus();
+		//
+		//
+		// if (!noteTakerRef.current) {
+		// 	console.warn('[NotePage] NoteTaker ref not available, cannot insert content');
+		// 	return;
+		// }
+		//
+		// // Insert content at cursor position
+		// noteTakerRef.current.insertContent(insertion, 'cursor');
+		//
+		// // Focus the editor after insertion
+		// noteTakerRef.current.focus();
 	}, []);
 
 	const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -178,7 +176,7 @@ export default function NotePage() {
 					)}
 					<div className={isRightCollapsed ? "hidden" : "h-full"}>
 						<NotePad
-							note={selectedNote}
+							/>
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>

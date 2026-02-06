@@ -1,4 +1,4 @@
-import {type DragItem, ITEM_TYPE, type NoteItemProps} from "@/frontend/components/note/sidebar/type.ts";
+import {type DragItem, ITEM_TYPE, type NoteItemProps} from "@/frontend/components/note/pad/sidebar/type.ts";
 import {useRef, useState} from "react";
 import {useDrag, useDrop} from "react-dnd";
 import type {Identifier, XYCoord} from "dnd-core";
