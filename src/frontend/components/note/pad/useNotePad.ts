@@ -13,8 +13,9 @@ export function useNotePad() {
 	const [isLoading, setIsLoading] = useState(true)
 
 	// --- Current document ---
-	const [markdownContent, setMarkdownContent] = useState('')
-	const [activeView, setActiveView] = useState<ViewMode>('editor')
+	const contentRef = useRef('')
+	const [documentContent, setDocumentContent] = useState('')
+	const [activeView, setActiveViewRaw] = useState<ViewMode>('editor')
 	const rendererRef = useRef<NoteRendererHandle>(null)
 	const lastSavedContent = useRef('')
 
@@ -41,12 +42,22 @@ export function useNotePad() {
 
 	function applyNote(note: Note) {
 		setSelectedNoteId(note.id)
-		setMarkdownContent(note.content_markdown)
+		contentRef.current = note.content_markdown
+		setDocumentContent(note.content_markdown)
 		lastSavedContent.current = note.content_markdown
 	}
 
+	function handleContentChange(value: string) {
+		contentRef.current = value
+	}
+
+	function setActiveView(view: ViewMode) {
+		setDocumentContent(contentRef.current)
+		setActiveViewRaw(view)
+	}
+
 	function isDirty() {
-		return markdownContent !== lastSavedContent.current
+		return contentRef.current !== lastSavedContent.current
 	}
 
 	// --- Note selection ---
@@ -72,11 +83,11 @@ export function useNotePad() {
 
 		try {
 			const updated = await notesService.updateNote(selectedNoteId, {
-				content_markdown: markdownContent,
+				content_markdown: contentRef.current,
 				version: note.version,
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
-			lastSavedContent.current = markdownContent
+			lastSavedContent.current = contentRef.current
 		} catch (error) {
 			console.error('[useNotePad] Failed to save note:', error)
 		}
@@ -108,7 +119,8 @@ export function useNotePad() {
 					applyNote(remaining[0])
 				} else {
 					setSelectedNoteId('')
-					setMarkdownContent('')
+					contentRef.current = ''
+					setDocumentContent('')
 					lastSavedContent.current = ''
 				}
 			}
@@ -147,12 +159,14 @@ export function useNotePad() {
 		if (activeView === 'editor') {
 			rendererRef.current?.insertContent(content, position)
 		} else {
-			setMarkdownContent(prev => prev + '\n' + content.content)
+			const newContent = contentRef.current + '\n' + content.content
+			contentRef.current = newContent
+			setDocumentContent(newContent)
 		}
 	}
 
 	function getContent() {
-		return markdownContent
+		return contentRef.current
 	}
 
 	function focus() {
@@ -164,8 +178,8 @@ export function useNotePad() {
 		notes,
 		setNotes,
 		selectedNoteId,
-		markdownContent,
-		setMarkdownContent,
+		documentContent,
+		handleContentChange,
 		activeView,
 		setActiveView,
 		rendererRef,

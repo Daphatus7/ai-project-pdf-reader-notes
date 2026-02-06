@@ -15,7 +15,7 @@ export const NotePad = forwardRef<NotePadHandler>(
 			insertContent: pad.insertContent,
 			focus: pad.focus,
 			getContent: pad.getContent,
-		}), [pad.activeView, pad.markdownContent])
+		}), [pad.activeView])
 
 		return (
 			<div className="h-full flex flex-col bg-background">
@@ -45,16 +45,16 @@ export const NotePad = forwardRef<NotePadHandler>(
 					<div className="flex-1 overflow-hidden relative text-base">
 						<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
 							<NoteMarkdownRenderer
-								value={pad.markdownContent}
-								onChange={pad.setMarkdownContent}
+								value={pad.documentContent}
+								onChange={pad.handleContentChange}
 							/>
 						</TabsContent>
 
 						<TabsContent value="editor" className="h-full m-0">
 							<NoteRenderer
 								ref={pad.rendererRef}
-								value={pad.markdownContent}
-								onChange={pad.setMarkdownContent}
+								value={pad.documentContent}
+								onChange={pad.handleContentChange}
 							/>
 						</TabsContent>
 					</div>
