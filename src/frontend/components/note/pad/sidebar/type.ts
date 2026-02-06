@@ -7,7 +7,7 @@
  * @license     © 2026 . All rights reserved.
  */
 
-import type {Note} from "@/frontend/api/types/note.ts";
+import type {Note} from "@/frontend/api/types/note/note.ts";
 
 export interface NoteSidebarProps {
 	notes: Note[];

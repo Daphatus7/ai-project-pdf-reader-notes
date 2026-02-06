@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import type { Note } from '@/frontend/api/types/note.ts'
+import type { Note } from '@/frontend/api/types/note/note.ts'
 import type { ContentInsertion } from '@/frontend/features/types/content-insertion.ts'
 import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'

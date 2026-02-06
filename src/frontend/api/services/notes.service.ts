@@ -10,7 +10,7 @@ import type {
 	CreateNoteResponse,
 	UpdateNoteResponse,
 	DeleteNoteResponse,
-} from '../types/note.ts';
+} from '../types/note/note.ts';
 import { get, post, put, del } from '../core/client';
 import { apiConfig } from '../core/config';
 

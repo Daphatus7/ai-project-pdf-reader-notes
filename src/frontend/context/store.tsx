@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type {Note} from "@/frontend/api/types/note.ts";
+import type {Note} from "@/frontend/api/types/note/note.ts";
 
 /***
  * use zustand to store global state
