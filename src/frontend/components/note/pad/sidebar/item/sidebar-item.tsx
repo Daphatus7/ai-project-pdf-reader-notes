@@ -15,14 +15,12 @@ import {Button} from "@/frontend/components/ui/button.tsx";
 
 export function SidebarItem({note, index, isSelected, onSelect, onDelete, moveNote, onEditName}: NoteItemProps) {
 	const ref = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState(note.title);
 
 	const handleStartEdit = () => {
 		setEditValue(note.title);
 		setIsEditing(true);
-		setTimeout(() => inputRef.current?.focus(), 0);
 	};
 
 	const handleSaveEdit = () => {
@@ -117,7 +115,7 @@ export function SidebarItem({note, index, isSelected, onSelect, onDelete, moveNo
 					<FileText className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground"/>
 					{isEditing ? (
 						<Input
-							ref={inputRef}
+							autoFocus
 							value={editValue}
 							onChange={(e) => setEditValue(e.target.value)}
 							onBlur={handleSaveEdit}

@@ -44,6 +44,7 @@ export const notesService = {
 	 * Update a note (requires version for optimistic locking)
 	 */
 	async updateNote(noteId: string, data: UpdateNoteRequest): Promise<Note> {
+		console.log(data)
 		const response = await put<UpdateNoteResponse>(`${NOTES_BASE}/${noteId}`, data);
 		return response.note;
 	},
