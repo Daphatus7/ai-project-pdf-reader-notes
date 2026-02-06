@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
+import type {Note} from "@/frontend/api/types/note.ts";
 
 /***
  * use zustand to store global state
@@ -7,15 +7,15 @@ import type {MyNotePage} from "@/frontend/pages/my-note/my-note-page.tsx";
  */
 
 interface StoreState {
-  notes: MyNotePage[];
-  setNotes: (notes: MyNotePage[]) => void;
+  notes: Note[];
+  setNotes: (notes: Note[]) => void;
   selectedNoteId: string;
   setSelectedNoteId: (id: string) => void;
 }
 
 export const useNotesStore = create<StoreState>((set) => ({
   notes: [],
-  setNotes: (notes: MyNotePage[]) => set({ notes }),
+  setNotes: (notes: Note[]) => set({ notes }),
   selectedNoteId: '1',
   setSelectedNoteId: (id: string) => set({ selectedNoteId: id }),
 }));
