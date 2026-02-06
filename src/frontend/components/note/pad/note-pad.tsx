@@ -227,11 +227,6 @@ export const NotePad =
 		
 	});
 	
-	const toggleEditable = () => {
-		editor.setEditable(!editor.isEditable)
-		editor.view.dispatch(editor.view.state.tr)
-	}
-
 	useEffect(() => {
 		if (!editor || !note) return;
 		loadNoteContent(note);
@@ -297,17 +292,6 @@ export const NotePad =
 		 */
 		focus: () => {
 			return
-			// if (!editor) return;
-			//
-			// // Switch to editor view if not already
-			// if (activeView !== 'editor') {
-			// 	setActiveView('editor');
-			// 	setTimeout(() => {
-			// 		editor.commands.focus();
-			// 	}, 100);
-			// } else {
-			// 	editor.commands.focus();
-			// }
 		},
 
 		/**
@@ -383,7 +367,6 @@ export const NotePad =
 						{/*<TabsTrigger value="preview">Preview</TabsTrigger>*/}
 					</TabsList>
 				</div>
-
 				<div className="flex-1 overflow-hidden relative text-base">
 					{/* Markdown view */}
 					<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">

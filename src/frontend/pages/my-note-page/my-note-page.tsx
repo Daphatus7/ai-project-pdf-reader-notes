@@ -32,7 +32,6 @@ export default function NotePage() {
 	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
-	const noteTakerRef = useRef<NoteTakerHandle | null>(null);
 
 	useEffect(() => {
 		leftPanelRef.current?.collapse();
@@ -183,7 +182,6 @@ export default function NotePage() {
 					<div className={isRightCollapsed ? "hidden" : "h-full"}>
 						<NotePad
 							note={selectedNote}
-							ref={noteTakerRef} />
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>
