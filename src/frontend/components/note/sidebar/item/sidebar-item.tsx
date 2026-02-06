@@ -13,7 +13,7 @@ import {
 } from "@/frontend/components/ui/dropdown-menu.tsx";
 import {Button} from "@/frontend/components/ui/button.tsx";
 
-export function Item({note, index, isSelected, onSelect, onDelete, moveNote, onEditName}: NoteItemProps) {
+export function SidebarItem({note, index, isSelected, onSelect, onDelete, moveNote, onEditName}: NoteItemProps) {
 	const ref = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [isEditing, setIsEditing] = useState(false);

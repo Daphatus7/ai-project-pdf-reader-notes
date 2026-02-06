@@ -1,23 +1,16 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import {NoteSidebar} from "@/frontend/components/note/sidebar/note-sidebar.tsx";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@/frontend/components/ui/resizable.tsx";
-import {PanelLeftOpen, Menu, PanelRightOpen} from "lucide-react";
+import {PanelLeftOpen, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NoteTakerHandle } from "@/frontend/features/types/content-insertion.ts";
-import { Button } from "@/frontend/components/ui/button.tsx";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
-import {useNotesStore} from "@/frontend/context/store.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
-import type {Note} from "@/frontend/api/types/note.ts";
-import * as crypto from "node:crypto";
-
-
 
 /**
  * NotePage component - Main note-taking interface.
@@ -33,50 +26,10 @@ import * as crypto from "node:crypto";
  */
 export default function NotePage() {
 	
-	const initialNotes: Note[] = useNotesStore.getState().notes;
-	
-	const [notes, setNotes] = useState<Note[]>(initialNotes);
-	const [selectedNoteId, setSelectedNoteId] = useState<string>("1");
-	// const [screenshots, setScreenshots] = useState<ImageContextItem[]>([]);
-	// const [pendingImageAnalysis, setPendingImageAnalysis] = useState<ImageContextItem>();
-
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const selectedNote = notes.find(note => note.id === selectedNoteId) || notes[0];
-
-	// const handleScreenshotCapture = (imageDataUrl: string, name: string) => {
-	// 	const newScreenshot: ImageContextItem = {
-	// 		id: crypto.randomUUID(),
-	// 		type: "image",
-	// 		name: name,
-	// 		userPrompt: "Explain the image",
-	// 		imageUrls:[imageDataUrl]
-	// 	};
-	//
-	// 	// Make the screenshot available as context immediately
-	// 	setScreenshots(prev => [...prev, newScreenshot]);
-	// 	// Trigger one-shot auto analysis inside LLMChat (which owns chat history UI)
-	// 	setPendingImageAnalysis(newScreenshot);
-	// }
-
-	const handleAddNewNote = () => {
-		const newNote: Note = {
-			created_at: "", 
-			metadata: {}, 
-			user_id: "", 
-			version: 0,
-			id: crypto.randomUUID(),
-			title: "New Note",
-			summary: "",
-			updated_at: "Just now",
-			content_markdown: ""
-		};
-		setNotes(prevNotes => [newNote, ...prevNotes]);
-		setSelectedNoteId(newNote.id);
-	}
-
-
+	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
 	const noteTakerRef = useRef<NoteTakerHandle | null>(null);
@@ -123,17 +76,6 @@ export default function NotePage() {
 			rightPanelRef.current?.collapse();
 		}
 	};
-
-	const handleSaveNote = () => {
-		if (noteTakerRef.current && selectedNote) {
-			const updatedContent = noteTakerRef.current.getContent();
-			setNotes(prevNotes =>
-				prevNotes.map(note =>
-					note.id === selectedNote.id ? { ...note, content: updatedContent } : note
-				)
-			);
-		}
-	}
 	
 	const handleAskAI = (imageDataUrl: string, name: string) => {
 		// Extract base64 data and mime type from data URL
@@ -174,65 +116,22 @@ export default function NotePage() {
 	return (
 		<div className="h-screen w-screen flex flex-col bg-background">
 			<Header />
-			
-			{/* Floating Sidebar */}
-			{isSidebarOpen ? (
-				<div className="fixed top-0 left-0 h-20 bg-background shadow-2xl z-50">
-					{/* Toggle button attached to sidebar */}
-					<Button
-						variant="ghost"
-						size="icon"
-						className="absolute top-4 -right-10 shadow-md bg-background"
-						onClick={() => setIsSidebarOpen(false)}
-					>
-						<Menu className="w-5 h-5" />
-					</Button>
-
-					<NoteSidebar
-						notes={notes}
-						setNotes={setNotes}
-						selectedNoteId={selectedNoteId}
-						onAddNote={handleAddNewNote}
-						onSelectNote={(id) => {
-							//Save previous note before switching
-							handleSaveNote();
-							setSelectedNoteId(id);
-						}}
-					/>
-				</div>
-			) : (
-				<Button
-					variant="ghost"
-					size="icon"
-					className="fixed top-16 left-4 z-40 shadow-md"
-					onClick={() => setIsSidebarOpen(true)}
-				>
-					<Menu className="w-5 h-5" />
-				</Button>
-			)}
-
-
 			<ResizablePanelGroup direction="horizontal">
-				{/* Left Sidebar - Note Management */}
-
 				{/* Center Content - PDF Reader and AI Chat */}
 				<ResizablePanel
 					ref={centerPanelRef}
 					defaultSize={33}
-					minSize={2}
 					collapsible
-					collapsedSize={2}
 					onCollapse={() => setIsCenterCollapsed(true)}
 					onExpand={() => setIsCenterCollapsed(false)}
 					onResize={handleCenterResize}
 				>
 					{isCenterCollapsed ? (
 						<div
-							className="h-full w-full group border-r bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
 							onClick={() => centerPanelRef.current?.resize(52)}
 						>
-							<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-								<PanelLeftOpen className="w-4 h-4 text-muted-foreground rotate-180" />
+							<div>
+								<PanelLeftOpen />
 							</div>
 						</div>
 					) : (
@@ -246,7 +145,7 @@ export default function NotePage() {
 					)}
 				</ResizablePanel>
 				
-				<ResizableHandle  />
+				<ResizableHandle  withHandle/>
 
 				<ResizablePanel
 					defaultSize={34}
@@ -264,10 +163,8 @@ export default function NotePage() {
 					/>
 				</ResizablePanel>
 
-				<ResizableHandle  />
-
-				{/* Right Sidebar - Markdown Editor */}
-
+				<ResizableHandle  withHandle/>
+				
 				<ResizablePanel
 					ref={rightPanelRef}
 					collapsible
@@ -276,23 +173,17 @@ export default function NotePage() {
 					onExpand={() => setIsRightCollapsed(false)}
 					onResize={handleRightResize}
 				>
-					<div className="h-full w-full relative">
-						{isRightCollapsed && (
-							<div
-								className="absolute inset-0 z-10 group border-l bg-background hover:bg-accent/50 cursor-pointer flex items-center justify-center transition-colors duration-200"
-								onClick={() => rightPanelRef.current?.resize(50)}
-							>
-								<div className="opacity-40 group-hover:opacity-100 transition-opacity duration-200">
-									<PanelRightOpen className="w-4 h-4 text-muted-foreground" />
-								</div>
-							</div>
-						)}
-						<div className={isRightCollapsed ? "hidden" : "h-full"}>
-							<NotePad
-
-								note={selectedNote}
-								ref={noteTakerRef} />
+					{isRightCollapsed && (
+						<div
+							onClick={() => rightPanelRef.current?.resize(50)}
+						>
+							<PanelRightOpen/>
 						</div>
+					)}
+					<div className={isRightCollapsed ? "hidden" : "h-full"}>
+						<NotePad
+							note={selectedNote}
+							ref={noteTakerRef} />
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>

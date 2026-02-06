@@ -4,7 +4,7 @@ import {Input} from "../../ui/input.tsx";
 import {ScrollArea} from "../../ui/scroll-area.tsx";
 import {Plus, Search} from "lucide-react";
 import {type NoteSidebarProps} from "@/frontend/components/note/sidebar/type.ts";
-import {Item} from "@/frontend/components/note/sidebar/item/item.tsx";
+import {SidebarItem} from "@/frontend/components/note/sidebar/item/sidebar-item.tsx";
 
 export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onAddNote, onDeleteNote, onEditNoteName }: NoteSidebarProps) {
 	const handleDelete = (id: string) => {
@@ -71,7 +71,7 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 			<ScrollArea className="flex-1">
 				<div className="p-2">
 					{notes.map((note, index) => (
-						<Item
+						<SidebarItem
 							key={note.id}
 							note={note}
 							index={index}
