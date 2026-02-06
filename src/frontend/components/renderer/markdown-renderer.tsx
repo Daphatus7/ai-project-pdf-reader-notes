@@ -35,10 +35,10 @@ export function MarkdownRenderer({ content, onSectionClick }: MarkdownRendererPr
 	);
 
 	const components = useMemo(
-		() => createMarkdownComponents(onSectionClick),
-		[onSectionClick]
+		() => createMarkdownComponents(onSectionClick, processedContent),
+		[onSectionClick, processedContent]
 	);
-
+	
 	return (
 		<div>
 			<ReactMarkdown

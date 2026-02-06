@@ -8,6 +8,8 @@ import { cn } from '../ui/utils';
 export interface SelectableWrapperProps {
 	children: ReactNode;
 	sectionType: string;
+	/** Raw markdown sliced from the AST source. When provided, passed to onSelect instead of extractTextContent. */
+	rawMarkdown?: string;
 	onSelect?: (sectionType: string, content: string, html: string) => void;
 	className?: string;
 	as?: keyof JSX.IntrinsicElements;
@@ -34,6 +36,7 @@ function extractTextContent(node: ReactNode): string {
 export function SelectableWrapper({
 	children,
 	sectionType,
+	rawMarkdown,
 	onSelect,
 	className,
 	as: Component = 'div'
@@ -43,10 +46,10 @@ export function SelectableWrapper({
 	const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
 		if (!onSelect) return;
 		e.stopPropagation();
-		const text = extractTextContent(children);
+		const content = rawMarkdown || extractTextContent(children);
 		const html = e.currentTarget.innerHTML;
-		onSelect(sectionType, text, html);
-	}, [children, sectionType, onSelect]);
+		onSelect(sectionType, content, html);
+	}, [children, sectionType, onSelect, rawMarkdown]);
 
 	return React.createElement(
 		Component,

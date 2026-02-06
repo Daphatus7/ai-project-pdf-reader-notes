@@ -45,6 +45,7 @@ export default function NotePage() {
 	};
 
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
+		console.log(insertion);
 		if (!notePadRef.current) return;
 		notePadRef.current.insertContent(insertion, 'cursor');
 		notePadRef.current.focus();
