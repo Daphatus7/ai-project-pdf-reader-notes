@@ -6,6 +6,8 @@ import { NoteButton } from './sidebar/note-button.tsx'
 import { NoteSidebar } from './sidebar/note-sidebar.tsx'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
+import { Save } from 'lucide-react'
+import { Button } from '@/frontend/components/ui/button.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
 	function NotePad(_, ref) {
@@ -29,17 +31,23 @@ export const NotePad = forwardRef<NotePadHandler>(
 							<TabsTrigger value="markdown">Markdown</TabsTrigger>
 							<TabsTrigger value="editor">Editor</TabsTrigger>
 						</TabsList>
-						<NoteButton>
-							<NoteSidebar
-								notes={pad.notes}
-								setNotes={pad.setNotes}
-								selectedNoteId={pad.selectedNoteId}
-								onSelectNote={pad.selectNote}
-								onAddNote={pad.addNote}
-								onDeleteNote={pad.deleteNote}
-								onEditNoteName={pad.renameNote}
-							/>
-						</NoteButton>
+						<div className="flex">
+							<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote}>
+								<Save className="h-4 w-4" />
+							</Button>
+
+							<NoteButton>
+								<NoteSidebar
+									notes={pad.notes}
+									setNotes={pad.setNotes}
+									selectedNoteId={pad.selectedNoteId}
+									onSelectNote={pad.selectNote}
+									onAddNote={pad.addNote}
+									onDeleteNote={pad.deleteNote}
+									onEditNoteName={pad.renameNote}
+								/>
+							</NoteButton>
+						</div>
 					</div>
 
 					<div className="flex-1 overflow-hidden relative text-base">

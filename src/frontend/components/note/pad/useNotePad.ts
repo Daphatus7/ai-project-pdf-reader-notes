@@ -188,6 +188,7 @@ export function useNotePad() {
 		// Sidebar operations
 		selectNote,
 		addNote,
+		saveCurrentNote,
 		deleteNote,
 		renameNote,
 		reorderNotes,
