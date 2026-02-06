@@ -1,4 +1,3 @@
-import {useEffect} from "react";
 import {Button} from "../../../ui/button.tsx";
 import {Input} from "../../../ui/input.tsx";
 import {ScrollArea} from "../../../ui/scroll-area.tsx";
@@ -43,22 +42,16 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 		}
 	};
 
-	useEffect(() => {
-		
-	}, []);
-	
 	return (
-		<div className="h-full flex flex-col border-r bg-muted/30">
-			<div className="p-4 border-b">
-				<Button className="w-full" size="sm"
-						onClick={handleNewNote}
-				>
+		<>
+			<div className="p-3 border-b">
+				<Button className="w-full" size="sm" onClick={handleNewNote}>
 					<Plus className="w-4 h-4 mr-2" />
 					New Note
 				</Button>
 			</div>
 
-			<div className="px-4 py-3 border-b space-y-3">
+			<div className="px-3 py-2 border-b">
 				<div className="relative">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 					<Input
@@ -84,6 +77,6 @@ export function NoteSidebar({ notes, setNotes, selectedNoteId, onSelectNote, onA
 					))}
 				</div>
 			</ScrollArea>
-		</div>
+		</>
 	);
 }

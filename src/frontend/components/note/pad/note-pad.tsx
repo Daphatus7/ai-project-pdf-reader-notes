@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/ui/tabs.tsx'
 import { NoteMarkdownRenderer } from './renderer/note-markdown-renderer'
 import { NoteRenderer } from './renderer/note-renderer'
+import { NoteButton } from './sidebar/note-button.tsx'
 import { NoteSidebar } from './sidebar/note-sidebar.tsx'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
@@ -28,15 +29,17 @@ export const NotePad = forwardRef<NotePadHandler>(
 							<TabsTrigger value="markdown">Markdown</TabsTrigger>
 							<TabsTrigger value="editor">Editor</TabsTrigger>
 						</TabsList>
-						<NoteSidebar
-							notes={pad.notes}
-							setNotes={pad.setNotes}
-							selectedNoteId={pad.selectedNoteId}
-							onSelectNote={pad.selectNote}
-							onAddNote={pad.addNote}
-							onDeleteNote={pad.deleteNote}
-							onEditNoteName={pad.renameNote}
-						/>
+						<NoteButton>
+							<NoteSidebar
+								notes={pad.notes}
+								setNotes={pad.setNotes}
+								selectedNoteId={pad.selectedNoteId}
+								onSelectNote={pad.selectNote}
+								onAddNote={pad.addNote}
+								onDeleteNote={pad.deleteNote}
+								onEditNoteName={pad.renameNote}
+							/>
+						</NoteButton>
 					</div>
 
 					<div className="flex-1 overflow-hidden relative text-base">
