@@ -6,7 +6,7 @@ import {
 } from "@/frontend/components/ui/resizable.tsx";
 import {PanelLeftOpen, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
-import type { ContentInsertion } from "@/frontend/features/types/content-insertion.ts";
+import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
@@ -44,22 +44,10 @@ export default function NotePage() {
 		}
 	};
 
-	/**
-	 *  todo 把这个搬进到note-pad 里面
-	 */
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
-		//
-		//
-		// if (!noteTakerRef.current) {
-		// 	console.warn('[NotePage] NoteTaker ref not available, cannot insert content');
-		// 	return;
-		// }
-		//
-		// // Insert content at cursor position
-		// noteTakerRef.current.insertContent(insertion, 'cursor');
-		//
-		// // Focus the editor after insertion
-		// noteTakerRef.current.focus();
+		if (!notePadRef.current) return;
+		notePadRef.current.insertContent(insertion, 'cursor');
+		notePadRef.current.focus();
 	}, []);
 
 	const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -106,6 +94,7 @@ export default function NotePage() {
 	}
 
 	const chatRef = useRef<LLMChatFeatureHandle>(null);
+	const notePadRef = useRef<NotePadHandler>(null);
 
 	return (
 		<div className="h-screen w-screen flex flex-col bg-background">
@@ -175,8 +164,7 @@ export default function NotePage() {
 						</div>
 					)}
 					<div className={isRightCollapsed ? "hidden" : "h-full"}>
-						<NotePad
-							/>
+						<NotePad ref={notePadRef} />
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>
