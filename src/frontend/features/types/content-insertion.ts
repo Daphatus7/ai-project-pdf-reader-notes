@@ -68,7 +68,7 @@ export interface ContentInsertion {
  * Allows parent components to programmatically insert content
  * and control the editor.
  */
-export interface NoteTakerHandle {
+export interface NotePadHandler {
 	/**
 	 * Inserts content into the editor at the specified position.
 	 * 

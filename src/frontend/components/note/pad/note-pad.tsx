@@ -1,7 +1,7 @@
 import {useRef, useState, forwardRef, useImperativeHandle, useEffect} from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
 import 'katex/dist/katex.min.css'
-import type { NoteTakerHandle } from '../../../features/types/content-insertion.ts'
+import type { NotePadHandler } from '../../../features/types/content-insertion.ts'
 import { createBlockMarkdownSpec, Node } from '@tiptap/core'
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
 import { Highlight } from '@tiptap/extension-highlight'
@@ -95,7 +95,7 @@ const CustomReactNode = Node.create({
  * @param note - Optional note to load
  */
 export const NotePad = 
-	forwardRef<NoteTakerHandle, NoteTakerProps>(function NoteTaker({ note }, ref) {
+	forwardRef<NotePadHandler, NoteTakerProps>(function NoteTaker({ note }, ref) {
 	/**
 	 * Normalizes incoming HTML snippets to TipTap math nodes.
 	 * 

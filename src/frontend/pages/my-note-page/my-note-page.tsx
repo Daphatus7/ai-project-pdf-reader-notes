@@ -6,7 +6,7 @@ import {
 } from "@/frontend/components/ui/resizable.tsx";
 import {PanelLeftOpen, PanelRightOpen} from "lucide-react";
 import {type ImperativePanelHandle } from "react-resizable-panels";
-import type { ContentInsertion, NoteTakerHandle } from "@/frontend/features/types/content-insertion.ts";
+import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
@@ -47,14 +47,11 @@ export default function NotePage() {
 	};
 
 	/**
-	 * Handles content insertion from LLMChat into NoteTaker.
-	 *
-	 * Called when user clicks on a section in MarkdownRenderer.
-	 * Inserts the formatted markdown content into the note editor.
-	 *
-	 * @param insertion - Content insertion payload with formatted markdown
+	 *  todo 把这个搬进到note-pad 里面
 	 */
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
+		
+		
 		if (!noteTakerRef.current) {
 			console.warn('[NotePage] NoteTaker ref not available, cannot insert content');
 			return;
