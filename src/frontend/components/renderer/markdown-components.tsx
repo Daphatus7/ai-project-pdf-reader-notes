@@ -1,11 +1,13 @@
 /**
  * @file        markdown-components.tsx
- * @description Custom React components for markdown rendering
+ * @description Custom React components for markdown rendering.
+ *              Typography is handled by markdown-typography.scss —
+ *              components here only provide SelectableWrapper (click-to-select)
+ *              and minimal structural classes.
  */
 import type { Components } from 'react-markdown';
 import type { ReactNode } from 'react';
 import { SelectableWrapper } from './selectable-wrapper';
-import { cn } from '../ui/utils';
 
 export type SectionClickHandler = (sectionType: string, content: string, html: string) => void;
 
@@ -37,59 +39,29 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 	return {
 		// Headings
 		h1: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="heading-1"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="h1"
-				className="text-2xl font-bold mt-6 mb-4 border-b pb-2"
-			>
+			<SelectableWrapper sectionType="heading-1" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="h1">
 				{children}
 			</SelectableWrapper>
 		),
 		h2: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="heading-2"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="h2"
-				className="text-xl font-bold mt-5 mb-3 border-b pb-1"
-			>
+			<SelectableWrapper sectionType="heading-2" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="h2">
 				{children}
 			</SelectableWrapper>
 		),
 		h3: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="heading-3"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="h3"
-				className="text-lg font-semibold mt-4 mb-2"
-			>
+			<SelectableWrapper sectionType="heading-3" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="h3">
 				{children}
 			</SelectableWrapper>
 		),
 		h4: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="heading-4"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="h4"
-				className="text-base font-semibold mt-3 mb-2"
-			>
+			<SelectableWrapper sectionType="heading-4" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="h4">
 				{children}
 			</SelectableWrapper>
 		),
 
 		// Paragraphs
 		p: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="paragraph"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="p"
-				className="my-2 leading-relaxed"
-			>
+			<SelectableWrapper sectionType="paragraph" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="p">
 				{children}
 			</SelectableWrapper>
 		),
@@ -101,32 +73,21 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 
 			if (inline) {
 				return (
-					<SelectableWrapper
-						sectionType="inline-code"
-						rawMarkdown={sliceSource(source, node)}
-						onSelect={onSelect}
-						as="code"
-						className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono"
-					>
+					<SelectableWrapper sectionType="inline-code" rawMarkdown={sliceSource(source, node)} onSelect={onSelect} as="code">
 						{children}
 					</SelectableWrapper>
 				);
 			}
 
 			return (
-				<SelectableWrapper
-					sectionType="code-block"
-					rawMarkdown={sliceSource(source, node)}
-					onSelect={onSelect}
-					className="relative my-4"
-				>
+				<SelectableWrapper sectionType="code-block" rawMarkdown={sliceSource(source, node)} onSelect={onSelect} className="relative">
 					{language && (
-						<div className="absolute top-0 right-0 px-2 py-1 text-xs text-muted-foreground bg-muted/50 rounded-bl rounded-tr">
+						<div className="absolute top-0 right-0 px-2 py-1 text-xs text-muted-foreground bg-muted/50 rounded-bl rounded-tr z-10">
 							{language}
 						</div>
 					)}
-					<pre className="p-4 rounded-lg bg-muted/50 border">
-						<code className={cn('text-sm font-mono', className)} {...props}>
+					<pre>
+						<code className={className} {...props}>
 							{children}
 						</code>
 					</pre>
@@ -134,71 +95,23 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 			);
 		},
 
-		// Tables
+		// Tables — only table wrapper needs SelectableWrapper
 		table: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="table"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				className="my-4"
-			>
-				<table className="min-w-full border-collapse border border-border">
-					{children}
-				</table>
+			<SelectableWrapper sectionType="table" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect}>
+				<table>{children}</table>
 			</SelectableWrapper>
 		),
-		thead: ({ children }) => (
-			<thead className="bg-muted/50">{children}</thead>
-		),
-		th: ({ children }) => (
-			<th className="border border-border px-4 py-2 text-left font-semibold">
-				{children}
-			</th>
-		),
-		td: ({ children }) => (
-			<td className="border border-border px-4 py-2">
-				{children}
-			</td>
-		),
 
-		// Lists
-		ul: ({ children }) => (
-			<ul
-				className="my-2 ml-6 space-y-1"
-				style={{ listStyleType: 'disc', listStylePosition: 'outside' }}
-			>
-				{children}
-			</ul>
-		),
-		ol: ({ children }) => (
-			<ol
-				className="my-2 ml-6 space-y-1"
-				style={{ listStyleType: 'decimal', listStylePosition: 'outside' }}
-			>
-				{children}
-			</ol>
-		),
+		// Lists — li needs SelectableWrapper for click-to-select
 		li: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="list-item"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="li"
-				className="leading-relaxed"
-			>
+			<SelectableWrapper sectionType="list-item" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="li">
 				{children}
 			</SelectableWrapper>
 		),
 
 		// Blockquotes
 		blockquote: ({ children, node }) => (
-			<SelectableWrapper
-				sectionType="blockquote"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				as="blockquote"
-				className="my-4 pl-4 border-l-4 border-primary/50 italic text-muted-foreground"
-			>
+			<SelectableWrapper sectionType="blockquote" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="blockquote">
 				{children}
 			</SelectableWrapper>
 		),
@@ -211,7 +124,6 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 					href={href}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-primary underline underline-offset-2 hover:text-primary/80"
 					onClick={(e) => {
 						if (!onSelect) return;
 						e.stopPropagation();
@@ -225,25 +137,10 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 			);
 		},
 
-		// Other elements
-		hr: () => <hr className="my-6 border-t border-border" />,
-		strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-		em: ({ children }) => <em className="italic">{children}</em>,
-		del: ({ children }) => (
-			<del className="line-through text-muted-foreground">{children}</del>
-		),
+		// Images
 		img: ({ src, alt, node }) => (
-			<SelectableWrapper
-				sectionType="image"
-				rawMarkdown={sliceSource(source, node as AstNode)}
-				onSelect={onSelect}
-				className="my-4"
-			>
-				<img
-					src={src}
-					alt={alt || ''}
-					className="max-w-full h-auto rounded-lg"
-				/>
+			<SelectableWrapper sectionType="image" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect}>
+				<img src={src} alt={alt || ''} />
 			</SelectableWrapper>
 		),
 	};

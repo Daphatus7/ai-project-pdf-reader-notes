@@ -9,6 +9,7 @@ import rehypeKatex from 'rehype-katex';
 import { useMemo } from 'react';
 import { createMarkdownComponents, type SectionClickHandler } from './markdown-components';
 import { preprocessMathPipes } from './preprocess';
+import './markdown-typography.scss';
 
 interface MarkdownRendererProps {
 	content: string;
@@ -40,7 +41,7 @@ export function MarkdownRenderer({ content, onSectionClick }: MarkdownRendererPr
 	);
 	
 	return (
-		<div>
+		<div className="chat-typography">
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkMath]}
 				rehypePlugins={[rehypeKatex]}

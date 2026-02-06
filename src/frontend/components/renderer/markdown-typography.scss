@@ -1,0 +1,192 @@
+/**
+ * Chat markdown typography — mirrors TipTap editor styles
+ * from tiptap-node/*.scss so chat and editor render identically.
+ */
+
+.chat-typography {
+  font-family: "DM Sans", sans-serif;
+
+  // === Component-level variables (same as TipTap scoped vars) ===
+  --blockquote-bg-color: var(--tt-gray-light-900);
+  --link-text-color: var(--tt-brand-color-500);
+  --tt-inline-code-bg-color: var(--tt-gray-light-a-100);
+  --tt-inline-code-text-color: var(--tt-gray-light-a-700);
+  --tt-inline-code-border-color: var(--tt-gray-light-a-200);
+  --tt-codeblock-bg: var(--tt-gray-light-a-50);
+  --tt-codeblock-text: var(--tt-gray-light-a-800);
+  --tt-codeblock-border: var(--tt-gray-light-a-200);
+
+  .dark & {
+    --blockquote-bg-color: var(--tt-gray-dark-900);
+    --link-text-color: var(--tt-brand-color-400);
+    --tt-inline-code-bg-color: var(--tt-gray-dark-a-100);
+    --tt-inline-code-text-color: var(--tt-gray-dark-a-700);
+    --tt-inline-code-border-color: var(--tt-gray-dark-a-200);
+    --tt-codeblock-bg: var(--tt-gray-dark-a-50);
+    --tt-codeblock-text: var(--tt-gray-dark-a-800);
+    --tt-codeblock-border: var(--tt-gray-dark-a-200);
+  }
+
+  // === Headings (heading-node.scss) ===
+  h1, h2, h3, h4 {
+    position: relative;
+    color: inherit;
+    font-style: inherit;
+
+    &:first-child,
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  h1 { font-size: 1.5em;   font-weight: 700; margin-top: 3em; }
+  h2 { font-size: 1.25em;  font-weight: 700; margin-top: 2.5em; }
+  h3 { font-size: 1.125em; font-weight: 600; margin-top: 2em; }
+  h4 { font-size: 1em;     font-weight: 600; margin-top: 2em; }
+
+  // === Paragraphs (paragraph-node.scss) ===
+  p:not(:first-child):not(td p):not(th p) {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: normal;
+    margin-top: 20px;
+  }
+
+  // === Blockquotes (blockquote-node.scss) ===
+  blockquote {
+    position: relative;
+    padding-left: 1em;
+    padding-top: 0.375em;
+    padding-bottom: 0.375em;
+    margin: 1.5rem 0;
+
+    p { margin-top: 0; }
+
+    &::before {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0.25em;
+      background-color: var(--blockquote-bg-color);
+      content: "";
+    }
+  }
+
+  // === Code (code-block-node.scss) ===
+  code {
+    background-color: var(--tt-inline-code-bg-color);
+    color: var(--tt-inline-code-text-color);
+    border: 1px solid var(--tt-inline-code-border-color);
+    font-family: "JetBrains Mono NL", monospace;
+    font-size: 0.875em;
+    line-height: 1.4;
+    border-radius: 6px;
+    padding: 0.1em 0.2em;
+  }
+
+  pre {
+    background-color: var(--tt-codeblock-bg);
+    color: var(--tt-codeblock-text);
+    border: 1px solid var(--tt-codeblock-border);
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    padding: 1em;
+    font-size: 1rem;
+    border-radius: 6px;
+
+    code {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      -webkit-text-fill-color: inherit;
+      color: inherit;
+    }
+  }
+
+  // === Lists (list-node.scss) ===
+  ol,
+  ul {
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+
+    &:first-child { margin-top: 0; }
+    &:last-child  { margin-bottom: 0; }
+
+    ol, ul {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  li p {
+    margin-top: 0;
+    line-height: 1.6;
+  }
+
+  ol {
+    list-style: decimal;
+    ol { list-style: lower-alpha;
+      ol { list-style: lower-roman; }
+    }
+  }
+
+  ul {
+    list-style: disc;
+    ul { list-style: circle;
+      ul { list-style: square; }
+    }
+  }
+
+  // === Tables (index.css .tiptap table) ===
+  table {
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+
+    td,
+    th {
+      border: 1px solid var(--tt-border-color);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * { margin-bottom: 0; }
+    }
+
+    th {
+      background-color: var(--tt-gray-light-a-50);
+      font-weight: bold;
+      text-align: left;
+
+      .dark & {
+        background-color: var(--tt-gray-dark-a-50);
+      }
+    }
+  }
+
+  // === Links (paragraph-node.scss) ===
+  a {
+    color: var(--link-text-color);
+    text-decoration: underline;
+  }
+
+  // === Horizontal Rule (horizontal-rule-node.scss) ===
+  hr {
+    border: none;
+    border-top: 1px solid var(--tt-border-color);
+    margin: 2em 0;
+  }
+
+  // === Images ===
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
