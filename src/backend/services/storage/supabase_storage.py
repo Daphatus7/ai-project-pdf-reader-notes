@@ -54,7 +54,7 @@ class SupabaseStorage(Service):
         except Exception as e:
             raise ValueError('SUPABASE_URL environment variable is not set.') from e
         try:
-            key: str = os.environ.get('SUPABASE_KEY')
+            key: str = os.environ.get('SUPABASE_SECRET_KEY')
             if key is None:
                 raise ValueError('SUPABASE_KEY environment variable is not set.')
         except Exception as e:
@@ -264,9 +264,9 @@ class SupabaseStorage(Service):
             Vector embeddings should be deleted separately from the vector database.
         """
         try:
-            # Verify document belongs to user and project
+            # Verify document belongs to user and project, fetch storage path
             document = (self.__database.table('documents')
-                        .select('id')
+                        .select('id, document_dir')
                         .eq('id', document_id)
                         .eq('user_id', user_id)
                         .eq('project_id', project_id)
@@ -274,10 +274,18 @@ class SupabaseStorage(Service):
 
             if not document.data:
                 raise HTTPException(status_code=404, detail='Document not found or access denied')
+
+            # Delete from storage
+            storage_path = document.data[0].get('document_dir')
+            if storage_path:
+                self.__database.storage.from_('docs').remove([storage_path])
+                logger.info(f'Deleted from storage: {storage_path}')
+            else:
+                logger.warning(f'No storage path for document {document_id}, skipping storage deletion')
             
-            # Delete document
-            response = self.__database.table('documents').delete().eq('id', document_id).eq('user_id', user_id).execute()
-            
+            # Delete document record
+            self.__database.table('documents').delete().eq('id', document_id).eq('user_id', user_id).execute()
+
             return {'response': 'Document deleted successfully'}
             
         except HTTPException:
