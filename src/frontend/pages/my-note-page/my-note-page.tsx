@@ -9,7 +9,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
-import {PdfReader} from "@/frontend/components/reader/pdf-reader.tsx";
+import {PdfReader} from "@/frontend/components/source/reader/pdf-reader.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 
 /**
