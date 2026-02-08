@@ -451,7 +451,8 @@ class LlmAgent:
         return ChatResponse(
             id=resp['id'],
             role=resp['role'],
-            content=[{"type": "text", 
+            content=[{"type": "text",
                        "text": ai_msg.content}],
-            created_at=resp["created_at"]
+            created_at=resp["created_at"],
+            total_tokens=input_tokens + output_tokens
         )

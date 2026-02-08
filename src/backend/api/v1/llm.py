@@ -15,6 +15,8 @@ from src.backend.schemas import (
 )
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
+from src.backend.config.config import settings
+from src.backend.schemas.usage import raise_quota_exceeded
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
     ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse, ThreadInfo
 
@@ -25,9 +27,24 @@ router = APIRouter(prefix='/llm', tags=['llm'])
 @router.post('/chat', response_model=ChatResponse)
 async def chat(
         request: ChatRequest = Depends(get_chat_request),
-        llm_service=Depends(get_llm_service)
+        llm_service=Depends(get_llm_service),
+        database_service=Depends(get_database_service),
 ):
+    user_id = request.user_id
+    plan = await database_service.get_user_plan(user_id)
+
+    # Pre-check: is user within token quota?
+    if plan == 'free':
+        result = await database_service.check_token_limit(user_id, settings.free_max_tokens)
+        if not result['allowed']:
+            raise_quota_exceeded('tokens', result['current'], settings.free_max_tokens)
+
     response = await llm_service.chat(request=request)
+
+    # Post-increment with actual tokens used
+    if plan == 'free' and response.total_tokens and response.total_tokens > 0:
+        await database_service.increment_token_usage(user_id, response.total_tokens)
+
     return response
 
 #create a thread

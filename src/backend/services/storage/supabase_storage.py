@@ -119,6 +119,10 @@ class SupabaseStorage(Service):
                 'id': user_id,
                 'display_name': display_name,
             }).execute()
+            # Initialize usage tracking row
+            self.__database.table('user_usages').upsert({
+                'user_id': user_id,
+            }).execute()
             logger.info(f'User profile created for user {user_id}')
             return resp
         except HTTPException:
@@ -721,3 +725,90 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to delete note {note_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to delete note')
+
+    # ==================== Usage Tracking Operations ====================
+
+    async def get_user_plan(self, user_id: str) -> str:
+        """Get the user's current plan ('free' or 'pro')."""
+        try:
+            response = self.__database.table('profiles').select('plan').eq('id', user_id).execute()
+            if response.data:
+                return response.data[0].get('plan', 'free')
+            return 'free'
+        except Exception as e:
+            logger.error(f'Failed to get user plan for {user_id}: {e}')
+            return 'free'
+
+    async def check_and_increment_usage(self, user_id: str, field: str, limit: int) -> dict:
+        """
+        Atomically check if usage is within limit and increment.
+        Returns {'allowed': bool, 'current': int}.
+        """
+        try:
+            response = self.__database.rpc('check_and_increment', {
+                'p_user_id': user_id,
+                'p_field': field,
+                'p_limit': limit,
+            }).execute()
+            return response.data
+        except Exception as e:
+            logger.error(f'Usage check_and_increment failed for {user_id}/{field}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to check usage quota')
+
+    async def decrement_usage(self, user_id: str, field: str) -> None:
+        """Decrement a usage counter by 1 (floor at 0)."""
+        try:
+            self.__database.rpc('decrement_usage', {
+                'p_user_id': user_id,
+                'p_field': field,
+            }).execute()
+        except Exception as e:
+            logger.error(f'Usage decrement failed for {user_id}/{field}: {e}')
+
+    async def decrement_usage_by(self, user_id: str, field: str, amount: int) -> None:
+        """Decrement a usage counter by N (floor at 0). Used for cascade deletes."""
+        try:
+            self.__database.rpc('decrement_usage_by', {
+                'p_user_id': user_id,
+                'p_field': field,
+                'p_amount': amount,
+            }).execute()
+        except Exception as e:
+            logger.error(f'Usage batch decrement failed for {user_id}/{field}: {e}')
+
+    async def check_token_limit(self, user_id: str, limit: int) -> dict:
+        """
+        Check if user is within token limit (read-only, no increment).
+        Returns {'allowed': bool, 'current': int}.
+        """
+        try:
+            response = self.__database.rpc('check_token_limit', {
+                'p_user_id': user_id,
+                'p_limit': limit,
+            }).execute()
+            return response.data
+        except Exception as e:
+            logger.error(f'Token limit check failed for {user_id}: {e}')
+            raise HTTPException(status_code=500, detail='Failed to check token quota')
+
+    async def increment_token_usage(self, user_id: str, amount: int) -> int:
+        """Increment token usage by actual amount after LLM call."""
+        try:
+            response = self.__database.rpc('increment_token_usage', {
+                'p_user_id': user_id,
+                'p_amount': amount,
+            }).execute()
+            return response.data
+        except Exception as e:
+            logger.error(f'Token usage increment failed for {user_id}: {e}')
+
+    async def get_user_usage(self, user_id: str) -> dict:
+        """Get current usage counters for a user."""
+        try:
+            response = self.__database.rpc('get_user_usage', {
+                'p_user_id': user_id,
+            }).execute()
+            return response.data
+        except Exception as e:
+            logger.error(f'Failed to get usage for {user_id}: {e}')
+            return {'project_count': 0, 'doc_count': 0, 'note_count': 0, 'token_used': 0}

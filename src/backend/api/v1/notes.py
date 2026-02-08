@@ -7,6 +7,7 @@ import logging
 from fastapi import APIRouter, Depends, Path
 
 from src.backend.api.deps import get_database_service, get_user
+from src.backend.config.config import settings
 from src.backend.schemas.note import (
     ListNotesResponse,
     NoteResponse,
@@ -16,6 +17,7 @@ from src.backend.schemas.note import (
     UpdateNoteResponse,
     DeleteNoteResponse,
 )
+from src.backend.schemas.usage import raise_quota_exceeded
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/notes', tags=['notes'])
@@ -59,7 +61,18 @@ async def create_note(
     Create a new note for the authenticated user.
     """
     user_id = user['sub']
-    note = await database_service.create_note(user_id, payload)
+    plan = await database_service.get_user_plan(user_id)
+    if plan == 'free':
+        result = await database_service.check_and_increment_usage(
+            user_id, 'note_count', settings.free_max_notes)
+        if not result['allowed']:
+            raise_quota_exceeded('notes', result['current'], settings.free_max_notes)
+    try:
+        note = await database_service.create_note(user_id, payload)
+    except Exception:
+        if plan == 'free':
+            await database_service.decrement_usage(user_id, 'note_count')
+        raise
     return CreateNoteResponse(note=NoteResponse(**note))
 
 
@@ -90,4 +103,5 @@ async def delete_note(
     """
     user_id = user['sub']
     result = await database_service.delete_note(user_id, note_id)
+    await database_service.decrement_usage(user_id, 'note_count')
     return DeleteNoteResponse(**result)

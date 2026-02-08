@@ -53,7 +53,8 @@ class ChatResponse(BaseModel):
         
     """
     created_at: str
-    
+    total_tokens: int | None = None  # for usage tracking
+
 # threads
 class CreateThreadRequest(BaseModel):
     """Request model for creating a conversation thread"""

@@ -115,4 +115,3 @@ async def get_chat_request(
     """
     payload.user_id = user["sub"]
     return payload
-

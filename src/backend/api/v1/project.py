@@ -11,6 +11,7 @@ import tempfile
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Path
 
 from src.backend.api.deps import get_rag_service, get_database_service, get_user
+from src.backend.config.config import settings
 from src.backend.schemas.project import (
     ListProjectsResponse,
     CreateProjectResponse,
@@ -20,6 +21,7 @@ from src.backend.schemas.project import (
     DeleteDocumentResponse,
 )
 from src.backend.schemas.rag import RagRequest, UploadResponse
+from src.backend.schemas.usage import raise_quota_exceeded
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/projects', tags=['process'])
@@ -55,10 +57,21 @@ async def create_project(
     Create a new project for the authenticated user.
     """
     user_id = user['sub']
-    response = await database_service.create_project(
-        user_id=user_id,
-        payload=payload,
-    )
+    plan = await database_service.get_user_plan(user_id)
+    if plan == 'free':
+        result = await database_service.check_and_increment_usage(
+            user_id, 'project_count', settings.free_max_projects)
+        if not result['allowed']:
+            raise_quota_exceeded('projects', result['current'], settings.free_max_projects)
+    try:
+        response = await database_service.create_project(
+            user_id=user_id,
+            payload=payload,
+        )
+    except Exception:
+        if plan == 'free':
+            await database_service.decrement_usage(user_id, 'project_count')
+        raise
     return CreateProjectResponse(response=response)
 
 
@@ -72,7 +85,18 @@ async def delete_project(
     Delete a project and all associated documents.
     """
     user_id = user['sub']
-    return await database_service.delete_project(user_id, project_id)
+    # Count docs before cascade delete so we can decrement accurately
+    docs = await database_service.get_documents(user_id, project_id)
+    doc_count = len(docs)
+
+    result = await database_service.delete_project(user_id, project_id)
+
+    # Decrement usage counters
+    await database_service.decrement_usage(user_id, 'project_count')
+    if doc_count > 0:
+        await database_service.decrement_usage_by(user_id, 'doc_count', doc_count)
+
+    return result
 
 
 # ==================== Documents Management ====================
@@ -99,17 +123,30 @@ async def upload_document(
         file: UploadFile = File(..., description='PDF file to upload'),
         user=Depends(get_user),
         source_name: str = Form(None, description='Optional custom name for the document'),
-        rag_service=Depends(get_rag_service)
+        rag_service=Depends(get_rag_service),
+        database_service=Depends(get_database_service),
 ):
     """
     Upload a PDF file and process it into the vector database.
-    
+
     File validation:
     - Type: PDF only
     - Size: Max 50MB
     """
+    user_id = user['sub']
+    plan = await database_service.get_user_plan(user_id)
+    incremented = False
+    if plan == 'free':
+        result = await database_service.check_and_increment_usage(
+            user_id, 'doc_count', settings.free_max_documents)
+        if not result['allowed']:
+            raise_quota_exceeded('documents', result['current'], settings.free_max_documents)
+        incremented = True
+
     # Validate file type
     if file.content_type not in ALLOWED_TYPES:
+        if incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
         raise HTTPException(
             status_code=400,
             detail=f'Invalid file type. Allowed: {ALLOWED_TYPES}'
@@ -144,9 +181,13 @@ async def upload_document(
         return result
 
     except HTTPException:
+        if incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
         raise
     except Exception as e:
-        logger.exception(f"Upload failed for user {user["sub"]}: {e}")
+        if incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
+        logger.exception(f"Upload failed for user {user_id}: {e}")
         return UploadResponse(
             success=False,
             message=f"Processing failed: {str(e)}"
@@ -178,6 +219,7 @@ async def delete_document(
     )
 
     logger.info(f'Document deleted: user={user_id}, project={project_id}, document={document_id}')
+    await database_service.decrement_usage(user_id, 'doc_count')
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 
