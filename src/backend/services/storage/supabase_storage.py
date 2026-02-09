@@ -280,8 +280,6 @@ class SupabaseStorage(Service):
             if storage_path:
                 self.__database.storage.from_('docs').remove([storage_path])
                 logger.info(f'Deleted from storage: {storage_path}')
-            else:
-                logger.warning(f'No storage path for document {document_id}, skipping storage deletion')
             
             # Delete document record
             self.__database.table('documents').delete().eq('id', document_id).eq('user_id', user_id).execute()
@@ -733,6 +731,16 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to delete note {note_id}: {e}')
             raise HTTPException(status_code=500, detail='Failed to delete note')
+
+    async def delete_project_documents_storage(self, storage_paths: list[str]) -> None:
+        """Batch delete document files from Supabase Storage (best-effort)."""
+        if not storage_paths:
+            return
+        try:
+            self.__database.storage.from_('docs').remove(storage_paths)
+            logger.info(f'Deleted {len(storage_paths)} files from storage')
+        except Exception as e:
+            logger.error(f'Failed to delete storage files: {e}')
 
     # ==================== Usage Tracking Operations ====================
 
