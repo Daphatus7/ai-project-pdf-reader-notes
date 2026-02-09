@@ -103,18 +103,12 @@ class RagService(Service):
             raise e
         
 
-    async def upload_document(self, rag_request: RagRequest) -> UploadResponse:
+    async def chunking_document(self, rag_request: RagRequest) -> UploadResponse:
         """
         Process incoming pdf file and store to vector database.
         Returns UploadResponse with status.
         """
-        # Validate input
-        if not self.validate_input(rag_request):
-            return UploadResponse(
-                success=False,
-                message="Invalid input: file not found or invalid request"
-            )
-
+        
         # Extract and chunk
         try:
             chunks = await chonkie_chunk(rag_request)
