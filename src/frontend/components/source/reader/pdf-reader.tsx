@@ -8,12 +8,13 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 
 interface PdfReaderProps {
+  fileUrl: string;
   onScreenshotCapture: (imageDataUrl: string, name: string) => void;
   onSaveToNote?: (imageDataUrl: string, name: string) => void;
   onDownload?: (imageDataUrl: string, name: string) => void;
 }
 
-export function PdfReader({ onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
+export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -89,8 +90,9 @@ export function PdfReader({ onScreenshotCapture, onSaveToNote, onDownload }: Pdf
       >
         <Worker workerUrl={workerUrl}>
           <Viewer
+            key={fileUrl}
             plugins={[toolbarPluginInstance, screenshot.plugin]}
-            fileUrl="src/frontend/components/reader/Artificial Intelligence - A Modern Approach (3rd Edition).pdf"
+            fileUrl={fileUrl}
           />
         </Worker>
 

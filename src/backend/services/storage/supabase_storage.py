@@ -7,13 +7,14 @@
 import logging
 import os
 import dotenv
-from fastapi import HTTPException
 from supabase import create_client, Client
 
-from src.backend.schemas import RegisterRequest
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 from src.backend.config.config import settings
+from src.backend.schemas.error import (
+    AppError, not_found, conflict, internal_error, quota_exceeded,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,32 +22,20 @@ logger = logging.getLogger(__name__)
 class SupabaseStorage(Service):
     """
         Database service for managing projects and documents in Supabase.
-        
+
         Provides CRUD operations for:
         - Projects: User's organizational units
         - Documents: PDF files associated with projects
     """
-    
+
     def __init__(self):
         dotenv.load_dotenv()
         self.__database = None
-        
+
     def get(self):
-        """
-        Get the Supabase client instance.
-        
-        Returns:
-            Client: Supabase client instance
-        """
         return self.__database
 
     def start(self):
-        """
-        Initialize the Supabase client connection.
-        
-        Raises:
-            ValueError: If environment variables are not set
-        """
         try:
             url: str = os.environ.get('SUPABASE_URL')
             if url is None:
@@ -62,7 +51,9 @@ class SupabaseStorage(Service):
 
         self.__database: Client = create_client(url, key)
         logger.info('Supabase database service started')
-    
+
+    # ==================== Auth Operations ====================
+
     async def register(self, request) -> dict:
         try:
             logger.info(f"Attempting to register {request.email}")
@@ -77,22 +68,13 @@ class SupabaseStorage(Service):
                 }
             })
             return resp
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Register failed for email {request.email}: {e}')
-            raise HTTPException(status_code=500, detail='Register failed')   
-        
+            internal_error('Registration failed')
+
     async def login(self, email: str, password: str) -> dict:
-        """
-        Login a user using email and password.
-        
-        Args:
-            email: User's email
-            password: User's password
-        Returns:
-            dict: Authentication response containing access token and user info
-        """
         try:
             logger.info("Attempting to log in user with email: %s", email)
             resp = self.__database.auth.sign_in_with_password({
@@ -102,19 +84,10 @@ class SupabaseStorage(Service):
             return resp
         except Exception as e:
             logger.error(f'Login failed for email {email}: {e}')
-            raise HTTPException(status_code=500, detail='Login failed')
-        
-    async def create_user_profile(self, user_id: str, 
-                                  display_name: str,
-                                  ) -> None:
-        """
-            Create a user profile in the database.
-        :param user_id: 
-        :param display_name: 
-        :return: 
-        """
+            internal_error('Login failed')
+
+    async def create_user_profile(self, user_id: str, display_name: str) -> None:
         try:
-            
             resp = self.__database.table('profiles').upsert({
                 'id': user_id,
                 'display_name': display_name,
@@ -125,184 +98,197 @@ class SupabaseStorage(Service):
             }).execute()
             logger.info(f'User profile created for user {user_id}')
             return resp
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to create user profile for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to create user profile')
+            internal_error('Failed to create profile')
+
+    # ==================== Quota Enforcement ====================
+
+    async def enforce_quota(self, user_id: str, resource: str) -> bool:
+        """Check plan, atomically increment quota. Raises AppError(429) if exceeded.
+        Returns True if counter was incremented (free plan), False otherwise."""
+        plan = await self.get_user_plan(user_id)
+        if plan != 'free':
+            return False
+        limits = {
+            'project_count': settings.free_max_projects,
+            'doc_count': settings.free_max_documents,
+            'note_count': settings.free_max_notes,
+        }
+        limit = limits[resource]
+        result = await self.check_and_increment_usage(user_id, resource, limit)
+        if not result['allowed']:
+            resource_names = {
+                'project_count': 'projects',
+                'doc_count': 'documents',
+                'note_count': 'notes',
+            }
+            quota_exceeded(resource_names[resource], result['current'], limit)
+        return True
+
+    async def enforce_token_quota(self, user_id: str):
+        """Check token quota (read-only, no increment). Raises AppError(429) if exceeded."""
+        plan = await self.get_user_plan(user_id)
+        if plan != 'free':
+            return
+        result = await self.check_token_limit(user_id, settings.free_max_tokens)
+        if not result['allowed']:
+            quota_exceeded('tokens', result['current'], settings.free_max_tokens)
+
+    async def track_token_usage(self, user_id: str, tokens: int):
+        """Increment token usage if on free plan and tokens > 0."""
+        if tokens and tokens > 0:
+            plan = await self.get_user_plan(user_id)
+            if plan == 'free':
+                await self.increment_token_usage(user_id, tokens)
 
     # ==================== Projects Operations ====================
 
     async def list_projects(self, user_id: str) -> list[dict]:
-        """
-        Get all projects for a specific user.
-        
-        Args:
-            user_id: User's unique identifier
-            
-        Returns:
-            List of project dictionaries with id, name, description, created_at, updated_at
-        """
         try:
             response = self.__database.table('projects').select('*').eq('user_id', user_id).execute()
-            #dump response to json
             return response.data
         except Exception as e:
             logger.error(f'Failed to get projects for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to retrieve projects')
+            internal_error('Failed to retrieve projects')
 
     async def create_project(self, user_id: str, payload) -> str:
-        """
-        Create a new project for a user.
-        
-        Args:
-            user_id: User's unique identifier
-            payload: CreateProjectRequest with name and optional description
-            
-        Returns:
-            Success message with project ID
-        """
+        """Create a new project with quota enforcement and rollback."""
+        incremented = await self.enforce_quota(user_id, 'project_count')
         try:
             project_data = {
                 'user_id': user_id,
                 'name': payload.name,
                 'description': payload.description or '',
             }
-            
             response = self.__database.table('projects').insert(project_data).execute()
-            
-            if response.data:
-                project_id = response.data[0]['id']
-                logger.info(f'Project created: user={user_id}, project={project_id}')
-                return f'Project created successfully with ID: {project_id}'
-            else:
-                raise HTTPException(status_code=500, detail='Failed to create project')
-                
-        except HTTPException:
+            if not response.data:
+                internal_error('Failed to create project')
+            project_id = response.data[0]['id']
+            logger.info(f'Project created: user={user_id}, project={project_id}')
+            return f'Project created successfully with ID: {project_id}'
+        except AppError:
+            if incremented:
+                await self.decrement_usage(user_id, 'project_count')
             raise
         except Exception as e:
+            if incremented:
+                await self.decrement_usage(user_id, 'project_count')
             logger.error(f'Failed to create project for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to create project')
+            internal_error('Failed to create project')
 
     async def delete_project(self, user_id: str, project_id: str) -> dict:
-        """
-        Delete a project and all associated documents.
-        
-        Args:
-            user_id: User's unique identifier
-            project_id: Project's unique identifier
-            
-        Returns:
-            Response dictionary with deletion status
-            
-        Note:
-            Documents will be cascade deleted due to foreign key constraints.
-        """
+        """Delete a project: storage files → cascade delete → decrement usage."""
         try:
             # Verify project belongs to user
             project = self.__database.table('projects').select('id').eq('id', project_id).eq('user_id', user_id).execute()
-            
             if not project.data:
-                raise HTTPException(status_code=404, detail='Project not found or access denied')
-            
-            # Delete project (documents cascade)
-            response = self.__database.table('projects').delete().eq('id', project_id).eq('user_id', user_id).execute()
-            
+                not_found('Project')
+
+            # Get documents for storage cleanup and usage count
+            docs = self.__database.table('documents').select('document_dir').eq('project_id', project_id).eq('user_id', user_id).execute()
+            doc_count = len(docs.data) if docs.data else 0
+
+            # Delete storage files (best-effort)
+            storage_paths = [d['document_dir'] for d in (docs.data or []) if d.get('document_dir')]
+            if storage_paths:
+                try:
+                    self.__database.storage.from_('docs').remove(storage_paths)
+                    logger.info(f'Deleted {len(storage_paths)} files from storage')
+                except Exception as e:
+                    logger.error(f'Failed to delete storage files: {e}')
+
+            # Cascade delete project
+            self.__database.table('projects').delete().eq('id', project_id).eq('user_id', user_id).execute()
             logger.info(f'Project deleted: user={user_id}, project={project_id}')
+
+            # Decrement usage counters
+            await self.decrement_usage(user_id, 'project_count')
+            if doc_count > 0:
+                await self.decrement_usage_by(user_id, 'doc_count', doc_count)
+
             return {'response': 'Project deleted successfully'}
-            
-        except HTTPException:
+
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to delete project {project_id} for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to delete project')
+            internal_error('Failed to delete project')
 
     # ==================== Documents Operations ====================
 
     async def get_documents(self, user_id: str, project_id: str) -> list[dict]:
-        """
-        Get all documents for a specific project.
-        
-        Args:
-            user_id: User's unique identifier
-            project_id: Project's unique identifier
-            
-        Returns:
-            List of document dictionaries
-        """
         try:
-            # Verify project belongs to user
             project = self.__database.table('projects').select('id').eq('id', project_id).eq('user_id', user_id).execute()
-            
             if not project.data:
-                raise HTTPException(status_code=404, detail='Project not found or access denied')
-            
-            # Get documents
+                not_found('Project')
             response = self.__database.table('documents').select('*').eq('project_id', project_id).eq('user_id', user_id).execute()
-            
             return response.data
-            
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to get documents for project {project_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to retrieve documents')
+            internal_error('Failed to retrieve documents')
 
     async def delete_document(self, user_id: str, document_id: str, project_id: str) -> dict:
-        """
-        Delete a document from a project.
-        
-        Args:
-            user_id: User's unique identifier
-            document_id: Document's unique identifier
-            project_id: Project's unique identifier
-            
-        Returns:
-            Response dictionary with deletion status
-            
-        Note:
-            Vector embeddings should be deleted separately from the vector database.
-        """
+        """Delete a document: storage file → DB record → decrement usage."""
         try:
-            # Verify document belongs to user and project, fetch storage path
             document = (self.__database.table('documents')
                         .select('id, document_dir')
                         .eq('id', document_id)
                         .eq('user_id', user_id)
                         .eq('project_id', project_id)
                         .execute())
-
             if not document.data:
-                raise HTTPException(status_code=404, detail='Document not found or access denied')
+                not_found('Document')
 
             # Delete from storage
             storage_path = document.data[0].get('document_dir')
             if storage_path:
                 self.__database.storage.from_('docs').remove([storage_path])
                 logger.info(f'Deleted from storage: {storage_path}')
-            
+
             # Delete document record
             self.__database.table('documents').delete().eq('id', document_id).eq('user_id', user_id).execute()
+            logger.info(f'Document deleted: user={user_id}, project={project_id}, document={document_id}')
+
+            # Decrement usage
+            await self.decrement_usage(user_id, 'doc_count')
 
             return {'response': 'Document deleted successfully'}
-            
-        except HTTPException:
+
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to delete document {document_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to delete document')
-        
+            internal_error('Failed to delete document')
+
+    async def get_document_url(self, user_id: str, document_id: str, project_id: str) -> str:
+        """Get a signed URL for viewing a document PDF."""
+        try:
+            document = (self.__database.table('documents')
+                        .select('document_dir')
+                        .eq('id', document_id)
+                        .eq('user_id', user_id)
+                        .eq('project_id', project_id)
+                        .single()
+                        .execute())
+            if not document.data:
+                not_found('Document')
+            storage_path = document.data['document_dir']
+            signed = self.__database.storage.from_('docs').create_signed_url(storage_path, expires_in=3600)
+            return signed['signedURL']
+        except AppError:
+            raise
+        except Exception as e:
+            logger.exception(f"Failed to generate document URL: {e}")
+            internal_error('Failed to generate document URL')
+
     # ==================== Conversation Threads Operations ====================
 
     async def list_conversation_threads(self, user_id: str) -> dict:
-        """
-        Get all conversation threads for a specific user.
-
-        Args:
-            user_id: User's unique identifier
-        Returns:
-            Dictionary with list of thread dictionaries
-        """
         try:
             response = (self.__database.table('threads')
                         .select('*')
@@ -312,96 +298,59 @@ class SupabaseStorage(Service):
             return response.data
         except Exception as e:
             logger.error(f'Failed to get conversation threads for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to retrieve conversation threads')
+            internal_error('Failed to retrieve conversation threads')
 
     async def create_conversation_thread(self, user_id: str) -> dict:
-        """
-        Create a new conversation thread for a user.
-
-        Args:
-            user_id: User's unique identifier
-
-        Returns:
-            Dictionary with thread_id and empty messages list
-        """
         try:
             thread_data = {
                 'user_id': user_id,
                 'title': "New Conversation",
                 'thread_summary': "To be generated in the future",
             }
-
             response = self.__database.table('threads').insert(thread_data).execute()
-
-            if response.data:
-                thread_id = response.data[0]['id']
-                logger.info(f'Thread created: user={user_id}, thread={thread_id}')
-                return {'thread_id': thread_id, 
-                        'title': thread_data['title'],
-                        'thread_summary': thread_data['thread_summary']}
-            else:
-                raise HTTPException(status_code=500, detail='Failed to create conversation thread')
-
-        except HTTPException:
+            if not response.data:
+                internal_error('Failed to create conversation thread')
+            thread_id = response.data[0]['id']
+            logger.info(f'Thread created: user={user_id}, thread={thread_id}')
+            return {'thread_id': thread_id,
+                    'title': thread_data['title'],
+                    'thread_summary': thread_data['thread_summary']}
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to create conversation thread for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to create conversation thread')
+            internal_error('Failed to create conversation thread')
 
     async def load_conversation_thread(self, user_id: str, request: LoadThreadRequest) -> dict:
-        """
-        Load a conversation thread with its messages.
-
-        Args:
-            user_id: User's unique identifier
-            request: LoadThreadRequest with thread_id
-
-        Returns:
-            Dictionary with messages list
-        """
         thread_id = request.thread_id
         try:
-            # Load messages for this thread
             messages_response = (self.__database.table('messages')
                                  .select('*')
                                  .eq('thread_id', thread_id)
                                  .order('created_at', desc=False)
                                  .execute())
             return messages_response.data
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to load conversation thread {thread_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to load conversation thread')
+            internal_error('Failed to load conversation thread')
 
     async def delete_conversation_thread(self, user_id: str, request) -> dict:
-        """
-        Delete a conversation thread.
-
-        Args:
-            user_id: User's unique identifier
-            request: DeleteThreadRequest with thread_id
-
-        Returns:
-            Response dictionary with deletion status
-        """
         thread_id = request.thread_id
         try:
-            # Delete thread (messages will cascade delete)
             (self.__database.table('threads')
              .delete()
              .eq('id', thread_id)
              .eq('user_id', user_id)
              .execute())
-
             logger.info(f'Thread deleted: user={user_id}, thread={thread_id}')
             return {'response': 'Thread deleted successfully'}
-
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to delete conversation thread {thread_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to delete conversation thread')
+            internal_error('Failed to delete conversation thread')
 
     # ==================== Message Persistence Operations ====================
 
@@ -413,21 +362,7 @@ class SupabaseStorage(Service):
         content: list[dict],
         token_count: int
     ) -> dict:
-        """
-        Save a single message to the database.
-
-        Args:
-            user_id: User's unique identifier
-            thread_id: Conversation thread ID
-            role: Message role ('user', 'assistant', 'system')
-            content: Message content as list of ChatContent dicts [{type, text/data, ...}]
-            token_count: Token count for this message
-
-        Returns:
-            Created message record
-        """
         try:
-
             message_data = {
                 'user_id': user_id,
                 'thread_id': thread_id,
@@ -435,20 +370,16 @@ class SupabaseStorage(Service):
                 'content': content,
                 'token_count': token_count,
             }
-
             response = self.__database.table('messages').insert(message_data).execute()
-
-            if response.data:
-                logger.info(f'Message saved: thread={thread_id}, role={role}, tokens={token_count}')
-                return response.data[0]
-            else:
-                raise HTTPException(status_code=500, detail='Failed to save message')
-
-        except HTTPException:
+            if not response.data:
+                internal_error('Failed to save message')
+            logger.info(f'Message saved: thread={thread_id}, role={role}, tokens={token_count}')
+            return response.data[0]
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to save message for thread {thread_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to save message')
+            internal_error('Failed to save message')
 
     async def load_recent_messages(
         self,
@@ -456,27 +387,12 @@ class SupabaseStorage(Service):
         max_messages: int | None = None,
         max_tokens: int | None = None
     ) -> list[dict]:
-        """
-        Load recent messages from a thread with dual limits.
-
-        Stops when either limit is reached (whichever comes first).
-        Returns messages in chronological order (oldest first).
-
-        Args:
-            thread_id: Conversation thread ID
-            max_messages: Maximum messages to load (default: settings.cold_start_max_messages)
-            max_tokens: Maximum total tokens (default: settings.cold_start_max_tokens)
-
-        Returns:
-            List of message dicts in chronological order
-        """
         if max_messages is None:
             max_messages = settings.cold_start_max_messages
         if max_tokens is None:
             max_tokens = settings.cold_start_max_tokens
 
         try:
-            # Fetch messages ordered by newest first, limited by max_messages
             response = (self.__database.table('messages')
                         .select('id, user_id, role, content, token_count, created_at')
                         .eq('thread_id', thread_id)
@@ -491,10 +407,6 @@ class SupabaseStorage(Service):
             # Apply token limit
             selected_messages = []
             total_tokens = 0
-            #dump the response data to json
-            with open("debug_supabase_messages.json", "w") as f:
-                import json
-                json.dump(response.data, f, indent=4)
 
             for msg in response.data:
                 msg_tokens = msg.get('token_count', 0)
@@ -511,22 +423,13 @@ class SupabaseStorage(Service):
             )
             return selected_messages
 
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to load messages for thread {thread_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to load messages')
+            internal_error('Failed to load messages')
 
     async def thread_exists(self, thread_id: str) -> bool:
-        """
-        Check if a thread exists in the database.
-
-        Args:
-            thread_id: Thread ID to check
-
-        Returns:
-            True if thread exists, False otherwise
-        """
         try:
             response = (self.__database.table('threads')
                         .select('id')
@@ -540,15 +443,6 @@ class SupabaseStorage(Service):
     # ==================== Notes Operations ====================
 
     async def list_notes(self, user_id: str) -> list[dict]:
-        """
-        Get all notes for a specific user.
-
-        Args:
-            user_id: User's unique identifier
-
-        Returns:
-            List of note dictionaries ordered by updated_at desc
-        """
         try:
             response = (self.__database.table('notes')
                         .select('*')
@@ -558,50 +452,27 @@ class SupabaseStorage(Service):
             return response.data
         except Exception as e:
             logger.error(f'Failed to get notes for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to retrieve notes')
+            internal_error('Failed to retrieve notes')
 
     async def get_note(self, user_id: str, note_id: str) -> dict:
-        """
-        Get a single note by ID.
-
-        Args:
-            user_id: User's unique identifier
-            note_id: Note's unique identifier
-
-        Returns:
-            Note dictionary
-
-        Raises:
-            HTTPException 404 if note not found
-        """
         try:
             response = (self.__database.table('notes')
                         .select('*')
                         .eq('id', note_id)
                         .eq('user_id', user_id)
                         .execute())
-
             if not response.data:
-                raise HTTPException(status_code=404, detail='Note not found')
-
+                not_found('Note')
             return response.data[0]
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to get note {note_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to retrieve note')
+            internal_error('Failed to retrieve note')
 
     async def create_note(self, user_id: str, payload) -> dict:
-        """
-        Create a new note for a user.
-
-        Args:
-            user_id: User's unique identifier
-            payload: CreateNoteRequest
-
-        Returns:
-            Created note dictionary
-        """
+        """Create a new note with quota enforcement and rollback."""
+        incremented = await self.enforce_quota(user_id, 'note_count')
         try:
             note_data = {
                 'user_id': user_id,
@@ -611,47 +482,23 @@ class SupabaseStorage(Service):
                 'metadata': payload.metadata or {},
                 'version': 1,
             }
-            logger.info(
-                f"user_id: {user_id}\n"
-                f"title: {payload.title}\n"
-                f"content_markdown: {payload.content_markdown}\n"
-                f"summary: {payload.summary}\n"
-                f"metadata: {payload.metadata}\n"
-                f"version: 1\n"
-            )
-
             response = self.__database.table('notes').insert(note_data).execute()
-
-            if response.data:
-                logger.info(f'Note created: user={user_id}, note={response.data[0]["id"]}')
-                return response.data[0]
-            else:
-                raise HTTPException(status_code=500, detail='Failed to create note')
-
-        except HTTPException:
+            if not response.data:
+                internal_error('Failed to create note')
+            logger.info(f'Note created: user={user_id}, note={response.data[0]["id"]}')
+            return response.data[0]
+        except AppError:
+            if incremented:
+                await self.decrement_usage(user_id, 'note_count')
             raise
         except Exception as e:
+            if incremented:
+                await self.decrement_usage(user_id, 'note_count')
             logger.error(f'Failed to create note for user {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to create note')
+            internal_error('Failed to create note')
 
     async def update_note(self, user_id: str, note_id: str, payload) -> dict:
-        """
-        Update a note with optimistic locking.
-
-        Args:
-            user_id: User's unique identifier
-            note_id: Note's unique identifier
-            payload: UpdateNoteRequest
-
-        Returns:
-            Updated note dictionary
-
-        Raises:
-            HTTPException 404 if note not found
-            HTTPException 409 if version conflict (optimistic lock failure)
-        """
         try:
-            # Build update dict with only provided fields
             update_data = {}
             if payload.title is not None:
                 update_data['title'] = payload.title
@@ -662,10 +509,8 @@ class SupabaseStorage(Service):
             if payload.metadata is not None:
                 update_data['metadata'] = payload.metadata
 
-            # Increment version for optimistic locking
             update_data['version'] = payload.version + 1
 
-            # Update only if version matches (optimistic locking)
             response = (self.__database.table('notes')
                         .update(update_data)
                         .eq('id', note_id)
@@ -674,78 +519,51 @@ class SupabaseStorage(Service):
                         .execute())
 
             if not response.data:
-                # Check if note exists but version mismatched
                 existing = (self.__database.table('notes')
                            .select('id, version')
                            .eq('id', note_id)
                            .eq('user_id', user_id)
                            .execute())
-
                 if existing.data:
-                    raise HTTPException(
-                        status_code=409,
-                        detail=f'Version conflict. Current version: {existing.data[0]["version"]}'
-                    )
+                    conflict(f'Version conflict. Current version: {existing.data[0]["version"]}')
                 else:
-                    raise HTTPException(status_code=404, detail='Note not found')
+                    not_found('Note')
 
             logger.info(f'Note updated: user={user_id}, note={note_id}')
             return response.data[0]
 
-        except HTTPException:
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to update note {note_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to update note')
+            internal_error('Failed to update note')
 
     async def delete_note(self, user_id: str, note_id: str) -> dict:
-        """
-        Delete a note.
-
-        Args:
-            user_id: User's unique identifier
-            note_id: Note's unique identifier
-
-        Returns:
-            Response dictionary with deletion status
-        """
+        """Delete a note and decrement usage."""
         try:
-            # Verify note belongs to user
             note = (self.__database.table('notes')
                     .select('id')
                     .eq('id', note_id)
                     .eq('user_id', user_id)
                     .execute())
-
             if not note.data:
-                raise HTTPException(status_code=404, detail='Note not found')
+                not_found('Note')
 
-            # Delete note
             self.__database.table('notes').delete().eq('id', note_id).execute()
-
             logger.info(f'Note deleted: user={user_id}, note={note_id}')
-            return {'message': 'Note deleted successfully'}
 
-        except HTTPException:
+            await self.decrement_usage(user_id, 'note_count')
+
+            return {'message': 'Note deleted successfully'}
+        except AppError:
             raise
         except Exception as e:
             logger.error(f'Failed to delete note {note_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to delete note')
-
-    async def delete_project_documents_storage(self, storage_paths: list[str]) -> None:
-        """Batch delete document files from Supabase Storage (best-effort)."""
-        if not storage_paths:
-            return
-        try:
-            self.__database.storage.from_('docs').remove(storage_paths)
-            logger.info(f'Deleted {len(storage_paths)} files from storage')
-        except Exception as e:
-            logger.error(f'Failed to delete storage files: {e}')
+            internal_error('Failed to delete note')
 
     # ==================== Usage Tracking Operations ====================
 
     async def get_user_plan(self, user_id: str) -> str:
-        """Get the user's current plan ('free' or 'pro')."""
         try:
             response = self.__database.table('profiles').select('plan').eq('id', user_id).execute()
             if response.data:
@@ -756,10 +574,6 @@ class SupabaseStorage(Service):
             return 'free'
 
     async def check_and_increment_usage(self, user_id: str, field: str, limit: int) -> dict:
-        """
-        Atomically check if usage is within limit and increment.
-        Returns {'allowed': bool, 'current': int}.
-        """
         try:
             response = self.__database.rpc('check_and_increment', {
                 'p_user_id': user_id,
@@ -769,10 +583,9 @@ class SupabaseStorage(Service):
             return response.data
         except Exception as e:
             logger.error(f'Usage check_and_increment failed for {user_id}/{field}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to check usage quota')
+            internal_error('Failed to check usage quota')
 
     async def decrement_usage(self, user_id: str, field: str) -> None:
-        """Decrement a usage counter by 1 (floor at 0)."""
         try:
             self.__database.rpc('decrement_usage', {
                 'p_user_id': user_id,
@@ -782,7 +595,6 @@ class SupabaseStorage(Service):
             logger.error(f'Usage decrement failed for {user_id}/{field}: {e}')
 
     async def decrement_usage_by(self, user_id: str, field: str, amount: int) -> None:
-        """Decrement a usage counter by N (floor at 0). Used for cascade deletes."""
         try:
             self.__database.rpc('decrement_usage_by', {
                 'p_user_id': user_id,
@@ -793,10 +605,6 @@ class SupabaseStorage(Service):
             logger.error(f'Usage batch decrement failed for {user_id}/{field}: {e}')
 
     async def check_token_limit(self, user_id: str, limit: int) -> dict:
-        """
-        Check if user is within token limit (read-only, no increment).
-        Returns {'allowed': bool, 'current': int}.
-        """
         try:
             response = self.__database.rpc('check_token_limit', {
                 'p_user_id': user_id,
@@ -805,10 +613,9 @@ class SupabaseStorage(Service):
             return response.data
         except Exception as e:
             logger.error(f'Token limit check failed for {user_id}: {e}')
-            raise HTTPException(status_code=500, detail='Failed to check token quota')
+            internal_error('Failed to check token quota')
 
     async def increment_token_usage(self, user_id: str, amount: int) -> int:
-        """Increment token usage by actual amount after LLM call."""
         try:
             response = self.__database.rpc('increment_token_usage', {
                 'p_user_id': user_id,
@@ -819,7 +626,6 @@ class SupabaseStorage(Service):
             logger.error(f'Token usage increment failed for {user_id}: {e}')
 
     async def get_user_usage(self, user_id: str) -> dict:
-        """Get current usage counters for a user."""
         try:
             response = self.__database.rpc('get_user_usage', {
                 'p_user_id': user_id,

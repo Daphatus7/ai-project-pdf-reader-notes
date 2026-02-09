@@ -103,6 +103,40 @@ class RagService(Service):
             raise e
         
 
+    async def upload_document(self, rag_request: RagRequest) -> UploadResponse:
+        """Upload PDF to storage and create document record (no RAG processing)."""
+        # Create document record
+        try:
+            response = await self.create_document_table(rag_request)
+            document_id = response.data[0]['id']
+        except Exception as e:
+            logger.exception(f"Failed to create document table entry: {e}")
+            return UploadResponse(
+                success=False,
+                message=f"Failed to create document record: {str(e)}"
+            )
+
+        # Upload PDF to Supabase Storage
+        try:
+            storage_path = self.upload_to_storage(
+                rag_request.document_dir, rag_request.user_id, document_id
+            )
+            self.supabase.table("documents").update({
+                "document_dir": storage_path
+            }).eq("id", document_id).execute()
+        except Exception as e:
+            self.supabase.table("documents").delete().eq("id", document_id).execute()
+            logger.exception(f"Storage upload failed: {e}")
+            return UploadResponse(
+                success=False,
+                message=f"PDF storage failed: {str(e)}"
+            )
+
+        return UploadResponse(
+            success=True,
+            message=f"Document uploaded successfully"
+        )
+
     async def chunking_document(self, rag_request: RagRequest) -> UploadResponse:
         """
         Process incoming pdf file and store to vector database.

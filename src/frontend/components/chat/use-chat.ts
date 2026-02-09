@@ -15,7 +15,8 @@ import type {ChatContent} from "@/frontend/api";
 export function useChat(
 	activeThreadId: string | null,
 	addUserMessage: (message: UserMessage) => void,
-	addAIMessage: (message: AIMessage) => void
+	addAIMessage: (message: AIMessage) => void,
+	sourceIds: string[] = [],
 ) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export function useChat(
 			const response = await llmService.chat({
 				thread_id: activeThreadId,
 				content,
-				source_ids: [],
+				source_ids: sourceIds,
 			});
 			// Add AI message with backend ID
 			addAIMessage({
@@ -46,7 +47,7 @@ export function useChat(
 		} finally {
 			setIsLoading(false);
 		}
-	}, [activeThreadId, addUserMessage, addAIMessage]);
+	}, [activeThreadId, addUserMessage, addAIMessage, sourceIds]);
 
 	const selectMessage = useCallback((messageId: string) => {
 		console.log('Selected message:', messageId);

@@ -103,3 +103,42 @@ export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
     ...(data && { body: JSON.stringify(data) }),
   });
 }
+
+/**
+ * File upload helper using FormData (multipart/form-data)
+ */
+export async function upload<T>(endpoint: string, formData: FormData): Promise<T> {
+  const url = `${apiConfig.baseUrl}${endpoint}`;
+  const { data: { session } } = await supabase.auth.getSession();
+
+  const headers: HeadersInit = {
+    ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      let errorData: unknown = null;
+      try {
+        errorData = await response.json();
+        if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
+          errorMessage = String(errorData.detail);
+        }
+      } catch {
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new ApiError(errorMessage, response.status, errorData);
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

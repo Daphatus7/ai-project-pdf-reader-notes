@@ -60,6 +60,8 @@ export interface LLMChatFeatureProps {
 	onInjectMessage?: (handler: (message: UserMessage) => void) => void;
 	/** Callback when user selects content from AI response */
 	onSelectContent?: (content: string) => void;
+	/** Selected document IDs to use as context for LLM chat */
+	sourceIds?: string[];
 }
 
 

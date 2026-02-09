@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # Free tier usage limits
     free_max_projects: int = Field(default=2, env="FREE_MAX_PROJECTS")
-    free_max_documents: int = Field(default=10, env="FREE_MAX_DOCUMENTS")
+    free_max_documents: int = Field(default=4, env="FREE_MAX_DOCUMENTS")
     free_max_notes: int = Field(default=10, env="FREE_MAX_NOTES")
     free_max_tokens: int = Field(default=100000, env="FREE_MAX_TOKENS")
 

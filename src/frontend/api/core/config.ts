@@ -23,5 +23,13 @@ export const apiConfig = {
 		notes: {
 			base: '/api/v1/notes',
 		},
+		projects: {
+			base: '/api/v1/projects',
+			documents: (projectId: string) => `/api/v1/projects/${projectId}/documents`,
+			document: (projectId: string, documentId: string) =>
+				`/api/v1/projects/${projectId}/documents/${documentId}`,
+			documentUrl: (projectId: string, documentId: string) =>
+				`/api/v1/projects/${projectId}/documents/${documentId}/url`,
+		},
 	},
 } as const;

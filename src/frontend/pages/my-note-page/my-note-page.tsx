@@ -9,7 +9,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
-import {PdfReader} from "@/frontend/components/source/reader/pdf-reader.tsx";
+import {SourcePanel} from "@/frontend/components/source/source-panel.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 
 /**
@@ -27,6 +27,7 @@ import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm
 export default function NotePage() {
 	
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
+	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
 	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
@@ -119,13 +120,12 @@ export default function NotePage() {
 							</div>
 						</div>
 					) : (
-						<ResizablePanelGroup direction="vertical">
-							<PdfReader
-								onScreenshotCapture={handleAskAI}
-								onSaveToNote={handleSaveToNote}
-								onDownload={handleDownload}
-							/>
-						</ResizablePanelGroup>
+						<SourcePanel
+							onScreenshotCapture={handleAskAI}
+							onSaveToNote={handleSaveToNote}
+							onDownload={handleDownload}
+							onSourceSelectionChange={setSelectedSourceIds}
+						/>
 					)}
 				</ResizablePanel>
 				
@@ -137,6 +137,7 @@ export default function NotePage() {
 				>
 					<LLMChatFeature
 						ref={chatRef}
+						sourceIds={selectedSourceIds}
 						onSelectContent={(content) => {
 							handleContentInsert({
 								content,
