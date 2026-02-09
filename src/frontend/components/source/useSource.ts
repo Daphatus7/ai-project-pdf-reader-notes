@@ -1,24 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { projectsService } from '@/frontend/api/services/projects.service';
-import type { Project, Document, SourcePanelView } from './type';
+import type { Document, SourcePanelView } from './type';
 
 export interface UseSourceReturn {
-	projects: Project[];
-	currentProject: Project | null;
 	documents: Document[];
 	selectedDocumentIds: string[];
 
 	view: SourcePanelView;
 	currentDocumentUrl: string | null;
 
-	isLoadingProjects: boolean;
 	isLoadingDocuments: boolean;
 	isUploading: boolean;
 	error: string | null;
 
-	selectProject: (projectId: string) => void;
-	createProject: (name: string, description?: string) => Promise<void>;
-	deleteProject: (projectId: string) => Promise<void>;
 	uploadDocument: (file: File, sourceName?: string) => Promise<void>;
 	deleteDocument: (documentId: string) => Promise<void>;
 	toggleDocumentSelection: (documentId: string) => void;
@@ -28,26 +22,21 @@ export interface UseSourceReturn {
 	refreshDocuments: () => Promise<void>;
 }
 
-export function useSource(): UseSourceReturn {
-	const [projects, setProjects] = useState<Project[]>([]);
-	const [currentProject, setCurrentProject] = useState<Project | null>(null);
+export function useSource(projectId: string | null): UseSourceReturn {
 	const [documents, setDocuments] = useState<Document[]>([]);
 	const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
 
 	const [view, setView] = useState<SourcePanelView>({ type: 'list' });
 	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
-
-	const [isLoadingProjects, setIsLoadingProjects] = useState(false);
 	const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// Load documents for a given project
-	const loadDocuments = useCallback(async (projectId: string) => {
+	const loadDocuments = useCallback(async (pid: string) => {
 		setIsLoadingDocuments(true);
 		setError(null);
 		try {
-			const docs = await projectsService.listDocuments(projectId);
+			const docs = await projectsService.listDocuments(pid);
 			setDocuments(docs);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to load documents');
@@ -56,87 +45,31 @@ export function useSource(): UseSourceReturn {
 		}
 	}, []);
 
-	// Load projects on mount
+	// Load documents when projectId changes
 	useEffect(() => {
-		(async () => {
-			setIsLoadingProjects(true);
-			setError(null);
-			try {
-				const list = await projectsService.listProjects();
-				setProjects(list);
-				if (list.length > 0) {
-					setCurrentProject(list[0]);
-					await loadDocuments(list[0].id);
-				}
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to load projects');
-			} finally {
-				setIsLoadingProjects(false);
-			}
-		})();
-	}, [loadDocuments]);
-
-	const selectProject = useCallback(
-		(projectId: string) => {
-			const project = projects.find((p) => p.id === projectId);
-			if (!project) return;
-			setCurrentProject(project);
+		if (projectId) {
 			setSelectedDocumentIds([]);
+			setView({ type: 'list' });
+			setCurrentDocumentUrl(null);
 			loadDocuments(projectId);
-		},
-		[projects, loadDocuments],
-	);
-
-	const createProject = useCallback(
-		async (name: string, description?: string) => {
-			setError(null);
-			try {
-				await projectsService.createProject({ name, description });
-				const list = await projectsService.listProjects();
-				setProjects(list);
-				if (!currentProject && list.length > 0) {
-					setCurrentProject(list[0]);
-					await loadDocuments(list[0].id);
-				}
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to create project');
-				throw err;
-			}
-		},
-		[currentProject, loadDocuments],
-	);
-
-	const deleteProject = useCallback(
-		async (projectId: string) => {
-			setError(null);
-			try {
-				await projectsService.deleteProject(projectId);
-				if (currentProject?.id === projectId) {
-					setCurrentProject(null);
-					setDocuments([]);
-				}
-				const list = await projectsService.listProjects();
-				setProjects(list);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to delete project');
-				throw err;
-			}
-		},
-		[currentProject],
-	);
+		} else {
+			setDocuments([]);
+			setSelectedDocumentIds([]);
+		}
+	}, [projectId, loadDocuments]);
 
 	const refreshDocuments = useCallback(async () => {
-		if (!currentProject) return;
-		await loadDocuments(currentProject.id);
-	}, [currentProject, loadDocuments]);
+		if (!projectId) return;
+		await loadDocuments(projectId);
+	}, [projectId, loadDocuments]);
 
 	const uploadDocument = useCallback(
 		async (file: File, sourceName?: string) => {
-			if (!currentProject) throw new Error('No project selected');
+			if (!projectId) throw new Error('No project selected');
 			setIsUploading(true);
 			setError(null);
 			try {
-				await projectsService.uploadDocument(currentProject.id, file, sourceName);
+				await projectsService.uploadDocument(projectId, file, sourceName);
 				await refreshDocuments();
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Failed to upload document');
@@ -145,15 +78,15 @@ export function useSource(): UseSourceReturn {
 				setIsUploading(false);
 			}
 		},
-		[currentProject, refreshDocuments],
+		[projectId, refreshDocuments],
 	);
 
 	const deleteDocument = useCallback(
 		async (documentId: string) => {
-			if (!currentProject) return;
+			if (!projectId) return;
 			setError(null);
 			try {
-				await projectsService.deleteDocument(currentProject.id, documentId);
+				await projectsService.deleteDocument(projectId, documentId);
 				setSelectedDocumentIds((prev) => prev.filter((id) => id !== documentId));
 				await refreshDocuments();
 			} catch (err) {
@@ -161,7 +94,7 @@ export function useSource(): UseSourceReturn {
 				throw err;
 			}
 		},
-		[currentProject, refreshDocuments],
+		[projectId, refreshDocuments],
 	);
 
 	const toggleDocumentSelection = useCallback((documentId: string) => {
@@ -176,17 +109,17 @@ export function useSource(): UseSourceReturn {
 
 	const openDocumentReader = useCallback(
 		async (documentId: string) => {
-			if (!currentProject) return;
+			if (!projectId) return;
 			setError(null);
 			try {
-				const url = await projectsService.getDocumentUrl(currentProject.id, documentId);
+				const url = await projectsService.getDocumentUrl(projectId, documentId);
 				setCurrentDocumentUrl(url);
 				setView({ type: 'reader', documentId });
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Failed to open document');
 			}
 		},
-		[currentProject],
+		[projectId],
 	);
 
 	const closeDocumentReader = useCallback(() => {
@@ -195,19 +128,13 @@ export function useSource(): UseSourceReturn {
 	}, []);
 
 	return {
-		projects,
-		currentProject,
 		documents,
 		selectedDocumentIds,
 		view,
 		currentDocumentUrl,
-		isLoadingProjects,
 		isLoadingDocuments,
 		isUploading,
 		error,
-		selectProject,
-		createProject,
-		deleteProject,
 		uploadDocument,
 		deleteDocument,
 		toggleDocumentSelection,

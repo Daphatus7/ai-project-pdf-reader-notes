@@ -9,7 +9,7 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
-import {SourcePanel} from "@/frontend/components/source/source-panel.tsx";
+import {ManagementPanel} from "@/frontend/components/source/management-panel.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 
 /**
@@ -120,7 +120,7 @@ export default function NotePage() {
 							</div>
 						</div>
 					) : (
-						<SourcePanel
+						<ManagementPanel
 							onScreenshotCapture={handleAskAI}
 							onSaveToNote={handleSaveToNote}
 							onDownload={handleDownload}

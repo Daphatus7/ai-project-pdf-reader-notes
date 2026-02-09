@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
+import { useProject } from './useProject';
 import { useSource } from './useSource';
+import { ProjectManagementPanel } from './project-management-panel';
 import { SourceList } from './source-list';
 import { PdfReader } from './reader/pdf-reader';
 
@@ -12,18 +14,20 @@ interface SourcePanelProps {
 	onSourceSelectionChange?: (selectedIds: string[]) => void;
 }
 
-export function SourcePanel({
+export function ManagementPanel({
 	onScreenshotCapture,
 	onSaveToNote,
 	onDownload,
 	onSourceSelectionChange,
 }: SourcePanelProps) {
-	const source = useSource();
+	const project = useProject();
+	const source = useSource(project.currentProject?.id ?? null);
 
 	useEffect(() => {
 		onSourceSelectionChange?.(source.selectedDocumentIds);
 	}, [source.selectedDocumentIds, onSourceSelectionChange]);
 
+	// PDF Reader view
 	if (source.view.type === 'reader' && source.currentDocumentUrl) {
 		return (
 			<div className="h-full flex flex-col">
@@ -49,23 +53,34 @@ export function SourcePanel({
 		);
 	}
 
+	// Source control panel (inside a project)
+	if (project.currentProject) {
+		return (
+			<SourceList
+				currentProject={project.currentProject}
+				documents={source.documents}
+				selectedDocumentIds={source.selectedDocumentIds}
+				isLoadingDocuments={source.isLoadingDocuments}
+				isUploading={source.isUploading}
+				error={source.error}
+				onGoBack={project.closeProject}
+				onUploadDocument={source.uploadDocument}
+				onDeleteDocument={source.deleteDocument}
+				onToggleSelection={source.toggleDocumentSelection}
+				onOpenDocument={source.openDocumentReader}
+			/>
+		);
+	}
+
+	// Project management panel (top-level)
 	return (
-		<SourceList
-			projects={source.projects}
-			currentProject={source.currentProject}
-			documents={source.documents}
-			selectedDocumentIds={source.selectedDocumentIds}
-			isLoadingProjects={source.isLoadingProjects}
-			isLoadingDocuments={source.isLoadingDocuments}
-			isUploading={source.isUploading}
-			error={source.error}
-			onSelectProject={source.selectProject}
-			onCreateProject={source.createProject}
-			onDeleteProject={source.deleteProject}
-			onUploadDocument={source.uploadDocument}
-			onDeleteDocument={source.deleteDocument}
-			onToggleSelection={source.toggleDocumentSelection}
-			onOpenDocument={source.openDocumentReader}
+		<ProjectManagementPanel
+			projects={project.projects}
+			isLoading={project.isLoadingProjects}
+			error={project.error}
+			onOpenProject={project.openProject}
+			onCreateProject={project.createProject}
+			onDeleteProject={project.deleteProject}
 		/>
 	);
 }
