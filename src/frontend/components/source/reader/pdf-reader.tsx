@@ -74,7 +74,7 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
               }`}
               onClick={() => (screenshot.isActive ? screenshot.deactivate() : screenshot.activate())}
             >
-              {screenshot.isActive ? 'Cancel' : 'Screenshot'}
+              {screenshot.isActive ? 'Cancel' : 'Ask AI'}
             </button>
           </div>
         )}
