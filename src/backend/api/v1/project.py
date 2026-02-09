@@ -89,6 +89,10 @@ async def delete_project(
     docs = await database_service.get_documents(user_id, project_id)
     doc_count = len(docs)
 
+    # Delete storage files BEFORE cascade (best-effort)
+    storage_paths = [d['document_dir'] for d in docs if d.get('document_dir')]
+    await database_service.delete_project_documents_storage(storage_paths)
+
     result = await database_service.delete_project(user_id, project_id)
 
     # Decrement usage counters
@@ -177,7 +181,7 @@ async def upload_document(
             document_dir=temp_path
         )
         #first need to create a table for the document
-        result = await rag_service.upload_document(rag_request)
+        result = await rag_service.chunking_document(rag_request)
         return result
 
     except HTTPException:
@@ -223,6 +227,38 @@ async def delete_document(
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 
+@router.get('/{project_id}/documents/{document_id}/url')
+async def get_document_url(
+        project_id: str = Path(..., description='Project ID'),
+        document_id: str = Path(..., description='Document ID'),
+        user=Depends(get_user),
+        rag_service=Depends(get_rag_service),
+):
+    """
+    Get a signed URL for viewing a document PDF.
+    Returns a temporary signed URL (valid for 1 hour).
+    """
+    user_id = user['sub']
+    supabase = rag_service.supabase
+
+    # Verify document belongs to user and project
+    document = supabase.table('documents').select('document_dir').eq(
+        'id', document_id
+    ).eq('user_id', user_id).eq('project_id', project_id).single().execute()
+
+    if not document.data:
+        raise HTTPException(status_code=404, detail='Document not found')
+
+    storage_path = document.data['document_dir']
+
+    try:
+        signed = supabase.storage.from_('docs').create_signed_url(
+            storage_path, expires_in=3600
+        )
+        return {'url': signed['signedURL']}
+    except Exception as e:
+        logger.exception(f"Failed to generate document URL: {e}")
+        raise HTTPException(status_code=500, detail='Failed to generate document URL')
 
 
             
