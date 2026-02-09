@@ -6,9 +6,7 @@ Provides endpoints for:
 - Streaming chat
 - Structured output chat (enforces schema-conformant responses)
 """
-import logging
 from fastapi import APIRouter, Depends
-from fastapi.responses import StreamingResponse
 
 from src.backend.schemas import (
     ChatRequest,
@@ -17,19 +15,21 @@ from src.backend.schemas import (
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
-    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse
-
-logger = logging.getLogger(__name__)
+    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse, ThreadInfo
 
 router = APIRouter(prefix='/llm', tags=['llm'])
 
 @router.post('/chat', response_model=ChatResponse)
 async def chat(
         request: ChatRequest = Depends(get_chat_request),
-        llm_service=Depends(get_llm_service)
+        llm_service=Depends(get_llm_service),
+        database_service=Depends(get_database_service),
 ):
+    user_id = request.user_id
+    await database_service.enforce_token_quota(user_id)
     response = await llm_service.chat(request=request)
-    return ChatResponse(response=response)
+    await database_service.track_token_usage(user_id, response.total_tokens)
+    return response
 
 #create a thread
 @router.post('/thread', response_model=CreateThreadResponse)
@@ -57,7 +57,17 @@ async def list_conversation_threads(
     """
     user_id = user["sub"]  # Supabase user id
     threads = await database_service.list_conversation_threads(user_id)
-    return ListThreadsResponse(threads=threads)
+    return ListThreadsResponse(threads=
+        [
+            ThreadInfo(
+                thread_id=thread["id"],
+                title=thread["title"],
+                thread_summary=thread["thread_summary"],
+                created_at=thread["created_at"],
+                updated_at=thread["updated_at"]
+            ) for thread in threads
+        ]
+    )
 
 # Delete a conversation thread
 @router.delete('/thread', response_model=DeleteThreadResponse)
@@ -89,5 +99,7 @@ async def load_conversation_thread(
         user_id=user_id,
         request=request,
     )
-    return LoadThreadResponse(messages=messages)
+    return LoadThreadResponse(
+        thread_id=request.thread_id,
+        messages=messages)
 

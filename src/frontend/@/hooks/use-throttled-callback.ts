@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle"
 
-import { useUnmount } from "@@/frontend/@/hooks/use-unmount.ts"
+import { useUnmount } from "@/frontend/@/hooks/use-unmount.ts"
 import { useMemo } from "react"
 
 interface ThrottleSettings {

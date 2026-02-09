@@ -203,7 +203,7 @@ def test_service_direct():
         )
 
         print(f"[INFO] Processing {TEST_PDF_PATH.name}...")
-        result = service.upload_document(req)
+        result = service.chunking_document(req)
 
         print(f"\n[INFO] Result:")
         print(f"       success: {result.success}")

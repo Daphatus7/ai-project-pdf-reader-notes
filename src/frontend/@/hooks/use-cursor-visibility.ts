@@ -1,6 +1,6 @@
 import type { Editor } from "@tiptap/react"
-import { useWindowSize } from "@@/frontend/@/hooks/use-window-size.ts"
-import { useBodyRect } from "@@/frontend/@/hooks/use-element-rect.ts"
+import { useWindowSize } from "@/frontend/@/hooks/use-window-size.ts"
+import { useBodyRect } from "@/frontend/@/hooks/use-element-rect.ts"
 import { useEffect } from "react"
 
 export interface CursorVisibilityOptions {
@@ -37,28 +37,30 @@ export function useCursorVisibility({
     const ensureCursorVisibility = () => {
       if (!editor) return
 
-      const { state, view } = editor
-      if (!view.hasFocus()) return
+      try {
+        const { state, view } = editor
+        if (!view.hasFocus()) return
 
-      // Get current cursor position coordinates
-      const { from } = state.selection
-      const cursorCoords = view.coordsAtPos(from)
+        const { from } = state.selection
+        const cursorCoords = view.coordsAtPos(from)
 
-      if (windowHeight < rect.height && cursorCoords) {
-        const availableSpace = windowHeight - cursorCoords.top
+        if (windowHeight < rect.height && cursorCoords) {
+          const availableSpace = windowHeight - cursorCoords.top
 
-        // If the cursor is hidden behind the overlay or offscreen, scroll it into view
-        if (availableSpace < overlayHeight) {
-          const targetCursorY = Math.max(windowHeight / 2, overlayHeight)
-          const currentScrollY = window.scrollY
-          const cursorAbsoluteY = cursorCoords.top + currentScrollY
-          const newScrollY = cursorAbsoluteY - targetCursorY
+          if (availableSpace < overlayHeight) {
+            const targetCursorY = Math.max(windowHeight / 2, overlayHeight)
+            const currentScrollY = window.scrollY
+            const cursorAbsoluteY = cursorCoords.top + currentScrollY
+            const newScrollY = cursorAbsoluteY - targetCursorY
 
-          window.scrollTo({
-            top: Math.max(0, newScrollY),
-            behavior: "smooth",
-          })
+            window.scrollTo({
+              top: Math.max(0, newScrollY),
+              behavior: "smooth",
+            })
+          }
         }
+      } catch {
+        // Editor view not mounted yet, will retry on next effect trigger
       }
     }
 

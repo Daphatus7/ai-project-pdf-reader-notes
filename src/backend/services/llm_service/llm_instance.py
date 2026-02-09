@@ -1,12 +1,9 @@
-import json
 import logging
-from sys import thread_info
 from typing import Any, TYPE_CHECKING
-
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool, InjectedToolArg
 from typing import Annotated
@@ -15,15 +12,67 @@ from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
 from supabase import Client
 
-from src.backend.schemas import ChatRequest
+from src.backend.schemas import ChatRequest, ChatResponse
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langchain.messages import RemoveMessage
+
 from src.backend.services.llm_service.conversation_storage import ConversationStorage
 
 if TYPE_CHECKING:
     from src.backend.services.storage.supabase_storage import SupabaseStorage
     from src.backend.services.storage.redis_storage import RedisStorage
 
+
+import logging
+from typing import Any, Optional, Sequence
+
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+
+logger = logging.getLogger(__name__)
+
+SUPPORTED_ROLES = {"assistant", "user"}
+
+MAX_MESSAGES = 50          # 总历史条数上限（按你业务调）
+MAX_CHARS_PER_MSG = 4000   # 单条消息最大字符数（按你业务调）
+
+def _extract_text(msg: dict[str, Any]) -> Optional[str]:
+    """
+    支持两类常见结构：
+    1) msg["content"] = [{"type":"text","text":"..."}, ...]
+    2) msg["content"] = "..."
+    解析不到就返回 None。
+    """
+    content = msg.get("content")
+
+    if isinstance(content, str):
+        text = content.strip()
+        return text or None
+
+    if isinstance(content, Sequence) and not isinstance(content, (str, bytes)):
+        # 找第一段 type=text 且有 text 的 block
+        for block in content:
+            if isinstance(block, dict):
+                if block.get("type") == "text" and isinstance(block.get("text"), str):
+                    text = block["text"].strip()
+                    return text or None
+        return None
+
+    return None
+
+def _sanitize_text(text: str) -> str:
+    # 1) 基础清理
+    text = text.replace("\x00", "")  # 去掉 NUL
+    text = text.strip()
+
+    # 2) 截断，避免 token/内存爆炸
+    if len(text) > MAX_CHARS_PER_MSG:
+        text = text[:MAX_CHARS_PER_MSG] + "…(truncated)"
+    return text
+
+def _to_lc_message(role: str, text: str) -> BaseMessage:
+    if role == "assistant":
+        return AIMessage(content=text)
+    return HumanMessage(content=text)
 
 STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
 
@@ -66,14 +115,55 @@ FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
 6. BLOCKQUOTES: Use > for notes
 
 CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
+def _parse_ai_response(ai_msg) -> list[dict]:
+    """Parse AI message into structured output contents.
+
+    Converts OpenAI response format to our OutputContent structure.
+    Supports text and image outputs for multimodal responses.
+    """
+    contents = []
+
+    if isinstance(ai_msg.content, str):
+        # Simple text response
+        contents.append({"type": "text", "text": ai_msg.content})
+    elif isinstance(ai_msg.content, list):
+        # Multimodal response (OpenAI format)
+        for item in ai_msg.content:
+            if isinstance(item, dict):
+                if item.get("type") == "text":
+                    contents.append({"type": "text", "text": item["text"]})
+                elif item.get("type") == "image_url":
+                    # Extract base64 from data URL
+                    url = item["image_url"]["url"]
+                    if url.startswith("data:"):
+                        parts = url.split(";base64,", 1)
+                        if len(parts) == 2:
+                            mime_type = parts[0].replace("data:", "")
+                            data = parts[1]
+                            contents.append({
+                                "type": "image",
+                                "data": data,
+                                "mime_type": mime_type
+                            })
+            elif hasattr(item, "text"):
+                # LangChain text content object
+                contents.append({"type": "text", "text": item.text})
+    else:
+        # Fallback: convert to string
+        contents.append({"type": "text", "text": str(ai_msg.content)})
+
+    return contents
+
+
 def _build_human_message(contents: list) -> HumanMessage:
     """Build HumanMessage from request contents."""
+    logging.info(contents)
     content_parts = []
     for item in contents:
-        if item.type == "text":
-            content_parts.append({"type": "text", "text": item.text})
-        elif item.type == "image":
-            data_url = f"data:{item.mime_type};base64,{item.data}"
+        if item.get('type') == "text":
+            content_parts.append({"type": "text", "text": item['text']})
+        elif item.get('type') == "image":
+            data_url = f"data:{item['mime_type']};base64,{item['data']}"
             content_parts.append({"type": "image_url", "image_url": {"url": data_url}})
     return HumanMessage(content=content_parts)
 
@@ -253,36 +343,61 @@ class LlmAgent:
             middleware=[
                 #log_state, 
                 trim_messages],
-            system_prompt=SystemMessage("You are a helpful assistant."),  # Basic system prompt
+            system_prompt=SystemMessage(STRUCTURED_OUTPUT_SYSTEM_PROMPT),  # Basic system prompt
             checkpointer=self._checkpointer,
         )
         self.counter = 0
+    
+    
     async def chat(self, request: ChatRequest) -> Any:
         self.counter += 1
         logging.info(f"Agent called {self.counter} times")
         # 1. Refresh Redis TTL at request start
         if not self._conversation_storage:
             logging.error("|----- No conversation storage configured")
+            
         # 2. Cold start: load from Supabase if thread not in Redis
-        
-        
         history_to_add = await self._conversation_storage.cold_start_load(request.thread_id)
         logging.info(history_to_add)
+
+
         if history_to_add:
-            self.agent.update_state(
-                config={"configurable": {"thread_id": request.thread_id}},
-                values={"messages": history_to_add},
-                as_node="__start__"
-            )
+            to_history: list[BaseMessage] = []
+        
+            # 限制最大条数（取最近 MAX_MESSAGES 条）
+            trimmed = history_to_add[-MAX_MESSAGES:] if len(history_to_add) > MAX_MESSAGES else history_to_add
+        
+            for i, msg in enumerate(trimmed):
+                if not isinstance(msg, dict):
+                    logger.warning("Skipping non-dict history item at index=%s", i)
+                    continue
+        
+                role = msg.get("role")
+                if role not in SUPPORTED_ROLES:
+                    logger.warning("Skipping unsupported role=%r at index=%s", role, i)
+                    continue
+        
+                text = _extract_text(msg)
+                if not text:
+                    logger.warning("Skipping empty/unparseable content role=%s index=%s", role, i)
+                    continue
+        
+                safe_text = _sanitize_text(text)
+                to_history.append(_to_lc_message(role, safe_text))
+        
+                # 安全日志：不打印全文
+                logger.debug("History accepted index=%s role=%s chars=%s", i, role, len(safe_text))
+        
+            if to_history:
+                self.agent.update_state(
+                    config={"configurable": {"thread_id": request.thread_id}},
+                    values={"messages": to_history},
+                    as_node="__start__",
+                )
+            else:
+                logger.info("No valid history messages to inject (all skipped).")
             
-            # todo Debug: log loaded messages delete later
-            current_history = self.agent.get_state(
-                config={"configurable": {"thread_id": request.thread_id}})
-            
-            for msg,idx in current_history :
-                logging.info(f"Cold start msg {idx}: {msg.content}")
-            
-        # 3. Build messages
+        # 3. Build Configuration
         config: RunnableConfig = {
             "configurable": {
                 "thread_id": request.thread_id,
@@ -290,36 +405,54 @@ class LlmAgent:
         }
         
         system_msg = SystemMessage(content="""you are a helpful assistant, keep everything brief""") # 用户不允许编辑system message
-        human_msg = _build_human_message(request.contents)
+        human_msg = _build_human_message(request.content)
 
         # Run LLM call
         response = self.agent.invoke(
             {"messages": human_msg},  # todo weird bug why system_msg is not allowed here
-            config=config
+            config=config,
         )
 
         ai_msg = response["messages"][-1]
 
-        # 5. Dual-write: persist to Supabase
-        human_content = human_msg.content
-        ai_content = ai_msg.content if isinstance(ai_msg.content, str) else str(ai_msg.content)
+        # Parse AI response into structured output contents
+        logging.info(f"ai message + {ai_msg}")
+
 
         # Get token counts from usage_metadata
-        input_tokens = 0
-        output_tokens = 0
-        if hasattr(ai_msg, "usage_metadata") and ai_msg.usage_metadata:
-            input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
-            output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+        input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
+        logging.info(f"input tokens: {input_tokens}")
+        output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+        logging.info(f"output tokens: {output_tokens}")
 
         self._conversation_storage.refresh_ttl(request.thread_id)
 
+        # store both human and ai messages
         await self._conversation_storage.persist(
+            #store chat
             user_id=request.user_id,
             thread_id=request.thread_id,
-            human_content=human_content,
-            ai_content=ai_content,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens
+            role= "user",
+            content=human_msg.content,
+            token_count=input_tokens
         )
 
-        return ai_content
+        resp = await self._conversation_storage.persist(
+            #store ai
+            user_id=request.user_id,
+            thread_id=request.thread_id,
+            role= "assistant",
+            content=[{"type": "text",
+                      "text": ai_msg.content}],
+            token_count=output_tokens
+        )
+        logging.info(f"store-----:{resp}")
+        #only need to return ai response
+        return ChatResponse(
+            id=resp['id'],
+            role=resp['role'],
+            content=[{"type": "text",
+                       "text": ai_msg.content}],
+            created_at=resp["created_at"],
+            total_tokens=input_tokens + output_tokens
+        )

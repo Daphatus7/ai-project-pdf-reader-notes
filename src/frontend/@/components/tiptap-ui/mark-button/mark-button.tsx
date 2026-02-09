@@ -3,19 +3,19 @@
 import { forwardRef, useCallback } from "react"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { parseShortcutKeys } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Tiptap UI ---
-import type { Mark, UseMarkConfig } from "@@/frontend/@/components/tiptap-ui/mark-button/index.tsx"
-import { MARK_SHORTCUT_KEYS, useMark } from "@@/frontend/@/components/tiptap-ui/mark-button/index.tsx"
+import type { Mark, UseMarkConfig } from "@/frontend/@/components/tiptap-ui/mark-button/index.tsx"
+import { MARK_SHORTCUT_KEYS, useMark } from "@/frontend/@/components/tiptap-ui/mark-button/index.tsx"
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Badge } from "@@/frontend/@/components/tiptap-ui-primitive/badge"
+import type { ButtonProps } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Badge } from "@/frontend/@/components/tiptap-ui-primitive/badge"
 
 export interface MarkButtonProps
   extends Omit<ButtonProps, "type">,

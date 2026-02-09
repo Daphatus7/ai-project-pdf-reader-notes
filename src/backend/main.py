@@ -14,6 +14,7 @@ import sys
 from src.backend.servers import services
 from src.backend.config.config import settings
 from src.backend.api import v1_router
+from src.backend.schemas.error import AppError
 
 # Configure logging
 logging.basicConfig(
@@ -73,17 +74,26 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["GET","POST","OPTIONS"],
+    allow_methods=["GET","POST","DELETE","OPTIONS","PUT"],
     allow_headers=["authorization","content-type","accept"],
 )
 
-# Global exception handler
+# AppError handler — returns flat JSON
+@app.exception_handler(AppError)
+async def app_error_handler(request, exc: AppError):
+    body = {"detail": exc.detail, "code": exc.code}
+    if exc.meta:
+        body["meta"] = exc.meta
+    return JSONResponse(status_code=exc.status_code, content=body)
+
+
+# Global fallback — catches unexpected exceptions
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"error": "Internal server error", "detail": str(exc)}
+        content={"detail": "Internal server error", "code": "INTERNAL_ERROR"}
     )
 
 # Health check endpoint

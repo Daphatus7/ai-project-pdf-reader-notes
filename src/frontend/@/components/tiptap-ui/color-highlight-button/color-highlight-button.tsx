@@ -1,25 +1,25 @@
 import { forwardRef, useCallback, useMemo } from "react"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { parseShortcutKeys } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Tiptap UI ---
-import type { UseColorHighlightConfig } from "@@/frontend/@/components/tiptap-ui/color-highlight-button/index.tsx"
+import type { UseColorHighlightConfig } from "@/frontend/@/components/tiptap-ui/color-highlight-button/index.tsx"
 import {
   COLOR_HIGHLIGHT_SHORTCUT_KEY,
   useColorHighlight,
-} from "@@/frontend/@/components/tiptap-ui/color-highlight-button/index.tsx"
+} from "@/frontend/@/components/tiptap-ui/color-highlight-button/index.tsx"
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Badge } from "@@/frontend/@/components/tiptap-ui-primitive/badge"
+import type { ButtonProps } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Badge } from "@/frontend/@/components/tiptap-ui-primitive/badge"
 
 // --- Styles ---
-import "@@/frontend/@/components/tiptap-ui/color-highlight-button/color-highlight-button.scss"
+import "@/frontend/@/components/tiptap-ui/color-highlight-button/color-highlight-button.scss"
 
 export interface ColorHighlightButtonProps
   extends Omit<ButtonProps, "type">,

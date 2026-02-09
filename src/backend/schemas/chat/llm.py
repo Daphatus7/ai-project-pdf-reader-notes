@@ -11,20 +11,17 @@ from typing import Union, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-# Content Models
-class TextContent(BaseModel):
-    type: Literal["text"] = "text"
-    text: str
+
+# Output Content Models (mirror input structure for API symmetry)
 
 
 class ImageContent(BaseModel):
+    """Image content for both user input and AI response"""
     type: Literal["image"] = "image"
     data: str = Field(..., description="Base64-encoded image (no data URI prefix)")
     mime_type: Literal["image/png", "image/jpeg", "image/webp"] = "image/png"
-    name: Optional[str] = None
+    name: Optional[str] = Field(default=None, description="Optional filename for display")
 
-
-InputContent = Union[TextContent, ImageContent]
 
 ContentType = Literal['explanation', 'summary', 'answer', 'analysis', 'code', 'table', 'list']
 
@@ -37,21 +34,28 @@ class ChatRequest(BaseModel):
         project_id: the users project id
     """
     user_id: Optional[str] = None  # injected by server from auth token
-    project_id: str  # the user's project_id or folder id
+    # project_id: str  # the user's project_id or folder id
     thread_id: str  # conversation thread for the user
     # users query and any context send by the user
-    contents: list[InputContent] = Field(
-        ...,
-        description="Ordered list of text and image inputs"
-    )
+    content: list[dict]
     # RAG filter fields
     source_ids: Optional[list[str]] = Field(default=None, description="List of source/document IDs to search within")
 
-
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
-    response: str = Field(..., description='LLM response message')
+    id: str
+    role: str
+    content: list[dict] # create
+    """
+        example:
+             contents=[{"type": "text", 
+                       "text": ai_msg.content}],
+        
+    """
+    created_at: str
+    total_tokens: int | None = None  # for usage tracking
 
+# threads
 class CreateThreadRequest(BaseModel):
     """Request model for creating a conversation thread"""
 
@@ -64,10 +68,17 @@ class CreateThreadResponse(BaseModel):
 class ListThreadsRequest(BaseModel):
     """Request model for fetching conversation threads"""
     project_id: str
-    
+
+class ThreadInfo(BaseModel):
+    thread_id: str
+    title: str
+    thread_summary: str
+    created_at: str
+    updated_at: str
+
 class ListThreadsResponse(BaseModel):
     """Response model for fetching conversation threads"""
-    threads: list[dict]  # List of thread details
+    threads: list[ThreadInfo]  # List of thread details
     # ToDO data structure to be improved later
 
 class DeleteThreadRequest(BaseModel):
@@ -84,5 +95,6 @@ class LoadThreadRequest(BaseModel):
 
 class LoadThreadResponse(BaseModel):
     """Response model for loading a conversation thread"""
+    thread_id: str
     messages: list[dict] # to be enhanced in the future
     # ToDO data structure to be improved later

@@ -5,6 +5,7 @@
 
 import { apiConfig } from './config';
 import { ApiError } from './errors';
+import { supabase } from '../services/supabase';
 
 /**
  * Base fetch wrapper with error handling
@@ -15,8 +16,11 @@ export async function request<T>(
 ): Promise<T> {
   const url = `${apiConfig.baseUrl}${endpoint}`;
 
+  const{ data: { session } } = await supabase.auth.getSession();
+  
   const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', 
+	  ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
   };
 
   const config: RequestInit = {
@@ -72,77 +76,69 @@ export async function post<T>(endpoint: string, data: unknown): Promise<T> {
 }
 
 /**
- * Streaming request helper
- * Returns an async generator that yields Server-Sent Events (SSE) data
+ * GET request helper
  */
-export async function* streamRequest(
-  endpoint: string,
-  data: unknown
-): AsyncGenerator<string, void, unknown> {
-  const url = `${apiConfig.baseUrl}${endpoint}`;
+export async function get<T>(endpoint: string): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'GET',
+  });
+}
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+/**
+ * PUT request helper
+ */
+export async function put<T>(endpoint: string, data: unknown): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'PUT',
     body: JSON.stringify(data),
   });
+}
 
-  if (!response.ok) {
-    let errorMessage = `HTTP error! status: ${response.status}`;
-    try {
-      const errorData = await response.json();
-      if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
-        errorMessage = String(errorData.detail);
-      }
-    } catch {
-      errorMessage = response.statusText || errorMessage;
-    }
-    throw new ApiError(errorMessage, response.status);
-  }
+/**
+ * DELETE request helper
+ */
+export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
+  return request<T>(endpoint, {
+    method: 'DELETE',
+    ...(data && { body: JSON.stringify(data) }),
+  });
+}
 
-  if (!response.body) {
-    throw new ApiError('Response body is null');
-  }
+/**
+ * File upload helper using FormData (multipart/form-data)
+ */
+export async function upload<T>(endpoint: string, formData: FormData): Promise<T> {
+  const url = `${apiConfig.baseUrl}${endpoint}`;
+  const { data: { session } } = await supabase.auth.getSession();
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+  const headers: HeadersInit = {
+    ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
+  };
 
   try {
-    while (true) {
-      const { done, value } = await reader.read();
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
 
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const text = line.slice(6);
-
-          if (text.startsWith('[ERROR]')) {
-            throw new ApiError(text.slice(8));
-          }
-
-          yield text;
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      let errorData: unknown = null;
+      try {
+        errorData = await response.json();
+        if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
+          errorMessage = String(errorData.detail);
         }
+      } catch {
+        errorMessage = response.statusText || errorMessage;
       }
+      throw new ApiError(errorMessage, response.status, errorData);
     }
 
-    // Handle any remaining data in buffer
-    if (buffer.startsWith('data: ')) {
-      const text = buffer.slice(6);
-      if (!text.startsWith('[ERROR]')) {
-        yield text;
-      }
-    }
-  } finally {
-    reader.releaseLock();
+    return await response.json();
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

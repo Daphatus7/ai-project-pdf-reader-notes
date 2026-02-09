@@ -1,8 +1,74 @@
 /**
+ * LLM Chat Feature Types
+ * @description Type definitions for LLM chat feature
+ */
+import type {Thread} from "@/frontend/api/types/thread.ts";
+import type {ChatMessage, UserMessage} from "@/frontend/api/types/chat.ts";
+import type {ChatContent} from "@/frontend/api";
+
+// ============ Message Types ============
+
+/**
+ * A single content item in a chat message
+ * Can be text, image, or other content types
+ */
+
+// ============ Thread Types ============
+
+// ============ Component Props Types ============
+
+export interface ThreadTabsProps {
+	threads: Thread[];
+	activeThreadId: string | null;
+	onSelectThread: (threadId: string) => void;
+	onCreateThread: () => void;
+	onDeleteThread: (threadId: string) => void;
+}
+
+export interface ChatPanelProps {
+	threadProp: ThreadTabsProps;
+	messages: ChatMessage[];
+	isLoading: boolean;
+	onSendMessage: (content: ChatContent[]) => void;
+	onSelectContent?: (content: string) => void;
+}
+
+export interface ChatBubblesProps {
+	messages: ChatMessage[];
+	onSelectContent?: (content: string) => void;
+}
+
+export interface ChatBarProps {
+	onSend: (content: ChatContent[]) => void;
+	isLoading: boolean;
+	placeholder?: string;
+}
+
+export interface ChatBubbleProps {
+	message: ChatMessage;
+}
+
+export interface AIChatBubbleProps {
+	message: ChatMessage;
+	onSelectContent?: (content: string) => void;
+}
+
+// ============ Feature Props Types ============
+
+export interface LLMChatFeatureProps {
+	/** External interface to inject user messages */
+	onInjectMessage?: (handler: (message: UserMessage) => void) => void;
+	/** Callback when user selects content from AI response */
+	onSelectContent?: (content: string) => void;
+	/** Selected document IDs to use as context for LLM chat */
+	sourceIds?: string[];
+}
+
+
+/**
  * LLM API types matching backend Pydantic models
  */
 
-import type { InputContent } from './common';
 
 /**
  * Content types for structured LLM responses
@@ -13,91 +79,26 @@ export type ContentType = 'explanation' | 'summary' | 'answer' | 'analysis' | 'c
  * Code block in structured output
  */
 export interface CodeBlock {
-  language: string;
-  code: string;
-  explanation?: string;
+	language: string;
+	code: string;
+	explanation?: string;
 }
 
 /**
  * LaTeX math expression in structured output
  */
 export interface MathExpression {
-  latex: string;
-  description?: string;
-  is_block?: boolean;
+	latex: string;
+	description?: string;
+	is_block?: boolean;
 }
 
 /**
  * Section in structured output
  */
 export interface Section {
-  heading: string;
-  content: string;
+	heading: string;
+	content: string;
 }
 
-/**
- * Basic chat request
- */
-export interface ChatRequest {
-  contents: InputContent[];
-  system_message?: string;
-}
 
-/**
- * Basic chat response
- */
-export interface ChatResponse {
-  response: string;
-  usage?: Record<string, unknown> | null;
-}
-
-/**
- * Streaming chat request
- */
-export interface StreamChatRequest {
-  contents: InputContent[];
-  system_message?: string;
-  expected_content_type?: ContentType;
-}
-
-/**
- * Structured output from LLM with markdown, LaTeX, and GFM support
- * Ensures consistent, parseable output format
- */
-export interface LLMStructuredOutput {
-  content: string;
-  content_type: ContentType;
-  title?: string;
-  sections?: Section[];
-  key_points?: string[];
-  code_blocks?: CodeBlock[];
-  math_expressions?: MathExpression[];
-  references?: string[];
-  suggested_followups?: string[];
-}
-
-/**
- * Structured chat request
- */
-export interface StructuredChatRequest {
-  contents: InputContent[];
-  system_message?: string;
-  expected_content_type?: ContentType;
-}
-
-/**
- * Structured chat response
- */
-export interface StructuredChatResponse {
-  structured_output: LLMStructuredOutput;
-  usage?: Record<string, unknown> | null;
-}
-
-/**
- * Structured image chat request (alias for StructuredChatRequest)
- */
-export interface StructuredImageChatRequest {
-  contents: InputContent[];
-  system_message?: string;
-  expected_content_type?: ContentType;
-}

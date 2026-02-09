@@ -4,15 +4,15 @@ import { useEffect, useMemo, useState } from "react"
 import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Icons ---
-import { ListIcon } from "@@/frontend/@/components/tiptap-icons/list-icon.tsx"
-import { ListOrderedIcon } from "@@/frontend/@/components/tiptap-icons/list-ordered-icon.tsx"
-import { ListTodoIcon } from "@@/frontend/@/components/tiptap-icons/list-todo-icon.tsx"
+import { ListIcon } from "@/frontend/@/components/tiptap-icons/list-icon.tsx"
+import { ListOrderedIcon } from "@/frontend/@/components/tiptap-icons/list-ordered-icon.tsx"
+import { ListTodoIcon } from "@/frontend/@/components/tiptap-icons/list-todo-icon.tsx"
 
 // --- Lib ---
-import { isNodeInSchema } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { isNodeInSchema } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Tiptap UI ---
 import {
@@ -20,7 +20,7 @@ import {
   isListActive,
   listIcons,
   type ListType,
-} from "@@/frontend/@/components/tiptap-ui/list-button"
+} from "@/frontend/@/components/tiptap-ui/list-button"
 
 /**
  * Configuration for the list dropdown menu functionality

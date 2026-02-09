@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useThrottledCallback } from "@@/frontend/@/hooks/use-throttled-callback.ts"
+import { useThrottledCallback } from "@/frontend/@/hooks/use-throttled-callback.ts"
 
 export interface WindowSizeState {
   /**

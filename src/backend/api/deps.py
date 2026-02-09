@@ -12,15 +12,20 @@ from typing import Optional
 
 import jwt
 from jwt import PyJWKClient
-from fastapi import HTTPException, Header, Depends
+from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.backend.servers import services
 from src.backend.schemas import ChatRequest
+from src.backend.schemas.error import service_unavailable, auth_required
 
 logger = logging.getLogger(__name__)
 
 # Initialize JWKS client for Supabase token verification
 _jwks_client: Optional[PyJWKClient] = None
+
+# Security scheme for Swagger UI
+security = HTTPBearer()
 
 
 def get_jwks_client() -> PyJWKClient:
@@ -49,7 +54,7 @@ def get_llm_service():
         return services.get_service('llm_service')
     except ValueError as e:
         logger.error(f'Failed to get LLM service: {e}')
-        raise HTTPException(status_code=503, detail='LLM service not available')
+        service_unavailable("LLM service")
 
 def get_rag_service():
     """
@@ -60,7 +65,7 @@ def get_rag_service():
         return services.get_service('rag_service')
     except ValueError as e:
         logger.error(f'Failed to get Rag service: {e}')
-        raise HTTPException(status_code=503, detail='Rag service not available')
+        service_unavailable("RAG service")
 
 def get_database_service():
     """
@@ -71,15 +76,12 @@ def get_database_service():
         return services.get_service('database_service')
     except ValueError as e:
         logger.error(f'Failed to get database service: {e}')
-        raise HTTPException(status_code=503, detail='database service not available')
+        service_unavailable("Database service")
 
 
 # Authentication Dependency
-async def get_user(authorization: str = Header(...)):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid auth header")
-
-    token = authorization.split(" ")[1]
+async def get_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
 
     try:
         # Get the signing key from JWKS endpoint
@@ -94,10 +96,10 @@ async def get_user(authorization: str = Header(...)):
         )
     except jwt.PyJWTError as e:
         logger.error(f"JWT verification failed: {e}")
-        raise HTTPException(status_code=401, detail="Invalid token")
+        auth_required("Invalid token")
     except Exception as e:
         logger.error(f"Authentication error: {e}")
-        raise HTTPException(status_code=401, detail="Authentication failed")
+        auth_required("Authentication failed")
 
     logger.debug(f"Authenticated user: {payload.get('sub')}")
     return payload  # Contains user_id (sub), email, role
@@ -114,4 +116,3 @@ async def get_chat_request(
     """
     payload.user_id = user["sub"]
     return payload
-

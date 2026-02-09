@@ -108,7 +108,7 @@ def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
 
     return result
 
-def __process_pdf(payload: RawContextPayload
+async def __process_pdf(payload: RawContextPayload
                   )->list[dict]:
     #1. clean data
     cleaned_data = __process_raw_to_internal_format(payload.payload)
@@ -179,7 +179,7 @@ def __process_pdf(payload: RawContextPayload
 
     return return_result 
 
-def chonkie_chunk(rag_request: RagRequest) -> list[dict]:
+async def chonkie_chunk(rag_request: RagRequest) -> list[dict]:
     """
     Extract and chunk a PDF file from the given request.
     Returns list of chunk dicts with content and metadata.
@@ -192,7 +192,7 @@ def chonkie_chunk(rag_request: RagRequest) -> list[dict]:
     if not extracted:
         raise ValueError("No content extracted from PDF")
 
-    chonkie_output = __process_pdf(
+    chonkie_output = await __process_pdf(
         payload=RawContextPayload(
             payload=[el.to_dict() for el in extracted],
             dir=rag_request.document_dir,

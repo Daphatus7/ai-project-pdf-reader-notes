@@ -2,26 +2,34 @@
  * API configuration for backend communication
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const apiConfig = {
 	baseUrl: API_BASE_URL,
 	timeout: 30000, // 30 seconds
 	endpoints: {
-		llm: {
-			// Auth
-			login:'/api/v1/auth/signin',
-			register:'/api/v1/auth/register',
-			logout:'/api/v1/auth/logout',
+		auth: {
+			login: '/api/v1/auth/login',
+			register: '/api/v1/auth/register',
+			logout: '/api/v1/auth/logout',
 			refresh: '/api/v1/auth/refresh',
-
-			//llm
+		},
+		llm: {
 			chat: '/api/v1/llm/chat',
-			chatStream: '/api/v1/llm/chat/stream',
-			chatAsync: '/api/v1/llm/chat/async',
-			chatStructured: '/api/v1/llm/chat/structured',
-			chatStructuredSync: '/api/v1/llm/chat/structured/sync',
-			chatStructuredStream: '/api/v1/llm/chat/structured/stream',
+			thread: '/api/v1/llm/thread',
+			threadList: '/api/v1/llm/thread/list',
+			threadLoad: '/api/v1/llm/thread/load',
+		},
+		notes: {
+			base: '/api/v1/notes',
+		},
+		projects: {
+			base: '/api/v1/projects',
+			documents: (projectId: string) => `/api/v1/projects/${projectId}/documents`,
+			document: (projectId: string, documentId: string) =>
+				`/api/v1/projects/${projectId}/documents/${documentId}`,
+			documentUrl: (projectId: string, documentId: string) =>
+				`/api/v1/projects/${projectId}/documents/${documentId}/url`,
 		},
 	},
 } as const;
