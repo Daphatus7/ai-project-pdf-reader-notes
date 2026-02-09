@@ -31,7 +31,7 @@ interface ProjectManagementPanelProps {
 	onDeleteProject: (projectId: string) => Promise<void>;
 }
 
-export function ProjectManagementPanel({
+export function ProjectPanel({
 	projects,
 	isLoading,
 	error,

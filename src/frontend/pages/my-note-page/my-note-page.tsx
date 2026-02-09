@@ -9,8 +9,8 @@ import {type ImperativePanelHandle } from "react-resizable-panels";
 import type { ContentInsertion, NotePadHandler } from "@/frontend/features/types/content-insertion.ts";
 import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
-import {ManagementPanel} from "@/frontend/components/source/management-panel.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
+import {ManagementPanel} from "@/frontend/components/source/project-management.tsx";
 
 /**
  * NotePage component - Main note-taking interface.

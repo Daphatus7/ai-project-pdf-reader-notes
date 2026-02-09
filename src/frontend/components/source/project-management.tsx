@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { useProject } from './useProject';
 import { useSource } from './useSource';
-import { ProjectManagementPanel } from './project-management-panel';
+import { ProjectPanel } from './project-panel.tsx';
 import { SourceList } from './source-list';
 import { PdfReader } from './reader/pdf-reader';
 
@@ -74,7 +74,7 @@ export function ManagementPanel({
 
 	// Project management panel (top-level)
 	return (
-		<ProjectManagementPanel
+		<ProjectPanel
 			projects={project.projects}
 			isLoading={project.isLoadingProjects}
 			error={project.error}

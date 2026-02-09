@@ -15,6 +15,20 @@ import {
 import { DocumentUpload } from './document-upload';
 import type { Project, Document } from './type';
 
+const FADE_GRADIENT = 'linear-gradient(to right, black 90%, transparent)';
+
+function FadeText({ text, maxChars = 120 }: { text: string; maxChars?: number }) {
+	const isLong = text.length > maxChars;
+	return (
+		<span
+			className="text-sm "
+			style={isLong ? { maskImage: FADE_GRADIENT, WebkitMaskImage: FADE_GRADIENT } : undefined}
+		>
+			{isLong ? text.slice(0, maxChars) : text}
+		</span>
+	);
+}
+
 interface SourceListProps {
 	currentProject: Project;
 	documents: Document[];
@@ -105,9 +119,7 @@ export function SourceList({
 											className="flex-1 flex items-center gap-2 text-left min-w-0"
 										>
 											<FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-											<span className="text-sm truncate">
-													{doc.document_name}
-												</span>
+											<FadeText text={doc.document_name} />
 										</button>
 										<Button
 											variant="ghost"
