@@ -2,7 +2,14 @@
 @import './@/styles/_variables.scss';
 
 @import "tailwindcss";
-
+@layer base {
+    *,
+    ::before,
+    ::after {
+        border-color: rgb(217, 217, 217);
+        border-radius: var(--border-radius);
+    }
+}
 @theme {
     --font-size: 16px;
     --color-background: #fff;
