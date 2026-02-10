@@ -54,7 +54,6 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	const handleClick = (e: React.MouseEvent) => {
-		console.log("AIChatBubble outer div clicked");
 		if (onSelectContent) {
 			const textContent = extractTextContent(contents);
 			onSelectContent(textContent);
@@ -64,8 +63,8 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`max-w-[80%] bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
-					onSelectContent ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
+				className={`px-4 py-2 rounded-lg ${
+					onSelectContent ? 'cursor-pointer  transition-colors' : ''
 				}`}
 				onClick={handleClick}
 			>
