@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle } from "react";
-import { useThreads } from "@/frontend/components/chat/thread-tabs/use-threads";
+import { useThreads } from "@/frontend/components/chat/thread-sidebar/use-threads.ts";
 import { useChat } from "@/frontend/components/chat/use-chat";
 import { ChatPanel } from "@/frontend/components/chat/chat-panel/chat-panel";
 import type { LLMChatFeatureProps } from "@/frontend/api/types/llm";
