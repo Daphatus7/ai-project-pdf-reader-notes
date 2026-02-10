@@ -24,6 +24,9 @@ import {ManagementPanel} from "@/frontend/components/source/project-management.t
  * Handles content insertion flow:
  * MarkdownRenderer (click) → LLMChat → NotePage → NoteTaker (insert)
  */
+
+const panelStyle = "bg-panel border rounded-xl";
+
 export default function NotePage() {
 	
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
@@ -110,6 +113,7 @@ export default function NotePage() {
 					onCollapse={() => setIsCenterCollapsed(true)}
 					onExpand={() => setIsCenterCollapsed(false)}
 					onResize={handleCenterResize}
+					className={panelStyle}
 				>
 					{isCenterCollapsed ? (
 						<div
@@ -134,6 +138,7 @@ export default function NotePage() {
 				<ResizablePanel
 					defaultSize={34}
 					minSize={15}
+					className={panelStyle}
 				>
 					<LLMChatFeature
 						ref={chatRef}
@@ -157,6 +162,7 @@ export default function NotePage() {
 					onCollapse={() => setIsRightCollapsed(true)}
 					onExpand={() => setIsRightCollapsed(false)}
 					onResize={handleRightResize}
+					className={panelStyle}
 				>
 					{isRightCollapsed && (
 						<div
