@@ -1,0 +1,64 @@
+/**
+ * Shared typography tokens — single source of truth.
+ * Both .chat-typography (chat) and .tiptap.ProseMirror (editor)
+ * read from these variables so a single change keeps them in sync.
+ *
+ * TipTap's own SCSS is treated as vendor code (may change on upgrade).
+ * A thin override layer (tiptap-overrides.scss) applies these tokens
+ * on top, so upgrades never silently break formatting parity.
+ */
+
+:root {
+  /* ---- Fonts ---- */
+  --content-font: "DM Sans", sans-serif;
+  --content-code-font: "JetBrains Mono NL", monospace;
+
+  /* ---- Base text ---- */
+  --content-font-size: 0.875rem;
+  --content-line-height: 1.6;
+
+  /* ---- Headings ---- */
+  --content-h1-size: 1.25em;
+  --content-h1-weight: 700;
+  --content-h1-margin-top: 3em;
+
+  --content-h2-size: 1.125em;
+  --content-h2-weight: 700;
+  --content-h2-margin-top: 2.5em;
+
+  --content-h3-size: 1em;
+  --content-h3-weight: 600;
+  --content-h3-margin-top: 2em;
+
+  --content-h4-size: 0.875em;
+  --content-h4-weight: 600;
+  --content-h4-margin-top: 2em;
+
+  /* ---- Paragraph ---- */
+  --content-p-margin-top: 16px;
+
+  /* ---- Code (inline) ---- */
+  --content-code-size: 0.5em;
+  --content-code-line-height: 1.4;
+  --content-code-radius: 6px;
+  --content-code-padding: 0.1em 0.2em;
+
+  /* ---- Code block ---- */
+  --content-codeblock-margin-y: 1.5em;
+  --content-codeblock-padding: 1em;
+  --content-codeblock-font-size: 1rem;
+  --content-codeblock-radius: 6px;
+
+  /* ---- Blockquote ---- */
+  --content-blockquote-padding-left: 1em;
+  --content-blockquote-padding-y: 0.375em;
+  --content-blockquote-margin-y: 1.5rem;
+  --content-blockquote-bar-width: 0.25em;
+
+  /* ---- Lists ---- */
+  --content-list-margin-y: 1.5em;
+  --content-list-padding-left: 1.5em;
+
+  /* ---- Horizontal rule ---- */
+  --content-hr-margin-y: 2em;
+}

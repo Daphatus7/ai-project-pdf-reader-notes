@@ -22,6 +22,9 @@ import "@/frontend/@/components/tiptap-node/image-node/image-node.scss"
 import "@/frontend/@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/frontend/@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
+// --- Typography override (must load AFTER tiptap-node styles) ---
+import "@/frontend/@/styles/_tiptap-overrides.scss"
+
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/frontend/@/components/tiptap-ui/heading-dropdown-menu"
 import { ImageUploadButton } from "@/frontend/@/components/tiptap-ui/image-upload-button"

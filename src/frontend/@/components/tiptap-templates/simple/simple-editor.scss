@@ -50,9 +50,7 @@ body,
   background: transparent;
 }
 
-.tiptap.ProseMirror {
-  font-family: "DM Sans", sans-serif;
-}
+/* font-family now applied via _tiptap-overrides.scss using shared tokens */
 
 .simple-editor-wrapper {
   width: 100%;

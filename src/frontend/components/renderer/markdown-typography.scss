@@ -1,12 +1,13 @@
 /**
- * Chat markdown typography — mirrors TipTap editor styles
- * from tiptap-node/*.scss so chat and editor render identically.
+ * Chat markdown typography — driven by shared tokens
+ * from _typography-tokens.scss so chat and editor stay in sync.
  */
 
 .chat-typography {
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--content-font);
+  font-size: var(--content-font-size);
 
-  // === Component-level variables (same as TipTap scoped vars) ===
+  // === Component-level color variables ===
   --blockquote-bg-color: var(--tt-gray-light-900);
   --link-text-color: var(--tt-brand-color-500);
   --tt-inline-code-bg-color: var(--tt-gray-light-a-100);
@@ -27,7 +28,7 @@
     --tt-codeblock-border: var(--tt-gray-dark-a-200);
   }
 
-  // === Headings (heading-node.scss) ===
+  // === Headings ===
   h1, h2, h3, h4 {
     position: relative;
     color: inherit;
@@ -39,26 +40,26 @@
     }
   }
 
-  h1 { font-size: 1.5em;   font-weight: 700; margin-top: 3em; }
-  h2 { font-size: 1.25em;  font-weight: 700; margin-top: 2.5em; }
-  h3 { font-size: 1.125em; font-weight: 600; margin-top: 2em; }
-  h4 { font-size: 1em;     font-weight: 600; margin-top: 2em; }
+  h1 { font-size: var(--content-h1-size); font-weight: var(--content-h1-weight); margin-top: var(--content-h1-margin-top); }
+  h2 { font-size: var(--content-h2-size); font-weight: var(--content-h2-weight); margin-top: var(--content-h2-margin-top); }
+  h3 { font-size: var(--content-h3-size); font-weight: var(--content-h3-weight); margin-top: var(--content-h3-margin-top); }
+  h4 { font-size: var(--content-h4-size); font-weight: var(--content-h4-weight); margin-top: var(--content-h4-margin-top); }
 
-  // === Paragraphs (paragraph-node.scss) ===
+  // === Paragraphs ===
   p:not(:first-child):not(td p):not(th p) {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: var(--content-font-size);
+    line-height: var(--content-line-height);
     font-weight: normal;
-    margin-top: 20px;
+    margin-top: var(--content-p-margin-top);
   }
 
-  // === Blockquotes (blockquote-node.scss) ===
+  // === Blockquotes ===
   blockquote {
     position: relative;
-    padding-left: 1em;
-    padding-top: 0.375em;
-    padding-bottom: 0.375em;
-    margin: 1.5rem 0;
+    padding-left: var(--content-blockquote-padding-left);
+    padding-top: var(--content-blockquote-padding-y);
+    padding-bottom: var(--content-blockquote-padding-y);
+    margin: var(--content-blockquote-margin-y) 0;
 
     p { margin-top: 0; }
 
@@ -68,33 +69,34 @@
       left: 0;
       top: 0;
       height: 100%;
-      width: 0.25em;
+      width: var(--content-blockquote-bar-width);
       background-color: var(--blockquote-bg-color);
       content: "";
     }
   }
 
-  // === Code (code-block-node.scss) ===
+  // === Inline code ===
   code {
     background-color: var(--tt-inline-code-bg-color);
     color: var(--tt-inline-code-text-color);
     border: 1px solid var(--tt-inline-code-border-color);
-    font-family: "JetBrains Mono NL", monospace;
-    font-size: 0.875em;
-    line-height: 1.4;
-    border-radius: 6px;
-    padding: 0.1em 0.2em;
+    font-family: var(--content-code-font);
+    font-size: var(--content-code-size);
+    line-height: var(--content-code-line-height);
+    border-radius: var(--content-code-radius);
+    padding: var(--content-code-padding);
   }
 
+  // === Code blocks ===
   pre {
     background-color: var(--tt-codeblock-bg);
     color: var(--tt-codeblock-text);
     border: 1px solid var(--tt-codeblock-border);
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-    padding: 1em;
-    font-size: 1rem;
-    border-radius: 6px;
+    margin-top: var(--content-codeblock-margin-y);
+    margin-bottom: var(--content-codeblock-margin-y);
+    padding: var(--content-codeblock-padding);
+    font-size: var(--content-codeblock-font-size);
+    border-radius: var(--content-codeblock-radius);
 
     code {
       background-color: transparent;
@@ -105,12 +107,12 @@
     }
   }
 
-  // === Lists (list-node.scss) ===
+  // === Lists ===
   ol,
   ul {
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-    padding-left: 1.5em;
+    margin-top: var(--content-list-margin-y);
+    margin-bottom: var(--content-list-margin-y);
+    padding-left: var(--content-list-padding-left);
 
     &:first-child { margin-top: 0; }
     &:last-child  { margin-bottom: 0; }
@@ -123,7 +125,7 @@
 
   li p {
     margin-top: 0;
-    line-height: 1.6;
+    line-height: var(--content-line-height);
   }
 
   ol {
@@ -140,7 +142,7 @@
     }
   }
 
-  // === Tables (index.css .tiptap table) ===
+  // === Tables ===
   table {
     border-collapse: collapse;
     margin: 1.5rem 0;
@@ -171,17 +173,17 @@
     }
   }
 
-  // === Links (paragraph-node.scss) ===
+  // === Links ===
   a {
     color: var(--link-text-color);
     text-decoration: underline;
   }
 
-  // === Horizontal Rule (horizontal-rule-node.scss) ===
+  // === Horizontal Rule ===
   hr {
     border: none;
     border-top: 1px solid var(--tt-border-color);
-    margin: 2em 0;
+    margin: var(--content-hr-margin-y) 0;
   }
 
   // === Images ===

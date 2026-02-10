@@ -1,5 +1,6 @@
 /*tip tap editor*/
 @import './@/styles/_variables.scss';
+@import './@/styles/_typography-tokens.scss';
 
 @import "tailwindcss";
 @layer base {

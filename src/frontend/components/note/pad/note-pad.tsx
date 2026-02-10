@@ -6,7 +6,7 @@ import { NoteButton } from './sidebar/note-button.tsx'
 import { NoteSidebar } from './sidebar/note-sidebar.tsx'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
-import {FolderOpen, Save} from 'lucide-react'
+import {Save} from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
