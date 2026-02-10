@@ -6,7 +6,7 @@
  */
 import { Button } from "@/frontend/components/ui/button.tsx";
 import { ScrollArea } from "@/frontend/components/ui/scroll-area.tsx";
-import { Plus, X } from "lucide-react";
+import {LucideSidebar, Plus, X} from "lucide-react";
 import type { ThreadTabsProps } from "@/frontend/api/types/llm.ts";
 
 interface ThreadSidebarProps extends ThreadTabsProps {
@@ -26,7 +26,7 @@ export function ThreadSidebar({
 			<div className="p-3 border-b flex items-center justify-between">
 				<span className="text-sm font-medium">Threads</span>
 				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
-					<X className="h-4 w-4" />
+					<LucideSidebar className="h-4 w-4" />
 				</Button>
 			</div>
 
@@ -47,7 +47,7 @@ export function ThreadSidebar({
 								className={`
 									flex items-center justify-between px-3 py-2 rounded-md text-sm cursor-pointer transition-colors
 									${isActive
-										? "bg-accent text-accent-foreground font-medium"
+										? "bg-accent  text-sm"
 										: "text-muted-foreground hover:bg-muted hover:text-foreground"
 									}
 								`}
