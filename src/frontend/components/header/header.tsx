@@ -22,7 +22,7 @@ export function Header() {
 
   return (
     <>
-    <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-2 flex items-center justify-between">
+    <header className=" backdrop-blurpx-6 py-2 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <FileText className="w-5 h-5 text-muted-foreground/70" />
         <h1 className="text-base tracking-tight text-foreground/90">NoteFlow AI</h1>
