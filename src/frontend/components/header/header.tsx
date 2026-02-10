@@ -24,7 +24,7 @@ export function Header() {
 		<header className=" backdrop-blurpx-6 py-2 flex items-center justify-between ml-2 mr-2">
 			<div className="flex items-center gap-2 ml-2"
 			>
-				<img src="/logo.png" alt="Atlas Notebook AI Logo" className="h-8" />
+				<img src="/logo.svg" alt="Atlas Notebook AI Logo" className="h-8" />
 			</div>
 
 			<div className="flex items-center gap-2 mr-2">
