@@ -25,8 +25,6 @@ import {ManagementPanel} from "@/frontend/components/source/project-management.t
  * MarkdownRenderer (click) → LLMChat → NotePage → NoteTaker (insert)
  */
 
-const panelStyle = "bg-panel border rounded-xl";
-
 export default function NotePage() {
 	
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
@@ -113,7 +111,7 @@ export default function NotePage() {
 					onCollapse={() => setIsCenterCollapsed(true)}
 					onExpand={() => setIsCenterCollapsed(false)}
 					onResize={handleCenterResize}
-					className={panelStyle}
+					className="bg-panel border rounded-xl ml-2 mr-1 mb-2"
 				>
 					{isCenterCollapsed ? (
 						<div
@@ -138,7 +136,7 @@ export default function NotePage() {
 				<ResizablePanel
 					defaultSize={34}
 					minSize={15}
-					className={panelStyle}
+					className="bg-panel border rounded-xl ml-1 mr-1 mb-2"
 				>
 					<LLMChatFeature
 						ref={chatRef}
@@ -155,6 +153,7 @@ export default function NotePage() {
 
 				<ResizableHandle  withHandle/>
 				
+				{/* Notepad*/}
 				<ResizablePanel
 					ref={rightPanelRef}
 					collapsible
@@ -162,7 +161,7 @@ export default function NotePage() {
 					onCollapse={() => setIsRightCollapsed(true)}
 					onExpand={() => setIsRightCollapsed(false)}
 					onResize={handleRightResize}
-					className={panelStyle}
+					className="bg-panel border rounded-xl ml-1 mr-2 mb-2"
 				>
 					{isRightCollapsed && (
 						<div
