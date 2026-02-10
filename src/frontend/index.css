@@ -12,7 +12,8 @@
 }
 @theme {
     --font-size: 16px;
-    --color-background: #fff;
+    --color-background: rgb(234,239,246);
+    --color-panel: rgb(255, 255, 255);
     --color-foreground: #25252e;
     --color-card: #fff;
     --color-card-foreground: #25252e;
@@ -48,14 +49,21 @@
     --color-sidebar-ring: #b3b3b3;
     --radius: .625rem;
     
+    
+/*    chat bubble*/
+    --color-chat-bubble: #e1e7ee;
+
 }
 
 :root {
+    --text-xm: 12px;
+    --text-em: 16px;
     --font-weight-medium: 500;
     --font-weight-normal: 400;
     /* Bare-name aliases for direct var(--*) references (sonner, sidebar, etc.) */
     --background: var(--color-background);
     --foreground: var(--color-foreground);
+    --chat-bubble: var(--color-chat-bubble);
     --card: var(--color-card);
     --card-foreground: var(--color-card-foreground);
     --popover: var(--color-popover);
@@ -88,11 +96,19 @@
     --sidebar-accent-foreground: var(--color-sidebar-accent-foreground);
     --sidebar-border: var(--color-sidebar-border);
     --sidebar-ring: var(--color-sidebar-ring);
+    
+    
+/*    Tiptap*/
+    --tt-toolbar-bg-color: var(--color-panel);
 }
 
 .dark {
+    
+    /*Chat bubble*/
+    --color-chat-bubble: #e1e7ee;
     --color-background: #25252e;
     --color-foreground: #fafafa;
+    --color-panel: #333;
     --color-card: #25252e;
     --color-card-foreground: #fafafa;
     --color-popover: #25252e;
@@ -125,76 +141,4 @@
     --color-sidebar-accent-foreground: #fafafa;
     --color-sidebar-border: #444;
     --color-sidebar-ring: #737373;
-}
-
-html {
-
-}
-
-/* Basic editor styles */
-.tiptap {
-    :first-child {
-        margin-top: 0;
-    }
-
-    /* Table-specific styling */
-    table {
-        border-collapse: collapse;
-        margin: 0;
-        overflow: hidden;
-        table-layout: fixed;
-        width: 100%;
-
-        td,
-        th {
-            border: 1px solid var(--gray-3);
-            box-sizing: border-box;
-            min-width: 1em;
-            padding: 6px 8px;
-            position: relative;
-            vertical-align: top;
-
-            > * {
-                margin-bottom: 0;
-            }
-        }
-
-        th {
-            background-color: var(--gray-1);
-            font-weight: bold;
-            text-align: left;
-        }
-
-        .selectedCell:after {
-            background: var(--gray-2);
-            content: '';
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            pointer-events: none;
-            position: absolute;
-            z-index: 2;
-        }
-
-        .column-resize-handle {
-            background-color: var(--purple);
-            bottom: -2px;
-            pointer-events: none;
-            position: absolute;
-            right: -2px;
-            top: 0;
-            width: 4px;
-        }
-    }
-
-    .tableWrapper {
-        margin: 1.5rem 0;
-        overflow-x: auto;
-    }
-
-    &.resize-cursor {
-        cursor: ew-resize;
-        cursor: col-resize;
-    }
 }
