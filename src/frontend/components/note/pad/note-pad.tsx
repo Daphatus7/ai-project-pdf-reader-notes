@@ -6,7 +6,7 @@ import { NoteButton } from './sidebar/note-button.tsx'
 import { NoteSidebar } from './sidebar/note-sidebar.tsx'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
-import { Save } from 'lucide-react'
+import {FolderOpen, Save} from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
@@ -20,13 +20,13 @@ export const NotePad = forwardRef<NotePadHandler>(
 		}), [pad.activeView])
 
 		return (
-			<div className="h-full flex flex-col bg-background">
+			<div className="h-full flex flex-col">
 				<Tabs
 					value={pad.activeView}
 					onValueChange={v => pad.setActiveView(v as ViewMode)}
 					className="h-full flex flex-col"
 				>
-					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
+					<div className="p-3 flex items-center gap-2 border-b h-12 justify-between">
 						<TabsList>
 							<TabsTrigger value="markdown">Markdown</TabsTrigger>
 							<TabsTrigger value="editor">Editor</TabsTrigger>
