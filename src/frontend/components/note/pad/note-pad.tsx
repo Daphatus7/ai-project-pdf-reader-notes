@@ -26,7 +26,7 @@ export const NotePad = forwardRef<NotePadHandler>(
 					onValueChange={v => pad.setActiveView(v as ViewMode)}
 					className="h-full flex flex-col"
 				>
-					<div className="p-3 flex items-center gap-2 border-b h-12 justify-between">
+					<div className="p-3 flex items-center gap-2 border-b h-13 justify-between">
 						<TabsList>
 							<TabsTrigger value="markdown">Markdown</TabsTrigger>
 							<TabsTrigger value="editor">Editor</TabsTrigger>
