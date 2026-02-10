@@ -63,7 +63,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`px-4 py-2 rounded-lg ${
+				className={`px-4 py-2 rounded-lg${
 					onSelectContent ? 'cursor-pointer  transition-colors' : ''
 				}`}
 				onClick={handleClick}
