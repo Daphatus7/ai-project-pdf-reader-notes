@@ -57,8 +57,6 @@
 }
 
 :root {
-    --text-xm: 12px;
-    --text-em: 16px;
     --font-weight-medium: 500;
     --font-weight-normal: 400;
     /* Bare-name aliases for direct var(--*) references (sonner, sidebar, etc.) */
