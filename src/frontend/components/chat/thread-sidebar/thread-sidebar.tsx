@@ -23,7 +23,7 @@ export function ThreadSidebar({
 }: ThreadSidebarProps) {
 	return (
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
-			<div className="p-3 border-b flex items-center justify-between">
+			<div className="p-3 border-b flex items-center justify-between h-13">
 				<span className="text-sm font-medium">Threads</span>
 				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />

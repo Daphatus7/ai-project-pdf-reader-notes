@@ -60,6 +60,7 @@
     --font-weight-medium: 500;
     --font-weight-normal: 400;
     /* Bare-name aliases for direct var(--*) references (sonner, sidebar, etc.) */
+    --panel-header: calc(var(--spacing) * 13);
     --background: var(--color-background);
     --foreground: var(--color-foreground);
     --chat-bubble: var(--color-chat-bubble);

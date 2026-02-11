@@ -61,7 +61,10 @@ export function SourceList({
 	return (
 		<div className="h-full flex flex-col">
 			{/* Header with back button and project name */}
-			<div className="border-b p-3 flex items-center gap-2">
+			<div className="border-b p-3 flex items-center justify-between gap-2 h-13">
+				<span className="text-sm font-medium truncate">
+					{currentProject.name}
+				</span>
 				<Button
 					variant="ghost"
 					size="icon"
@@ -70,9 +73,7 @@ export function SourceList({
 				>
 					<ArrowLeft className="h-4 w-4" />
 				</Button>
-				<span className="text-sm font-medium truncate">
-					{currentProject.name}
-				</span>
+
 			</div>
 
 			{/* Error */}

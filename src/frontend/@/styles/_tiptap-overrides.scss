@@ -67,6 +67,37 @@
     line-height: var(--content-line-height);
   }
 
+  // --- Tables ---
+  table {
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+
+    td,
+    th {
+      border: 1px solid var(--tt-border-color);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * { margin-bottom: 0; }
+    }
+
+    th {
+      background-color: var(--tt-gray-light-a-50);
+      font-weight: bold;
+      text-align: left;
+
+      .dark & {
+        background-color: var(--tt-gray-dark-a-50);
+      }
+    }
+  }
+
   // --- Horizontal rule ---
   hr {
     margin: var(--content-hr-margin-y) 0;

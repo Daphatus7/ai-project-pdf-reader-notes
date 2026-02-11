@@ -31,14 +31,13 @@ export function ManagementPanel({
 	if (source.view.type === 'reader' && source.currentDocumentUrl) {
 		return (
 			<div className="h-full flex flex-col">
-				<div className="border-b p-2">
+				<div className="flex border-b p-2 justify-end">
 					<Button
 						variant="ghost"
 						size="sm"
 						onClick={source.closeDocumentReader}
 					>
-						<ArrowLeft className="h-4 w-4 mr-2" />
-						Back to Sources
+						<ArrowLeft className="h-4 w-4" />
 					</Button>
 				</div>
 				<div className="flex-1 overflow-hidden">
