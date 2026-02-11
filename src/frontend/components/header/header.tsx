@@ -5,7 +5,7 @@ import {
 	Settings,
 	User,
 	LogIn,
-	CreditCard
+	CreditCard, LucideMail
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -34,14 +34,23 @@ export function Header() {
 					onClick={() => setPricingOpen(true)}
 					className="text-xs h-8 px-3"
 				>
-					<CreditCard className="w-3.5 h-3.5 mr-1.5" />
+					<CreditCard className="w-4 h-4" />
 					Upgrade
 				</Button>
 
+				<Button variant="ghost" size="icon" className="h-8 w-8">
+					<LucideMail className="w-4 h-4 mr-2" />
+				</Button>
+
+				<Button variant="ghost" size="icon" className="h-8 w-8">
+					<img className="w-4 h-4 mr-2" src="public/discord-logo.svg"
+					 alt="discord portal"/>
+				</Button>
+				
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">
-							<Settings className="w-4 h-4 text-muted-foreground" />
+							<Settings className="w-4 h-4 " />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
@@ -62,7 +71,7 @@ export function Header() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">
-							<User className="w-4 h-4 text-muted-foreground" />
+							<User className="w-4 h-4 " />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
