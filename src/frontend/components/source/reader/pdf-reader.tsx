@@ -1,12 +1,14 @@
 import { useRef } from 'react';
 import { RotateDirection, Viewer, Worker } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type ToolbarSlot } from '@react-pdf-viewer/toolbar';
+import { Sparkles } from 'lucide-react';
 import { useScreenshot } from './useScreenshot.tsx';
 import { ScreenshotOverlay } from '../../screenshot/ScreenshotOverlay.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 import '@/frontend/styles/pdf-reader.scss';
+import {Button} from "@/frontend/components/ui/button.tsx";
 
 interface PdfReaderProps {
   fileUrl: string;
@@ -69,14 +71,21 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
             <div className="pdf-toolbar-separator" />
 
             {/* Screenshot */}
-            <button
+            <Button
               className={`pdf-toolbar-btn ${
-                screenshot.isActive ? 'pdf-toolbar-btn--danger' : 'pdf-toolbar-btn--primary'
+                screenshot.isActive ? 'pdf-toolbar-btn--danger' : 'pdf-toolbar-btn--ai'
               }`}
               onClick={() => (screenshot.isActive ? screenshot.deactivate() : screenshot.activate())}
             >
-              {screenshot.isActive ? 'Cancel' : 'Ask AI'}
-            </button>
+              {screenshot.isActive ? (
+                'Cancel'
+              ) : (
+                <>
+                  <Sparkles size={14} />
+                  Ask AI
+                </>
+              )}
+            </Button>
           </div>
         )}
       </Toolbar>
