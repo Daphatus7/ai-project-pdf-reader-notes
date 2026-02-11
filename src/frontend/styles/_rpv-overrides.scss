@@ -1,0 +1,67 @@
+/* ==========================================================
+   react-pdf-viewer → Semantic Token Bridge
+
+   Overrides rpv's --rpv-core__* CSS variables to reference
+   the Tier 2 semantic tokens from _tokens.scss.
+   Also applies structural overrides (radius, height, transition)
+   to match the site-wide control geometry.
+   ========================================================== */
+
+/* ---- Variable overrides: light mode ---- */
+:root {
+  /* Buttons */
+  --rpv-core__minimal-button-color: var(--control-text);
+  --rpv-core__minimal-button--hover-background-color: var(--control-bg-hover);
+  --rpv-core__minimal-button--disabled-color: var(--control-text-disabled);
+  --rpv-core__minimal-button--selected-background-color: var(--control-bg-active);
+
+  /* Text input */
+  --rpv-core__textbox-background-color: var(--input-bg);
+  --rpv-core__textbox-border-color: var(--input-border);
+  --rpv-core__textbox-color: var(--input-text);
+
+  /* Separator */
+  --rpv-core__separator-border-bottom-color: var(--separator-color);
+
+  /* Tooltip */
+  --rpv-core__tooltip-body-background-color: var(--black);
+  --rpv-core__tooltip-body-color: var(--white);
+}
+
+/* ---- Variable overrides: dark mode ---- */
+.dark {
+  --rpv-core__minimal-button-color: var(--control-text);
+  --rpv-core__minimal-button--hover-background-color: var(--control-bg-hover);
+  --rpv-core__minimal-button--disabled-color: var(--control-text-disabled);
+  --rpv-core__minimal-button--selected-background-color: var(--control-bg-active);
+
+  --rpv-core__textbox-background-color: var(--input-bg);
+  --rpv-core__textbox-border-color: var(--input-border);
+  --rpv-core__textbox-color: var(--input-text);
+
+  --rpv-core__separator-border-bottom-color: var(--separator-color);
+
+  --rpv-core__tooltip-body-background-color: var(--tt-gray-dark-200);
+  --rpv-core__tooltip-body-color: var(--white);
+}
+
+/* ---- Structural overrides: button geometry ---- */
+.rpv-core__minimal-button {
+  border-radius: var(--control-radius);
+  height: var(--control-height);
+  padding: 0 0.5rem;
+  transition-property: background, color, opacity;
+  transition-duration: var(--transition-duration);
+  transition-timing-function: var(--transition-easing);
+}
+
+/* ---- Structural overrides: text input geometry ---- */
+.rpv-core__textbox {
+  border-radius: var(--input-radius);
+  height: var(--control-height);
+}
+
+.rpv-page-navigation__current-page-input {
+  border-radius: var(--input-radius);
+  height: var(--control-height);
+}

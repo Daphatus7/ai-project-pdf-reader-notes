@@ -1,0 +1,62 @@
+/* ==========================================================
+   PDF Reader Toolbar
+
+   Uses Tier 2 semantic tokens from _tokens.scss.
+   Mirrors the visual language of .tiptap-toolbar[data-variant="fixed"].
+   ========================================================== */
+
+.pdf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: var(--toolbar-height);
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
+  padding: 0 0.5rem;
+}
+
+.pdf-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.pdf-toolbar-separator {
+  width: 1px;
+  height: 1.5rem;
+  background-color: var(--separator-color);
+  flex-shrink: 0;
+  margin: 0 0.25rem;
+}
+
+.pdf-toolbar-btn {
+  height: var(--control-height);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--control-radius);
+  cursor: pointer;
+  transition-property: background, color, opacity;
+  transition-duration: var(--transition-duration);
+  transition-timing-function: var(--transition-easing);
+
+  &--primary {
+    background: var(--control-primary-bg);
+    color: var(--control-primary-text);
+
+    &:hover {
+      background: var(--control-primary-bg-hover);
+    }
+  }
+
+  &--danger {
+    background: var(--control-danger-bg);
+    color: var(--control-danger-text);
+
+    &:hover {
+      background: var(--control-danger-bg-hover);
+    }
+  }
+}

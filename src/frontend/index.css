@@ -1,6 +1,8 @@
 /*tip tap editor*/
 @import './@/styles/_variables.scss';
 @import './@/styles/_typography-tokens.scss';
+@import './styles/_tokens.scss';
+@import './styles/_rpv-overrides.scss';
 
 @import "tailwindcss";
 @layer base {
@@ -96,10 +98,6 @@
     --sidebar-accent-foreground: var(--color-sidebar-accent-foreground);
     --sidebar-border: var(--color-sidebar-border);
     --sidebar-ring: var(--color-sidebar-ring);
-    
-    
-/*    Tiptap*/
-    --tt-toolbar-bg-color: var(--color-panel);
 }
 
 .dark {

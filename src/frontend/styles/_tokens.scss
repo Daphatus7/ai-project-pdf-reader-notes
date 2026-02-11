@@ -1,0 +1,78 @@
+/* ==========================================================
+   Tier 2 — Semantic Design Tokens
+
+   Single source of truth for cross-component visual properties.
+   Values reference Tier 1 primitives (_variables.scss).
+   All components (TipTap, rpv, pdf-toolbar) should consume
+   these tokens instead of referencing primitives directly.
+   ========================================================== */
+
+:root {
+  /* ---- Surfaces ---- */
+  --toolbar-bg: var(--color-panel);
+  --toolbar-border: var(--tt-gray-light-a-100);
+  --toolbar-height: 2.75rem;
+
+  /* ---- Interactive controls (buttons) ---- */
+  --control-height: 2rem;
+  --control-radius: var(--tt-radius-lg);
+  --control-bg: var(--tt-gray-light-a-100);
+  --control-bg-hover: var(--tt-gray-light-200);
+  --control-bg-active: var(--tt-gray-light-a-200);
+  --control-text: var(--tt-gray-light-a-600);
+  --control-text-hover: var(--tt-gray-light-a-900);
+  --control-text-disabled: var(--tt-gray-light-a-400);
+
+  /* ---- Primary action ---- */
+  --control-primary-bg: var(--tt-brand-color-500);
+  --control-primary-bg-hover: var(--tt-brand-color-600);
+  --control-primary-text: var(--white);
+
+  /* ---- Danger / cancel action ---- */
+  --control-danger-bg: var(--color-destructive, #d4183d);
+  --control-danger-bg-hover: var(--tt-color-red-dec-1);
+  --control-danger-text: var(--white);
+
+  /* ---- Separator ---- */
+  --separator-color: var(--tt-gray-light-a-200);
+
+  /* ---- Input ---- */
+  --input-bg: var(--tt-bg-color);
+  --input-border: var(--tt-border-color);
+  --input-radius: var(--tt-radius-md);
+  --input-text: var(--tt-gray-light-a-900);
+
+  /* ---- Transition ---- */
+  --transition-duration: var(--tt-transition-duration-default);
+  --transition-easing: var(--tt-transition-easing-default);
+
+  /* ---- TipTap toolbar bridge ---- */
+  --tt-toolbar-bg-color: var(--toolbar-bg);
+}
+
+/* ---- Dark mode ---- */
+.dark {
+  --toolbar-bg: var(--color-panel);
+  --toolbar-border: var(--tt-gray-dark-a-50);
+
+  --control-bg: var(--tt-gray-dark-a-100);
+  --control-bg-hover: var(--tt-gray-dark-200);
+  --control-bg-active: var(--tt-gray-dark-a-200);
+  --control-text: var(--tt-gray-dark-a-600);
+  --control-text-hover: var(--tt-gray-dark-a-900);
+  --control-text-disabled: var(--tt-gray-dark-a-300);
+
+  --control-primary-bg: var(--tt-brand-color-500);
+  --control-primary-bg-hover: var(--tt-brand-color-600);
+
+  --control-danger-bg: var(--color-destructive, #dc2626);
+  --control-danger-bg-hover: var(--tt-color-red-dec-2);
+
+  --separator-color: var(--tt-gray-dark-a-200);
+
+  --input-bg: var(--tt-bg-color);
+  --input-border: var(--tt-border-color);
+  --input-text: var(--tt-gray-dark-a-900);
+
+  --tt-toolbar-bg-color: var(--toolbar-bg);
+}
