@@ -5,7 +5,7 @@ import { PdfReader } from './pdf-reader';
 interface ReaderPanelProps {
 	documentUrl: string;
 	onBack: () => void;
-	onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+	onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
 	onDownload?: (imageDataUrl: string, name: string) => void;
 }

@@ -8,7 +8,7 @@ import { ReaderPanel } from './reader/reader-panel';
 type ActiveView = 'projects' | 'sources' | 'reader';
 
 interface ManagementPanelProps {
-	onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+	onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
 	onDownload?: (imageDataUrl: string, name: string) => void;
 	onSourceSelectionChange?: (selectedIds: string[]) => void;

@@ -62,7 +62,7 @@ export default function NotePage() {
 		}
 	};
 	
-	const handleAskAI = (imageDataUrl: string, name: string) => {
+	const handleAskAI = (imageDataUrl: string, name: string, prompt?: string) => {
 		// Extract base64 data and mime type from data URL
 		const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
 		if (!match) {
@@ -82,7 +82,7 @@ export default function NotePage() {
 			},
 			{
 				type: 'text',
-				text: 'Please explain this screenshot.',
+				text: prompt || 'Please explain this screenshot.',
 			},
 		]);
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');

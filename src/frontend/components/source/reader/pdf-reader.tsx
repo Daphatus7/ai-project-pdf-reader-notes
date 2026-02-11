@@ -12,7 +12,7 @@ import {Button} from "@/frontend/components/ui/button.tsx";
 
 interface PdfReaderProps {
   fileUrl: string;
-  onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+  onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
   onSaveToNote?: (imageDataUrl: string, name: string) => void;
   onDownload?: (imageDataUrl: string, name: string) => void;
 }
@@ -26,14 +26,14 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
 
   const screenshot = useScreenshot();
 
-  const captureAndCall = async (callback: (dataUrl: string, name: string) => void) => {
+  const captureAndCall = async (callback: (dataUrl: string, name: string, ...args: unknown[]) => void, ...extra: unknown[]) => {
     if (!containerRef.current) return;
     const dataUrl = await screenshot.capture(containerRef.current);
-    callback(dataUrl, `screenshot-${Date.now()}.png`);
+    callback(dataUrl, `screenshot-${Date.now()}.png`, ...extra);
     screenshot.deactivate();
   };
 
-  const handleAskAI = () => captureAndCall(onScreenshotCapture);
+  const handleAskAI = (prompt?: string) => captureAndCall(onScreenshotCapture, prompt);
   const handleSaveToNote = onSaveToNote ? () => captureAndCall(onSaveToNote) : undefined;
   const handleDownload = onDownload ? () => captureAndCall(onDownload) : undefined;
 

@@ -97,8 +97,29 @@
    ========================================================== */
 
 .screenshot-action-panel {
-  min-width: 9rem;
+  min-width: 13rem;
   border-color: var(--toolbar-border);
+
+  &__input {
+    width: 100%;
+    height: var(--control-height);
+    padding: 0 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--input-text);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--input-radius);
+    outline: none;
+    transition: border-color var(--transition-duration) var(--transition-easing);
+
+    &::placeholder {
+      color: var(--control-text-disabled);
+    }
+
+    &:focus {
+      border-color: var(--tt-brand-color-400);
+    }
+  }
 
   &__ai-btn {
     position: relative;

@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
 import { Sparkles, StickyNote, Download, X } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 
@@ -13,7 +13,7 @@ interface ScreenshotOverlayProps {
   selectionRect: Rect | null;
   isSelecting: boolean;
   isCapturing: boolean;
-  onAskAI: () => void;
+  onAskAI: (prompt?: string) => void;
   onSaveToNote?: () => void;
   onDownload?: () => void;
   onCancel: () => void;
@@ -32,6 +32,7 @@ export function ScreenshotOverlay({
 }: ScreenshotOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const [prompt, setPrompt] = useState('');
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -59,6 +60,17 @@ export function ScreenshotOverlay({
     panel.style.left = `${left}px`;
     panel.style.top = `${top}px`;
   });
+
+  const handleSubmit = () => {
+    onAskAI(prompt.trim() || undefined);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
 
   return (
     <div ref={overlayRef} className="absolute inset-0 z-50 cursor-crosshair">
@@ -91,11 +103,22 @@ export function ScreenshotOverlay({
           }}
           data-screenshot-ignore
         >
+          {/* Prompt input */}
+          <input
+            className="screenshot-action-panel__input"
+            type="text"
+            placeholder="Ask anything..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoFocus
+          />
+
           <Button
             variant="default"
             size="sm"
             className="justify-start screenshot-action-panel__ai-btn"
-            onClick={onAskAI}
+            onClick={handleSubmit}
             disabled={isCapturing}
           >
             <Sparkles />
