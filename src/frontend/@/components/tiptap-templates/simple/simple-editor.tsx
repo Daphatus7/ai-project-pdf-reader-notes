@@ -22,6 +22,9 @@ import "@/frontend/@/components/tiptap-node/image-node/image-node.scss"
 import "@/frontend/@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/frontend/@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
+// --- Typography override (must load AFTER tiptap-node styles) ---
+import "@/frontend/@/styles/_tiptap-overrides.scss"
+
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/frontend/@/components/tiptap-ui/heading-dropdown-menu"
 import { ImageUploadButton } from "@/frontend/@/components/tiptap-ui/image-upload-button"
@@ -57,6 +60,9 @@ import { ThemeToggle } from "@/frontend/@/components/tiptap-templates/simple/the
 
 // --- Styles ---
 import "@/frontend/@/components/tiptap-templates/simple/simple-editor.scss"
+
+// --- Token override (must load AFTER all tiptap-ui component styles) ---
+import "@/frontend/styles/_tiptap-token-overrides.scss"
 
 
 
@@ -189,14 +195,11 @@ export function SimpleEditor({ editor }: { editor: Editor }) {
 
 	return (
 		<div
-			style={{
-				width: "100%",
-				height: "100%",
-			}}
 			className="simple-editor-wrapper">
 			<EditorContext.Provider value={{ editor }}>
 				<Toolbar
 					ref={toolbarRef}
+					className="simple-editor-toolbar"
 					style={{
 						...(isMobile
 							? {

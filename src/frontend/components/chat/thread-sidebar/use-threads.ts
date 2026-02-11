@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { llmService } from '@/frontend/api/services/llm.service';
+import { llmService } from '@/frontend/api/services/llm.service.ts';
 import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage, UserMessage, AIMessage} from "@/frontend/api/types/chat.ts";
 

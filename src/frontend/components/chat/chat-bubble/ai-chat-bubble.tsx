@@ -7,6 +7,8 @@
 import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
 import type {ChatContent} from "@/frontend/api";
 import {MarkdownRenderer} from "@/frontend/components/renderer/markdown-renderer.tsx";
+import {Button} from "@/frontend/components/ui/button.tsx";
+import {LucideArrowRight} from "lucide-react";
 
 /**
  * Render a single content item (text or image)
@@ -54,7 +56,6 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
 	const handleClick = (e: React.MouseEvent) => {
-		console.log("AIChatBubble outer div clicked");
 		if (onSelectContent) {
 			const textContent = extractTextContent(contents);
 			onSelectContent(textContent);
@@ -64,12 +65,17 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`max-w-[80%] bg-gray-100 text-gray-800 px-4 py-2 rounded-lg ${
-					onSelectContent ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
-				}`}
-				onClick={handleClick}
+				className="px-4 py-2 rounded-lg"
 			>
 				{contents.map((item, index) => renderContentItem(item, index, onSelectContent))}
+				{onSelectContent && (
+					<div className='flex justify-end'>
+						<Button variant='secondary' className='bg-panel border rounded-2xl' size='sm' onClick={handleClick}>
+							Insert to note
+							<LucideArrowRight className="size-4" />
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

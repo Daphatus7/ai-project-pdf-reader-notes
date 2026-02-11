@@ -1,7 +1,11 @@
+export type ProjectCategory = 'research' | 'personal' | 'work';
+
 export interface Project {
 	id: string;
 	name: string;
 	description?: string;
+	category?: ProjectCategory;
+	is_starred?: boolean;
 	created_at: string;
 	updated_at: string;
 }
@@ -16,9 +20,4 @@ export interface Document {
 	created_at: string;
 	updated_at: string;
 	metadata?: Record<string, unknown>;
-}
-
-export interface SourcePanelView {
-	type: 'list' | 'reader';
-	documentId?: string;
 }

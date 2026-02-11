@@ -1,15 +1,18 @@
 import { useRef } from 'react';
 import { RotateDirection, Viewer, Worker } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type ToolbarSlot } from '@react-pdf-viewer/toolbar';
+import { Sparkles } from 'lucide-react';
 import { useScreenshot } from './useScreenshot.tsx';
 import { ScreenshotOverlay } from '../../screenshot/ScreenshotOverlay.tsx';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
+import '@/frontend/styles/pdf-reader.scss';
+import {Button} from "@/frontend/components/ui/button.tsx";
 
 interface PdfReaderProps {
   fileUrl: string;
-  onScreenshotCapture: (imageDataUrl: string, name: string) => void;
+  onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
   onSaveToNote?: (imageDataUrl: string, name: string) => void;
   onDownload?: (imageDataUrl: string, name: string) => void;
 }
@@ -23,14 +26,14 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
 
   const screenshot = useScreenshot();
 
-  const captureAndCall = async (callback: (dataUrl: string, name: string) => void) => {
+  const captureAndCall = async (callback: (dataUrl: string, name: string, ...args: unknown[]) => void, ...extra: unknown[]) => {
     if (!containerRef.current) return;
     const dataUrl = await screenshot.capture(containerRef.current);
-    callback(dataUrl, `screenshot-${Date.now()}.png`);
+    callback(dataUrl, `screenshot-${Date.now()}.png`, ...extra);
     screenshot.deactivate();
   };
 
-  const handleAskAI = () => captureAndCall(onScreenshotCapture);
+  const handleAskAI = (prompt?: string) => captureAndCall(onScreenshotCapture, prompt);
   const handleSaveToNote = onSaveToNote ? () => captureAndCall(onSaveToNote) : undefined;
   const handleDownload = onDownload ? () => captureAndCall(onDownload) : undefined;
 
@@ -39,43 +42,50 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
       {/* Toolbar */}
       <Toolbar>
         {(props: ToolbarSlot) => (
-          <div className="flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
+          <div className="pdf-toolbar">
             {/* Navigation */}
-            <div className="flex items-center gap-1">
+            <div className="pdf-toolbar-group">
               <props.GoToPreviousPage />
               <props.CurrentPageInput />
-              <span className="text-sm text-gray-500">/ <props.NumberOfPages /></span>
+              <span className="text-sm" style={{ color: 'var(--control-text)' }}>/ <props.NumberOfPages /></span>
               <props.GoToNextPage />
             </div>
 
-            <div className="w-px h-6 bg-gray-300 mx-2" />
+            <div className="pdf-toolbar-separator" />
 
             {/* Zoom */}
-            <div className="flex items-center gap-1">
+            <div className="pdf-toolbar-group">
               <props.ZoomOut />
               <props.Zoom />
               <props.ZoomIn />
             </div>
 
-            <div className="w-px h-6 bg-gray-300 mx-2" />
+            <div className="pdf-toolbar-separator" />
 
             {/* Actions */}
-            <div className="flex items-center gap-1">
+            <div className="pdf-toolbar-group">
               <props.Rotate direction={RotateDirection.Backward} />
               <props.EnterFullScreen />
             </div>
 
-            <div className="w-px h-6 bg-gray-300 mx-2" />
+            <div className="pdf-toolbar-separator" />
 
             {/* Screenshot */}
-            <button
-              className={`px-3 py-1 text-sm rounded transition-colors ${
-                screenshot.isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'
+            <Button
+              className={`pdf-toolbar-btn ${
+                screenshot.isActive ? 'pdf-toolbar-btn--danger' : 'pdf-toolbar-btn--ai'
               }`}
               onClick={() => (screenshot.isActive ? screenshot.deactivate() : screenshot.activate())}
             >
-              {screenshot.isActive ? 'Cancel' : 'Ask AI'}
-            </button>
+              {screenshot.isActive ? (
+                'Cancel'
+              ) : (
+                <>
+                  <Sparkles size={14} />
+                  Ask AI
+                </>
+              )}
+            </Button>
           </div>
         )}
       </Toolbar>

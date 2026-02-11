@@ -24,6 +24,7 @@ import {ManagementPanel} from "@/frontend/components/source/project-management.t
  * Handles content insertion flow:
  * MarkdownRenderer (click) → LLMChat → NotePage → NoteTaker (insert)
  */
+
 export default function NotePage() {
 	
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
@@ -61,7 +62,7 @@ export default function NotePage() {
 		}
 	};
 	
-	const handleAskAI = (imageDataUrl: string, name: string) => {
+	const handleAskAI = (imageDataUrl: string, name: string, prompt?: string) => {
 		// Extract base64 data and mime type from data URL
 		const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
 		if (!match) {
@@ -81,7 +82,7 @@ export default function NotePage() {
 			},
 			{
 				type: 'text',
-				text: 'Please explain this screenshot.',
+				text: prompt || 'Please explain this screenshot.',
 			},
 		]);
 		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
@@ -110,6 +111,7 @@ export default function NotePage() {
 					onCollapse={() => setIsCenterCollapsed(true)}
 					onExpand={() => setIsCenterCollapsed(false)}
 					onResize={handleCenterResize}
+					className="bg-panel border rounded-xl ml-2 mr-1 mb-2"
 				>
 					{isCenterCollapsed ? (
 						<div
@@ -134,6 +136,7 @@ export default function NotePage() {
 				<ResizablePanel
 					defaultSize={34}
 					minSize={15}
+					className="bg-panel border rounded-xl ml-1 mr-1 mb-2"
 				>
 					<LLMChatFeature
 						ref={chatRef}
@@ -150,6 +153,7 @@ export default function NotePage() {
 
 				<ResizableHandle  withHandle/>
 				
+				{/* Notepad*/}
 				<ResizablePanel
 					ref={rightPanelRef}
 					collapsible
@@ -157,6 +161,7 @@ export default function NotePage() {
 					onCollapse={() => setIsRightCollapsed(true)}
 					onExpand={() => setIsRightCollapsed(false)}
 					onResize={handleRightResize}
+					className="bg-panel border rounded-xl ml-1 mr-2 mb-2"
 				>
 					{isRightCollapsed && (
 						<div

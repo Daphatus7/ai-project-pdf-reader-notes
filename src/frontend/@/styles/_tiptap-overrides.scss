@@ -1,0 +1,105 @@
+/**
+ * TipTap typography overrides — loaded AFTER vendor tiptap-node/*.scss.
+ * Applies shared tokens from _typography-tokens.scss so the editor
+ * matches the chat renderer.
+ *
+ * When TipTap upgrades, this file stays untouched — it simply
+ * re-applies our token values on top of whatever the vendor ships.
+ */
+
+.tiptap.ProseMirror {
+  font-family: var(--content-font);
+  font-size: var(--content-font-size);
+
+  // --- Headings ---
+  h1 { font-size: var(--content-h1-size); font-weight: var(--content-h1-weight); margin-top: var(--content-h1-margin-top); }
+  h2 { font-size: var(--content-h2-size); font-weight: var(--content-h2-weight); margin-top: var(--content-h2-margin-top); }
+  h3 { font-size: var(--content-h3-size); font-weight: var(--content-h3-weight); margin-top: var(--content-h3-margin-top); }
+  h4 { font-size: var(--content-h4-size); font-weight: var(--content-h4-weight); margin-top: var(--content-h4-margin-top); }
+
+  // --- Paragraphs ---
+  p:not(:first-child):not(td p):not(th p) {
+    font-size: var(--content-font-size);
+    line-height: var(--content-line-height);
+    margin-top: var(--content-p-margin-top);
+  }
+
+  // --- Inline code ---
+  code {
+    font-family: var(--content-code-font);
+    font-size: var(--content-code-size);
+    line-height: var(--content-code-line-height);
+    border-radius: var(--content-code-radius);
+    padding: var(--content-code-padding);
+  }
+
+  // --- Code blocks ---
+  pre {
+    margin-top: var(--content-codeblock-margin-y);
+    margin-bottom: var(--content-codeblock-margin-y);
+    padding: var(--content-codeblock-padding);
+    font-size: var(--content-codeblock-font-size);
+    border-radius: var(--content-codeblock-radius);
+  }
+
+  // --- Blockquotes ---
+  blockquote {
+    padding-left: var(--content-blockquote-padding-left);
+    padding-top: var(--content-blockquote-padding-y);
+    padding-bottom: var(--content-blockquote-padding-y);
+    margin: var(--content-blockquote-margin-y) 0;
+
+    &::before,
+    &.is-empty::before {
+      width: var(--content-blockquote-bar-width);
+    }
+  }
+
+  // --- Lists ---
+  ol,
+  ul {
+    margin-top: var(--content-list-margin-y);
+    margin-bottom: var(--content-list-margin-y);
+    padding-left: var(--content-list-padding-left);
+  }
+
+  li p {
+    line-height: var(--content-line-height);
+  }
+
+  // --- Tables ---
+  table {
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+
+    td,
+    th {
+      border: 1px solid var(--tt-border-color);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * { margin-bottom: 0; }
+    }
+
+    th {
+      background-color: var(--tt-gray-light-a-50);
+      font-weight: bold;
+      text-align: left;
+
+      .dark & {
+        background-color: var(--tt-gray-dark-a-50);
+      }
+    }
+  }
+
+  // --- Horizontal rule ---
+  hr {
+    margin: var(--content-hr-margin-y) 0;
+  }
+}

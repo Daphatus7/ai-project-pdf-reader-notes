@@ -14,7 +14,7 @@ export function NoteMarkdownRenderer({ value, onChange }: NoteMarkdownRendererPr
 
 	return (
 		<textarea
-			className="markdown-input w-full h-full font-mono p-4 resize-none outline-none bg-background text-foreground"
+			className="markdown-input w-full h-full font-mono p-4 resize-none outline-none bg-panel text-foreground"
 			value={localValue}
 			onChange={e => {
 				setLocalValue(e.target.value)

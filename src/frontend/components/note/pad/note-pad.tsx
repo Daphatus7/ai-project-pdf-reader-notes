@@ -1,17 +1,17 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/ui/tabs.tsx'
 import { NoteMarkdownRenderer } from './renderer/note-markdown-renderer'
 import { NoteRenderer } from './renderer/note-renderer'
-import { NoteButton } from './sidebar/note-button.tsx'
-import { NoteSidebar } from './sidebar/note-sidebar.tsx'
+import { NoteSidebar } from './note-sidebar'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
-import { Save } from 'lucide-react'
+import { Save, Sidebar } from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
 	function NotePad(_, ref) {
 		const pad = useNotePad()
+		const [showSidebar, setShowSidebar] = useState(false)
 
 		useImperativeHandle(ref, () => ({
 			insertContent: pad.insertContent,
@@ -20,53 +20,60 @@ export const NotePad = forwardRef<NotePadHandler>(
 		}), [pad.activeView])
 
 		return (
-			<div className="h-full flex flex-col bg-background">
-				<Tabs
-					value={pad.activeView}
-					onValueChange={v => pad.setActiveView(v as ViewMode)}
-					className="h-full flex flex-col"
-				>
-					<div className="border-b px-4 py-2 flex items-center justify-between bg-muted/20">
-						<TabsList>
-							<TabsTrigger value="markdown">Markdown</TabsTrigger>
-							<TabsTrigger value="editor">Editor</TabsTrigger>
-						</TabsList>
-						<div className="flex">
-							<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote}>
-								<Save className="h-4 w-4" />
-							</Button>
-
-							<NoteButton>
-								<NoteSidebar
-									notes={pad.notes}
-									setNotes={pad.setNotes}
-									selectedNoteId={pad.selectedNoteId}
-									onSelectNote={pad.selectNote}
-									onAddNote={pad.addNote}
-									onDeleteNote={pad.deleteNote}
-									onEditNoteName={pad.renameNote}
-								/>
-							</NoteButton>
+			<div className="flex flex-row h-full">
+				<div className="flex flex-col flex-1 min-w-0">
+					<Tabs
+						value={pad.activeView}
+						onValueChange={v => pad.setActiveView(v as ViewMode)}
+						className="h-full flex flex-col"
+					>
+						<div className="p-3 flex items-center border-b h-13 justify-between">
+							<div className="flex items-center gap-2">
+								<TabsList>
+									<TabsTrigger value="markdown">Markdown</TabsTrigger>
+									<TabsTrigger value="editor">Editor</TabsTrigger>
+								</TabsList>
+							</div>
+							<div className="flex items-center gap-1">
+								<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote}>
+									<Save className="h-4 w-4" />
+								</Button>
+								<Button variant="ghost" size="icon" onClick={() => setShowSidebar(!showSidebar)}>
+									<Sidebar className="h-4 w-4" />
+								</Button>
+							</div>
 						</div>
-					</div>
 
-					<div className="flex-1 overflow-hidden relative text-base">
-						<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
-							<NoteMarkdownRenderer
-								value={pad.documentContent}
-								onChange={pad.handleContentChange}
-							/>
-						</TabsContent>
+						<div className="flex-1 overflow-hidden relative text-base">
+							<TabsContent value="markdown" className="h-full m-0 p-0 flex flex-col">
+								<NoteMarkdownRenderer
+									value={pad.documentContent}
+									onChange={pad.handleContentChange}
+								/>
+							</TabsContent>
 
-						<TabsContent value="editor" className="h-full m-0">
-							<NoteRenderer
-								ref={pad.rendererRef}
-								value={pad.documentContent}
-								onChange={pad.handleContentChange}
-							/>
-						</TabsContent>
-					</div>
-				</Tabs>
+							<TabsContent value="editor" className="h-full m-0">
+								<NoteRenderer
+									ref={pad.rendererRef}
+									value={pad.documentContent}
+									onChange={pad.handleContentChange}
+								/>
+							</TabsContent>
+						</div>
+					</Tabs>
+				</div>
+
+				{showSidebar && (
+					<NoteSidebar
+						notes={pad.notes}
+						selectedNoteId={pad.selectedNoteId}
+						onSelectNote={pad.selectNote}
+						onAddNote={pad.addNote}
+						onDeleteNote={pad.deleteNote}
+						onRenameNote={pad.renameNote}
+						onClose={() => setShowSidebar(false)}
+					/>
+				)}
 			</div>
 		)
 	},

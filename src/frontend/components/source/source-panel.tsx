@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	ArrowLeft,
 	FileText,
@@ -13,7 +13,7 @@ import {
 	Collapsible,
 } from '@/frontend/components/ui/collapsible';
 import { DocumentUpload } from './document-upload';
-import type { Project, Document } from './type';
+import { useSource } from './useSource';
 
 const FADE_GRADIENT = 'linear-gradient(to right, black 90%, transparent)';
 
@@ -29,56 +29,49 @@ function FadeText({ text, maxChars = 120 }: { text: string; maxChars?: number })
 	);
 }
 
-interface SourceListProps {
-	currentProject: Project;
-	documents: Document[];
-	selectedDocumentIds: string[];
-	isLoadingDocuments: boolean;
-	isUploading: boolean;
-	error: string | null;
-	onGoBack: () => void;
-	onUploadDocument: (file: File, sourceName?: string) => Promise<void>;
-	onDeleteDocument: (documentId: string) => Promise<void>;
-	onToggleSelection: (documentId: string) => void;
+interface SourcePanelProps {
+	projectId: string;
+	projectName: string;
+	onBack: () => void;
 	onOpenDocument: (documentId: string) => void;
+	onSourceSelectionChange?: (selectedIds: string[]) => void;
 }
 
-export function SourceList({
-	currentProject,
-	documents,
-	selectedDocumentIds,
-	isLoadingDocuments,
-	isUploading,
-	error,
-	onGoBack,
-	onUploadDocument,
-	onDeleteDocument,
-	onToggleSelection,
+export function SourcePanel({
+	projectId,
+	projectName,
+	onBack,
 	onOpenDocument,
-}: SourceListProps) {
+	onSourceSelectionChange,
+}: SourcePanelProps) {
+	const source = useSource(projectId);
 	const [isSourcesOpen, setIsSourcesOpen] = useState(true);
+
+	useEffect(() => {
+		onSourceSelectionChange?.(source.selectedDocumentIds);
+	}, [source.selectedDocumentIds, onSourceSelectionChange]);
 
 	return (
 		<div className="h-full flex flex-col">
-			{/* Header with back button and project name */}
-			<div className="border-b p-3 flex items-center gap-2">
+			{/* Header - for source list */}
+			<div className="border-b p-3 flex items-center justify-between gap-2 h-13">
+				<span className="text-sm font-medium truncate">
+					{projectName}
+				</span>
 				<Button
 					variant="ghost"
-					size="icon"
-					className="h-7 w-7 shrink-0"
-					onClick={onGoBack}
+					size="sm"
+					onClick={onBack}
 				>
 					<ArrowLeft className="h-4 w-4" />
 				</Button>
-				<span className="text-sm font-medium truncate">
-					{currentProject.name}
-				</span>
+
 			</div>
 
 			{/* Error */}
-			{error && (
+			{source.error && (
 				<div className="px-3 pt-2">
-					<div className="text-sm text-destructive">{error}</div>
+					<div className="text-sm text-destructive">{source.error}</div>
 				</div>
 			)}
 
@@ -90,18 +83,18 @@ export function SourceList({
 						{/* Upload Area */}
 						<div className="mb-4">
 							<DocumentUpload
-								onUpload={onUploadDocument}
-								isUploading={isUploading}
+								onUpload={source.uploadDocument}
+								isUploading={source.isUploading}
 							/>
 						</div>
 
 						{/* Documents List */}
-						{isLoadingDocuments ? (
+						{source.isLoadingDocuments ? (
 							<div className="space-y-2">
 								<Skeleton className="h-10 w-full" />
 								<Skeleton className="h-10 w-full" />
 							</div>
-						) : documents.length === 0 ? (
+						) : source.documents.length === 0 ? (
 							<div className="text-center py-8 text-muted-foreground">
 								<Upload className="h-12 w-12 mx-auto mb-2 opacity-50" />
 								<p className="text-sm">No documents yet</p>
@@ -109,7 +102,7 @@ export function SourceList({
 							</div>
 						) : (
 							<div className="space-y-1">
-								{documents.map((doc) => (
+								{source.documents.map((doc) => (
 									<div
 										key={doc.id}
 										className="flex items-center gap-2 p-2 hover:bg-accent rounded-md group"
@@ -125,14 +118,13 @@ export function SourceList({
 											variant="ghost"
 											size="icon"
 											className="h-7 w-7 opacity-0 group-hover:opacity-100 shrink-0"
-											onClick={() => onDeleteDocument(doc.id)}
+											onClick={() => source.deleteDocument(doc.id)}
 										>
 											<Trash2 className="h-3.5 w-3.5" />
 										</Button>
 										<Checkbox
-											className="border-r-8"
-											checked={selectedDocumentIds.includes(doc.id)}
-											onCheckedChange={() => onToggleSelection(doc.id)}
+											checked={source.selectedDocumentIds.includes(doc.id)}
+											onCheckedChange={() => source.toggleDocumentSelection(doc.id)}
 										/>
 									</div>
 								))}

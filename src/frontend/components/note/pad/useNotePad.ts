@@ -156,8 +156,8 @@ export function useNotePad() {
 	// --- Imperative interface (exposed to parent via ref) ---
 
 	function insertContent(content: ContentInsertion, position: 'cursor' | 'end' = 'cursor') {
-		if (activeView === 'editor') {
-			rendererRef.current?.insertContent(content, position)
+		if (activeView === 'editor' && rendererRef.current) {
+			rendererRef.current.insertContent(content, position)
 		} else {
 			const newContent = contentRef.current + '\n' + content.content
 			contentRef.current = newContent
@@ -185,7 +185,7 @@ export function useNotePad() {
 		rendererRef,
 		isLoading,
 
-		// Sidebar operations
+		// Note operations
 		selectNote,
 		addNote,
 		saveCurrentNote,
