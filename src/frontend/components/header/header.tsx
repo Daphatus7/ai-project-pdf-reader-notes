@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button.tsx";
 import {
 	FileText,
 	Settings,
 	User,
 	LogIn,
+	LogOut,
 	CreditCard, LucideMail
 } from "lucide-react";
 import {
@@ -16,9 +18,21 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu.tsx";
 import {PricingDialog} from "@/frontend/features/pricing/PricingDialog.tsx";
+import { useAuth } from "@/frontend/features/auth";
 
 export function Header() {
 	const [pricingOpen, setPricingOpen] = useState(false);
+	const { user, signOut } = useAuth();
+	const navigate = useNavigate();
+
+	const handleLogin = () => {
+		navigate("/login");
+	};
+
+	const handleLogout = async () => {
+		await signOut();
+		navigate("/");
+	};
 
 	return (
 		<header className=" backdrop-blurpx-6 py-2 flex items-center justify-between ml-2 mr-2">
@@ -46,7 +60,7 @@ export function Header() {
 					<img className="w-4 h-4 mr-2" src="public/discord-logo.svg"
 					 alt="discord portal"/>
 				</Button>
-				
+
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">
@@ -75,19 +89,29 @@ export function Header() {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>My Account</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<LogIn className="w-4 h-4 mr-2" />
-							Login / Sign Up
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							Profile Settings
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							Logout
-						</DropdownMenuItem>
+						{user ? (
+							<>
+								<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem>
+									Profile Settings
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem onClick={handleLogout}>
+									<LogOut className="w-4 h-4 mr-2" />
+									Logout
+								</DropdownMenuItem>
+							</>
+						) : (
+							<>
+								<DropdownMenuLabel>My Account</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem onClick={handleLogin}>
+									<LogIn className="w-4 h-4 mr-2" />
+									Login / Sign Up
+								</DropdownMenuItem>
+							</>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
