@@ -71,8 +71,9 @@ export function ProjectPanel({
 	}
 
 	return (
+		// Project panel - displaying list of projects
 		<div className="h-full flex flex-col mg-2">
-			{/* Header */}
+			{/* Header for list of projects */}
 			<div className=" p-3 flex items-center gap-2 border-b h-13">
 				<FolderOpen className="h-4 w-4 text-muted-foreground" />
 				<span className="text-sm font-medium">Projects</span>

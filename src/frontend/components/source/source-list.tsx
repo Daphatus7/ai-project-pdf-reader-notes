@@ -60,15 +60,14 @@ export function SourceList({
 
 	return (
 		<div className="h-full flex flex-col">
-			{/* Header with back button and project name */}
+			{/* Header - for source list */}
 			<div className="border-b p-3 flex items-center justify-between gap-2 h-13">
 				<span className="text-sm font-medium truncate">
 					{currentProject.name}
 				</span>
 				<Button
 					variant="ghost"
-					size="icon"
-					className="h-7 w-7 shrink-0"
+					size="sm"
 					onClick={onGoBack}
 				>
 					<ArrowLeft className="h-4 w-4" />
