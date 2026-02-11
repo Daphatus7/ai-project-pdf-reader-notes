@@ -92,6 +92,50 @@
   }
 }
 
+/* ==========================================================
+   Screenshot Action Panel
+   ========================================================== */
+
+.screenshot-action-panel {
+  min-width: 9rem;
+  border-color: var(--toolbar-border);
+
+  &__ai-btn {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+      135deg,
+      var(--tt-brand-color-400),
+      var(--tt-brand-color-500),
+      var(--tt-brand-color-600)
+    ) !important;
+    color: var(--white) !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      animation: ai-shimmer 3s ease-in-out infinite;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        var(--tt-brand-color-300),
+        var(--tt-brand-color-500),
+        var(--tt-brand-color-700)
+      ) !important;
+    }
+  }
+}
+
 @keyframes ai-shimmer {
   0% {
     transform: translateX(-100%);

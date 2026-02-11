@@ -1,3 +1,7 @@
+import { useRef, useLayoutEffect } from 'react';
+import { Sparkles, StickyNote, Download, X } from 'lucide-react';
+import { Button } from '@/frontend/components/ui/button';
+
 interface Rect {
   x: number;
   y: number;
@@ -15,6 +19,8 @@ interface ScreenshotOverlayProps {
   onCancel: () => void;
 }
 
+const PANEL_GAP = 8;
+
 export function ScreenshotOverlay({
   selectionRect,
   isSelecting,
@@ -24,65 +30,113 @@ export function ScreenshotOverlay({
   onDownload,
   onCancel,
 }: ScreenshotOverlayProps) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const overlay = overlayRef.current;
+    if (!panel || !overlay || !selectionRect || isSelecting) return;
+
+    const cW = overlay.clientWidth;
+    const cH = overlay.clientHeight;
+    const pW = panel.offsetWidth;
+    const pH = panel.offsetHeight;
+
+    // Prefer right of selection
+    let left = selectionRect.x + selectionRect.width + PANEL_GAP;
+    let top = selectionRect.y;
+
+    // Flip to left if overflows right
+    if (left + pW > cW) {
+      left = selectionRect.x - pW - PANEL_GAP;
+    }
+
+    // Clamp within container
+    left = Math.max(PANEL_GAP, Math.min(left, cW - pW - PANEL_GAP));
+    top = Math.max(PANEL_GAP, Math.min(top, cH - pH - PANEL_GAP));
+
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
+  });
+
   return (
-    <div className="absolute inset-0 z-50 cursor-crosshair">
+    <div ref={overlayRef} className="absolute inset-0 z-50 cursor-crosshair">
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
       {/* Selection rectangle */}
       {selectionRect && (
         <div
-          className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none"
+          className="absolute border-2 pointer-events-none"
           style={{
             left: selectionRect.x,
             top: selectionRect.y,
             width: selectionRect.width,
             height: selectionRect.height,
+            borderColor: 'var(--tt-brand-color-400)',
+            backgroundColor: 'color-mix(in srgb, var(--tt-brand-color-400) 10%, transparent)',
           }}
         />
       )}
 
-      {/* Action widget - shows after selection complete */}
+      {/* Action panel */}
       {selectionRect && !isSelecting && (
         <div
-          className="absolute bg-white rounded shadow-lg p-2 flex flex-col gap-2"
+          ref={panelRef}
+          className="screenshot-action-panel absolute flex flex-col gap-1 rounded-lg border bg-popover p-1 shadow-lg"
           style={{
-            left: selectionRect.x + selectionRect.width + 8,
+            left: selectionRect.x + selectionRect.width + PANEL_GAP,
             top: selectionRect.y,
           }}
           data-screenshot-ignore
         >
-          <button
-            className="px-3 py-1 text-sm bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50"
+          <Button
+            variant="default"
+            size="sm"
+            className="justify-start screenshot-action-panel__ai-btn"
             onClick={onAskAI}
             disabled={isCapturing}
           >
+            <Sparkles />
             {isCapturing ? 'Capturing...' : 'Ask AI'}
-          </button>
+          </Button>
+
           {onSaveToNote && (
-            <button
-              className="px-3 py-1 text-sm bg-green-500 rounded hover:bg-green-600 disabled:opacity-50"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="justify-start"
               onClick={onSaveToNote}
               disabled={isCapturing}
             >
+              <StickyNote />
               Save to Note
-            </button>
+            </Button>
           )}
+
           {onDownload && (
-            <button
-              className="px-3 py-1 text-sm bg-purple-500 rounded hover:bg-purple-600 disabled:opacity-50"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="justify-start"
               onClick={onDownload}
               disabled={isCapturing}
             >
+              <Download />
               Download
-            </button>
+            </Button>
           )}
-          <button
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="justify-start"
             onClick={onCancel}
           >
+            <X />
             Cancel
-          </button>
+          </Button>
         </div>
       )}
     </div>
