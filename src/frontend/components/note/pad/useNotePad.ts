@@ -5,16 +5,12 @@ import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'
 
 export type ViewMode = 'markdown' | 'editor'
-export type PadView = 'list' | 'notepad'
 
 export function useNotePad() {
 	// --- Notes list ---
 	const [notes, setNotes] = useState<Note[]>([])
 	const [selectedNoteId, setSelectedNoteId] = useState('')
 	const [isLoading, setIsLoading] = useState(true)
-
-	// --- Navigation ---
-	const [padView, setPadView] = useState<PadView>('list')
 
 	// --- Current document ---
 	const contentRef = useRef('')
@@ -64,20 +60,6 @@ export function useNotePad() {
 		return contentRef.current !== lastSavedContent.current
 	}
 
-	// --- Navigation ---
-
-	async function openNote(id: string) {
-		await selectNote(id)
-		setPadView('notepad')
-	}
-
-	async function backToList() {
-		if (selectedNoteId && isDirty()) {
-			await saveCurrentNote()
-		}
-		setPadView('list')
-	}
-
 	// --- Note selection ---
 
 	async function selectNote(id: string) {
@@ -121,20 +103,6 @@ export function useNotePad() {
 			const created = await notesService.createNote({ title: 'Untitled' })
 			setNotes(prev => [created, ...prev])
 			applyNote(created)
-		} catch (error) {
-			console.error('[useNotePad] Failed to create note:', error)
-		}
-	}
-
-	async function addNoteAndOpen() {
-		try {
-			if (selectedNoteId && isDirty()) {
-				await saveCurrentNote()
-			}
-			const created = await notesService.createNote({ title: 'Untitled' })
-			setNotes(prev => [created, ...prev])
-			applyNote(created)
-			setPadView('notepad')
 		} catch (error) {
 			console.error('[useNotePad] Failed to create note:', error)
 		}
@@ -188,10 +156,6 @@ export function useNotePad() {
 	// --- Imperative interface (exposed to parent via ref) ---
 
 	function insertContent(content: ContentInsertion, position: 'cursor' | 'end' = 'cursor') {
-		if (padView === 'list') {
-			setPadView('notepad')
-		}
-
 		if (activeView === 'editor' && rendererRef.current) {
 			rendererRef.current.insertContent(content, position)
 		} else {
@@ -220,16 +184,10 @@ export function useNotePad() {
 		setActiveView,
 		rendererRef,
 		isLoading,
-		padView,
-
-		// Navigation
-		openNote,
-		backToList,
 
 		// Note operations
 		selectNote,
 		addNote,
-		addNoteAndOpen,
 		saveCurrentNote,
 		deleteNote,
 		renameNote,
