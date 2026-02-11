@@ -37,22 +37,17 @@ export function formatRelativeDate(dateString: string): string {
 
 interface ProjectItemProps {
 	project: Project;
-	isSelected?: boolean;
 	onClick: () => void;
 	onDelete: () => void;
 }
 
-export function ProjectItem({ project, isSelected, onClick, onDelete }: ProjectItemProps) {
+export function ProjectItem({ project, onClick, onDelete }: ProjectItemProps) {
 	const category = project.category ?? 'research';
 
 	return (
 		<div
 			onClick={onClick}
-			className={`group relative cursor-pointer rounded-xl border p-3 transition-all duration-200 ${
-				isSelected
-					? 'hover:shadow-sm'
-					: 'hover:shadow-md'
-			}`}
+			className="group relative cursor-pointer rounded-xl border p-3 transition-all duration-200 hover:shadow-md"
 		>
 			<div className="flex items-start gap-3">
 				{/* Icon */}

@@ -15,11 +15,10 @@ import {
 import { ProjectItem } from './project-item';
 import type { Project } from './type';
 
-interface ProjectManagementPanelProps {
+interface ProjectPanelProps {
 	projects: Project[];
 	isLoading: boolean;
 	error: string | null;
-	selectedProjectId?: string;
 	onOpenProject: (projectId: string) => void;
 	onCreateProject: (name: string, description?: string) => Promise<void>;
 	onDeleteProject: (projectId: string) => Promise<void>;
@@ -29,11 +28,10 @@ export function ProjectPanel({
 	projects,
 	isLoading,
 	error,
-	selectedProjectId,
 	onOpenProject,
 	onCreateProject,
 	onDeleteProject,
-}: ProjectManagementPanelProps) {
+}: ProjectPanelProps) {
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
 	const [newProjectName, setNewProjectName] = useState('');
 	const [newProjectDesc, setNewProjectDesc] = useState('');
@@ -93,7 +91,6 @@ export function ProjectPanel({
 							<ProjectItem
 								key={project.id}
 								project={project}
-								isSelected={selectedProjectId === project.id}
 								onClick={() => onOpenProject(project.id)}
 								onDelete={() => onDeleteProject(project.id)}
 							/>

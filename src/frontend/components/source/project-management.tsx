@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/frontend/components/ui/button';
+import { useState, useCallback } from 'react';
+import { projectsService } from '@/frontend/api/services/projects.service';
 import { useProject } from './useProject';
-import { useSource } from './useSource';
-import { ProjectPanel } from './project-panel.tsx';
-import { SourceList } from './source-list';
-import { PdfReader } from './reader/pdf-reader';
+import { ProjectPanel } from './project-panel';
+import { SourcePanel } from './source-panel';
+import { ReaderPanel } from './reader/reader-panel';
 
-interface SourcePanelProps {
+type ActiveView = 'projects' | 'sources' | 'reader';
+
+interface ManagementPanelProps {
 	onScreenshotCapture: (imageDataUrl: string, name: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
 	onDownload?: (imageDataUrl: string, name: string) => void;
@@ -19,68 +19,85 @@ export function ManagementPanel({
 	onSaveToNote,
 	onDownload,
 	onSourceSelectionChange,
-}: SourcePanelProps) {
+}: ManagementPanelProps) {
 	const project = useProject();
-	const source = useSource(project.currentProject?.id ?? null);
 
-	useEffect(() => {
-		onSourceSelectionChange?.(source.selectedDocumentIds);
-	}, [source.selectedDocumentIds, onSourceSelectionChange]);
+	// Navigation state — owned exclusively by ManagementPanel
+	const [activeView, setActiveView] = useState<ActiveView>('projects');
+	const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+	const [currentProjectName, setCurrentProjectName] = useState('');
+	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
 
-	// PDF Reader view
-	if (source.view.type === 'reader' && source.currentDocumentUrl) {
+	const handleOpenProject = useCallback((projectId: string) => {
+		const found = project.projects.find((p) => p.id === projectId);
+		setCurrentProjectId(projectId);
+		setCurrentProjectName(found?.name ?? '');
+		setActiveView('sources');
+	}, [project.projects]);
+
+	const handleBackToProjects = useCallback(() => {
+		setCurrentProjectId(null);
+		setCurrentProjectName('');
+		setActiveView('projects');
+	}, []);
+
+	const handleDeleteProject = useCallback(async (projectId: string) => {
+		await project.deleteProject(projectId);
+		// If deleting the currently open project, go back to project list
+		if (projectId === currentProjectId) {
+			handleBackToProjects();
+		}
+	}, [project, currentProjectId, handleBackToProjects]);
+
+	const handleOpenDocument = useCallback(async (documentId: string) => {
+		if (!currentProjectId) return;
+		try {
+			const url = await projectsService.getDocumentUrl(currentProjectId, documentId);
+			setCurrentDocumentUrl(url);
+			setActiveView('reader');
+		} catch {
+			// Error is handled silently; SourcePanel can show its own errors
+		}
+	}, [currentProjectId]);
+
+	const handleBackToSources = useCallback(() => {
+		setCurrentDocumentUrl(null);
+		setActiveView('sources');
+	}, []);
+
+	// Route to the active panel
+	if (activeView === 'reader' && currentDocumentUrl) {
 		return (
-			<div className="h-full flex flex-col">
-				{/* PDF Reader Header */}
-				<div className="flex border-b p-2 justify-end h-13">
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={source.closeDocumentReader}
-					>
-						<ArrowLeft className="h-4 w-4" />
-					</Button>
-				</div>
-				<div className="flex-1 overflow-hidden">
-					<PdfReader
-						fileUrl={source.currentDocumentUrl}
-						onScreenshotCapture={onScreenshotCapture}
-						onSaveToNote={onSaveToNote}
-						onDownload={onDownload}
-					/>
-				</div>
-			</div>
-		);
-	}
-
-	// Source control panel (inside a project)
-	if (project.currentProject) {
-		return (
-			<SourceList
-				currentProject={project.currentProject}
-				documents={source.documents}
-				selectedDocumentIds={source.selectedDocumentIds}
-				isLoadingDocuments={source.isLoadingDocuments}
-				isUploading={source.isUploading}
-				error={source.error}
-				onGoBack={project.closeProject}
-				onUploadDocument={source.uploadDocument}
-				onDeleteDocument={source.deleteDocument}
-				onToggleSelection={source.toggleDocumentSelection}
-				onOpenDocument={source.openDocumentReader}
+			<ReaderPanel
+				documentUrl={currentDocumentUrl}
+				onBack={handleBackToSources}
+				onScreenshotCapture={onScreenshotCapture}
+				onSaveToNote={onSaveToNote}
+				onDownload={onDownload}
 			/>
 		);
 	}
 
-	// Project management panel (top-level)
+	if (activeView === 'sources' && currentProjectId) {
+		return (
+			<SourcePanel
+				projectId={currentProjectId}
+				projectName={currentProjectName}
+				onBack={handleBackToProjects}
+				onOpenDocument={handleOpenDocument}
+				onSourceSelectionChange={onSourceSelectionChange}
+			/>
+		);
+	}
+
 	return (
 		<ProjectPanel
 			projects={project.projects}
 			isLoading={project.isLoadingProjects}
 			error={project.error}
-			onOpenProject={project.openProject}
+			onOpenProject={handleOpenProject}
 			onCreateProject={project.createProject}
-			onDeleteProject={project.deleteProject}
+			onDeleteProject={handleDeleteProject}
 		/>
 	);
 }

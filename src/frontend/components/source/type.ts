@@ -21,8 +21,3 @@ export interface Document {
 	updated_at: string;
 	metadata?: Record<string, unknown>;
 }
-
-export interface SourcePanelView {
-	type: 'list' | 'reader';
-	documentId?: string;
-}

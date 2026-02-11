@@ -1,13 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { projectsService } from '@/frontend/api/services/projects.service';
-import type { Document, SourcePanelView } from './type';
+import type { Document } from './type';
 
 export interface UseSourceReturn {
 	documents: Document[];
 	selectedDocumentIds: string[];
-
-	view: SourcePanelView;
-	currentDocumentUrl: string | null;
 
 	isLoadingDocuments: boolean;
 	isUploading: boolean;
@@ -17,8 +14,6 @@ export interface UseSourceReturn {
 	deleteDocument: (documentId: string) => Promise<void>;
 	toggleDocumentSelection: (documentId: string) => void;
 	clearSelection: () => void;
-	openDocumentReader: (documentId: string) => Promise<void>;
-	closeDocumentReader: () => void;
 	refreshDocuments: () => Promise<void>;
 }
 
@@ -26,8 +21,6 @@ export function useSource(projectId: string | null): UseSourceReturn {
 	const [documents, setDocuments] = useState<Document[]>([]);
 	const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
 
-	const [view, setView] = useState<SourcePanelView>({ type: 'list' });
-	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
 	const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -49,8 +42,6 @@ export function useSource(projectId: string | null): UseSourceReturn {
 	useEffect(() => {
 		if (projectId) {
 			setSelectedDocumentIds([]);
-			setView({ type: 'list' });
-			setCurrentDocumentUrl(null);
 			loadDocuments(projectId);
 		} else {
 			setDocuments([]);
@@ -107,31 +98,9 @@ export function useSource(projectId: string | null): UseSourceReturn {
 		setSelectedDocumentIds([]);
 	}, []);
 
-	const openDocumentReader = useCallback(
-		async (documentId: string) => {
-			if (!projectId) return;
-			setError(null);
-			try {
-				const url = await projectsService.getDocumentUrl(projectId, documentId);
-				setCurrentDocumentUrl(url);
-				setView({ type: 'reader', documentId });
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to open document');
-			}
-		},
-		[projectId],
-	);
-
-	const closeDocumentReader = useCallback(() => {
-		setView({ type: 'list' });
-		setCurrentDocumentUrl(null);
-	}, []);
-
 	return {
 		documents,
 		selectedDocumentIds,
-		view,
-		currentDocumentUrl,
 		isLoadingDocuments,
 		isUploading,
 		error,
@@ -139,8 +108,6 @@ export function useSource(projectId: string | null): UseSourceReturn {
 		deleteDocument,
 		toggleDocumentSelection,
 		clearSelection,
-		openDocumentReader,
-		closeDocumentReader,
 		refreshDocuments,
 	};
 }

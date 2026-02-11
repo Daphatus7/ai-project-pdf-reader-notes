@@ -4,19 +4,15 @@ import type { Project } from './type';
 
 export interface UseProjectReturn {
 	projects: Project[];
-	currentProject: Project | null;
 	isLoadingProjects: boolean;
 	error: string | null;
 
-	openProject: (projectId: string) => void;
-	closeProject: () => void;
 	createProject: (name: string, description?: string) => Promise<void>;
 	deleteProject: (projectId: string) => Promise<void>;
 }
 
 export function useProject(): UseProjectReturn {
 	const [projects, setProjects] = useState<Project[]>([]);
-	const [currentProject, setCurrentProject] = useState<Project | null>(null);
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -34,20 +30,6 @@ export function useProject(): UseProjectReturn {
 				setIsLoadingProjects(false);
 			}
 		})();
-	}, []);
-
-	const openProject = useCallback(
-		(projectId: string) => {
-			const project = projects.find((p) => p.id === projectId);
-			if (project) {
-				setCurrentProject(project);
-			}
-		},
-		[projects],
-	);
-
-	const closeProject = useCallback(() => {
-		setCurrentProject(null);
 	}, []);
 
 	const createProject = useCallback(
@@ -70,9 +52,6 @@ export function useProject(): UseProjectReturn {
 			setError(null);
 			try {
 				await projectsService.deleteProject(projectId);
-				if (currentProject?.id === projectId) {
-					setCurrentProject(null);
-				}
 				const list = await projectsService.listProjects();
 				setProjects(list);
 			} catch (err) {
@@ -80,16 +59,13 @@ export function useProject(): UseProjectReturn {
 				throw err;
 			}
 		},
-		[currentProject],
+		[],
 	);
 
 	return {
 		projects,
-		currentProject,
 		isLoadingProjects,
 		error,
-		openProject,
-		closeProject,
 		createProject,
 		deleteProject,
 	};
