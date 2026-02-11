@@ -7,6 +7,8 @@
 import type {AIChatBubbleProps} from "@/frontend/api/types/llm.ts";
 import type {ChatContent} from "@/frontend/api";
 import {MarkdownRenderer} from "@/frontend/components/renderer/markdown-renderer.tsx";
+import {Button} from "@/frontend/components/ui/button.tsx";
+import {LucideArrowRight} from "lucide-react";
 
 /**
  * Render a single content item (text or image)
@@ -63,12 +65,17 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className={`px-4 py-2 rounded-lg${
-					onSelectContent ? 'cursor-pointer  transition-colors' : ''
-				}`}
-				onClick={handleClick}
+				className="px-4 py-2 rounded-lg"
 			>
 				{contents.map((item, index) => renderContentItem(item, index, onSelectContent))}
+				{onSelectContent && (
+					<div className='flex justify-end'>
+						<Button variant='secondary' className='bg-panel border rounded-2xl' size='sm' onClick={handleClick}>
+							Insert to note
+							<LucideArrowRight className="size-4" />
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
