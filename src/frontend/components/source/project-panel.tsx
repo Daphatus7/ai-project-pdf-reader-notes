@@ -73,7 +73,7 @@ export function ProjectPanel({
 	return (
 		<div className="h-full flex flex-col mg-2">
 			{/* Header */}
-			<div className=" p-3 flex items-center gap-2 border-b">
+			<div className=" p-3 flex items-center gap-2 border-b h-13">
 				<FolderOpen className="h-4 w-4 text-muted-foreground" />
 				<span className="text-sm font-medium">Projects</span>
 			</div>

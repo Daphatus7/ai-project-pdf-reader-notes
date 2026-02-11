@@ -31,7 +31,8 @@ export function ManagementPanel({
 	if (source.view.type === 'reader' && source.currentDocumentUrl) {
 		return (
 			<div className="h-full flex flex-col">
-				<div className="flex border-b p-2 justify-end">
+				{/* PDF Reader Header */}
+				<div className="flex border-b p-2 justify-end h-13">
 					<Button
 						variant="ghost"
 						size="sm"
