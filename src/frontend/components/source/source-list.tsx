@@ -130,7 +130,6 @@ export function SourceList({
 											<Trash2 className="h-3.5 w-3.5" />
 										</Button>
 										<Checkbox
-											className="border-r-8"
 											checked={selectedDocumentIds.includes(doc.id)}
 											onCheckedChange={() => onToggleSelection(doc.id)}
 										/>
