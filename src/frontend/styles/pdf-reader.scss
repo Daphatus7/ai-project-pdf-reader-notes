@@ -10,7 +10,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.25rem;
-  min-height: var(--toolbar-height);
+  justify-content: space-between;
+  height: var(--toolbar-height);
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--toolbar-border);
   padding: 0 0.5rem;

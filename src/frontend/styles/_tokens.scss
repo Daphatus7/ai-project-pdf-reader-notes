@@ -19,9 +19,12 @@
   --control-bg: var(--tt-gray-light-a-100);
   --control-bg-hover: var(--tt-gray-light-200);
   --control-bg-active: var(--tt-gray-light-a-200);
+  --control-bg-active-hover: var(--tt-gray-light-300);
+  --control-bg-disabled: var(--tt-gray-light-a-50);
   --control-text: var(--tt-gray-light-a-600);
   --control-text-hover: var(--tt-gray-light-a-900);
   --control-text-disabled: var(--tt-gray-light-a-400);
+  --control-icon-active: var(--tt-brand-color-500);
 
   /* ---- Primary action ---- */
   --control-primary-bg: var(--tt-brand-color-500);
@@ -46,8 +49,9 @@
   --transition-duration: var(--tt-transition-duration-default);
   --transition-easing: var(--tt-transition-easing-default);
 
-  /* ---- TipTap toolbar bridge ---- */
+  /* ---- TipTap bridges ---- */
   --tt-toolbar-bg-color: var(--toolbar-bg);
+  --tt-toolbar-border-color: var(--toolbar-border);
 }
 
 /* ---- Dark mode ---- */
@@ -58,9 +62,12 @@
   --control-bg: var(--tt-gray-dark-a-100);
   --control-bg-hover: var(--tt-gray-dark-200);
   --control-bg-active: var(--tt-gray-dark-a-200);
+  --control-bg-active-hover: var(--tt-gray-dark-300);
+  --control-bg-disabled: var(--tt-gray-dark-a-50);
   --control-text: var(--tt-gray-dark-a-600);
   --control-text-hover: var(--tt-gray-dark-a-900);
   --control-text-disabled: var(--tt-gray-dark-a-300);
+  --control-icon-active: var(--tt-brand-color-400);
 
   --control-primary-bg: var(--tt-brand-color-500);
   --control-primary-bg-hover: var(--tt-brand-color-600);
@@ -75,4 +82,5 @@
   --input-text: var(--tt-gray-dark-a-900);
 
   --tt-toolbar-bg-color: var(--toolbar-bg);
+  --tt-toolbar-border-color: var(--toolbar-border);
 }

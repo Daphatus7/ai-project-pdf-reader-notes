@@ -58,6 +58,12 @@ body,
   overflow: auto;
 }
 
+.simple-editor-toolbar {
+  height: var(--toolbar-height);
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
+}
+
 .simple-editor-content {
   max-width: 648px;
   width: 90%; 

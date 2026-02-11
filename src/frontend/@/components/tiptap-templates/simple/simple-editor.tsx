@@ -61,6 +61,9 @@ import { ThemeToggle } from "@/frontend/@/components/tiptap-templates/simple/the
 // --- Styles ---
 import "@/frontend/@/components/tiptap-templates/simple/simple-editor.scss"
 
+// --- Token override (must load AFTER all tiptap-ui component styles) ---
+import "@/frontend/styles/_tiptap-token-overrides.scss"
+
 
 
 const MainToolbarContent = ({
@@ -196,6 +199,7 @@ export function SimpleEditor({ editor }: { editor: Editor }) {
 			<EditorContext.Provider value={{ editor }}>
 				<Toolbar
 					ref={toolbarRef}
+					className="simple-editor-toolbar"
 					style={{
 						...(isMobile
 							? {
