@@ -2,11 +2,10 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/ui/tabs.tsx'
 import { NoteMarkdownRenderer } from './renderer/note-markdown-renderer'
 import { NoteRenderer } from './renderer/note-renderer'
-import { NoteButton } from './sidebar/note-button.tsx'
-import { NoteSidebar } from './sidebar/note-sidebar.tsx'
+import { NoteListPanel } from './note-list-panel'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
-import {Save} from 'lucide-react'
+import {ArrowLeft, Save, Sidebar} from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
@@ -17,7 +16,21 @@ export const NotePad = forwardRef<NotePadHandler>(
 			insertContent: pad.insertContent,
 			focus: pad.focus,
 			getContent: pad.getContent,
-		}), [pad.activeView])
+		}), [pad.activeView, pad.padView])
+
+		if (pad.padView === 'list') {
+			return (
+				<NoteListPanel
+					notes={pad.notes}
+					selectedNoteId={pad.selectedNoteId}
+					isLoading={pad.isLoading}
+					onSelectNote={pad.openNote}
+					onAddNote={pad.addNoteAndOpen}
+					onDeleteNote={pad.deleteNote}
+					onRenameNote={pad.renameNote}
+				/>
+			)
+		}
 
 		return (
 			<div className="h-full flex flex-col">
@@ -27,26 +40,20 @@ export const NotePad = forwardRef<NotePadHandler>(
 					className="h-full flex flex-col"
 				>
 					<div className="p-3 flex items-center border-b h-13 justify-between">
-						<TabsList>
-							<TabsTrigger value="markdown">Markdown</TabsTrigger>
-							<TabsTrigger value="editor">Editor</TabsTrigger>
-						</TabsList>
-						<div className="flex">
+						<div className="flex items-center gap-2">
+	
+							<TabsList>
+								<TabsTrigger value="markdown">Markdown</TabsTrigger>
+								<TabsTrigger value="editor">Editor</TabsTrigger>
+							</TabsList>
+						</div>
+						<div>
 							<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote}>
 								<Save className="h-4 w-4" />
 							</Button>
-
-							<NoteButton>
-								<NoteSidebar
-									notes={pad.notes}
-									setNotes={pad.setNotes}
-									selectedNoteId={pad.selectedNoteId}
-									onSelectNote={pad.selectNote}
-									onAddNote={pad.addNote}
-									onDeleteNote={pad.deleteNote}
-									onEditNoteName={pad.renameNote}
-								/>
-							</NoteButton>
+							<Button variant="ghost" size="icon" onClick={pad.backToList}>
+								<Sidebar className="h-4 w-4" />
+							</Button>
 						</div>
 					</div>
 
