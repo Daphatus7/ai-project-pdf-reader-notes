@@ -15,6 +15,21 @@ export interface LoginRequest {
 	password: string;
 }
 
+export interface RegisterRequest {
+	email: string;
+	username: string;
+	password: string;
+	full_name?: string;
+}
+
+export interface RegisterResponse {
+	id: string;
+	email: string;
+	username: string;
+	full_name: string | null;
+	status: string;
+}
+
 export interface AuthSession {
 	access_token: string;
 	refresh_token: string;
@@ -31,6 +46,36 @@ export interface AuthSession {
 export interface LoginResponse {
 	session: AuthSession;
 	user: AuthSession['user'];
+}
+
+/**
+ * Register via backend API
+ */
+export async function registerViaApi(data: RegisterRequest): Promise<RegisterResponse> {
+	const url = `${apiConfig.baseUrl}${apiConfig.endpoints.auth.register}`;
+
+	const response = await fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(data),
+	});
+
+	if (!response.ok) {
+		let errorMessage = `Registration failed: ${response.status}`;
+		try {
+			const errorData = await response.json();
+			if (errorData?.detail) {
+				errorMessage = errorData.detail;
+			}
+		} catch {
+			// ignore json parse error
+		}
+		throw new ApiError(errorMessage, response.status);
+	}
+
+	return response.json();
 }
 
 /**

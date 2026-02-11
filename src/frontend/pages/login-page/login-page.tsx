@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginViaApi, loginWithDebugCredentials } from "../../api/services/auth.service";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/frontend/components/ui/card";
+import { Input } from "@/frontend/components/ui/input";
+import { Button } from "@/frontend/components/ui/button";
+import { Label } from "@/frontend/components/ui/label";
+import { Checkbox } from "@/frontend/components/ui/checkbox";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
@@ -11,6 +16,7 @@ const LoginPage = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || "/";
+	const successMessage = location.state?.message as string | undefined;
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -42,116 +48,91 @@ const LoginPage = () => {
 	};
 
 	return (
-		<section className="bg-gray-50 dark:bg-gray-900">
-			<div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-				<div className="w-full bg-white rounded-lg shadow dark:border md:mb-20 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-					<div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-						<h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-							Sign in to your account
-						</h1>
+		<div className="flex min-h-screen items-center justify-center bg-background px-4">
+			<Card className="w-full max-w-md">
+				<CardHeader>
+					<CardTitle className="text-xl">Sign in to your account</CardTitle>
+					<CardDescription>Enter your credentials to continue</CardDescription>
+				</CardHeader>
+				<CardContent>
+					{successMessage && (
+						<div className="mb-4 rounded-md bg-green-100 p-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
+							{successMessage}
+						</div>
+					)}
 
-						{error && (
-							<div className="p-3 text-sm text-red-500 bg-red-100 rounded-lg dark:bg-red-900/20">
-								{error}
+					{error && (
+						<div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+							{error}
+						</div>
+					)}
+
+					<form className="space-y-4" onSubmit={handleSubmit}>
+						<div className="space-y-2">
+							<Label htmlFor="email">Email</Label>
+							<Input
+								type="email"
+								id="email"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								placeholder="name@company.com"
+								required
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="password">Password</Label>
+							<Input
+								type="password"
+								id="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<Checkbox id="remember" />
+								<Label htmlFor="remember" className="font-normal text-muted-foreground">
+									Remember me
+								</Label>
 							</div>
+							<Link
+								to="#"
+								className="text-sm font-medium text-primary hover:underline"
+							>
+								Forgot password?
+							</Link>
+						</div>
+						<Button type="submit" disabled={loading} className="w-full">
+							{loading ? "Signing in..." : "Sign in"}
+						</Button>
+
+						{import.meta.env.DEV && (
+							<Button
+								type="button"
+								variant="secondary"
+								onClick={handleDebugLogin}
+								disabled={loading}
+								className="w-full"
+							>
+								{loading ? "Signing in..." : "Debug Login (Dev Only)"}
+							</Button>
 						)}
 
-						<form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-							<div>
-								<label
-									htmlFor="email"
-									className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-								>
-									Email
-								</label>
-								<input
-									type="email"
-									name="email"
-									id="email"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-									placeholder="name@company.com"
-									required
-								/>
-							</div>
-							<div>
-								<label
-									htmlFor="password"
-									className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-								>
-									Password
-								</label>
-								<input
-									type="password"
-									name="password"
-									id="password"
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									placeholder="••••••••"
-									className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-									required
-								/>
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="flex items-start">
-									<div className="flex items-center h-5">
-										<input
-											id="remember"
-											aria-describedby="remember"
-											type="checkbox"
-											className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-										/>
-									</div>
-									<div className="ml-3 text-sm">
-										<label
-											htmlFor="remember"
-											className="text-gray-500 dark:text-gray-300"
-										>
-											Remember me
-										</label>
-									</div>
-								</div>
-								<a
-									href="#"
-									className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-								>
-									Forgot password?
-								</a>
-							</div>
-							<button
-								type="submit"
-								disabled={loading}
-								className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+						<p className="text-center text-sm text-muted-foreground">
+							Don't have an account yet?{" "}
+							<Link
+								to="/signup"
+								className="font-medium text-primary hover:underline"
 							>
-								{loading ? "Signing in..." : "Sign in"}
-							</button>
-
-							{import.meta.env.DEV && (
-								<button
-									type="button"
-									onClick={handleDebugLogin}
-									disabled={loading}
-									className="w-full text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-								>
-									{loading ? "Signing in..." : "Debug Login (Dev Only)"}
-								</button>
-							)}
-
-							<p className="text-sm font-light text-gray-500 dark:text-gray-400">
-								Don't have an account yet?{" "}
-								<a
-									href="#"
-									className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-								>
-									Sign up
-								</a>
-							</p>
-						</form>
-					</div>
-				</div>
-			</div>
-		</section>
+								Sign up
+							</Link>
+						</p>
+					</form>
+				</CardContent>
+			</Card>
+		</div>
 	);
 };
 
