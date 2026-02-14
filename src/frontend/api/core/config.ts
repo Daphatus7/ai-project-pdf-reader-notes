@@ -13,6 +13,7 @@ export const apiConfig = {
 			register: '/api/v1/auth/register',
 			logout: '/api/v1/auth/logout',
 			refresh: '/api/v1/auth/refresh',
+			createProfile: '/api/v1/auth/create-profile',
 		},
 		llm: {
 			chat: '/api/v1/llm/chat',

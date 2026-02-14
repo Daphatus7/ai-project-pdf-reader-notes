@@ -149,6 +149,20 @@ export async function getAccessToken(email: string, password: string) {
 }
 
 /**
+ * Login with Google OAuth via Supabase
+ */
+export async function loginWithGoogle() {
+	const { data, error } = await supabase.auth.signInWithOAuth({
+		provider: 'google',
+		options: {
+			redirectTo: window.location.origin,
+		},
+	});
+	if (error) throw new ApiError(error.message);
+	return data;
+}
+
+/**
  * Logout user
  */
 export async function logout() {
