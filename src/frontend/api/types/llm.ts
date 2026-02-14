@@ -29,6 +29,7 @@ export interface ChatPanelProps {
 	threadProp: ThreadTabsProps;
 	messages: ChatMessage[];
 	isLoading: boolean;
+	isThreadsLoading?: boolean;
 	onSendMessage: (content: ChatContent[]) => void;
 	onSelectContent?: (content: string) => void;
 }
