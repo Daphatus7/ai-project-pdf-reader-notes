@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button.tsx";
 import {
-	FileText,
 	Settings,
 	User,
 	LogIn,
@@ -57,7 +56,7 @@ export function Header() {
 				</Button>
 
 				<Button variant="ghost" size="icon" className="h-8 w-8">
-					<img className="w-4 h-4 mr-2" src="public/discord-logo.svg"
+					<img className="w-4 h-4 mr-2" src="/discord-logo.svg"
 					 alt="discord portal"/>
 				</Button>
 
