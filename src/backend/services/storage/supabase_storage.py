@@ -31,25 +31,23 @@ class SupabaseStorage(Service):
     def __init__(self):
         dotenv.load_dotenv()
         self.__database = None
+        self.__auth_client = None
 
     def get(self):
         return self.__database
 
     def start(self):
-        try:
-            url: str = os.environ.get('SUPABASE_URL')
-            if url is None:
-                raise ValueError('SUPABASE_URL environment variable is not set.')
-        except Exception as e:
-            raise ValueError('SUPABASE_URL environment variable is not set.') from e
-        try:
-            key: str = os.environ.get('SUPABASE_SECRET_KEY')
-            if key is None:
-                raise ValueError('SUPABASE_KEY environment variable is not set.')
-        except Exception as e:
-            raise ValueError('SUPABASE_KEY environment variable is not set.') from e
+        url: str = os.environ.get('SUPABASE_URL')
+        if url is None:
+            raise ValueError('SUPABASE_URL environment variable is not set.')
+        key: str = os.environ.get('SUPABASE_SECRET_KEY')
+        if key is None:
+            raise ValueError('SUPABASE_KEY environment variable is not set.')
 
+        # Separate clients: __database for DB operations (service_role, never mutated),
+        # __auth_client for login/register (its auth state will change per call).
         self.__database: Client = create_client(url, key)
+        self.__auth_client: Client = create_client(url, key)
         logger.info('Supabase database service started')
 
     # ==================== Auth Operations ====================
@@ -57,7 +55,7 @@ class SupabaseStorage(Service):
     async def register(self, request) -> dict:
         try:
             logger.info(f"Attempting to register {request.email}")
-            resp = self.__database.auth.sign_up({
+            resp = self.__auth_client.auth.sign_up({
                 "email": request.email,
                 "password": request.password,
                 "options": {
@@ -77,7 +75,7 @@ class SupabaseStorage(Service):
     async def login(self, email: str, password: str) -> dict:
         try:
             logger.info("Attempting to log in user with email: %s", email)
-            resp = self.__database.auth.sign_in_with_password({
+            resp = self.__auth_client.auth.sign_in_with_password({
                 'email': email,
                 'password': password,
             })

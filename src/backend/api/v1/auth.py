@@ -79,7 +79,8 @@ async def create_profile(
     database_service=Depends(get_database_service),
 ):
     """Create user profile information."""
-    resp = await database_service.create_user_profile(user['sub'], display_name=request.display_name)
+    resp = await database_service.create_user_profile(user['sub'], 
+                                                      display_name=request.display_name)
     logger.info(f"User profile created: {user['sub']}")
     return CreateProfileResponse(response=resp.data)
         

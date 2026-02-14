@@ -49,25 +49,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const profileChecked = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
-		// 初始化时获取 session
-		supabase.auth.getSession().then(({ data: { session } }) => {
+		const maybeCreateProfile = async (session: Session | null) => {
+			if (!session?.user || profileChecked.current.has(session.user.id)) return;
+			profileChecked.current.add(session.user.id);
+			await ensureProfileExists(session);
+		};
+
+		// 初始化时获取 session（页面刷新也会补建 profile）
+		supabase.auth.getSession().then(async ({ data: { session } }) => {
+			await maybeCreateProfile(session);
 			setSession(session);
 			setLoading(false);
 		});
 
-		// 监听变化
+		// 监听变化（先建 profile，再 setSession，避免竞态）
 		const { data: { subscription } } = supabase.auth.onAuthStateChange(
 			async (event, session) => {
-				setSession(session);
-
-				// OAuth 用户首次登录时自动创建 profile
-				if (event === 'SIGNED_IN' && session?.user) {
-					const provider = session.user.app_metadata?.provider;
-					if (provider && provider !== 'email' && !profileChecked.current.has(session.user.id)) {
-						profileChecked.current.add(session.user.id);
-						await ensureProfileExists(session);
-					}
+				if (event === 'SIGNED_IN') {
+					await maybeCreateProfile(session);
 				}
+				setSession(session);
 			}
 		);
 

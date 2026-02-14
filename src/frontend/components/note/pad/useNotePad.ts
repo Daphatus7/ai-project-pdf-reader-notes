@@ -29,8 +29,12 @@ export function useNotePad() {
 		try {
 			setIsLoading(true)
 			const fetched = await notesService.listNotes()
-			setNotes(fetched)
-			if (fetched.length > 0) {
+			if (fetched.length === 0) {
+				const created = await notesService.createNote({ title: 'Untitled' })
+				setNotes([created])
+				applyNote(created)
+			} else {
+				setNotes(fetched)
 				applyNote(fetched[0])
 			}
 		} catch (error) {
