@@ -74,47 +74,11 @@ def _to_lc_message(role: str, text: str) -> BaseMessage:
         return AIMessage(content=text)
     return HumanMessage(content=text)
 
-STRUCTURED_OUTPUT_SYSTEM_PROMPT = '''You are a helpful assistant that provides well-structured responses.
+STRUCTURED_OUTPUT_SYSTEM_PROMPT = """You are a helpful assistant. Keep responses concise.
+  Use markdown formatting. Wrap all math expressions in $...$ delimiters
+  using LaTeX commands (e.g. $\\sum$, $\\omega$), never Unicode math symbols.
+  In tables, use $\\lvert x \\rvert$ instead of $|x|$."""
 
-FORMAT YOUR RESPONSES USING PROPER MARKDOWN:
-
-1. HEADERS: Use # ## ### for section organization
-
-2. MATH EXPRESSIONS (CRITICAL - follow these rules EXACTLY):
-
-   A) ALWAYS wrap ALL math in $...$ delimiters - no exceptions!
-      - Variables: $P(t)$, $c_n$, $\\omega$, $T$
-      - Equations: $P(t) = A\\cos(\\omega t)$
-      - Subscripts/superscripts: $c_{-1}$, $e^{j\\omega t}$, $c_n^*$
-
-   B) Use LaTeX commands, NEVER Unicode symbols:
-      - WRONG: ∑, ∞, ω, π, ∫ (Unicode symbols)
-      - CORRECT: $\\sum$, $\\infty$, $\\omega$, $\\pi$, $\\int$
-
-   C) Display math: Use $$ on separate lines (NOT inside bullet points)
-
-   WRONG examples (will NOT render):
-   - P(t) = ∑_{n=-∞}^{∞} c_n e^{jnωt}
-   - c_{-n} = c_n^*
-   - cos(ωt) = (e^{jωt} + e^{-jωt})/2
-
-   CORRECT examples (WILL render):
-   - $P(t) = \\sum_{n=-\\infty}^{\\infty} c_n e^{jn\\omega t}$
-   - $c_{-n} = c_n^*$
-   - $\\cos(\\omega t) = (e^{j\\omega t} + e^{-j\\omega t})/2$
-
-3. CODE BLOCKS: Use ```language
-
-4. TABLES WITH MATH (CRITICAL):
-   - All math in cells MUST use $...$ delimiters
-   - For absolute value |x|, use $\\lvert x \\rvert$ NOT $|x|$ (pipe conflicts with table syntax)
-   - Example: "Vanishing gradient for large $\\lvert x \\rvert$"
-
-5. LISTS: Use - for bullets. Keep math inline with $...$
-
-6. BLOCKQUOTES: Use > for notes
-
-CRITICAL REMINDER: Every math expression must use $...$ delimiters. In tables, use \\lvert and \\rvert for absolute values instead of |.'''
 def _parse_ai_response(ai_msg) -> list[dict]:
     """Parse AI message into structured output contents.
 
