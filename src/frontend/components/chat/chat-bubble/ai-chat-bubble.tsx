@@ -65,7 +65,7 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 	return (
 		<div className="flex justify-start">
 			<div
-				className="px-4 py-2 rounded-lg"
+				className="px-4 py-2 w-full"
 			>
 				{contents.map((item, index) => renderContentItem(item, index, onSelectContent))}
 				{onSelectContent && (
