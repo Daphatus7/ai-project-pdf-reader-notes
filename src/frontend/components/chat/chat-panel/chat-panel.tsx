@@ -37,7 +37,7 @@ export function ChatPanel({threadProp, messages, isLoading, onSendMessage, onSel
 					</div>
 				</div>
 
-				<ChatBubbles messages={messages} onSelectContent={onSelectContent} />
+				<ChatBubbles messages={messages} isLoading={isLoading} onSelectContent={onSelectContent} />
 
 				<ChatBar onSend={onSendMessage} isLoading={isLoading} />
 			</div>

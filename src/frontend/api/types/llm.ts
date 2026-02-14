@@ -35,6 +35,7 @@ export interface ChatPanelProps {
 
 export interface ChatBubblesProps {
 	messages: ChatMessage[];
+	isLoading?: boolean;
 	onSelectContent?: (content: string) => void;
 }
 
