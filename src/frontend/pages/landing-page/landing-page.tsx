@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { SparkleIcon, ArrowRightIcon, CheckCircleIcon, ShieldIcon, UsersIcon } from "./components/icons";
-import {LucideSparkles} from "lucide-react";
+import {ArrowRightIcon, LucideCheckCheck, LucideCog, LucideHardHat, LucideLock, LucideSparkles} from "lucide-react";
+import DemoSection from "./components/demo";
 
 const LandingPage = () => {
   return (
@@ -106,19 +106,19 @@ const LandingPage = () => {
         {/* Features Pills */}
         <div className="flex flex-wrap justify-center gap-8 max-w-4xl">
           <div className="flex items-center gap-2">
-            <CheckCircleIcon />
+            <LucideCheckCheck />
             <span className="text-sm text-muted-foreground">
               No credit card required
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ShieldIcon />
+            <LucideLock />
             <span className="text-sm text-muted-foreground">
               Enterprise-grade security
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <UsersIcon />
+            <LucideHardHat />
             <span className="text-sm text-muted-foreground">
               10,000+ researchers
             </span>
@@ -126,46 +126,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Demo Images Section */}
-      <section className="w-full px-4 py-16">
-        {/* Demo Badge */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
-            <SparkleIcon />
-            <span className="font-medium text-xs text-foreground">
-              Demo
-            </span>
-          </div>
-        </div>
-
-        {/* Screenshots Grid - Placeholder */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="aspect-[476/766] overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-[#f0f4ff] to-[#e8eeff] flex items-center justify-center">
-            <div className="text-center text-muted-foreground px-6">
-              <svg className="size-12 mx-auto mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
-              </svg>
-              <p className="text-sm">PDF Reader View</p>
-            </div>
-          </div>
-          <div className="aspect-[484/766] overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-[#f5f0ff] to-[#ede5ff] flex items-center justify-center">
-            <div className="text-center text-muted-foreground px-6">
-              <svg className="size-12 mx-auto mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-              </svg>
-              <p className="text-sm">AI Chat View</p>
-            </div>
-          </div>
-          <div className="aspect-[477/766] overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-[#f0fff4] to-[#e5ffed] flex items-center justify-center">
-            <div className="text-center text-muted-foreground px-6">
-              <svg className="size-12 mx-auto mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-              </svg>
-              <p className="text-sm">Notebook View</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <DemoSection />
 
       {/* Features Section */}
       <section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
@@ -173,7 +134,7 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <div className="flex justify-center mb-6">
               <div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
-                <SparkleIcon />
+                <LucideCog />
                 <span className="font-medium text-xs text-foreground">
                   How it works
                 </span>
@@ -332,7 +293,7 @@ const LandingPage = () => {
                       "linear-gradient(135deg, rgb(49, 65, 88) 0%, rgb(67, 45, 215) 100%)",
                   }}
                 >
-                  <SparkleIcon className="size-4" stroke="white" />
+                  <LucideSparkles className="size-4" stroke="white" />
                 </div>
                 <span className="text-base text-foreground">
                   Atlas Notebook
@@ -390,30 +351,7 @@ const LandingPage = () => {
                 </li>
               </ul>
             </div>
-
-            {/* Company */}
-            <div>
-              <h4 className="font-medium text-sm text-foreground mb-3">
-                Company
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#about" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#privacy" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a href="#terms" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-                    Terms
-                  </a>
-                </li>
-              </ul>
-            </div>
+			  
           </div>
 
           {/* Footer Bottom */}
