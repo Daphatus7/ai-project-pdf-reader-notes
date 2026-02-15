@@ -44,8 +44,8 @@ RUN npm install -g serve
 # Copy built files from production stage
 COPY --from=production /app/build ./build
 
-EXPOSE 3000
+EXPOSE ${PORT:-3000}
 
-# Serve static files
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Serve static files - Railway injects $PORT, local defaults to 3000
+CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]
 

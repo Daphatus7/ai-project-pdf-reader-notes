@@ -36,9 +36,9 @@ FROM base AS production
 COPY . .
 RUN chown -R app:app /app
 USER app
-EXPOSE 8000
+EXPOSE ${PORT:-8000}
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
-# Start without reload for production
-CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+# Start without reload for production - Railway injects $PORT, local defaults to 8000
+CMD ["sh", "-c", "uvicorn src.backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
