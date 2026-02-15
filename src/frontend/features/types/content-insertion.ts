@@ -68,32 +68,9 @@ export interface ContentInsertion {
  * Allows parent components to programmatically insert content
  * and control the editor.
  */
-export interface NoteTakerHandle {
-	/**
-	 * Inserts content into the editor at the specified position.
-	 * 
-	 * @param content - Markdown content to insert
-	 * @param position - Where to insert: 'cursor' (current cursor position) or 'end' (end of document)
-	 */
-	insertContent: (content: any, position?: 'cursor' | 'end') => void;
-	
-	/**
-	 * Focuses the editor.
-	 */
+export interface NotePadHandler {
+	insertContent: (content: ContentInsertion, position?: 'cursor' | 'end') => void;
 	focus: () => void;
-	
-	/**
-	 * Gets the underlying TipTap editor instance.
-	 * 
-	 * @returns Editor instance or null if not initialized
-	 */
-	getEditor: () => any | null;
-	
-	/**
-	 * Gets the current markdown content from the editor.
-	 * 
-	 * @returns The markdown content as string
-	 */
 	getContent: () => string;
 }
 

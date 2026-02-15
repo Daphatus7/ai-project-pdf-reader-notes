@@ -1,0 +1,63 @@
+/* ==========================================================
+   TipTap Component Token → Semantic Token Bridge
+
+   Overrides TipTap's component-level CSS variables to reference
+   Tier 2 semantic tokens from _tokens.scss.
+
+   IMPORTANT: This file must load AFTER TipTap's own SCSS
+   (button-colors.scss, toolbar.scss, separator.scss) to win
+   in the cascade. Import it at the end of simple-editor.tsx.
+   ========================================================== */
+
+/* ---- Default button style ---- */
+.tiptap-button {
+  /* Background */
+  --tt-button-default-bg-color: var(--control-bg);
+  --tt-button-hover-bg-color: var(--control-bg-hover);
+  --tt-button-active-bg-color: var(--control-bg-active);
+  --tt-button-active-hover-bg-color: var(--control-bg-active-hover);
+  --tt-button-disabled-bg-color: var(--control-bg-disabled);
+
+  /* Text */
+  --tt-button-default-text-color: var(--control-text);
+  --tt-button-hover-text-color: var(--control-text-hover);
+  --tt-button-active-text-color: var(--control-text-hover);
+  --tt-button-disabled-text-color: var(--control-text-disabled);
+
+  /* Icon */
+  --tt-button-default-icon-color: var(--control-text);
+  --tt-button-hover-icon-color: var(--control-text-hover);
+  --tt-button-active-icon-color: var(--control-icon-active);
+  --tt-button-disabled-icon-color: var(--control-text-disabled);
+}
+
+/* Dark mode — same declarations, values auto-resolve via semantic tokens */
+.dark .tiptap-button {
+  /* Background */
+  --tt-button-default-bg-color: var(--control-bg);
+  --tt-button-hover-bg-color: var(--control-bg-hover);
+  --tt-button-active-bg-color: var(--control-bg-active);
+  --tt-button-active-hover-bg-color: var(--control-bg-active-hover);
+  --tt-button-disabled-bg-color: var(--control-bg-disabled);
+
+  /* Text */
+  --tt-button-default-text-color: var(--control-text);
+  --tt-button-hover-text-color: var(--control-text-hover);
+  --tt-button-active-text-color: var(--control-text-hover);
+  --tt-button-disabled-text-color: var(--control-text-disabled);
+
+  /* Icon */
+  --tt-button-default-icon-color: var(--control-text);
+  --tt-button-hover-icon-color: var(--control-text-hover);
+  --tt-button-active-icon-color: var(--control-icon-active);
+  --tt-button-disabled-icon-color: var(--control-text-disabled);
+}
+
+/* ---- Separator ---- */
+.tiptap-separator {
+  --tt-link-border-color: var(--separator-color);
+}
+
+.dark .tiptap-separator {
+  --tt-link-border-color: var(--separator-color);
+}

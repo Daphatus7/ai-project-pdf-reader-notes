@@ -1,0 +1,6879 @@
+[
+  {
+    "type": "Header",
+    "element_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4",
+    "text": "Note: Q1d, 2a, 2b, 3d are no longer covered in the syllabus and not examinable",
+    "metadata": {
+      "detection_class_prob": 0.6133316159248352,
+      "coordinates": {
+        "points": [
+          [
+            174.83154296875,
+            89.0713882446289
+          ],
+          [
+            174.83154296875,
+            133.47633361816406
+          ],
+          [
+            1402.1845703125,
+            133.47633361816406
+          ],
+          [
+            1402.1845703125,
+            89.0713882446289
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "15e7bbc58f8013010a5996d35e313550",
+    "text": "Student Number:",
+    "metadata": {
+      "detection_class_prob": 0.43640777468681335,
+      "coordinates": {
+        "points": [
+          [
+            777.7074584960938,
+            248.239013671875
+          ],
+          [
+            777.7074584960938,
+            278.972900390625
+          ],
+          [
+            1043.5380859375,
+            278.972900390625
+          ],
+          [
+            1043.5380859375,
+            248.239013671875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "87d663da98c483a205e0b7b60459158b",
+    "text": "The University of Melbourne",
+    "metadata": {
+      "detection_class_prob": 0.5552138686180115,
+      "coordinates": {
+        "points": [
+          [
+            635.7913818359375,
+            373.6263732910156
+          ],
+          [
+            635.7913818359375,
+            408.02801513671875
+          ],
+          [
+            1090.1663818359375,
+            408.02801513671875
+          ],
+          [
+            1090.1663818359375,
+            373.6263732910156
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "37ebb2cef067c826ac06479a9d023cb7",
+    "text": "Semester 1 Assessment 2021",
+    "metadata": {
+      "detection_class_prob": 0.5498183369636536,
+      "coordinates": {
+        "points": [
+          [
+            640.9808959960938,
+            438.8638610839844
+          ],
+          [
+            640.9808959960938,
+            472.6918029785156
+          ],
+          [
+            1082.9263916015625,
+            472.6918029785156
+          ],
+          [
+            1082.9263916015625,
+            438.8638610839844
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "6d668c9b5158f8ba7f3646b0d826936a",
+    "text": "School of Computing and Information Systems",
+    "metadata": {
+      "detection_class_prob": 0.5367842316627502,
+      "coordinates": {
+        "points": [
+          [
+            502.1640930175781,
+            528.9935302734375
+          ],
+          [
+            502.1640930175781,
+            562.0315551757812
+          ],
+          [
+            1217.889892578125,
+            562.0315551757812
+          ],
+          [
+            1217.889892578125,
+            528.9935302734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "508c1b4a6dea4d2aec20d814638970b9",
+    "text": "COMP30024 Artificial Intelligence",
+    "metadata": {
+      "detection_class_prob": 0.3401843011379242,
+      "coordinates": {
+        "points": [
+          [
+            450.28118896484375,
+            587.6893310546875
+          ],
+          [
+            450.28118896484375,
+            634.2544555664062
+          ],
+          [
+            1271.2186279296875,
+            634.2544555664062
+          ],
+          [
+            1271.2186279296875,
+            587.6893310546875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "b1799ade24336b529ce694b1e9e553dc",
+    "text": "Time for writing and upload: 3 hours 15 minutes.",
+    "metadata": {
+      "detection_class_prob": 0.7752872109413147,
+      "coordinates": {
+        "points": [
+          [
+            266.82574462890625,
+            732.8484497070312
+          ],
+          [
+            266.82574462890625,
+            762.9089965820312
+          ],
+          [
+            996.4793701171875,
+            762.9089965820312
+          ],
+          [
+            996.4793701171875,
+            732.8484497070312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "e21b379e16c991a77b2d78e6c6c82bf2",
+    "text": "This paper has 20 pages including this cover page.",
+    "metadata": {
+      "detection_class_prob": 0.6848467588424683,
+      "coordinates": {
+        "points": [
+          [
+            274.2341613769531,
+            799.5723876953125
+          ],
+          [
+            274.2341613769531,
+            827.42626953125
+          ],
+          [
+            1047.08349609375,
+            827.42626953125
+          ],
+          [
+            1047.08349609375,
+            799.5723876953125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "e2ffe50825202f1b0fbd5489bb0ff9b5",
+    "text": "Common Content Papers: None",
+    "metadata": {
+      "detection_class_prob": 0.5719020366668701,
+      "coordinates": {
+        "points": [
+          [
+            268.2410583496094,
+            867.9063720703125
+          ],
+          [
+            268.2410583496094,
+            891.912109375
+          ],
+          [
+            756.2291259765625,
+            891.912109375
+          ],
+          [
+            756.2291259765625,
+            867.9063720703125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "7d56a55eb52a8cdfb7d645f19ad18af1",
+    "text": "Authorised Materials: Lecture notes, books, computer, on-line material",
+    "metadata": {
+      "detection_class_prob": 0.7714552879333496,
+      "coordinates": {
+        "points": [
+          [
+            287.04681396484375,
+            928.5515747070312
+          ],
+          [
+            287.04681396484375,
+            958.2163696289062
+          ],
+          [
+            1268.34228515625,
+            958.2163696289062
+          ],
+          [
+            1268.34228515625,
+            928.5515747070312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc",
+    "text": "Instructions to Students:",
+    "metadata": {
+      "detection_class_prob": 0.7535775303840637,
+      "coordinates": {
+        "points": [
+          [
+            280.238037109375,
+            1008.8992309570312
+          ],
+          [
+            280.238037109375,
+            1033.590087890625
+          ],
+          [
+            665.0897216796875,
+            1033.590087890625
+          ],
+          [
+            665.0897216796875,
+            1008.8992309570312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "61ff5a54a56f972aae0a3c39e6c3fdae",
+    "text": "e This paper counts for 70% of your final grade.",
+    "metadata": {
+      "detection_class_prob": 0.8420904874801636,
+      "coordinates": {
+        "points": [
+          [
+            324.9407958984375,
+            1067.2891845703125
+          ],
+          [
+            324.9407958984375,
+            1096.1893310546875
+          ],
+          [
+            973.8065795898438,
+            1096.1893310546875
+          ],
+          [
+            973.8065795898438,
+            1067.2891845703125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "622455db124dda69b5e1b150f5a52cae",
+    "text": "e There are 7 questions, with marks as indicated. Attempt all questions.",
+    "metadata": {
+      "detection_class_prob": 0.8485968112945557,
+      "coordinates": {
+        "points": [
+          [
+            318.5306091308594,
+            1116.03515625
+          ],
+          [
+            318.5306091308594,
+            1146.8543701171875
+          ],
+          [
+            1292.6474609375,
+            1146.8543701171875
+          ],
+          [
+            1292.6474609375,
+            1116.03515625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "0aee6a38ef04aa37304acbf357cd5436",
+    "text": "e Answer all the questions on the exam paper if possible, and then upload the com- pleted exam paper containing your solutions. If you are unable to print the exam paper or electronically edit the exam paper, you may write on your own blank paper and then upload images of your written answers.",
+    "metadata": {
+      "detection_class_prob": 0.9277856349945068,
+      "coordinates": {
+        "points": [
+          [
+            317.9764404296875,
+            1166.639404296875
+          ],
+          [
+            317.9764404296875,
+            1309.5595703125
+          ],
+          [
+            1469.64599609375,
+            1309.5595703125
+          ],
+          [
+            1469.64599609375,
+            1166.639404296875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "c1d03bb8e93df623e3f7c9fca8d055ac",
+    "text": "e You may upload your exam answers multiple times if you need to revise an answer at any time during the exam.",
+    "metadata": {
+      "detection_class_prob": 0.9139643907546997,
+      "coordinates": {
+        "points": [
+          [
+            316.1624450683594,
+            1329.3614501953125
+          ],
+          [
+            316.1624450683594,
+            1398.4283447265625
+          ],
+          [
+            1466.0906982421875,
+            1398.4283447265625
+          ],
+          [
+            1466.0906982421875,
+            1329.3614501953125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "13562d1eca203de7a3e3de14c4799474",
+    "text": "e You must not communicate with other students or seek assistance from anyone else taking whilst taking this exam, e.g. using messaging, chat rooms, email, telephone or face-to-face. Also, you must not assist anyone else taking the exam. You must not post answers to the questions or discussion of the questions online. Failure to comply with these instructions may be considered as academic misconduct.",
+    "metadata": {
+      "detection_class_prob": 0.9478132128715515,
+      "coordinates": {
+        "points": [
+          [
+            304.5819091796875,
+            1417.003662109375
+          ],
+          [
+            304.5819091796875,
+            1597.899658203125
+          ],
+          [
+            1477.4661865234375,
+            1597.899658203125
+          ],
+          [
+            1477.4661865234375,
+            1417.003662109375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "e3329c5a8c43de82526d6a83cf36f43c",
+    "text": "e You are free to use the course materials and your laptop/PC in this exam but note that there is a strict time window for the exam hence you should be mindful of the time spent using such resources.",
+    "metadata": {
+      "detection_class_prob": 0.9299862384796143,
+      "coordinates": {
+        "points": [
+          [
+            314.30078125,
+            1618.73583984375
+          ],
+          [
+            314.30078125,
+            1724.4415283203125
+          ],
+          [
+            1468.9273681640625,
+            1724.4415283203125
+          ],
+          [
+            1468.9273681640625,
+            1618.73583984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "ceba8b55370fd14ec3a9e79857610bab",
+    "text": "e Answer the questions as clearly and precisely as you can.",
+    "metadata": {
+      "detection_class_prob": 0.8577110171318054,
+      "coordinates": {
+        "points": [
+          [
+            324.152587890625,
+            1744.9703369140625
+          ],
+          [
+            324.152587890625,
+            1774.4744873046875
+          ],
+          [
+            1120.5926513671875,
+            1774.4744873046875
+          ],
+          [
+            1120.5926513671875,
+            1744.9703369140625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "d2b3d851c9d8a4c23e33c7724961ad6b",
+    "text": "e Your writing should be clear. Unreadable answers will be deemed wrong. Excessively long answers or irrelevant information may be penalised.",
+    "metadata": {
+      "detection_class_prob": 0.9110515713691711,
+      "coordinates": {
+        "points": [
+          [
+            325.0690612792969,
+            1792.8052978515625
+          ],
+          [
+            325.0690612792969,
+            1861.8768310546875
+          ],
+          [
+            1462.1044921875,
+            1861.8768310546875
+          ],
+          [
+            1462.1044921875,
+            1792.8052978515625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "174c5bac074877e9968b3b86411bb69d",
+    "text": "e For numerical methods, marks will be given for applying the correct method. Stu- dents will not be heavily penalised for arithmetic errors.",
+    "metadata": {
+      "detection_class_prob": 0.9175477623939514,
+      "coordinates": {
+        "points": [
+          [
+            319.4336853027344,
+            1881.00927734375
+          ],
+          [
+            319.4336853027344,
+            1949.1163330078125
+          ],
+          [
+            1462.7965087890625,
+            1949.1163330078125
+          ],
+          [
+            1462.7965087890625,
+            1881.00927734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "dd9f439bb038b594b531601fd8b6e289",
+    "text": "Library: This paper may NOT be reproduced and held by the Baillieu Library.",
+    "metadata": {
+      "detection_class_prob": 0.8681169748306274,
+      "coordinates": {
+        "points": [
+          [
+            273.9578552246094,
+            2009.967529296875
+          ],
+          [
+            273.9578552246094,
+            2041.5543212890625
+          ],
+          [
+            1345.2685546875,
+            2041.5543212890625
+          ],
+          [
+            1345.2685546875,
+            2009.967529296875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2a1c77c23b4187de8f2cf1ccbf68d0cc"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "cba906fed2450dcd7a843ae70af92333",
+    "text": "Question 1 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8473526835441589,
+      "coordinates": {
+        "points": [
+          [
+            269.2246398925781,
+            234.24063110351562
+          ],
+          [
+            269.2246398925781,
+            259.8431701660156
+          ],
+          [
+            615.263427734375,
+            259.8431701660156
+          ],
+          [
+            615.263427734375,
+            234.24063110351562
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "9b4f9471065155c5f7a75800aaee536a",
+    "text": "Pick the most appropriate answer to each of the following questions. Please write your answer to each question in the boxes below. Each question is worth 2 marks.",
+    "metadata": {
+      "detection_class_prob": 0.9311544299125671,
+      "coordinates": {
+        "points": [
+          [
+            268.1833801269531,
+            299.8587951660156
+          ],
+          [
+            268.1833801269531,
+            362.55419921875
+          ],
+          [
+            1459.8834228515625,
+            362.55419921875
+          ],
+          [
+            1459.8834228515625,
+            299.8587951660156
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "fd1a34f557990e93368c08f1bc8d8010",
+    "text": "Question || (a) (b) | (c) (d) | (e) Answer",
+    "metadata": {
+      "detection_class_prob": 0.5720595717430115,
+      "coordinates": {
+        "points": [
+          [
+            277.52667236328125,
+            393.3384704589844
+          ],
+          [
+            277.52667236328125,
+            547.5580444335938
+          ],
+          [
+            891.5281372070312,
+            547.5580444335938
+          ],
+          [
+            891.5281372070312,
+            393.3384704589844
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "6a6df8861733f370093927c5bc74ac77",
+    "text": "(a) Which of the following statements is true in general:",
+    "metadata": {
+      "detection_class_prob": 0.8685109615325928,
+      "coordinates": {
+        "points": [
+          [
+            276.2059326171875,
+            609.4884033203125
+          ],
+          [
+            276.2059326171875,
+            634.131591796875
+          ],
+          [
+            1013.5753173828125,
+            634.131591796875
+          ],
+          [
+            1013.5753173828125,
+            609.4884033203125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "cf1f1b3bf427d744de53cea2e9b5833e",
+    "text": "1. Depth-first search always expands at least as many nodes as A* search with an admissible heuristic.",
+    "metadata": {
+      "detection_class_prob": 0.9112449884414673,
+      "coordinates": {
+        "points": [
+          [
+            296.8838806152344,
+            698.3074951171875
+          ],
+          [
+            296.8838806152344,
+            759.2921752929688
+          ],
+          [
+            1458.453125,
+            759.2921752929688
+          ],
+          [
+            1458.453125,
+            698.3074951171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "a64be3a0f731f2eea87d8f3ec73c6b6e",
+    "text": "2. A perfectly rational backgammon agent never loses.",
+    "metadata": {
+      "detection_class_prob": 0.8458420634269714,
+      "coordinates": {
+        "points": [
+          [
+            303.5630187988281,
+            795.5606079101562
+          ],
+          [
+            303.5630187988281,
+            824.8466186523438
+          ],
+          [
+            1036.6634521484375,
+            824.8466186523438
+          ],
+          [
+            1036.6634521484375,
+            795.5606079101562
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "425383b88f2067741a3ebb5c4ed32d5e",
+    "text": "3. An advantage of Hill Climbing search is that it requires minimal memory.",
+    "metadata": {
+      "detection_class_prob": 0.8198612332344055,
+      "coordinates": {
+        "points": [
+          [
+            301.59246826171875,
+            857.5301513671875
+          ],
+          [
+            301.59246826171875,
+            888.519775390625
+          ],
+          [
+            1332.3546142578125,
+            888.519775390625
+          ],
+          [
+            1332.3546142578125,
+            857.5301513671875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "2f868252ef9eedf850401a51744fbe96",
+    "text": "4. Bi-directional search is always more efficient than uni-directional search.",
+    "metadata": {
+      "detection_class_prob": 0.867124080657959,
+      "coordinates": {
+        "points": [
+          [
+            305.22900390625,
+            918.6604614257812
+          ],
+          [
+            305.22900390625,
+            949.8250732421875
+          ],
+          [
+            1302.8428955078125,
+            949.8250732421875
+          ],
+          [
+            1302.8428955078125,
+            918.6604614257812
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "f27f7a359e138af46325e577e3206800",
+    "text": "(b) In a general CSP with n variables, each taking d possible values, what is the maxi- mum number of times a backtracking search algorithm might have to backtrack, if it is running arc consistency and applying the Minimum Remaining Values (MRV) and (Least Constraining Value) LCV heuristics?",
+    "metadata": {
+      "detection_class_prob": 0.9370436072349548,
+      "coordinates": {
+        "points": [
+          [
+            276.70318603515625,
+            1070.35302734375
+          ],
+          [
+            276.70318603515625,
+            1212.9326171875
+          ],
+          [
+            1473.27783203125,
+            1212.9326171875
+          ],
+          [
+            1473.27783203125,
+            1070.35302734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "d73ee462c5ddd7a4e0a7b51ce60bedfb",
+    "text": "1) 1 je) (",
+    "metadata": {
+      "detection_class_prob": 0.7483315467834473,
+      "coordinates": {
+        "points": [
+          [
+            308.69598388671875,
+            1243.787109375
+          ],
+          [
+            308.69598388671875,
+            1277.9522705078125
+          ],
+          [
+            408.61322021484375,
+            1277.9522705078125
+          ],
+          [
+            408.61322021484375,
+            1243.787109375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "4f21c8399b8803313a2ad55462312da7",
+    "text": "nd?) 2. 0 (",
+    "metadata": {
+      "detection_class_prob": 0.5884917974472046,
+      "coordinates": {
+        "points": [
+          [
+            305.5860595703125,
+            1304.2574462890625
+          ],
+          [
+            305.5860595703125,
+            1340.881103515625
+          ],
+          [
+            440.0924987792969,
+            1340.881103515625
+          ],
+          [
+            440.0924987792969,
+            1304.2574462890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "2aea6d32fc0bf8aa8bb512ba4171d661",
+    "text": "je) (n?d?)",
+    "metadata": {
+      "detection_class_prob": 0.5919826030731201,
+      "coordinates": {
+        "points": [
+          [
+            306.5740051269531,
+            1364.8533935546875
+          ],
+          [
+            306.5740051269531,
+            1402.816162109375
+          ],
+          [
+            450.9492492675781,
+            1402.816162109375
+          ],
+          [
+            450.9492492675781,
+            1364.8533935546875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "9837f630ce78291c107c376212504470",
+    "text": "( O d\u201d)",
+    "metadata": {
+      "detection_class_prob": 0.5044269561767578,
+      "coordinates": {
+        "points": [
+          [
+            307.95794677734375,
+            1432.0670166015625
+          ],
+          [
+            307.95794677734375,
+            1465.3465576171875
+          ],
+          [
+            424.6707763671875,
+            1465.3465576171875
+          ],
+          [
+            424.6707763671875,
+            1432.0670166015625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 2,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cba906fed2450dcd7a843ae70af92333"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "14d7bb77d482512acdf7b25d27913527",
+    "text": "Question 1 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8363685607910156,
+      "coordinates": {
+        "points": [
+          [
+            271.58990478515625,
+            231.8479766845703
+          ],
+          [
+            271.58990478515625,
+            260.22882080078125
+          ],
+          [
+            621.8037109375,
+            260.22882080078125
+          ],
+          [
+            621.8037109375,
+            231.8479766845703
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "9926be3e8306586eab652f0ef7b55813",
+    "text": "(c) You are given a game-tree for which you are the maximizer, and in the nodes in which you don\u2019t get to make a decision an action is chosen uniformly at random amongst the available options. Your objective is to maximize the probability that you win $10 or more (rather than the usual objective to maximize your expected value). Note that Expectimax is a variant of Expectiminimax where nodes alternate between max nodes and chance nodes at different layers of the search tree (there are no min nodes). Then which of the following statements is true:",
+    "metadata": {
+      "detection_class_prob": 0.9526755213737488,
+      "coordinates": {
+        "points": [
+          [
+            272.606689453125,
+            293.9726257324219
+          ],
+          [
+            272.606689453125,
+            551.681640625
+          ],
+          [
+            1460.64697265625,
+            551.681640625
+          ],
+          [
+            1460.64697265625,
+            293.9726257324219
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "920f69216e55cc5ad2a34ee1ba315e6a",
+    "text": "1. Running Expectimax will result in finding the optimal strategy to maximize the probability of winning $10 or more.",
+    "metadata": {
+      "detection_class_prob": 0.912005603313446,
+      "coordinates": {
+        "points": [
+          [
+            301.41357421875,
+            610.8950805664062
+          ],
+          [
+            301.41357421875,
+            680.907470703125
+          ],
+          [
+            1464.4476318359375,
+            680.907470703125
+          ],
+          [
+            1464.4476318359375,
+            610.8950805664062
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "7668b4bed53ea46c0b3e8114135b4700",
+    "text": "2. Running Minimax, where chance nodes are considered minimizers, will result in finding the optimal strategy to maximize the probability of winning $10 or more.",
+    "metadata": {
+      "detection_class_prob": 0.9182071089744568,
+      "coordinates": {
+        "points": [
+          [
+            303.1000671386719,
+            711.1312255859375
+          ],
+          [
+            303.1000671386719,
+            780.7974853515625
+          ],
+          [
+            1462.482421875,
+            780.7974853515625
+          ],
+          [
+            1462.482421875,
+            711.1312255859375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "d9da00ff4ef6ac4bb8c26170e912e309",
+    "text": "3. Running Expectimax in a modified game tree where every pay-off of $10 or more is given a value of 1, and every pay-off lower than $10 is given a value of 0 will result in finding the optimal strategy to maximize the probability of winning $10 or more.",
+    "metadata": {
+      "detection_class_prob": 0.9334926009178162,
+      "coordinates": {
+        "points": [
+          [
+            300.20477294921875,
+            811.91357421875
+          ],
+          [
+            300.20477294921875,
+            918.8283081054688
+          ],
+          [
+            1463.888427734375,
+            918.8283081054688
+          ],
+          [
+            1463.888427734375,
+            811.91357421875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "d36ce61defce7a02f1a78b2bf149f907",
+    "text": "4. Running Minimax in a modified game tree where every pay-off of $10 or more is given a value of 1, and every pay-off lower than $10 is given a value of 0 will result in finding the optimal strategy to maximize the probability of winning $10 or more.",
+    "metadata": {
+      "detection_class_prob": 0.922875165939331,
+      "coordinates": {
+        "points": [
+          [
+            295.37152099609375,
+            951.6882934570312
+          ],
+          [
+            295.37152099609375,
+            1055.93603515625
+          ],
+          [
+            1458.015625,
+            1055.93603515625
+          ],
+          [
+            1458.015625,
+            951.6882934570312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "050b992ff5ff977dda1d8343ba4975d1",
+    "text": "(d) Consider that you need to run four auctions labelled (A), (B), (C) and (D), where the most important property for each auction is as follows:",
+    "metadata": {
+      "detection_class_prob": 0.9163342118263245,
+      "coordinates": {
+        "points": [
+          [
+            274.3810729980469,
+            1180.043701171875
+          ],
+          [
+            274.3810729980469,
+            1243.70263671875
+          ],
+          [
+            1454.6434326171875,
+            1243.70263671875
+          ],
+          [
+            1454.6434326171875,
+            1180.043701171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "cc4c42e13727eea927e514f2203cfb61",
+    "text": "(A) Hard to collude, (B) Winner pays second highest price, (C) Open-cry, (D) Decending",
+    "metadata": {
+      "detection_class_prob": 0.7935641407966614,
+      "coordinates": {
+        "points": [
+          [
+            272.2759094238281,
+            1292.2069091796875
+          ],
+          [
+            272.2759094238281,
+            1317.89306640625
+          ],
+          [
+            1450.7373046875,
+            1317.89306640625
+          ],
+          [
+            1450.7373046875,
+            1292.2069091796875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "99ec02488cf41c6e864ea0f44d58fb38",
+    "text": "Which set of auction types below is the best match for these four auctions based on their respective desired properties?",
+    "metadata": {
+      "detection_class_prob": 0.9012381434440613,
+      "coordinates": {
+        "points": [
+          [
+            274.1047668457031,
+            1367.7525634765625
+          ],
+          [
+            274.1047668457031,
+            1428.93603515625
+          ],
+          [
+            1457.055419921875,
+            1428.93603515625
+          ],
+          [
+            1457.055419921875,
+            1367.7525634765625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "de56735259b540de48ee1bbbe575598a",
+    "text": "1. (A) Vickery, (B) Dutch, (C) English, (D) First-price sealed-bid",
+    "metadata": {
+      "detection_class_prob": 0.674910306930542,
+      "coordinates": {
+        "points": [
+          [
+            299.43157958984375,
+            1494.1693115234375
+          ],
+          [
+            299.43157958984375,
+            1522.057373046875
+          ],
+          [
+            1190.260009765625,
+            1522.057373046875
+          ],
+          [
+            1190.260009765625,
+            1494.1693115234375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "eaa80dd69a1ca4d3829117819625e231",
+    "text": "2. (A) Vickery, (B) English, (C) Dutch, (D) First-price sealed-bid",
+    "metadata": {
+      "detection_class_prob": 0.6637884378433228,
+      "coordinates": {
+        "points": [
+          [
+            299.26055908203125,
+            1556.950927734375
+          ],
+          [
+            299.26055908203125,
+            1584.815185546875
+          ],
+          [
+            1185.8173828125,
+            1584.815185546875
+          ],
+          [
+            1185.8173828125,
+            1556.950927734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "97f5c49d5426bfdf8b0b11a55b582b0e",
+    "text": "3. (A) First-price sealed-bid, (B) Dutch, (C) English, (D) Vickery",
+    "metadata": {
+      "detection_class_prob": 0.727917492389679,
+      "coordinates": {
+        "points": [
+          [
+            306.169677734375,
+            1618.910888671875
+          ],
+          [
+            306.169677734375,
+            1646.3533935546875
+          ],
+          [
+            1178.2762451171875,
+            1646.3533935546875
+          ],
+          [
+            1178.2762451171875,
+            1618.910888671875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "a1c159241f6d8f75c9dba6e0097f7754",
+    "text": "4. (A) First-price sealed-bid, (B) Vickery, (C) English, (D) Dutch",
+    "metadata": {
+      "detection_class_prob": 0.5467758774757385,
+      "coordinates": {
+        "points": [
+          [
+            308.8161926269531,
+            1681.4251708984375
+          ],
+          [
+            308.8161926269531,
+            1709.51318359375
+          ],
+          [
+            1181.83447265625,
+            1709.51318359375
+          ],
+          [
+            1181.83447265625,
+            1681.4251708984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 3,
+      "filename": "exam21-final.pdf",
+      "parent_id": "14d7bb77d482512acdf7b25d27913527"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "5fd45a6f64589c6235aa51c04423d2ba",
+    "text": "Question 1 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8749985694885254,
+      "coordinates": {
+        "points": [
+          [
+            271.7481994628906,
+            234.17759704589844
+          ],
+          [
+            271.7481994628906,
+            259.8805236816406
+          ],
+          [
+            621.5570068359375,
+            259.8805236816406
+          ],
+          [
+            621.5570068359375,
+            234.17759704589844
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "filename": "exam21-final.pdf",
+      "parent_id": "2b9cd57e1b6ebe26c6ed9ddec47dd1e4"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "b47a98a7042e0d78538451d6dddcb6c1",
+    "text": "(e) Figure 1-1 shows a robot arm that is made up of two sections Arm, and Armg. Arm, can rotate around the shoulder joint A, while Arma is connected to Arm, at the elbow joint B, and can rotate around the joint B. The configuration of the robot arm can be specified by the angle 6; between the horizontal axis and Army, and the angle 62 between Arm, and Arm. Both angles are measured in radians. There is also 1 fixed obstacle shown, which restricts the movement of the robot arm.",
+    "metadata": {
+      "detection_class_prob": 0.9492549300193787,
+      "coordinates": {
+        "points": [
+          [
+            266.2672424316406,
+            296.609375
+          ],
+          [
+            266.2672424316406,
+            512.9376220703125
+          ],
+          [
+            1456.7733154296875,
+            512.9376220703125
+          ],
+          [
+            1456.7733154296875,
+            296.609375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "filename": "exam21-final.pdf",
+      "parent_id": "5fd45a6f64589c6235aa51c04423d2ba"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "e233c3b6ccc9b83bc485c59e452f0933",
+    "text": "",
+    "metadata": {
+      "detection_class_prob": 0.8958072066307068,
+      "coordinates": {
+        "points": [
+          [
+            524.8065185546875,
+            628.8760986328125
+          ],
+          [
+            524.8065185546875,
+            1174.18017578125
+          ],
+          [
+            1166.667236328125,
+            1174.18017578125
+          ],
+          [
+            1166.667236328125,
+            628.8760986328125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-4-1.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "1f4b2a6b110f58a4919264da933d60da",
+    "text": "Figure 1-1",
+    "metadata": {
+      "detection_class_prob": 0.6902932524681091,
+      "coordinates": {
+        "points": [
+          [
+            792.9339599609375,
+            1222.7919921875
+          ],
+          [
+            792.9339599609375,
+            1248.3387451171875
+          ],
+          [
+            929.16748046875,
+            1248.3387451171875
+          ],
+          [
+            929.16748046875,
+            1222.7919921875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "cb9febc04dc027a3b2979d946f98e4a0",
+    "text": "Which of the following four figures best represents the configuration space for this robot? The figures are labelled (1) to (4).",
+    "metadata": {
+      "detection_class_prob": 0.8956881761550903,
+      "coordinates": {
+        "points": [
+          [
+            269.71331787109375,
+            1325.310546875
+          ],
+          [
+            269.71331787109375,
+            1386.6644287109375
+          ],
+          [
+            1456.2652587890625,
+            1386.6644287109375
+          ],
+          [
+            1456.2652587890625,
+            1325.310546875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "993997bf950f59f65d4ba4b6fdd075cf",
+    "text": "(1) (2) (3) (4) 2n 2n 2n 2n 6, 8, 8 8, bd m n bd 0 n an 0 T 2n 0 bd an 0 7 an 8, 8, % on",
+    "metadata": {
+      "detection_class_prob": 0.8995509147644043,
+      "coordinates": {
+        "points": [
+          [
+            323.5141906738281,
+            1448.824462890625
+          ],
+          [
+            323.5141906738281,
+            1735.0389404296875
+          ],
+          [
+            1400.2017822265625,
+            1735.0389404296875
+          ],
+          [
+            1400.2017822265625,
+            1448.824462890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-4-2.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "4e22efc8339468187e0e42a1493bb73e",
+    "text": "Figure 1-2",
+    "metadata": {
+      "detection_class_prob": 0.7786290049552917,
+      "coordinates": {
+        "points": [
+          [
+            794.7476806640625,
+            1772.3349609375
+          ],
+          [
+            794.7476806640625,
+            1798.2606201171875
+          ],
+          [
+            931.0223388671875,
+            1798.2606201171875
+          ],
+          [
+            931.0223388671875,
+            1772.3349609375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 4,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "e039acd39515636d770fff2da1dd797e",
+    "text": "Question 2 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8916272521018982,
+      "coordinates": {
+        "points": [
+          [
+            270.4029235839844,
+            234.91558837890625
+          ],
+          [
+            270.4029235839844,
+            259.8993225097656
+          ],
+          [
+            613.9625854492188,
+            259.8993225097656
+          ],
+          [
+            613.9625854492188,
+            234.91558837890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "9b4d5053c0f14a486caf81c1eaf22177",
+    "text": "For each part of the following question you should write a brief answer in the box provided.",
+    "metadata": {
+      "detection_class_prob": 0.8539690971374512,
+      "coordinates": {
+        "points": [
+          [
+            271.67169189453125,
+            299.5785217285156
+          ],
+          [
+            271.67169189453125,
+            325.7918395996094
+          ],
+          [
+            1447.0479736328125,
+            325.7918395996094
+          ],
+          [
+            1447.0479736328125,
+            299.5785217285156
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf",
+      "parent_id": "e039acd39515636d770fff2da1dd797e"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "c26370d21d8f44c6fe5abe678defdfd8",
+    "text": "(a) [2 marks] The following is the weight update rule for gradient decent learning as described in the lectures",
+    "metadata": {
+      "detection_class_prob": 0.8979493379592896,
+      "coordinates": {
+        "points": [
+          [
+            268.51861572265625,
+            366.33734130859375
+          ],
+          [
+            268.51861572265625,
+            425.5331115722656
+          ],
+          [
+            1462.69580078125,
+            425.5331115722656
+          ],
+          [
+            1462.69580078125,
+            366.33734130859375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf",
+      "parent_id": "e039acd39515636d770fff2da1dd797e"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "7c0211b904161ff46ac31ad3310f0ec5",
+    "text": "wi \u2014 wi \u2014 n(z\u2014 t) fils)",
+    "metadata": {
+      "detection_class_prob": 0.7457187175750732,
+      "coordinates": {
+        "points": [
+          [
+            350.1307678222656,
+            468.0442810058594
+          ],
+          [
+            350.1307678222656,
+            500.0723571777344
+          ],
+          [
+            656.1105346679688,
+            500.0723571777344
+          ],
+          [
+            656.1105346679688,
+            468.0442810058594
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf",
+      "parent_id": "e039acd39515636d770fff2da1dd797e"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "172ba07507a234d87d7d78ab28527b05",
+    "text": "where 77 is the learning rate, and w is the vector of weights in the evaluation function. Why it is important to get the learning rate parameter 1 right?",
+    "metadata": {
+      "detection_class_prob": 0.9310116171836853,
+      "coordinates": {
+        "points": [
+          [
+            262.3390808105469,
+            566.7980346679688
+          ],
+          [
+            262.3390808105469,
+            628.5567626953125
+          ],
+          [
+            1459.8333740234375,
+            628.5567626953125
+          ],
+          [
+            1459.8333740234375,
+            566.7980346679688
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf",
+      "parent_id": "e039acd39515636d770fff2da1dd797e"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "ea92834e0c67bb51ae68d917ae55a979",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.6989570260047913,
+      "coordinates": {
+        "points": [
+          [
+            262.5270080566406,
+            644.78173828125
+          ],
+          [
+            262.5270080566406,
+            1135.5487060546875
+          ],
+          [
+            1503.5631103515625,
+            1135.5487060546875
+          ],
+          [
+            1503.5631103515625,
+            644.78173828125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-5-3.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "9ef7c63d543368f6b64aaba777b5f67b",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.588813304901123,
+      "coordinates": {
+        "points": [
+          [
+            283.56353759765625,
+            657.181640625
+          ],
+          [
+            283.56353759765625,
+            678.65087890625
+          ],
+          [
+            405.046142578125,
+            678.65087890625
+          ],
+          [
+            405.046142578125,
+            657.181640625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "33460d87e46188aec6dff730f0f572ff",
+    "text": "(b) [2 marks] In the weight update rule in part (a), what does a small difference between z and t indicate about the current weight w;?",
+    "metadata": {
+      "detection_class_prob": 0.912899911403656,
+      "coordinates": {
+        "points": [
+          [
+            262.1180419921875,
+            1207.2823486328125
+          ],
+          [
+            262.1180419921875,
+            1269.48779296875
+          ],
+          [
+            1458.96728515625,
+            1269.48779296875
+          ],
+          [
+            1458.96728515625,
+            1207.2823486328125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "0f5a3cf2550a9f88a5fdb07481850331",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.728452742099762,
+      "coordinates": {
+        "points": [
+          [
+            257.66351318359375,
+            1286.5458984375
+          ],
+          [
+            257.66351318359375,
+            1780.505615234375
+          ],
+          [
+            1496.8043212890625,
+            1780.505615234375
+          ],
+          [
+            1496.8043212890625,
+            1286.5458984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-5-4.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "c3f2865e0ba0bb63b5dff1b80396e688",
+    "text": "ow",
+    "metadata": {
+      "detection_class_prob": 0.5134029388427734,
+      "coordinates": {
+        "points": [
+          [
+            853.1625366210938,
+            2096.614990234375
+          ],
+          [
+            853.1625366210938,
+            2123.03125
+          ],
+          [
+            869.1035766601562,
+            2123.03125
+          ],
+          [
+            869.1035766601562,
+            2096.614990234375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 5,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "0900336bc280a6f23e95718860739e65",
+    "text": "Question 2 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8855195641517639,
+      "coordinates": {
+        "points": [
+          [
+            272.1548767089844,
+            234.25772094726562
+          ],
+          [
+            272.1548767089844,
+            259.8566589355469
+          ],
+          [
+            620.2117919921875,
+            259.8566589355469
+          ],
+          [
+            620.2117919921875,
+            234.25772094726562
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "dc05fb25f09a5654b713b2632c56f3a7",
+    "text": "(c) [6 marks] For each of the following three environments, what is the most appropriate ype of agent (simple reflex agent, model-based reflex agent, goal-based agent, or utility- yased agent)? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.9391253590583801,
+      "coordinates": {
+        "points": [
+          [
+            267.650390625,
+            298.4150390625
+          ],
+          [
+            267.650390625,
+            399.5855712890625
+          ],
+          [
+            1464.0465087890625,
+            399.5855712890625
+          ],
+          [
+            1464.0465087890625,
+            298.4150390625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf",
+      "parent_id": "0900336bc280a6f23e95718860739e65"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "3bbf67ec75c967b11a721bde92c35cc4",
+    "text": "(i) An automated system that translates text from one language to another, e.g., Google ranslate",
+    "metadata": {
+      "detection_class_prob": 0.9014006853103638,
+      "coordinates": {
+        "points": [
+          [
+            266.0128173828125,
+            476.5230712890625
+          ],
+          [
+            266.0128173828125,
+            536.323486328125
+          ],
+          [
+            1461.1214599609375,
+            536.323486328125
+          ],
+          [
+            1461.1214599609375,
+            476.5230712890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf",
+      "parent_id": "0900336bc280a6f23e95718860739e65"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "ffc8888b48c31ed08719c51c5d07d208",
+    "text": "(ii) A movie recommendation system",
+    "metadata": {
+      "detection_class_prob": 0.8638325333595276,
+      "coordinates": {
+        "points": [
+          [
+            276.94891357421875,
+            553.9966430664062
+          ],
+          [
+            276.94891357421875,
+            578.160888671875
+          ],
+          [
+            761.7258911132812,
+            578.160888671875
+          ],
+          [
+            761.7258911132812,
+            553.9966430664062
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf",
+      "parent_id": "0900336bc280a6f23e95718860739e65"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "5f4939e8a0ef96da0d9dfa7045682ca3",
+    "text": "(iii) An automated taxi driver that is required to reach the airport on time",
+    "metadata": {
+      "detection_class_prob": 0.8454142808914185,
+      "coordinates": {
+        "points": [
+          [
+            277.4053955078125,
+            589.7554321289062
+          ],
+          [
+            277.4053955078125,
+            615.87109375
+          ],
+          [
+            1257.9063720703125,
+            615.87109375
+          ],
+          [
+            1257.9063720703125,
+            589.7554321289062
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf",
+      "parent_id": "0900336bc280a6f23e95718860739e65"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "f172c5bf70b07565e4a57243eb204046",
+    "text": "Answer:",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            288.0,
+            630.0
+          ],
+          [
+            288.0,
+            651.0
+          ],
+          [
+            408.0,
+            651.0
+          ],
+          [
+            408.0,
+            630.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "filename": "exam21-final.pdf",
+      "parent_id": "0900336bc280a6f23e95718860739e65"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "ac0dfa89d617c81cdb5514ccaba17ed1",
+    "text": "",
+    "metadata": {
+      "detection_class_prob": 0.3526807129383087,
+      "coordinates": {
+        "points": [
+          [
+            217.70863342285156,
+            672.3966064453125
+          ],
+          [
+            217.70863342285156,
+            1958.2701416015625
+          ],
+          [
+            1550.8651123046875,
+            1958.2701416015625
+          ],
+          [
+            1550.8651123046875,
+            672.3966064453125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 6,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-6-5.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "110f714f1c540b4cb4e827262c07ef23",
+    "text": "Question 3 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8811817765235901,
+      "coordinates": {
+        "points": [
+          [
+            269.8132019042969,
+            234.9832305908203
+          ],
+          [
+            269.8132019042969,
+            259.711669921875
+          ],
+          [
+            615.5153198242188,
+            259.711669921875
+          ],
+          [
+            615.5153198242188,
+            234.9832305908203
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "5c72b45ee51fa92de91d26863e2ff44e",
+    "text": "Consider the 3-ply game tree shown in Figure 3-1. Each node has an identifier (e.g., the root of the tree is node 1; it has three successor nodes 2, 12 and 22), and each terminal node has an associated value (e.g., the value of node 4 is 8).",
+    "metadata": {
+      "detection_class_prob": 0.935242235660553,
+      "coordinates": {
+        "points": [
+          [
+            266.7169494628906,
+            298.8636779785156
+          ],
+          [
+            266.7169494628906,
+            401.0932922363281
+          ],
+          [
+            1454.9278564453125,
+            401.0932922363281
+          ],
+          [
+            1454.9278564453125,
+            298.8636779785156
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf",
+      "parent_id": "110f714f1c540b4cb4e827262c07ef23"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "94fe5b887f5c114e0b5f835eb6237261",
+    "text": "MAX VALUE 8 6 1 5 7 4 6 0 2 4 7",
+    "metadata": {
+      "detection_class_prob": 0.9202196002006531,
+      "coordinates": {
+        "points": [
+          [
+            336.5,
+            490.62115478515625
+          ],
+          [
+            336.5,
+            1004.5413208007812
+          ],
+          [
+            1397.59619140625,
+            1004.5413208007812
+          ],
+          [
+            1397.59619140625,
+            490.62115478515625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-7-6.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "2a0767ac05952f0fe14090af1e1ac396",
+    "text": "Figure 3-1",
+    "metadata": {
+      "detection_class_prob": 0.7724306583404541,
+      "coordinates": {
+        "points": [
+          [
+            793.8346557617188,
+            1074.69189453125
+          ],
+          [
+            793.8346557617188,
+            1099.5555419921875
+          ],
+          [
+            931.2681274414062,
+            1099.5555419921875
+          ],
+          [
+            931.2681274414062,
+            1074.69189453125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "a438a81af25185a4d034913c1d85426b",
+    "text": "In the following questions, you are NOT required to redraw the search tree in your answer.",
+    "metadata": {
+      "detection_class_prob": 0.6587622761726379,
+      "coordinates": {
+        "points": [
+          [
+            276.9600524902344,
+            1175.3038330078125
+          ],
+          [
+            276.9600524902344,
+            1201.044921875
+          ],
+          [
+            1444.47314453125,
+            1201.044921875
+          ],
+          [
+            1444.47314453125,
+            1175.3038330078125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "cea3de684a4e6572832af5b8a3570335",
+    "text": "(a) [1 mark] What is the minimax value at node 1 after applying the minimax algorithm to this search tree? Answer:",
+    "metadata": {
+      "detection_class_prob": 0.36262696981430054,
+      "coordinates": {
+        "points": [
+          [
+            265.7211608886719,
+            1242.215576171875
+          ],
+          [
+            265.7211608886719,
+            1309.7725830078125
+          ],
+          [
+            1464.4471435546875,
+            1309.7725830078125
+          ],
+          [
+            1464.4471435546875,
+            1242.215576171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "1ded740ecef653172aa549aaf33e44bf",
+    "text": "(b) [4 marks] If the nodes are examined in the order shown by the identifier in each node in Figure 3-1, which nodes would be pruned if alpha-beta pruning is used? For each node that would be pruned, place a cross in the corresponding box below.",
+    "metadata": {
+      "detection_class_prob": 0.823484480381012,
+      "coordinates": {
+        "points": [
+          [
+            263.86065673828125,
+            1405.6627197265625
+          ],
+          [
+            263.86065673828125,
+            1507.4478759765625
+          ],
+          [
+            1452.572021484375,
+            1507.4478759765625
+          ],
+          [
+            1452.572021484375,
+            1405.6627197265625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Table",
+    "element_id": "ac962090b584b017510376579bb94166",
+    "text": "Node 1/2 )3 }/4 1/5 |]6 |7 )8 |9 | 10) 11} 12] 13) 14} 15 Answer: 16 Pruned",
+    "metadata": {
+      "detection_class_prob": 0.6522665619850159,
+      "coordinates": {
+        "points": [
+          [
+            272.797607421875,
+            1534.2154541015625
+          ],
+          [
+            272.797607421875,
+            1695.3446044921875
+          ],
+          [
+            1506.9759521484375,
+            1695.3446044921875
+          ],
+          [
+            1506.9759521484375,
+            1534.2154541015625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "text_as_html": "<table><thead><tr><th>Answer:</th><th>Node</th><th>ot</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>L</th><th>16</th></tr></thead><tbody><tr><td></td><td>Pruned</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/table-7-1.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Table",
+    "element_id": "9663e8a8ebc2c38996babe6f16fcac7c",
+    "text": "Node 17} 18} 19} 20} 21] 22) 23) 24) 25) 26) 27] 28) 29) 30] 31 Pruned",
+    "metadata": {
+      "detection_class_prob": 0.44253402948379517,
+      "coordinates": {
+        "points": [
+          [
+            386.1988830566406,
+            1717.438232421875
+          ],
+          [
+            386.1988830566406,
+            1888.1385498046875
+          ],
+          [
+            1450.72705078125,
+            1888.1385498046875
+          ],
+          [
+            1450.72705078125,
+            1717.438232421875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "text_as_html": "<table><thead><tr><th>Node</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th></tr></thead><tbody><tr><td>Pruned</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/table-7-2.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "60b85c6a241062455dcc32060aad386a",
+    "text": "(c) [2 marks] If we come up with the perfect ordering of the nodes, what is the maximum number of nodes that we can prune? Answer:",
+    "metadata": {
+      "detection_class_prob": 0.7988379597663879,
+      "coordinates": {
+        "points": [
+          [
+            264.7591857910156,
+            1908.9180908203125
+          ],
+          [
+            264.7591857910156,
+            1975.7969970703125
+          ],
+          [
+            1454.555908203125,
+            1975.7969970703125
+          ],
+          [
+            1454.555908203125,
+            1908.9180908203125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 7,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "b8a36082c6b809074dcf1699488d27b1",
+    "text": "Question 3 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.884124755859375,
+      "coordinates": {
+        "points": [
+          [
+            271.9747314453125,
+            234.35069274902344
+          ],
+          [
+            271.9747314453125,
+            259.7976379394531
+          ],
+          [
+            620.1162719726562,
+            259.7976379394531
+          ],
+          [
+            620.1162719726562,
+            234.35069274902344
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 8,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "ddeb7bccb7bb99fde6ce34faeed5b3e7",
+    "text": "(d) [3 marks] What are three properties that characterise an effective mechanism design for an auction? Note: you should briefly define each property that you give in your answer.",
+    "metadata": {
+      "detection_class_prob": 0.9292482733726501,
+      "coordinates": {
+        "points": [
+          [
+            265.1396484375,
+            299.7094421386719
+          ],
+          [
+            265.1396484375,
+            363.3415222167969
+          ],
+          [
+            1458.624755859375,
+            363.3415222167969
+          ],
+          [
+            1458.624755859375,
+            299.7094421386719
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 8,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b8a36082c6b809074dcf1699488d27b1"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "1090e6bcfc63f7a72019ab2df6c4b46e",
+    "text": "Write your answer in the space provided below. If you require more space, please use the ast page of the exam paper, and clearly indicate on this page that you have used the last age.",
+    "metadata": {
+      "detection_class_prob": 0.9364317059516907,
+      "coordinates": {
+        "points": [
+          [
+            271.3016662597656,
+            404.197265625
+          ],
+          [
+            271.3016662597656,
+            498.3663330078125
+          ],
+          [
+            1465.3155517578125,
+            498.3663330078125
+          ],
+          [
+            1465.3155517578125,
+            404.197265625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 8,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b8a36082c6b809074dcf1699488d27b1"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "4a274a781a6e12076ef0f2eea16a1d79",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.5167832970619202,
+      "coordinates": {
+        "points": [
+          [
+            283.61004638671875,
+            530.4558715820312
+          ],
+          [
+            283.61004638671875,
+            552.2445068359375
+          ],
+          [
+            405.2021179199219,
+            552.2445068359375
+          ],
+          [
+            405.2021179199219,
+            530.4558715820312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 8,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b8a36082c6b809074dcf1699488d27b1"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "b6a0fb1fcea68e6b5b2e53764210629d",
+    "text": "Question 4 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8664068579673767,
+      "coordinates": {
+        "points": [
+          [
+            269.64849853515625,
+            234.7650146484375
+          ],
+          [
+            269.64849853515625,
+            259.7720031738281
+          ],
+          [
+            615.9020385742188,
+            259.7720031738281
+          ],
+          [
+            615.9020385742188,
+            234.7650146484375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "6ec37a9ee8166a311a047a617f216834",
+    "text": "If a search problem has only a single goal state, it is common to perform bidirectional search. In bidirectional search you build two search trees at the same time: the \u201cforward\u201d search tree is the one we have always worked with in COMP30024, while the \u201cbackward\u201d search tree is the one that starts from the goal state, and calls a predecessor (rather than successor) function to work its way back to the start state. Both searches use the same cost function for transitioning between two states. There will now also be a backward heuristic, which for each state estimates the distance to the start state. Bidirectional search can result in significant computational advantages: the size of the search tree built grows exponentially with the depth of the search tree. By growing trees from the start and goal towards each other, these two trees could meet in the middle. Thus, one ends up with a computational complexity of just twice that of searching a tree of half the depth, which is a very significant saving.",
+    "metadata": {
+      "detection_class_prob": 0.9509932994842529,
+      "coordinates": {
+        "points": [
+          [
+            272.62884521484375,
+            296.427734375
+          ],
+          [
+            272.62884521484375,
+            739.3192749023438
+          ],
+          [
+            1456.2716064453125,
+            739.3192749023438
+          ],
+          [
+            1456.2716064453125,
+            296.427734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "6322a2932431cf238b3ecfd9e62749b8",
+    "text": "Recall the pseudo-code for a standard A* graph search",
+    "metadata": {
+      "detection_class_prob": 0.8675948977470398,
+      "coordinates": {
+        "points": [
+          [
+            272.3031921386719,
+            779.2799072265625
+          ],
+          [
+            272.3031921386719,
+            803.9603271484375
+          ],
+          [
+            1008.2365112304688,
+            803.9603271484375
+          ],
+          [
+            1008.2365112304688,
+            779.2799072265625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "8753b735672d999aadba1411e0e6e545",
+    "text": "Algorithm A* Search",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            272.0,
+            884.0
+          ],
+          [
+            272.0,
+            913.0
+          ],
+          [
+            583.0,
+            913.0
+          ],
+          [
+            583.0,
+            884.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "1e7f345d464b89406921629068b60f7d",
+    "text": "Function Astar-Graph-Search(problem) forward-closed + empty set forward-priority-queue + Insert(Make-Node(Start-State(problem)), forward-priority-queue) loop if forward-priority-queue is empty then return failure end if if forward-priority-queue is not empty then node + Pop(forward-priority-queue) if (State(node) == Goal-State(problem) ) then return node end if if State(node) is not in forward-closed then add State(node) to forward-closed forward-priority-queue + Insert-All(ExpandForward(node, problem), forward-priority-queue) end if end if loop",
+    "metadata": {
+      "detection_class_prob": 0.8487928509712219,
+      "coordinates": {
+        "points": [
+          [
+            332.29620361328125,
+            909.3805541992188
+          ],
+          [
+            332.29620361328125,
+            1609.7635498046875
+          ],
+          [
+            1356.6370849609375,
+            1609.7635498046875
+          ],
+          [
+            1356.6370849609375,
+            909.3805541992188
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "38117a88fe468b900ad5bcf489c14410",
+    "text": "end",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            302.0,
+            1573.0
+          ],
+          [
+            302.0,
+            1594.0
+          ],
+          [
+            355.0,
+            1594.0
+          ],
+          [
+            355.0,
+            1573.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "a88c00d08ea72bc3eec8f1ea4147fc66",
+    "text": "Now consider the following tentative pseudo-code for bidirectional A* search. We assume consistent forward heuristic, and a consistent backward heuristic. Concatenation is a function that builds a plan (i.e., a sequence of actions) that goes from the start state to the goal state by combining a forward partial plan and a backward partial plan that end the same state.",
+    "metadata": {
+      "detection_class_prob": 0.938566267490387,
+      "coordinates": {
+        "points": [
+          [
+            285.5950927734375,
+            1654.3497314453125
+          ],
+          [
+            285.5950927734375,
+            1834.542236328125
+          ],
+          [
+            1454.955078125,
+            1834.542236328125
+          ],
+          [
+            1454.955078125,
+            1654.3497314453125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "c42fa55a0c91cb6e6f3ccb2d045c96b9",
+    "text": "a",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            272.0,
+            1701.0
+          ],
+          [
+            272.0,
+            1715.0
+          ],
+          [
+            285.0,
+            1715.0
+          ],
+          [
+            285.0,
+            1701.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "d38cbb8ab73019a5a487eb15b0e09e12",
+    "text": "in",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            271.0,
+            1808.0
+          ],
+          [
+            271.0,
+            1828.0
+          ],
+          [
+            295.0,
+            1828.0
+          ],
+          [
+            295.0,
+            1808.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 9,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "fe932f610f137e152efe4809772a0ffd",
+    "text": "Question 4 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.4721527099609375,
+      "coordinates": {
+        "points": [
+          [
+            273.4410705566406,
+            234.2031707763672
+          ],
+          [
+            273.4410705566406,
+            259.488037109375
+          ],
+          [
+            618.2215576171875,
+            259.488037109375
+          ],
+          [
+            618.2215576171875,
+            234.2031707763672
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "5d2b1cea2edcc4312b8513be3f6d7c49",
+    "text": "Algorithm Bidirectional A* Search",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            272.0,
+            341.0
+          ],
+          [
+            272.0,
+            370.0
+          ],
+          [
+            763.0,
+            370.0
+          ],
+          [
+            763.0,
+            341.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "1c5407354e9042a63f5652ae70281707",
+    "text": "Function Bidirectional-Graph-Search(problem) forward-closed + empty set backward-closed <- empty set forward-priority-queue + Insert (Make-Node(Start-State(problem)), forward-priority-queue) backward-priority-queue + Insert (Make-Node(Goal-State(problem)), backward-priority-queue) loop if forward-priority-queue is empty AND backward-priority-queue is empty then return failure end if",
+    "metadata": {
+      "detection_class_prob": 0.5996783375740051,
+      "coordinates": {
+        "points": [
+          [
+            310.5569152832031,
+            368.083740234375
+          ],
+          [
+            310.5569152832031,
+            784.3915405273438
+          ],
+          [
+            1368.944091796875,
+            784.3915405273438
+          ],
+          [
+            1368.944091796875,
+            368.083740234375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "50550fd56bfc98819e3be25c1ca5bb6d",
+    "text": "if there exist a node nl in forward-priority-queue and a node n2 in backward priority queue such that State(nl) == State(n2) then {IF no:1} return Concatenation of nl and n2 end if",
+    "metadata": {
+      "detection_class_prob": 0.5176230669021606,
+      "coordinates": {
+        "points": [
+          [
+            333.45794677734375,
+            839.5687255859375
+          ],
+          [
+            333.45794677734375,
+            974.4965209960938
+          ],
+          [
+            1333.5125732421875,
+            974.4965209960938
+          ],
+          [
+            1333.5125732421875,
+            839.5687255859375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "c75abb2a98a09c86b548626ba7cef063",
+    "text": "if forward-priority-queue is not empty then node + Pop if (State(noc end if forward-priority-queue) e) == Goal-State(problem) ) then return node",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            333.0,
+            1030.0
+          ],
+          [
+            333.0,
+            1164.0
+          ],
+          [
+            1183.0,
+            1164.0
+          ],
+          [
+            1183.0,
+            1030.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "253e6a71acceae5f2339e8c36e89ed58",
+    "text": "if (State(noc e) is in backward-priority-queue ) then {IF no:2} return Concatenation of node and matching node in backward-priority-queue end if",
+    "metadata": {
+      "detection_class_prob": 0.4177325665950775,
+      "coordinates": {
+        "points": [
+          [
+            352.3498840332031,
+            1183.18896484375
+          ],
+          [
+            352.3498840332031,
+            1281.2412109375
+          ],
+          [
+            1443.20703125,
+            1281.2412109375
+          ],
+          [
+            1443.20703125,
+            1183.18896484375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "2efd5e3a1f4964233dd00f454fd0948b",
+    "text": "if (State(noc e) is in backward-closed ) then {IF no:3}",
+    "metadata": {
+      "detection_class_prob": 0.30015304684638977,
+      "coordinates": {
+        "points": [
+          [
+            363.8830871582031,
+            1292.36083984375
+          ],
+          [
+            363.8830871582031,
+            1320.815673828125
+          ],
+          [
+            1095.95947265625,
+            1320.815673828125
+          ],
+          [
+            1095.95947265625,
+            1292.36083984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "9988534d123d5c08720dcc524828f6d8",
+    "text": "return Concatenation of node and matching node in backward-closed",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            393.0,
+            1331.0
+          ],
+          [
+            393.0,
+            1358.0
+          ],
+          [
+            1322.0,
+            1358.0
+          ],
+          [
+            1322.0,
+            1331.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "aec5a35fe60a2b8eb2ebde1b7b7eb40c",
+    "text": "end if if (State(noc e) is not in forward-closed ) then add State(node) to forward-closed forward-priority-queue",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            362.0,
+            1368.0
+          ],
+          [
+            362.0,
+            1508.0
+          ],
+          [
+            993.0,
+            1508.0
+          ],
+          [
+            993.0,
+            1368.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "4adfb505aeff56cc7e1b208b95133cb0",
+    "text": "+ Insert-All(ExpandForward(node, problem), forward-priority-queue)",
+    "metadata": {
+      "detection_class_prob": 0.3605063557624817,
+      "coordinates": {
+        "points": [
+          [
+            416.40386962890625,
+            1516.8583984375
+          ],
+          [
+            416.40386962890625,
+            1547.4622802734375
+          ],
+          [
+            1422.9532470703125,
+            1547.4622802734375
+          ],
+          [
+            1422.9532470703125,
+            1516.8583984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "74dbdb6046d0d1cbb9a6629cf2aaeda5",
+    "text": "end if",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            362.0,
+            1557.0
+          ],
+          [
+            362.0,
+            1578.0
+          ],
+          [
+            449.0,
+            1578.0
+          ],
+          [
+            449.0,
+            1557.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "8801f3aca0507f30b3fb928b05a57135",
+    "text": "end if",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            332.0,
+            1594.0
+          ],
+          [
+            332.0,
+            1615.0
+          ],
+          [
+            419.0,
+            1615.0
+          ],
+          [
+            419.0,
+            1594.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b6a0fb1fcea68e6b5b2e53764210629d"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "84dc8244ad6aaedc084a54917d9f0133",
+    "text": "10",
+    "metadata": {
+      "detection_class_prob": 0.49409547448158264,
+      "coordinates": {
+        "points": [
+          [
+            847.0927124023438,
+            2097.118896484375
+          ],
+          [
+            847.0927124023438,
+            2123.3203125
+          ],
+          [
+            878.0091552734375,
+            2123.3203125
+          ],
+          [
+            878.0091552734375,
+            2097.118896484375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 10,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "761e84bae0d124fc92fc204175ac9333",
+    "text": "Question 4 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.5954179763793945,
+      "coordinates": {
+        "points": [
+          [
+            271.6008605957031,
+            233.83485412597656
+          ],
+          [
+            271.6008605957031,
+            259.4709777832031
+          ],
+          [
+            619.51953125,
+            259.4709777832031
+          ],
+          [
+            619.51953125,
+            233.83485412597656
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "6494329dabd0e5addee618c9cb13d0af",
+    "text": "Algorithm Bidirectional A* Search (continued)",
+    "metadata": {
+      "detection_class_prob": 0.6871638298034668,
+      "coordinates": {
+        "points": [
+          [
+            276.61468505859375,
+            304.91839599609375
+          ],
+          [
+            276.61468505859375,
+            330.3376159667969
+          ],
+          [
+            921.7662963867188,
+            330.3376159667969
+          ],
+          [
+            921.7662963867188,
+            304.91839599609375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "601ed9827ba824c73c184dc5c56988bb",
+    "text": "if backward-priority-queue is not empty then node \u00ab+ Pop(backward-priority-queue) if (State(node) == Start-State(problem)) then return node end if",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            333.0,
+            351.0
+          ],
+          [
+            333.0,
+            485.0
+          ],
+          [
+            1188.0,
+            485.0
+          ],
+          [
+            1188.0,
+            351.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "c766709d1f8a3c4f96b14fd8b081f8a5",
+    "text": "if ( State(node) is in forward-priority-queue ) then {IF no:4} return Concatenation of node and matching node in forward-priority-queue end if",
+    "metadata": {
+      "detection_class_prob": 0.5882055163383484,
+      "coordinates": {
+        "points": [
+          [
+            350.4383239746094,
+            499.66143798828125
+          ],
+          [
+            350.4383239746094,
+            602.8952026367188
+          ],
+          [
+            1422.6190185546875,
+            602.8952026367188
+          ],
+          [
+            1422.6190185546875,
+            499.66143798828125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "51b752e1fe77d0e8188032f0bc321e45",
+    "text": "if ( State(node) is in forward-closed ) then {IF no:5} return Concatenation of node and matching node in forward-closed end if",
+    "metadata": {
+      "detection_class_prob": 0.32482895255088806,
+      "coordinates": {
+        "points": [
+          [
+            360.9357604980469,
+            614.2603759765625
+          ],
+          [
+            360.9357604980469,
+            716.3167724609375
+          ],
+          [
+            1301.5645751953125,
+            716.3167724609375
+          ],
+          [
+            1301.5645751953125,
+            614.2603759765625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "2ab1abdf02de45a59ee3a1a74bc94bb4",
+    "text": "if ( State(node) is not in backward-closed ) then",
+    "metadata": {
+      "detection_class_prob": 0.27979743480682373,
+      "coordinates": {
+        "points": [
+          [
+            358.6756591796875,
+            725.10205078125
+          ],
+          [
+            358.6756591796875,
+            755.149658203125
+          ],
+          [
+            1037.323486328125,
+            755.149658203125
+          ],
+          [
+            1037.323486328125,
+            725.10205078125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "921552019837a566455367a43faf18a7",
+    "text": "add State(node) to backward-closed backward-priority-queue",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            393.0,
+            764.0
+          ],
+          [
+            393.0,
+            829.0
+          ],
+          [
+            868.0,
+            829.0
+          ],
+          [
+            868.0,
+            764.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "2bb4a259005430597dc571d4b3b184d7",
+    "text": "+ Insert-All(ExpandBackward(node, problem), backward-priority-queue) end if",
+    "metadata": {
+      "detection_class_prob": 0.3084842562675476,
+      "coordinates": {
+        "points": [
+          [
+            356.0919494628906,
+            837.7859497070312
+          ],
+          [
+            356.0919494628906,
+            915.447509765625
+          ],
+          [
+            1423.576904296875,
+            915.447509765625
+          ],
+          [
+            1423.576904296875,
+            837.7859497070312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "UncategorizedText",
+    "element_id": "19ab8fac3702e24e381c16ee16c7c902",
+    "text": "end if",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            332.0,
+            915.0
+          ],
+          [
+            332.0,
+            936.0
+          ],
+          [
+            419.0,
+            936.0
+          ],
+          [
+            419.0,
+            915.0
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "1d512c01600dd09c23a73cce27e95249",
+    "text": "end loop",
+    "metadata": {
+      "detection_class_prob": 0.5062251687049866,
+      "coordinates": {
+        "points": [
+          [
+            298.5765075683594,
+            993.8988037109375
+          ],
+          [
+            298.5765075683594,
+            1017.2307739257812
+          ],
+          [
+            430.9764404296875,
+            1017.2307739257812
+          ],
+          [
+            430.9764404296875,
+            993.8988037109375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "c2c382a5ddd04da2855c853037b087d0",
+    "text": "The IF statements labeled 1, 2, 3, 4, 5 are modifications to try to connect both search trees.",
+    "metadata": {
+      "detection_class_prob": 0.8947670459747314,
+      "coordinates": {
+        "points": [
+          [
+            275.1695556640625,
+            1071.822265625
+          ],
+          [
+            275.1695556640625,
+            1135.4324951171875
+          ],
+          [
+            1464.1541748046875,
+            1135.4324951171875
+          ],
+          [
+            1464.1541748046875,
+            1071.822265625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf",
+      "parent_id": "1d512c01600dd09c23a73cce27e95249"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "58316d67ef27a05c2d207efc8af2a38a",
+    "text": "(a) [2 marks] If we cut out all statements labeled 1, 2, 3, 4 or 5, will Bidirectional-Graph- Search return an optimal solution? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.9202876687049866,
+      "coordinates": {
+        "points": [
+          [
+            269.177978515625,
+            1175.7779541015625
+          ],
+          [
+            269.177978515625,
+            1240.3238525390625
+          ],
+          [
+            1465.603759765625,
+            1240.3238525390625
+          ],
+          [
+            1465.603759765625,
+            1175.7779541015625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf",
+      "parent_id": "1d512c01600dd09c23a73cce27e95249"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "47e64eb33f2699bcbfe0ff8835c8aac1",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.5734235048294067,
+      "coordinates": {
+        "points": [
+          [
+            254.95384216308594,
+            1264.434814453125
+          ],
+          [
+            254.95384216308594,
+            1746.7117919921875
+          ],
+          [
+            1496.6478271484375,
+            1746.7117919921875
+          ],
+          [
+            1496.6478271484375,
+            1264.434814453125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-11-7.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "b56b39f14f53721d27e97b4d2e7e33c1",
+    "text": "11",
+    "metadata": {
+      "detection_class_prob": 0.4729310870170593,
+      "coordinates": {
+        "points": [
+          [
+            846.950439453125,
+            2097.054443359375
+          ],
+          [
+            846.950439453125,
+            2123.720703125
+          ],
+          [
+            875.2481079101562,
+            2123.720703125
+          ],
+          [
+            875.2481079101562,
+            2097.054443359375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 11,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "6265e1e4490984faddd64c640d2a14f8",
+    "text": "Question 4 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8894876837730408,
+      "coordinates": {
+        "points": [
+          [
+            271.47003173828125,
+            234.51499938964844
+          ],
+          [
+            271.47003173828125,
+            259.6965637207031
+          ],
+          [
+            620.246826171875,
+            259.6965637207031
+          ],
+          [
+            620.246826171875,
+            234.51499938964844
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "3dca17bb5eef538d44ad96901ee4dfe1",
+    "text": "(b) [2 marks] If amongst the numbered statements we only retain 1, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.928142249584198,
+      "coordinates": {
+        "points": [
+          [
+            273.15814208984375,
+            301.1092224121094
+          ],
+          [
+            273.15814208984375,
+            362.0138854980469
+          ],
+          [
+            1461.24267578125,
+            362.0138854980469
+          ],
+          [
+            1461.24267578125,
+            301.1092224121094
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "filename": "exam21-final.pdf",
+      "parent_id": "6265e1e4490984faddd64c640d2a14f8"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "ad031e4a2df039c5e543c92a82bef3de",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.7621895670890808,
+      "coordinates": {
+        "points": [
+          [
+            257.6499938964844,
+            377.1235046386719
+          ],
+          [
+            257.6499938964844,
+            870.1297607421875
+          ],
+          [
+            1504.504150390625,
+            870.1297607421875
+          ],
+          [
+            1504.504150390625,
+            377.1235046386719
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-12-8.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "0145d07136ed92349cf7e88e481656cd",
+    "text": "(c) [2 marks] If amongst the numbered statements we only retain 2, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.9053618311882019,
+      "coordinates": {
+        "points": [
+          [
+            270.4303894042969,
+            941.0628662109375
+          ],
+          [
+            270.4303894042969,
+            1003.0502319335938
+          ],
+          [
+            1463.064453125,
+            1003.0502319335938
+          ],
+          [
+            1463.064453125,
+            941.0628662109375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "7f641c4330daebe6ce54538e9832fb83",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.4654250144958496,
+      "coordinates": {
+        "points": [
+          [
+            283.0494384765625,
+            1030.29345703125
+          ],
+          [
+            283.0494384765625,
+            1052.1585693359375
+          ],
+          [
+            405.78875732421875,
+            1052.1585693359375
+          ],
+          [
+            405.78875732421875,
+            1030.29345703125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Header",
+    "element_id": "e5ef108003e61525315e46b3b9b8c046",
+    "text": "12",
+    "metadata": {
+      "detection_class_prob": 0.38508617877960205,
+      "coordinates": {
+        "points": [
+          [
+            846.7003784179688,
+            2097.25634765625
+          ],
+          [
+            846.7003784179688,
+            2123.4755859375
+          ],
+          [
+            877.39404296875,
+            2123.4755859375
+          ],
+          [
+            877.39404296875,
+            2097.25634765625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 12,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "59fb90d4f5c181fa2634993274f5d514",
+    "text": "Question 4 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8874108791351318,
+      "coordinates": {
+        "points": [
+          [
+            271.52362060546875,
+            234.44981384277344
+          ],
+          [
+            271.52362060546875,
+            259.7044677734375
+          ],
+          [
+            620.323974609375,
+            259.7044677734375
+          ],
+          [
+            620.323974609375,
+            234.44981384277344
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "filename": "exam21-final.pdf",
+      "parent_id": "e5ef108003e61525315e46b3b9b8c046"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "635b33547e690744523aaa466a957e9a",
+    "text": "(d) [2 marks] If amongst the numbered statements we only retain 3, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.9276137351989746,
+      "coordinates": {
+        "points": [
+          [
+            272.6702575683594,
+            301.06768798828125
+          ],
+          [
+            272.6702575683594,
+            362.0286560058594
+          ],
+          [
+            1461.3363037109375,
+            362.0286560058594
+          ],
+          [
+            1461.3363037109375,
+            301.06768798828125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "filename": "exam21-final.pdf",
+      "parent_id": "59fb90d4f5c181fa2634993274f5d514"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "23e292ab6735f8ff2dcbfb40ba823cbe",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.7663390636444092,
+      "coordinates": {
+        "points": [
+          [
+            257.58843994140625,
+            377.0859680175781
+          ],
+          [
+            257.58843994140625,
+            870.0886840820312
+          ],
+          [
+            1504.49365234375,
+            870.0886840820312
+          ],
+          [
+            1504.49365234375,
+            377.0859680175781
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-13-9.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "f41531dc5dc475f88404b664da982617",
+    "text": "(e) [2 marks] If amongst the numbered statements we only retain 5, is Bidirectional-Graph- Search guaranteed to be optimal? Briefly justify your answer.",
+    "metadata": {
+      "detection_class_prob": 0.905392050743103,
+      "coordinates": {
+        "points": [
+          [
+            270.27557373046875,
+            941.068359375
+          ],
+          [
+            270.27557373046875,
+            1003.0382690429688
+          ],
+          [
+            1462.576416015625,
+            1003.0382690429688
+          ],
+          [
+            1462.576416015625,
+            941.068359375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "cad201e56bb12dee3a851edd7f1d007e",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.4671309292316437,
+      "coordinates": {
+        "points": [
+          [
+            283.0511169433594,
+            1030.2923583984375
+          ],
+          [
+            283.0511169433594,
+            1052.158935546875
+          ],
+          [
+            405.7842102050781,
+            1052.158935546875
+          ],
+          [
+            405.7842102050781,
+            1030.2923583984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "ebe200c33e018f8cb1affee03d3a57b0",
+    "text": "13",
+    "metadata": {
+      "detection_class_prob": 0.40257948637008667,
+      "coordinates": {
+        "points": [
+          [
+            847.1463012695312,
+            2096.886962890625
+          ],
+          [
+            847.1463012695312,
+            2123.589599609375
+          ],
+          [
+            877.438720703125,
+            2123.589599609375
+          ],
+          [
+            877.438720703125,
+            2096.886962890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 13,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "cd9ae588cc09119d9629244c3ab663a5",
+    "text": "Question 5 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8844544887542725,
+      "coordinates": {
+        "points": [
+          [
+            269.7887878417969,
+            234.948974609375
+          ],
+          [
+            269.7887878417969,
+            259.6763916015625
+          ],
+          [
+            614.0942993164062,
+            259.6763916015625
+          ],
+          [
+            614.0942993164062,
+            234.948974609375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "b8ed64c89b993a8ac987f98f03e3cc6f",
+    "text": "There are five undergraduate CS classes and three lecturers who will be teaching these classes. A lecturer can only teach one class at a time. The classes are:",
+    "metadata": {
+      "detection_class_prob": 0.9325146675109863,
+      "coordinates": {
+        "points": [
+          [
+            268.6166076660156,
+            299.364013671875
+          ],
+          [
+            268.6166076660156,
+            362.6746520996094
+          ],
+          [
+            1458.9893798828125,
+            362.6746520996094
+          ],
+          [
+            1458.9893798828125,
+            299.364013671875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "17b5d50edb88d0b4923e3292890bc13d",
+    "text": "Class 1 - Algorithms: meets from 8:00-9:00am",
+    "metadata": {
+      "detection_class_prob": 0.867228627204895,
+      "coordinates": {
+        "points": [
+          [
+            318.60699462890625,
+            435.2507019042969
+          ],
+          [
+            318.60699462890625,
+            460.89093017578125
+          ],
+          [
+            958.132080078125,
+            460.89093017578125
+          ],
+          [
+            958.132080078125,
+            435.2507019042969
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "c26eb1899075ed19b7651113893ddd34",
+    "text": "Class 2 - Intro to AI: meets from 8:30-9:30am",
+    "metadata": {
+      "detection_class_prob": 0.8745592832565308,
+      "coordinates": {
+        "points": [
+          [
+            320.1477966308594,
+            498.1827392578125
+          ],
+          [
+            320.1477966308594,
+            524.635009765625
+          ],
+          [
+            953.6152954101562,
+            524.635009765625
+          ],
+          [
+            953.6152954101562,
+            498.1827392578125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "2ce0fe2eadcf55c4ce8bd4ad09403fad",
+    "text": "Class 3 - Databases: meets from 9:00-10:00am",
+    "metadata": {
+      "detection_class_prob": 0.8714668154716492,
+      "coordinates": {
+        "points": [
+          [
+            317.08978271484375,
+            561.4788818359375
+          ],
+          [
+            317.08978271484375,
+            585.9402465820312
+          ],
+          [
+            958.4740600585938,
+            585.9402465820312
+          ],
+          [
+            958.4740600585938,
+            561.4788818359375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "a5d8d7e0ce1f8ee07c72de48ffd34a7e",
+    "text": "Class 4 - Operating Systems: meets from 9:00-10:00am",
+    "metadata": {
+      "detection_class_prob": 0.86449134349823,
+      "coordinates": {
+        "points": [
+          [
+            308.2621765136719,
+            623.9310302734375
+          ],
+          [
+            308.2621765136719,
+            649.6047973632812
+          ],
+          [
+            1083.268798828125,
+            649.6047973632812
+          ],
+          [
+            1083.268798828125,
+            623.9310302734375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "074af8b59b9efbc8eb2a955698dfcf17",
+    "text": "Class 5 - Machine Learning: meets from 9:30-10:30am",
+    "metadata": {
+      "detection_class_prob": 0.8514326810836792,
+      "coordinates": {
+        "points": [
+          [
+            312.5500793457031,
+            686.1401977539062
+          ],
+          [
+            312.5500793457031,
+            711.8916015625
+          ],
+          [
+            1067.4796142578125,
+            711.8916015625
+          ],
+          [
+            1067.4796142578125,
+            686.1401977539062
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "2aa6b2da2dbb2b21a91407b9b3e7dde4",
+    "text": "and the instructors are:",
+    "metadata": {
+      "detection_class_prob": 0.8537222146987915,
+      "coordinates": {
+        "points": [
+          [
+            267.4075927734375,
+            786.402587890625
+          ],
+          [
+            267.4075927734375,
+            809.901611328125
+          ],
+          [
+            585.4692993164062,
+            809.901611328125
+          ],
+          [
+            585.4692993164062,
+            786.402587890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "945a9e6171440939bcf56d8dd5599a8e",
+    "text": "e Professor A, who is available to teach Classes 3 and 4.",
+    "metadata": {
+      "detection_class_prob": 0.8774401545524597,
+      "coordinates": {
+        "points": [
+          [
+            318.76300048828125,
+            874.6661376953125
+          ],
+          [
+            318.76300048828125,
+            900.3946533203125
+          ],
+          [
+            1068.5047607421875,
+            900.3946533203125
+          ],
+          [
+            1068.5047607421875,
+            874.6661376953125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "2113a36fff7504e3a826a0f8bfbd4f38",
+    "text": "e Professor B, who is available to teach Classes 2, 3, 4, and 5.",
+    "metadata": {
+      "detection_class_prob": 0.8873634338378906,
+      "coordinates": {
+        "points": [
+          [
+            317.6740417480469,
+            937.7454223632812
+          ],
+          [
+            317.6740417480469,
+            962.5843505859375
+          ],
+          [
+            1146.1302490234375,
+            962.5843505859375
+          ],
+          [
+            1146.1302490234375,
+            937.7454223632812
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "4b5acad6a1d488fb708047de2ce969f5",
+    "text": "e Professor C, who is available to teach Classes 1, 2, 3, 4, 5.",
+    "metadata": {
+      "detection_class_prob": 0.8788912296295166,
+      "coordinates": {
+        "points": [
+          [
+            317.58929443359375,
+            999.473388671875
+          ],
+          [
+            317.58929443359375,
+            1024.4344482421875
+          ],
+          [
+            1112.5145263671875,
+            1024.4344482421875
+          ],
+          [
+            1112.5145263671875,
+            999.473388671875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "68321d6397717aefc8cd1b4da44d2498",
+    "text": "(a) [4 marks] Formulate this as a CSP problem in which there is one variable per class. State the variables and their domains, and the constraints. Constraints should be unary or binary and specified formally and precisely, but may be implicit rather than explicit.",
+    "metadata": {
+      "detection_class_prob": 0.937397301197052,
+      "coordinates": {
+        "points": [
+          [
+            270.5963134765625,
+            1089.935791015625
+          ],
+          [
+            270.5963134765625,
+            1191.5657958984375
+          ],
+          [
+            1461.27490234375,
+            1191.5657958984375
+          ],
+          [
+            1461.27490234375,
+            1089.935791015625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf",
+      "parent_id": "cd9ae588cc09119d9629244c3ab663a5"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "58d7b7ef8a7e6b3fc09e5b9548dbd0d5",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.6322645545005798,
+      "coordinates": {
+        "points": [
+          [
+            233.94668579101562,
+            1213.079345703125
+          ],
+          [
+            233.94668579101562,
+            2023.7015380859375
+          ],
+          [
+            1509.6358642578125,
+            2023.7015380859375
+          ],
+          [
+            1509.6358642578125,
+            1213.079345703125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-14-10.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "93f8182c36b3987f63e6a1020416a276",
+    "text": "14",
+    "metadata": {
+      "detection_class_prob": 0.4909398853778839,
+      "coordinates": {
+        "points": [
+          [
+            846.9185180664062,
+            2096.944091796875
+          ],
+          [
+            846.9185180664062,
+            2123.3349609375
+          ],
+          [
+            877.0625610351562,
+            2123.3349609375
+          ],
+          [
+            877.0625610351562,
+            2096.944091796875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 14,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "f4867fb6685c3dc1dfe7e343c14628a8",
+    "text": "Question 5 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.7635372281074524,
+      "coordinates": {
+        "points": [
+          [
+            271.5602722167969,
+            232.96237182617188
+          ],
+          [
+            271.5602722167969,
+            259.9300842285156
+          ],
+          [
+            621.4369506835938,
+            259.9300842285156
+          ],
+          [
+            621.4369506835938,
+            232.96237182617188
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "7a8d8db21c008d7c5115adce252b121b",
+    "text": "(b) [2 marks] Draw the constraint graph associated with your CSP. Answer:",
+    "metadata": {
+      "detection_class_prob": 0.43620240688323975,
+      "coordinates": {
+        "points": [
+          [
+            260.6066589355469,
+            279.6716613769531
+          ],
+          [
+            260.6066589355469,
+            827.5928344726562
+          ],
+          [
+            1509.0006103515625,
+            827.5928344726562
+          ],
+          [
+            1509.0006103515625,
+            279.6716613769531
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-15-11.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "e95e41ca12eb8f21f7b71773b5c6121f",
+    "text": "(c) [2 marks] Show the domains of the variables after running arc-consistency on this initial graph (after having already enforced any unary constraints).",
+    "metadata": {
+      "detection_class_prob": 0.8911386728286743,
+      "coordinates": {
+        "points": [
+          [
+            273.526611328125,
+            881.1038208007812
+          ],
+          [
+            273.526611328125,
+            945.1109008789062
+          ],
+          [
+            1459.984130859375,
+            945.1109008789062
+          ],
+          [
+            1459.984130859375,
+            881.1038208007812
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "472ebc6c3318b20dcd82fc8acb4a075e",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.7803012132644653,
+      "coordinates": {
+        "points": [
+          [
+            257.82476806640625,
+            963.7094116210938
+          ],
+          [
+            257.82476806640625,
+            1454.557861328125
+          ],
+          [
+            1505.2027587890625,
+            1454.557861328125
+          ],
+          [
+            1505.2027587890625,
+            963.7094116210938
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-15-12.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "ListItem",
+    "element_id": "3623b6fb84aff2ae1410213436271a55",
+    "text": "(d) [2 marks] Give one solution to this CSP.",
+    "metadata": {
+      "detection_class_prob": 0.8871891498565674,
+      "coordinates": {
+        "points": [
+          [
+            273.21575927734375,
+            1503.043212890625
+          ],
+          [
+            273.21575927734375,
+            1525.983642578125
+          ],
+          [
+            857.328857421875,
+            1525.983642578125
+          ],
+          [
+            857.328857421875,
+            1503.043212890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "49e5bc7354f35fe0d536a29ee4d9a892",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.7360805869102478,
+      "coordinates": {
+        "points": [
+          [
+            254.24659729003906,
+            1542.8896484375
+          ],
+          [
+            254.24659729003906,
+            2034.32080078125
+          ],
+          [
+            1496.6553955078125,
+            2034.32080078125
+          ],
+          [
+            1496.6553955078125,
+            1542.8896484375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 15,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-15-13.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "659c248a09ebdf11bbdc5e783d133ef1",
+    "text": "Question 6 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8728957772254944,
+      "coordinates": {
+        "points": [
+          [
+            269.8742980957031,
+            234.85391235351562
+          ],
+          [
+            269.8742980957031,
+            259.7734069824219
+          ],
+          [
+            615.7023315429688,
+            259.7734069824219
+          ],
+          [
+            615.7023315429688,
+            234.85391235351562
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 16,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "7e1d970ce28ef39b6f4a9d3604a2c3d3",
+    "text": "Consider the Bayes network shown in Figure 6-1 for a lift at a university, where S = Semester, C = Crowded, F = FaultyDoor and D = DelayedLift are all Boolean random variables, i.e., they take the value either true (t) or false (f). Also note that P(c) is shorthand for P(C = true) and P(-c) is shorthand for P(C = false).",
+    "metadata": {
+      "detection_class_prob": 0.9260135293006897,
+      "coordinates": {
+        "points": [
+          [
+            270.1605529785156,
+            297.7987060546875
+          ],
+          [
+            270.1605529785156,
+            437.5607604980469
+          ],
+          [
+            1464.2939453125,
+            437.5607604980469
+          ],
+          [
+            1464.2939453125,
+            297.7987060546875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 16,
+      "filename": "exam21-final.pdf",
+      "parent_id": "659c248a09ebdf11bbdc5e783d133ef1"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "a6367143ce3820ca896afb32ff2e9c6f",
+    "text": "P(S) (s) 0.6 S P(C|S) S P(F|S) t O08 t O85 (c) (F) fo O05 f 02 P(D|CF) 0.9 ane tO aa nan oO co",
+    "metadata": {
+      "detection_class_prob": 0.813122570514679,
+      "coordinates": {
+        "points": [
+          [
+            523.4677124023438,
+            581.9500122070312
+          ],
+          [
+            523.4677124023438,
+            963.5958862304688
+          ],
+          [
+            1101.285400390625,
+            963.5958862304688
+          ],
+          [
+            1101.285400390625,
+            581.9500122070312
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 16,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-16-14.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "FigureCaption",
+    "element_id": "b1211001200bed16e840d1a7039bbf3e",
+    "text": "Figure 6-1",
+    "metadata": {
+      "detection_class_prob": 0.5940105319023132,
+      "coordinates": {
+        "points": [
+          [
+            794.3428344726562,
+            1028.699951171875
+          ],
+          [
+            794.3428344726562,
+            1056.83984375
+          ],
+          [
+            929.4183959960938,
+            1056.83984375
+          ],
+          [
+            929.4183959960938,
+            1028.699951171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 16,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "0b39d48c786998ee2835d8cd335a6ef3",
+    "text": "16",
+    "metadata": {
+      "detection_class_prob": 0.40555664896965027,
+      "coordinates": {
+        "points": [
+          [
+            847.06396484375,
+            2097.1533203125
+          ],
+          [
+            847.06396484375,
+            2123.42529296875
+          ],
+          [
+            877.3639526367188,
+            2123.42529296875
+          ],
+          [
+            877.3639526367188,
+            2097.1533203125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 16,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "b21917ca58272a31e63d728b0c7911f9",
+    "text": "Question 6 (continued)",
+    "metadata": {
+      "detection_class_prob": 0.8914015889167786,
+      "coordinates": {
+        "points": [
+          [
+            272.0024719238281,
+            234.51930236816406
+          ],
+          [
+            272.0024719238281,
+            259.82427978515625
+          ],
+          [
+            619.8001708984375,
+            259.82427978515625
+          ],
+          [
+            619.8001708984375,
+            234.51930236816406
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 17,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "4bac6bccf939b38bbad1a14c177571f8",
+    "text": "10 marks] Calculate the value of P(f|d,s). If you cannot easily calculate the final value, try to simplify the expression as best you can. Justify your answer mathematically and clearly show your calculations.",
+    "metadata": {
+      "detection_class_prob": 0.9309142827987671,
+      "coordinates": {
+        "points": [
+          [
+            272.0527038574219,
+            298.2452087402344
+          ],
+          [
+            272.0527038574219,
+            398.3817443847656
+          ],
+          [
+            1458.843017578125,
+            398.3817443847656
+          ],
+          [
+            1458.843017578125,
+            298.2452087402344
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 17,
+      "filename": "exam21-final.pdf",
+      "parent_id": "b21917ca58272a31e63d728b0c7911f9"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "661b5de12010ae1286fbb232fd300e8b",
+    "text": "Answer:",
+    "metadata": {
+      "detection_class_prob": 0.49553993344306946,
+      "coordinates": {
+        "points": [
+          [
+            207.38571166992188,
+            407.7218017578125
+          ],
+          [
+            207.38571166992188,
+            1838.548828125
+          ],
+          [
+            1535.4990234375,
+            1838.548828125
+          ],
+          [
+            1535.4990234375,
+            407.7218017578125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 17,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-17-15.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "b3401dbe5e86482f0dc086926a98c734",
+    "text": "17",
+    "metadata": {
+      "detection_class_prob": 0.39568567276000977,
+      "coordinates": {
+        "points": [
+          [
+            846.65625,
+            2096.72607421875
+          ],
+          [
+            846.65625,
+            2123.44140625
+          ],
+          [
+            877.1375732421875,
+            2123.44140625
+          ],
+          [
+            877.1375732421875,
+            2096.72607421875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 17,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "957a2291cb1816b4de11c57a904ffa91",
+    "text": "Question 7 (10 marks)",
+    "metadata": {
+      "detection_class_prob": 0.8791701793670654,
+      "coordinates": {
+        "points": [
+          [
+            269.984619140625,
+            235.0887451171875
+          ],
+          [
+            269.984619140625,
+            259.8039855957031
+          ],
+          [
+            615.5164184570312,
+            259.8039855957031
+          ],
+          [
+            615.5164184570312,
+            235.0887451171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "151469ce5c1b12e373714a07e11edf91",
+    "text": "Someone is trying to send you a message in a very simple language. The language uses only two characters {A, B}. A message in the language is a string of A\u2019s and B\u2019s. Fur- thermore, messages in the language always start with the character A. For example, \u201cAB\u201d or \u201cAABA\u201d are both valid messages in the language.",
+    "metadata": {
+      "detection_class_prob": 0.9401121139526367,
+      "coordinates": {
+        "points": [
+          [
+            267.2030944824219,
+            299.12994384765625
+          ],
+          [
+            267.2030944824219,
+            437.2864990234375
+          ],
+          [
+            1460.8206787109375,
+            437.2864990234375
+          ],
+          [
+            1460.8206787109375,
+            299.12994384765625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "80ec2123fef58bf100d1cb4104f51aab",
+    "text": "Let S; represent the character at position 7 in a message ($1 denotes the first character in the message). For example, in the message \u201cAB\u201d, Sj = A and Sy = B. Each character in the message is generated at random (except for S,), where the probability of a particular character being generated depends only on the previous character in the message. These conditional probabilities P(S;+1|S;) are given as follows:",
+    "metadata": {
+      "detection_class_prob": 0.9355037212371826,
+      "coordinates": {
+        "points": [
+          [
+            276.9889831542969,
+            476.2523193359375
+          ],
+          [
+            276.9889831542969,
+            653.2058715820312
+          ],
+          [
+            1455.796875,
+            653.2058715820312
+          ],
+          [
+            1455.796875,
+            476.2523193359375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "948a7dd57ea6d014109645d6ce552732",
+    "text": "P(Siz1 = AlS; = A) = 0.6, P(Siz1 = BIS; = A) = 0.4, P(Siz1 = AlS; = B) = 0.2, P(Siz1 = B\\S; = B) =0.8",
+    "metadata": {
+      "detection_class_prob": 0.8289720416069031,
+      "coordinates": {
+        "points": [
+          [
+            275.6703186035156,
+            664.2913818359375
+          ],
+          [
+            275.6703186035156,
+            725.3070678710938
+          ],
+          [
+            1458.6636962890625,
+            725.3070678710938
+          ],
+          [
+            1458.6636962890625,
+            664.2913818359375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "a9197159c5c7cd2b82d0abe3ddc6f3ff",
+    "text": "[10 marks] When a message is sent to you, noise can cause some characters to be confused with each other. For example, the message \u201cABB\u201d might be received as \u201cBBB\u201d, where the first character was corrupted by noise and thus confused in the received message.",
+    "metadata": {
+      "detection_class_prob": 0.9350532293319702,
+      "coordinates": {
+        "points": [
+          [
+            275.2670593261719,
+            770.0651245117188
+          ],
+          [
+            275.2670593261719,
+            869.9234008789062
+          ],
+          [
+            1464.755859375,
+            869.9234008789062
+          ],
+          [
+            1464.755859375,
+            770.0651245117188
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "2067d9c2acbd01505a7e0919dfec0bc7",
+    "text": "Let S represent the character that is sent, and let R represent the character that is received. The \u201cconfusion\u201d probability of S and R is defined by the probability distribution P.(R|S). These conditional probabilities are given as follows: P.(R = A|S = A) = 0.9, P.(R= B\\S = A) =0.1, P.(R= A|S = B) =0.1, P.(R = BIS = B) =0.9",
+    "metadata": {
+      "detection_class_prob": 0.9343957901000977,
+      "coordinates": {
+        "points": [
+          [
+            274.2010192871094,
+            906.4818115234375
+          ],
+          [
+            274.2010192871094,
+            1048.365478515625
+          ],
+          [
+            1469.59912109375,
+            1048.365478515625
+          ],
+          [
+            1469.59912109375,
+            906.4818115234375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "466ed48f2984366aee2d8d8fc65530b9",
+    "text": "What is the most likely valid message to have been transmitted if you receive the message \u201cAB\"?",
+    "metadata": {
+      "detection_class_prob": 0.9080430865287781,
+      "coordinates": {
+        "points": [
+          [
+            273.3257141113281,
+            1086.3782958984375
+          ],
+          [
+            273.3257141113281,
+            1147.163330078125
+          ],
+          [
+            1464.88427734375,
+            1147.163330078125
+          ],
+          [
+            1464.88427734375,
+            1086.3782958984375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "c38ef347d87e0f5a7c0cf188a0c18443",
+    "text": "Justify you answer mathematically and clearly show all your calculations and assumptions.",
+    "metadata": {
+      "detection_class_prob": 0.8703779578208923,
+      "coordinates": {
+        "points": [
+          [
+            271.3896484375,
+            1188.4212646484375
+          ],
+          [
+            271.3896484375,
+            1217.4407958984375
+          ],
+          [
+            1452.7415771484375,
+            1217.4407958984375
+          ],
+          [
+            1452.7415771484375,
+            1188.4212646484375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf",
+      "parent_id": "957a2291cb1816b4de11c57a904ffa91"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "1d70714d541c638330b69c169015c23a",
+    "text": "18",
+    "metadata": {
+      "detection_class_prob": 0.42291319370269775,
+      "coordinates": {
+        "points": [
+          [
+            846.999755859375,
+            2097.24462890625
+          ],
+          [
+            846.999755859375,
+            2123.259033203125
+          ],
+          [
+            876.8054809570312,
+            2123.259033203125
+          ],
+          [
+            876.8054809570312,
+            2097.24462890625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 18,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "81bc52207aa9fac2932bc40db412155b",
+    "text": "Question 7 (continued) Answer:",
+    "metadata": {
+      "detection_class_prob": 0.5071306824684143,
+      "coordinates": {
+        "points": [
+          [
+            209.64430236816406,
+            240.47291564941406
+          ],
+          [
+            209.64430236816406,
+            1724.1556396484375
+          ],
+          [
+            1562.0596923828125,
+            1724.1556396484375
+          ],
+          [
+            1562.0596923828125,
+            240.47291564941406
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 19,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-19-16.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "ec7bfc5489daf5bedf02552258b871f8",
+    "text": "END OF EXAM QUESTIONS",
+    "metadata": {
+      "detection_class_prob": 0.4234756529331207,
+      "coordinates": {
+        "points": [
+          [
+            622.3929443359375,
+            1815.0050048828125
+          ],
+          [
+            622.3929443359375,
+            1843.4705810546875
+          ],
+          [
+            1099.6611328125,
+            1843.4705810546875
+          ],
+          [
+            1099.6611328125,
+            1815.0050048828125
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 19,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "eaeda636791ea42d2c4f97d387033c83",
+    "text": "19",
+    "metadata": {
+      "detection_class_prob": 0.5026583671569824,
+      "coordinates": {
+        "points": [
+          [
+            847.04248046875,
+            2096.90576171875
+          ],
+          [
+            847.04248046875,
+            2123.02197265625
+          ],
+          [
+            877.4124755859375,
+            2123.02197265625
+          ],
+          [
+            877.4124755859375,
+            2096.90576171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 19,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "NarrativeText",
+    "element_id": "55b4754ee6a23fcdcf5efffb1aa2e84d",
+    "text": "Extra space if needed to answer any question. If you write part of your answer here, please write the question number, and indicate at the corresponding question that you have used this space.",
+    "metadata": {
+      "detection_class_prob": 0.9063754677772522,
+      "coordinates": {
+        "points": [
+          [
+            271.3973083496094,
+            233.12742614746094
+          ],
+          [
+            271.3973083496094,
+            336.5690612792969
+          ],
+          [
+            1456.0062255859375,
+            336.5690612792969
+          ],
+          [
+            1456.0062255859375,
+            233.12742614746094
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 20,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Image",
+    "element_id": "c35b4ea068becb87527f5b4285ca26cb",
+    "text": "",
+    "metadata": {
+      "detection_class_prob": 0.4661303162574768,
+      "coordinates": {
+        "points": [
+          [
+            206.79005432128906,
+            375.41650390625
+          ],
+          [
+            206.79005432128906,
+            1952.02783203125
+          ],
+          [
+            1568.486328125,
+            1952.02783203125
+          ],
+          [
+            1568.486328125,
+            375.41650390625
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 20,
+      "image_path": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider/pdf_extractor/figures/figure-20-17.jpg",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Title",
+    "element_id": "72595b5bb209f3f131521ba739ca9085",
+    "text": "LAST PAGE OF EXAM",
+    "metadata": {
+      "detection_class_prob": 0.3884330093860626,
+      "coordinates": {
+        "points": [
+          [
+            670.2573852539062,
+            1990.0130615234375
+          ],
+          [
+            670.2573852539062,
+            2017.2806396484375
+          ],
+          [
+            1053.475830078125,
+            2017.2806396484375
+          ],
+          [
+            1053.475830078125,
+            1990.0130615234375
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 20,
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    "type": "Footer",
+    "element_id": "62805b001bf861a5e3726a1d25a40e9a",
+    "text": "20",
+    "metadata": {
+      "detection_class_prob": 0.4922981858253479,
+      "coordinates": {
+        "points": [
+          [
+            845.2615356445312,
+            2096.481201171875
+          ],
+          [
+            845.2615356445312,
+            2123.41357421875
+          ],
+          [
+            877.7200927734375,
+            2123.41357421875
+          ],
+          [
+            877.7200927734375,
+            2096.481201171875
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 20,
+      "filename": "exam21-final.pdf"
+    }
+  }
+]

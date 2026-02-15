@@ -7,10 +7,13 @@ WORKDIR /app
 # Install system dependencies needed for health checks
 RUN apt-get update && apt-get install -y \
     curl \
+    libgl1 \
+    poppler-utils \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies once for caching
-COPY requirements.txt ./
+COPY src/backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create non-root user for security
@@ -18,7 +21,7 @@ RUN useradd --create-home --shell /bin/bash app
 
 # Stage 2: Development - Hot reload with uvicorn --reload
 FROM base AS development
-COPY . .
+COPY src ./src
 RUN chown -R app:app /app
 USER app
 EXPOSE 8000
@@ -26,7 +29,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 # Start with auto-reload for development
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Stage 3: Production - Optimized for deployment
 FROM base AS production
@@ -38,4 +41,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 # Start without reload for production
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

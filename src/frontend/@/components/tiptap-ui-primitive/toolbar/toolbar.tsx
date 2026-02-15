@@ -1,9 +1,9 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react"
-import { Separator } from "@@/frontend/@/components/tiptap-ui-primitive/separator"
-import "@@/frontend/@/components/tiptap-ui-primitive/toolbar/toolbar.scss"
-import { cn } from "@@/frontend/@/lib/tiptap-utils.ts"
-import { useMenuNavigation } from "@@/frontend/@/hooks/use-menu-navigation.ts"
-import { useComposedRef } from "@@/frontend/@/hooks/use-composed-ref.ts"
+import { Separator } from "@/frontend/@/components/tiptap-ui-primitive/separator"
+import "@/frontend/@/components/tiptap-ui-primitive/toolbar/toolbar.scss"
+import { cn } from "@/frontend/@/lib/tiptap-utils.ts"
+import { useMenuNavigation } from "@/frontend/@/hooks/use-menu-navigation.ts"
+import { useComposedRef } from "@/frontend/@/hooks/use-composed-ref.ts"
 
 type BaseProps = React.HTMLAttributes<HTMLDivElement>
 

@@ -1,0 +1,50 @@
+[
+  {
+    "doc_id":,
+    "page":,
+    "section_number": 1,
+    "text": "Note: Q1d, 2a, 2b, 3d are no longer covered in the syllabus and not examinable",
+    "last_modified": "2025-06-15T10:11:53",
+    "page_number": 1,
+    "languages": ["eng"],
+    "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
+    "filename": "exam21-final.pdf",
+    "metadata": {
+      "coordinates": {
+        "points": [
+          [
+            174.83154296875,
+            89.0713882446289
+          ],
+          [
+            174.83154296875,
+            133.47633361816406
+          ],
+          [
+            1402.1845703125,
+            133.47633361816406
+          ],
+          [
+            1402.1845703125,
+            89.0713882446289
+          ]
+        ],
+        "system": "PixelSpace",
+        "layout_width": 1654,
+        "layout_height": 2339
+      },
+      "last_modified": "2025-06-15T10:11:53",
+      "filetype": "application/pdf",
+      "languages": [
+        "eng"
+      ],
+      "page_number": 1,
+      "file_directory": "/Users/daphatus/WebstormProjects/ai-project-pdf-reader-notes/src/backend/services/context_provider",
+      "filename": "exam21-final.pdf"
+    }
+  },
+  {
+    
+  }
+  
+]

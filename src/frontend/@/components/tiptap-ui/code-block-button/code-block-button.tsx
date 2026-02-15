@@ -1,22 +1,22 @@
 import { forwardRef, useCallback } from "react"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { parseShortcutKeys } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Tiptap UI ---
-import type { UseCodeBlockConfig } from "@@/frontend/@/components/tiptap-ui/code-block-button/index.tsx"
+import type { UseCodeBlockConfig } from "@/frontend/@/components/tiptap-ui/code-block-button/index.tsx"
 import {
   CODE_BLOCK_SHORTCUT_KEY,
   useCodeBlock,
-} from "@@/frontend/@/components/tiptap-ui/code-block-button/index.tsx"
+} from "@/frontend/@/components/tiptap-ui/code-block-button/index.tsx"
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Badge } from "@@/frontend/@/components/tiptap-ui-primitive/badge"
+import type { ButtonProps } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Badge } from "@/frontend/@/components/tiptap-ui-primitive/badge"
 
 export interface CodeBlockButtonProps
   extends Omit<ButtonProps, "type">,

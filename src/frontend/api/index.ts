@@ -1,20 +1,25 @@
 /**
  * Public API exports
+ * Single entry point for all frontend API interactions
  */
-export { llmService, LLMService } from './llm/llm-service';
+
+// Core
+export { ApiError } from './core/errors';
+export { apiConfig } from './core/config';
+
+// Services
+export { llmService, convertDataUrlsToContents } from './services/llm.service';
+
+// Common Types - unified content types for all chat messages
+export type { TextContent, ImageContent, ChatContent } from './types/common';
+
+// LLM Types
 export type {
-	ChatRequest,
-	ChatResponse,
-	StreamChatRequest,
-	StructuredChatRequest,
-	StructuredChatResponse,
-	LLMStructuredOutput,
 	ContentType,
 	CodeBlock,
 	MathExpression,
 	Section,
-} from './llm/types';
-export { ApiError } from './client';
-export { apiConfig } from './config';
-
+	
+	
+} from './types/llm';
 

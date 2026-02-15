@@ -5,7 +5,7 @@ import { type Editor } from "@tiptap/react"
 import { NodeSelection, TextSelection } from "@tiptap/pm/state"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Lib ---
 import {
@@ -14,10 +14,10 @@ import {
   isNodeTypeSelected,
   isValidPosition,
   selectionWithinConvertibleTypes,
-} from "@@/frontend/@/lib/tiptap-utils.ts"
+} from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Icons ---
-import { CodeBlockIcon } from "@@/frontend/@/components/tiptap-icons/code-block-icon.tsx"
+import { CodeBlockIcon } from "@/frontend/@/components/tiptap-icons/code-block-icon.tsx"
 
 export const CODE_BLOCK_SHORTCUT_KEY = "mod+alt+c"
 

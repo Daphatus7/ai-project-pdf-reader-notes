@@ -2,19 +2,19 @@ import { useCallback, useEffect, useState } from "react"
 import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- Lib ---
-import { isMarkInSchema, isNodeTypeSelected } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { isMarkInSchema, isNodeTypeSelected } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Icons ---
-import { BoldIcon } from "@@/frontend/@/components/tiptap-icons/bold-icon.tsx"
-import { Code2Icon } from "@@/frontend/@/components/tiptap-icons/code2-icon.tsx"
-import { ItalicIcon } from "@@/frontend/@/components/tiptap-icons/italic-icon.tsx"
-import { StrikeIcon } from "@@/frontend/@/components/tiptap-icons/strike-icon.tsx"
-import { SubscriptIcon } from "@@/frontend/@/components/tiptap-icons/subscript-icon.tsx"
-import { SuperscriptIcon } from "@@/frontend/@/components/tiptap-icons/superscript-icon.tsx"
-import { UnderlineIcon } from "@@/frontend/@/components/tiptap-icons/underline-icon.tsx"
+import { BoldIcon } from "@/frontend/@/components/tiptap-icons/bold-icon.tsx"
+import { Code2Icon } from "@/frontend/@/components/tiptap-icons/code2-icon.tsx"
+import { ItalicIcon } from "@/frontend/@/components/tiptap-icons/italic-icon.tsx"
+import { StrikeIcon } from "@/frontend/@/components/tiptap-icons/strike-icon.tsx"
+import { SubscriptIcon } from "@/frontend/@/components/tiptap-icons/subscript-icon.tsx"
+import { SuperscriptIcon } from "@/frontend/@/components/tiptap-icons/superscript-icon.tsx"
+import { UnderlineIcon } from "@/frontend/@/components/tiptap-icons/underline-icon.tsx"
 
 export type Mark =
   | "bold"

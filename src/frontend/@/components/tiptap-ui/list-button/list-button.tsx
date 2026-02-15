@@ -1,19 +1,19 @@
 import { forwardRef, useCallback } from "react"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@@/frontend/@/lib/tiptap-utils.ts"
+import { parseShortcutKeys } from "@/frontend/@/lib/tiptap-utils.ts"
 
 // --- Hooks ---
-import { useTiptapEditor } from "@@/frontend/@/hooks/use-tiptap-editor.ts"
+import { useTiptapEditor } from "@/frontend/@/hooks/use-tiptap-editor.ts"
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
-import { Badge } from "@@/frontend/@/components/tiptap-ui-primitive/badge"
+import type { ButtonProps } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
+import { Badge } from "@/frontend/@/components/tiptap-ui-primitive/badge"
 
 // --- Tiptap UI ---
-import type { ListType, UseListConfig } from "@@/frontend/@/components/tiptap-ui/list-button/index.tsx"
-import { LIST_SHORTCUT_KEYS, useList } from "@@/frontend/@/components/tiptap-ui/list-button/index.tsx"
+import type { ListType, UseListConfig } from "@/frontend/@/components/tiptap-ui/list-button/index.tsx"
+import { LIST_SHORTCUT_KEYS, useList } from "@/frontend/@/components/tiptap-ui/list-button/index.tsx"
 
 export interface ListButtonProps
   extends Omit<ButtonProps, "type">,

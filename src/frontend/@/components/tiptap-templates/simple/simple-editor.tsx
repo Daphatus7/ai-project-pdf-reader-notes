@@ -4,59 +4,65 @@ import { useEffect, useRef, useState } from "react"
 import {type Editor, EditorContent, EditorContext} from "@tiptap/react"
 
 // --- UI Primitives ---
-import { Button } from "@@/frontend/@/components/tiptap-ui-primitive/button"
+import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
 
-import { Spacer } from "@@/frontend/@/components/tiptap-ui-primitive/spacer"
+import { Spacer } from "@/frontend/@/components/tiptap-ui-primitive/spacer"
 import {
 	Toolbar,
 	ToolbarGroup,
 	ToolbarSeparator,
-} from "@@/frontend/@/components/tiptap-ui-primitive/toolbar"
+} from "@/frontend/@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import "@@/frontend/@/components/tiptap-node/blockquote-node/blockquote-node.scss"
-import "@@/frontend/@/components/tiptap-node/code-block-node/code-block-node.scss"
-import "@@/frontend/@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
-import "@@/frontend/@/components/tiptap-node/list-node/list-node.scss"
-import "@@/frontend/@/components/tiptap-node/image-node/image-node.scss"
-import "@@/frontend/@/components/tiptap-node/heading-node/heading-node.scss"
-import "@@/frontend/@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import "@/frontend/@/components/tiptap-node/blockquote-node/blockquote-node.scss"
+import "@/frontend/@/components/tiptap-node/code-block-node/code-block-node.scss"
+import "@/frontend/@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
+import "@/frontend/@/components/tiptap-node/list-node/list-node.scss"
+import "@/frontend/@/components/tiptap-node/image-node/image-node.scss"
+import "@/frontend/@/components/tiptap-node/heading-node/heading-node.scss"
+import "@/frontend/@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+
+// --- Typography override (must load AFTER tiptap-node styles) ---
+import "@/frontend/@/styles/_tiptap-overrides.scss"
 
 // --- Tiptap UI ---
-import { HeadingDropdownMenu } from "@@/frontend/@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@@/frontend/@/components/tiptap-ui/image-upload-button"
-import { ListDropdownMenu } from "@@/frontend/@/components/tiptap-ui/list-dropdown-menu"
-import { BlockquoteButton } from "@@/frontend/@/components/tiptap-ui/blockquote-button"
-import { CodeBlockButton } from "@@/frontend/@/components/tiptap-ui/code-block-button"
+import { HeadingDropdownMenu } from "@/frontend/@/components/tiptap-ui/heading-dropdown-menu"
+import { ImageUploadButton } from "@/frontend/@/components/tiptap-ui/image-upload-button"
+import { ListDropdownMenu } from "@/frontend/@/components/tiptap-ui/list-dropdown-menu"
+import { BlockquoteButton } from "@/frontend/@/components/tiptap-ui/blockquote-button"
+import { CodeBlockButton } from "@/frontend/@/components/tiptap-ui/code-block-button"
 import {
 	ColorHighlightPopover,
 	ColorHighlightPopoverContent,
 	ColorHighlightPopoverButton,
-} from "@@/frontend/@/components/tiptap-ui/color-highlight-popover"
+} from "@/frontend/@/components/tiptap-ui/color-highlight-popover"
 import {
 	LinkPopover,
 	LinkContent,
 	LinkButton,
-} from "@@/frontend/@/components/tiptap-ui/link-popover"
-import { MarkButton } from "@@/frontend/@/components/tiptap-ui/mark-button"
-import { TextAlignButton } from "@@/frontend/@/components/tiptap-ui/text-align-button"
-import { UndoRedoButton } from "@@/frontend/@/components/tiptap-ui/undo-redo-button"
+} from "@/frontend/@/components/tiptap-ui/link-popover"
+import { MarkButton } from "@/frontend/@/components/tiptap-ui/mark-button"
+import { TextAlignButton } from "@/frontend/@/components/tiptap-ui/text-align-button"
+import { UndoRedoButton } from "@/frontend/@/components/tiptap-ui/undo-redo-button"
 
 // --- Icons ---
-import { ArrowLeftIcon } from "@@/frontend/@/components/tiptap-icons/arrow-left-icon.tsx"
-import { HighlighterIcon } from "@@/frontend/@/components/tiptap-icons/highlighter-icon.tsx"
-import { LinkIcon } from "@@/frontend/@/components/tiptap-icons/link-icon.tsx"
+import { ArrowLeftIcon } from "@/frontend/@/components/tiptap-icons/arrow-left-icon.tsx"
+import { HighlighterIcon } from "@/frontend/@/components/tiptap-icons/highlighter-icon.tsx"
+import { LinkIcon } from "@/frontend/@/components/tiptap-icons/link-icon.tsx"
 
 // --- Hooks ---
-import { useIsMobile } from "@@/frontend/@/hooks/use-mobile.ts"
-import { useWindowSize } from "@@/frontend/@/hooks/use-window-size.ts"
-import { useCursorVisibility } from "@@/frontend/@/hooks/use-cursor-visibility.ts"
+import { useIsMobile } from "@/frontend/@/hooks/use-mobile.ts"
+import { useWindowSize } from "@/frontend/@/hooks/use-window-size.ts"
+import { useCursorVisibility } from "@/frontend/@/hooks/use-cursor-visibility.ts"
 
 // --- Components ---
-import { ThemeToggle } from "@@/frontend/@/components/tiptap-templates/simple/theme-toggle.tsx"
+import { ThemeToggle } from "@/frontend/@/components/tiptap-templates/simple/theme-toggle.tsx"
 
 // --- Styles ---
-import "@@/frontend/@/components/tiptap-templates/simple/simple-editor.scss"
+import "@/frontend/@/components/tiptap-templates/simple/simple-editor.scss"
+
+// --- Token override (must load AFTER all tiptap-ui component styles) ---
+import "@/frontend/styles/_tiptap-token-overrides.scss"
 
 
 
@@ -189,14 +195,11 @@ export function SimpleEditor({ editor }: { editor: Editor }) {
 
 	return (
 		<div
-			style={{
-				width: "100%",
-				height: "100%",
-			}}
 			className="simple-editor-wrapper">
 			<EditorContext.Provider value={{ editor }}>
 				<Toolbar
 					ref={toolbarRef}
+					className="simple-editor-toolbar"
 					style={{
 						...(isMobile
 							? {
