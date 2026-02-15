@@ -51,11 +51,11 @@ export function Header() {
 					Upgrade
 				</Button>
 
-				<Button variant="ghost" size="icon" className="h-8 w-8">
+				<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Contact support">
 					<LucideMail className="w-4 h-4 mr-2" />
 				</Button>
 
-				<Button variant="ghost" size="icon" className="h-8 w-8">
+				<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Join Discord community">
 					<img className="w-4 h-4 mr-2" src="/discord-logo.svg"
 					 alt="discord portal"/>
 				</Button>
