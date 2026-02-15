@@ -5,6 +5,7 @@ import { NoteRenderer } from './renderer/note-renderer'
 import { NoteSidebar } from './note-sidebar'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
+import { useQuota } from '@/frontend/features/quota/use-quota'
 import { Save, Sidebar, Loader2 } from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { Skeleton } from '@/frontend/components/ui/skeleton.tsx'
@@ -12,7 +13,13 @@ import { Skeleton } from '@/frontend/components/ui/skeleton.tsx'
 export const NotePad = forwardRef<NotePadHandler>(
 	function NotePad(_, ref) {
 		const pad = useNotePad()
+		const quota = useQuota()
 		const [showSidebar, setShowSidebar] = useState(false)
+
+		const noteUsage = quota.getUsage('notes')
+		const noteUsageLabel = noteUsage && noteUsage.limit !== -1
+			? `${noteUsage.current}/${noteUsage.limit}`
+			: undefined
 
 		useImperativeHandle(ref, () => ({
 			insertContent: pad.insertContent,
@@ -85,6 +92,8 @@ export const NotePad = forwardRef<NotePadHandler>(
 					<NoteSidebar
 						notes={pad.notes}
 						selectedNoteId={pad.selectedNoteId}
+						canCreateNote={quota.canCreate('notes')}
+						noteUsageLabel={noteUsageLabel}
 						onSelectNote={pad.selectNote}
 						onAddNote={pad.addNote}
 						onDeleteNote={pad.deleteNote}

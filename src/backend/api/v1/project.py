@@ -99,7 +99,9 @@ async def upload_document(
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
 
-    # action — quota enforcement handled by database_service.enforce_quota inside rag_service
+    # Enforce document quota (increments counter for free plan)
+    incremented = await database_service.enforce_quota(user_id, 'doc_count')
+
     temp_path = None
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
@@ -113,7 +115,14 @@ async def upload_document(
             document_dir=temp_path,
         )
         result = await rag_service.upload_document(rag_request)
+        # Rollback counter if upload failed
+        if not result.success and incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
         return result
+    except Exception:
+        if incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
+        raise
     finally:
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FolderOpen, Plus } from 'lucide-react';
+import { FolderOpen, Plus, Crown } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { Input } from '@/frontend/components/ui/input';
 import { Skeleton } from '@/frontend/components/ui/skeleton';
@@ -13,12 +13,15 @@ import {
 	DialogTitle,
 } from '@/frontend/components/ui/dialog';
 import { ProjectItem } from './project-item';
+import { PricingDialog } from '@/frontend/features/pricing/PricingDialog';
 import type { Project } from './type';
 
 interface ProjectPanelProps {
 	projects: Project[];
 	isLoading: boolean;
 	error: string | null;
+	canCreateProject: boolean;
+	projectUsageLabel?: string;
 	onOpenProject: (projectId: string) => void;
 	onCreateProject: (name: string, description?: string) => Promise<void>;
 	onDeleteProject: (projectId: string) => Promise<void>;
@@ -28,11 +31,13 @@ export function ProjectPanel({
 	projects,
 	isLoading,
 	error,
+	canCreateProject,
 	onOpenProject,
 	onCreateProject,
 	onDeleteProject,
 }: ProjectPanelProps) {
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
+	const [pricingOpen, setPricingOpen] = useState(false);
 	const [newProjectName, setNewProjectName] = useState('');
 	const [newProjectDesc, setNewProjectDesc] = useState('');
 	const [isCreating, setIsCreating] = useState(false);
@@ -47,6 +52,14 @@ export function ProjectPanel({
 			setCreateDialogOpen(false);
 		} finally {
 			setIsCreating(false);
+		}
+	};
+
+	const handleAddClick = () => {
+		if (canCreateProject) {
+			setCreateDialogOpen(true);
+		} else {
+			setPricingOpen(true);
 		}
 	};
 
@@ -74,7 +87,7 @@ export function ProjectPanel({
 			{/* Header for list of projects */}
 			<div className=" p-3 flex items-center gap-2 border-b h-13">
 				<FolderOpen className="h-4 w-4 text-muted-foreground" />
-				<span className="text-sm font-medium">Projects</span>
+
 			</div>
 
 			{/* Project Cards */}
@@ -100,15 +113,18 @@ export function ProjectPanel({
 					{/* Add New Project button */}
 					<button
 						type="button"
-						onClick={() => setCreateDialogOpen(true)}
+						onClick={handleAddClick}
 						className="cursor-pointer rounded-xl border border-dashed border-gray-300 hover:border-blue-400 p-4 transition-all duration-200 bg-white hover:bg-blue-50 group"
 					>
 						<div className="flex items-center justify-center gap-2">
 							<div className="p-2 rounded-lg bg-gray-100 group-hover:bg-blue-100 transition-colors">
-								<Plus className="size-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+								{canCreateProject
+									? <Plus className="size-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+									: <Crown className="size-5 text-amber-500" />
+								}
 							</div>
 							<span className="text-[14px] text-gray-600 group-hover:text-blue-600 transition-colors">
-								Add New Project
+								{canCreateProject ? 'Add New Project' : 'Upgrade to Add More'}
 							</span>
 						</div>
 					</button>
@@ -116,7 +132,8 @@ export function ProjectPanel({
 			</ScrollArea>
 
 			{/* Create Project Dialog */}
-			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}
+			>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Create Project</DialogTitle>
@@ -149,6 +166,8 @@ export function ProjectPanel({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
 		</div>
 	);
 }

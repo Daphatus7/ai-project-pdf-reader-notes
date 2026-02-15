@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
 import { useProject } from './useProject';
+import { useQuota } from '@/frontend/features/quota/use-quota';
 import { ProjectPanel } from './project-panel';
 import { SourcePanel } from './source-panel';
 import { ReaderPanel } from './reader/reader-panel';
@@ -22,6 +23,7 @@ export function ManagementPanel({
 	onSourceSelectionChange,
 }: ManagementPanelProps) {
 	const project = useProject();
+	const quota = useQuota();
 
 	// Navigation state — owned exclusively by ManagementPanel
 	const [activeView, setActiveView] = useState<ActiveView>('projects');
@@ -45,11 +47,16 @@ export function ManagementPanel({
 
 	const handleDeleteProject = useCallback(async (projectId: string) => {
 		await project.deleteProject(projectId);
-		// If deleting the currently open project, go back to project list
+		quota.refresh();
 		if (projectId === currentProjectId) {
 			handleBackToProjects();
 		}
-	}, [project, currentProjectId, handleBackToProjects]);
+	}, [project, quota, currentProjectId, handleBackToProjects]);
+
+	const handleCreateProject = useCallback(async (name: string, description?: string) => {
+		await project.createProject(name, description);
+		quota.refresh();
+	}, [project, quota]);
 
 	const handleOpenDocument = useCallback(async (documentId: string) => {
 		if (!currentProjectId) return;
@@ -69,6 +76,17 @@ export function ManagementPanel({
 		setCurrentDocumentUrl(null);
 		setActiveView('sources');
 	}, []);
+
+	// Build usage label
+	const projectUsage = quota.getUsage('projects');
+	const projectUsageLabel = projectUsage && projectUsage.limit !== -1
+		? `${projectUsage.current}/${projectUsage.limit}`
+		: undefined;
+
+	const docUsage = quota.getUsage('documents');
+	const docUsageLabel = docUsage && docUsage.limit !== -1
+		? `${docUsage.current}/${docUsage.limit}`
+		: undefined;
 
 	// Route to the active panel
 	if (activeView === 'reader' && currentDocumentUrl) {
@@ -91,6 +109,9 @@ export function ManagementPanel({
 				onBack={handleBackToProjects}
 				onOpenDocument={handleOpenDocument}
 				isLoadingDocument={isLoadingDocument}
+				canUploadDocument={quota.canCreate('documents')}
+				documentUsageLabel={docUsageLabel}
+				onDocumentChange={quota.refresh}
 				onSourceSelectionChange={onSourceSelectionChange}
 			/>
 		);
@@ -101,8 +122,10 @@ export function ManagementPanel({
 			projects={project.projects}
 			isLoading={project.isLoadingProjects}
 			error={project.error}
+			canCreateProject={quota.canCreate('projects')}
+			projectUsageLabel={projectUsageLabel}
 			onOpenProject={handleOpenProject}
-			onCreateProject={project.createProject}
+			onCreateProject={handleCreateProject}
 			onDeleteProject={handleDeleteProject}
 		/>
 	);

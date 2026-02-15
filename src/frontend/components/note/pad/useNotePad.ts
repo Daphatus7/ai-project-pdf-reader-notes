@@ -4,6 +4,7 @@ import type { Note } from '@/frontend/api/types/note/note.ts'
 import type { ContentInsertion } from '@/frontend/features/types/content-insertion.ts'
 import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'
+import { isQuotaError } from '@/frontend/features/quota/use-quota'
 
 export type ViewMode = 'markdown' | 'editor'
 
@@ -117,7 +118,11 @@ export function useNotePad() {
 			toast.success('Note created')
 		} catch (error) {
 			console.error('[useNotePad] Failed to create note:', error)
-			toast.error('Failed to create note')
+			if (isQuotaError(error)) {
+				toast.error('Note limit reached. Upgrade your plan to create more.')
+			} else {
+				toast.error('Failed to create note')
+			}
 		}
 	}
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { ScrollArea } from '@/frontend/components/ui/scroll-area.tsx'
 import { Input } from '@/frontend/components/ui/input.tsx'
-import { Sidebar as LucideSidebar, Plus, MoreVertical, EditIcon, Trash2 } from 'lucide-react'
+import { Sidebar as LucideSidebar, Plus, Crown, MoreVertical, EditIcon, Trash2 } from 'lucide-react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,11 +10,14 @@ import {
 	DropdownMenuTrigger,
 } from '@/frontend/components/ui/dropdown-menu.tsx'
 import { cn } from '@/frontend/components/ui/utils.ts'
+import { PricingDialog } from '@/frontend/features/pricing/PricingDialog'
 import type { Note } from '@/frontend/api/types/note/note.ts'
 
 interface NoteSidebarProps {
 	notes: Note[]
 	selectedNoteId: string
+	canCreateNote?: boolean
+	noteUsageLabel?: string
 	onSelectNote: (id: string) => void
 	onAddNote: () => void
 	onDeleteNote: (id: string) => void
@@ -25,25 +28,43 @@ interface NoteSidebarProps {
 export function NoteSidebar({
 	notes,
 	selectedNoteId,
+	canCreateNote = true,
+	noteUsageLabel,
 	onSelectNote,
 	onAddNote,
 	onDeleteNote,
 	onRenameNote,
 	onClose,
 }: NoteSidebarProps) {
+	const [pricingOpen, setPricingOpen] = useState(false)
+
+	const handleNewNote = () => {
+		if (canCreateNote) {
+			onAddNote()
+		} else {
+			setPricingOpen(true)
+		}
+	}
+
 	return (
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
 			<div className="p-3 border-b flex items-center justify-between h-13">
 				<span className="text-sm font-medium">Notes</span>
+				{noteUsageLabel && (
+					<span className="text-xs text-muted-foreground">{noteUsageLabel}</span>
+				)}
 				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />
 				</Button>
 			</div>
 
 			<div className="p-3 border-b">
-				<Button className="w-full" size="sm" onClick={onAddNote}>
-					<Plus className="w-4 h-4 mr-2" />
-					New Note
+				<Button className="w-full" size="sm" onClick={handleNewNote}>
+					{canCreateNote
+						? <Plus className="w-4 h-4 mr-2" />
+						: <Crown className="w-4 h-4 mr-2 text-amber-500" />
+					}
+					{canCreateNote ? 'New Note' : 'Upgrade to Add More'}
 				</Button>
 			</div>
 
@@ -61,6 +82,8 @@ export function NoteSidebar({
 					))}
 				</div>
 			</ScrollArea>
+
+			<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
 		</div>
 	)
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
+import { isQuotaError } from '@/frontend/features/quota/use-quota';
 import type { Project } from './type';
 
 export interface UseProjectReturn {
@@ -42,9 +43,13 @@ export function useProject(): UseProjectReturn {
 				setProjects(list);
 				toast.success('Project created');
 			} catch (err) {
-				const msg = err instanceof Error ? err.message : 'Failed to create project';
-				setError(msg);
-				toast.error(msg);
+				if (isQuotaError(err)) {
+					toast.error('Project limit reached. Upgrade your plan to create more.');
+				} else {
+					const msg = err instanceof Error ? err.message : 'Failed to create project';
+					setError(msg);
+					toast.error(msg);
+				}
 				throw err;
 			}
 		},

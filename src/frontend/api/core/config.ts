@@ -24,6 +24,7 @@ export const apiConfig = {
 		notes: {
 			base: '/api/v1/notes',
 		},
+		usage: '/api/v1/usage',
 		projects: {
 			base: '/api/v1/projects',
 			documents: (projectId: string) => `/api/v1/projects/${projectId}/documents`,
