@@ -23,8 +23,13 @@ from src.backend.schemas.error import validation_error
 
 router = APIRouter(prefix='/projects', tags=['process'])
 
-ALLOWED_TYPES = {'application/pdf'}
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+try:
+    # Prefer configuration from config.py if available
+    from config import ALLOWED_TYPES, MAX_FILE_SIZE  # type: ignore
+except ImportError:
+    # Fallback to defaults if config module is not available
+    ALLOWED_TYPES = {'application/pdf'}
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 
 async def read_and_validate_file(file: UploadFile, allowed_types: set, max_size: int) -> bytes:
