@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { RotateDirection, Viewer, Worker } from '@react-pdf-viewer/core';
 import { toolbarPlugin, type ToolbarSlot } from '@react-pdf-viewer/toolbar';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { useScreenshot } from './useScreenshot.tsx';
 import { ScreenshotOverlay } from '../../screenshot/ScreenshotOverlay.tsx';
 
@@ -20,6 +20,11 @@ interface PdfReaderProps {
 export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isPdfLoaded, setIsPdfLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsPdfLoaded(false);
+  }, [fileUrl]);
 
   const toolbarPluginInstance = toolbarPlugin();
   const { Toolbar } = toolbarPluginInstance;
@@ -98,11 +103,24 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
         onMouseMove={(e) => screenshot.handleMouseMove(e, containerRef.current!)}
         onMouseUp={screenshot.handleMouseUp}
       >
+        {!isPdfLoaded && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
+        {screenshot.isCapturing && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/40 backdrop-blur-sm">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
         <Worker workerUrl={workerUrl}>
           <Viewer
             key={fileUrl}
             plugins={[toolbarPluginInstance, screenshot.plugin]}
             fileUrl={fileUrl}
+            onDocumentLoad={() => setIsPdfLoaded(true)}
           />
         </Worker>
 

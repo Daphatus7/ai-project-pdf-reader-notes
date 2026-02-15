@@ -4,6 +4,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { AuthProvider } from "./features/auth";
 import { router } from "./router";
+import { Toaster } from "sonner";
 
 
 /**
@@ -25,6 +26,7 @@ export default function App() {
 					<RouterProvider router={router} />
 				</Suspense>
 			</DndProvider>
+		<Toaster position="bottom-right" richColors />
 		</AuthProvider>
 	);
 }

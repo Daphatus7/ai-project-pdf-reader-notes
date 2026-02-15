@@ -4,6 +4,7 @@ import {
 	FileText,
 	Trash2,
 	Upload,
+	Loader2,
 } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { Checkbox } from '@/frontend/components/ui/checkbox';
@@ -34,6 +35,7 @@ interface SourcePanelProps {
 	projectName: string;
 	onBack: () => void;
 	onOpenDocument: (documentId: string) => void;
+	isLoadingDocument?: boolean;
 	onSourceSelectionChange?: (selectedIds: string[]) => void;
 }
 
@@ -42,6 +44,7 @@ export function SourcePanel({
 	projectName,
 	onBack,
 	onOpenDocument,
+	isLoadingDocument,
 	onSourceSelectionChange,
 }: SourcePanelProps) {
 	const source = useSource(projectId);
@@ -52,7 +55,12 @@ export function SourcePanel({
 	}, [source.selectedDocumentIds, onSourceSelectionChange]);
 
 	return (
-		<div className="h-full flex flex-col">
+		<div className="h-full flex flex-col relative">
+			{isLoadingDocument && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+					<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+				</div>
+			)}
 			{/* Header - for source list */}
 			<div className="border-b p-3 flex items-center justify-between gap-2 h-13">
 				<span className="text-sm font-medium truncate">

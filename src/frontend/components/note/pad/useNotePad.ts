@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { toast } from 'sonner'
 import type { Note } from '@/frontend/api/types/note/note.ts'
 import type { ContentInsertion } from '@/frontend/features/types/content-insertion.ts'
 import type { NoteRendererHandle } from './renderer/note-renderer'
@@ -11,6 +12,7 @@ export function useNotePad() {
 	const [notes, setNotes] = useState<Note[]>([])
 	const [selectedNoteId, setSelectedNoteId] = useState('')
 	const [isLoading, setIsLoading] = useState(true)
+	const [isSaving, setIsSaving] = useState(false)
 
 	// --- Current document ---
 	const contentRef = useRef('')
@@ -85,6 +87,7 @@ export function useNotePad() {
 		const note = notes.find(n => n.id === selectedNoteId)
 		if (!note) return
 
+		setIsSaving(true)
 		try {
 			const updated = await notesService.updateNote(selectedNoteId, {
 				content_markdown: contentRef.current,
@@ -92,8 +95,12 @@ export function useNotePad() {
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
 			lastSavedContent.current = contentRef.current
+			toast.success('Note saved')
 		} catch (error) {
 			console.error('[useNotePad] Failed to save note:', error)
+			toast.error('Failed to save note')
+		} finally {
+			setIsSaving(false)
 		}
 	}
 
@@ -107,8 +114,10 @@ export function useNotePad() {
 			const created = await notesService.createNote({ title: 'Untitled' })
 			setNotes(prev => [created, ...prev])
 			applyNote(created)
+			toast.success('Note created')
 		} catch (error) {
 			console.error('[useNotePad] Failed to create note:', error)
+			toast.error('Failed to create note')
 		}
 	}
 
@@ -128,8 +137,10 @@ export function useNotePad() {
 					lastSavedContent.current = ''
 				}
 			}
+			toast.success('Note deleted')
 		} catch (error) {
 			console.error('[useNotePad] Failed to delete note:', error)
+			toast.error('Failed to delete note')
 		}
 	}
 
@@ -143,8 +154,10 @@ export function useNotePad() {
 				version: note.version,
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
+			toast.success('Note renamed')
 		} catch (error) {
 			console.error('[useNotePad] Failed to rename note:', error)
+			toast.error('Failed to rename note')
 		}
 	}
 
@@ -188,6 +201,7 @@ export function useNotePad() {
 		setActiveView,
 		rendererRef,
 		isLoading,
+		isSaving,
 
 		// Note operations
 		selectNote,

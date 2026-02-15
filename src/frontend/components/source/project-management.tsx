@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
 import { useProject } from './useProject';
 import { ProjectPanel } from './project-panel';
@@ -27,6 +28,7 @@ export function ManagementPanel({
 	const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
 	const [currentProjectName, setCurrentProjectName] = useState('');
 	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
+	const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
 	const handleOpenProject = useCallback((projectId: string) => {
 		const found = project.projects.find((p) => p.id === projectId);
@@ -51,12 +53,15 @@ export function ManagementPanel({
 
 	const handleOpenDocument = useCallback(async (documentId: string) => {
 		if (!currentProjectId) return;
+		setIsLoadingDocument(true);
 		try {
 			const url = await projectsService.getDocumentUrl(currentProjectId, documentId);
 			setCurrentDocumentUrl(url);
 			setActiveView('reader');
 		} catch {
-			// Error is handled silently; SourcePanel can show its own errors
+			toast.error('Failed to open document');
+		} finally {
+			setIsLoadingDocument(false);
 		}
 	}, [currentProjectId]);
 
@@ -85,6 +90,7 @@ export function ManagementPanel({
 				projectName={currentProjectName}
 				onBack={handleBackToProjects}
 				onOpenDocument={handleOpenDocument}
+				isLoadingDocument={isLoadingDocument}
 				onSourceSelectionChange={onSourceSelectionChange}
 			/>
 		);

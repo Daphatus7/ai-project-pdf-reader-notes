@@ -5,8 +5,9 @@ import { NoteRenderer } from './renderer/note-renderer'
 import { NoteSidebar } from './note-sidebar'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
-import { Save, Sidebar } from 'lucide-react'
+import { Save, Sidebar, Loader2 } from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
+import { Skeleton } from '@/frontend/components/ui/skeleton.tsx'
 
 export const NotePad = forwardRef<NotePadHandler>(
 	function NotePad(_, ref) {
@@ -18,6 +19,20 @@ export const NotePad = forwardRef<NotePadHandler>(
 			focus: pad.focus,
 			getContent: pad.getContent,
 		}), [pad.activeView])
+
+		if (pad.isLoading) {
+			return (
+				<div className="flex flex-col h-full p-4 gap-3">
+					<div className="flex items-center gap-2">
+						<Skeleton className="h-8 w-48" />
+						<div className="flex-1" />
+						<Skeleton className="h-8 w-8" />
+						<Skeleton className="h-8 w-8" />
+					</div>
+					<Skeleton className="flex-1 w-full" />
+				</div>
+			)
+		}
 
 		return (
 			<div className="flex flex-row h-full">
@@ -35,8 +50,11 @@ export const NotePad = forwardRef<NotePadHandler>(
 								</TabsList>
 							</div>
 							<div className="flex items-center gap-1">
-								<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote}>
-									<Save className="h-4 w-4" />
+								<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote} disabled={pad.isSaving}>
+									{pad.isSaving
+										? <Loader2 className="h-4 w-4 animate-spin" />
+										: <Save className="h-4 w-4" />
+									}
 								</Button>
 								<Button variant="ghost" size="icon" onClick={() => setShowSidebar(!showSidebar)}>
 									<Sidebar className="h-4 w-4" />
