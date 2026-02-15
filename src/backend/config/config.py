@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
 
     # Conversation Storage - Redis Thread Configuration
-    redis_thread_ttl: int = Field(default=600, env="REDIS_THREAD_TTL")  # 30 minutes
+    redis_thread_ttl: int = Field(default=600, env="REDIS_THREAD_TTL")  # 10 minutes
     redis_max_tokens: int = Field(default=20000, env="REDIS_MAX_TOKENS")  # Max tokens in Redis thread
 
     # Conversation Storage - Cold Start Configuration
