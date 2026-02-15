@@ -30,8 +30,15 @@ Dockerfile*
 docker-compose*.yml
 compose.yaml
 
+# Frontend (not needed for backend build)
+src/frontend/
+
 # Logs
 *.log
+
+# Misc
+.cache
+*.md
 
 
 

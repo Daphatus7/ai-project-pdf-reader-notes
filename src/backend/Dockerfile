@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for FastAPI backend
 # Stage 1: Base - Install dependencies (shared between dev and prod)
-FROM python:3.12 AS base
+FROM python:3.12-slim AS base
 
 WORKDIR /app
 
@@ -33,7 +33,8 @@ CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000", "
 
 # Stage 3: Production - Optimized for deployment
 FROM base AS production
-COPY . .
+COPY src/backend/ ./src/backend/
+COPY src/__init__.py ./src/
 RUN chown -R app:app /app
 USER app
 EXPOSE ${PORT:-8000}
