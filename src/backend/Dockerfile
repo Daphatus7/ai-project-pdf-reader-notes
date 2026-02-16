@@ -14,12 +14,12 @@ RUN apt-get update && apt-get install -y \
 
 # Layer 1: Heavy ML/PDF deps — rarely change, cached separately
 COPY src/backend/requirements-heavy.txt ./
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
     pip install -r requirements-heavy.txt
 
 # Layer 2: Light deps — rebuild only this layer when changed
 COPY src/backend/requirements.txt ./
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
 # Create non-root user for security
