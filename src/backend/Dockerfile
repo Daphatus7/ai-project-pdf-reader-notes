@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements-heavy.txt
 COPY src/backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV PYTHONUNBUFFERED=1
+
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash app
 
