@@ -6,9 +6,10 @@ dotenv.load_dotenv()
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 import logging
 import sys
 from src.backend.servers import services
@@ -71,7 +72,16 @@ app.include_router(v1_router)
 
 logger.info(f"CORS origins allowed: {settings.cors_origins_list}")
 
-# Configure CORS
+
+class LogOriginMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        origin = request.headers.get("origin", "no-origin")
+        logger.info(f"Request from origin: {origin} -> {request.method} {request.url.path}")
+        response = await call_next(request)
+        return response
+
+
+# Configure CORS (added before LogOrigin so CORS runs first in the response)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -79,6 +89,7 @@ app.add_middleware(
     allow_methods=["GET","POST","DELETE","OPTIONS","PUT"],
     allow_headers=["authorization","content-type","accept"],
 )
+app.add_middleware(LogOriginMiddleware)
 
 # AppError handler — returns flat JSON
 @app.exception_handler(AppError)
