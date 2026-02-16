@@ -30,7 +30,6 @@ class Settings(BaseSettings):
     
     # Server Configuration
     cors_origins: str = Field(
-        default="http://localhost:3000",
         env="CORS_ORIGINS"
     )
     
