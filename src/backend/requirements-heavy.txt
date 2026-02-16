@@ -1,0 +1,5 @@
+chonkie[neural]>=1.0.0
+unstructured[pdf]>=0.16.0
+unstructured
+langchain>=1.2.0
+langchain-openai>=1.1.0
