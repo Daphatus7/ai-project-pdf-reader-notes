@@ -43,7 +43,7 @@ COPY src/backend/ ./src/backend/
 COPY src/__init__.py ./src/
 RUN chown -R app:app /app
 USER app
-EXPOSE ${PORT:-8000}
+EXPOSE 8000
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
