@@ -27,11 +27,6 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 # Stage 3: Production - Build optimized static files and serve with simple HTTP server
 FROM base AS production
 
-# Vite embeds VITE_* at build time, so they must be ARGs
-ARG VITE_API_BASE_URL
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-
 # Copy all source files
 COPY . .
 
