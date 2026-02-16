@@ -37,14 +37,8 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         """Convert CORS_ORIGINS string to list, auto-adding https:// if no protocol specified"""
-        origins = []
-        for origin in self.cors_origins.split(','):
-            origin = origin.strip()
-            if origin and not origin.startswith(('http://', 'https://')):
-                origin = f'https://{origin}'
-            if origin:
-                origins.append(origin)
-        return origins
+        return [origin.strip() for origin in self.cors_origins.split(',')]
+
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     host: str = Field(default="0.0.0.0", env="HOST")
     port: int = Field(default=8000, env="PORT")
