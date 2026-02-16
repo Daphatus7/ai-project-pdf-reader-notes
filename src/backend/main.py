@@ -69,6 +69,8 @@ app = FastAPI(
 # Include routers
 app.include_router(v1_router)
 
+logger.info(f"CORS origins allowed: {settings.cors_origins_list}")
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
