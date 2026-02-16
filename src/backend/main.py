@@ -71,7 +71,6 @@ app = FastAPI(
 # Include routers
 app.include_router(v1_router)
 
-logger.info(f"CORS origins allowed: {settings.cors_origins_list}")
 
 
 class LogOriginMiddleware(BaseHTTPMiddleware):
@@ -81,12 +80,14 @@ class LogOriginMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+logger.info(f"CORS origins allowed: {settings.cors_origins_list}")
+
 
 # Configure CORS (added before LogOrigin so CORS runs first in the response)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    # allow_origins=settings.cors_origins_list,
+    # allow_origins=["*"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET","POST","DELETE","OPTIONS","PUT"],
     allow_headers=["authorization","content-type","accept"],
