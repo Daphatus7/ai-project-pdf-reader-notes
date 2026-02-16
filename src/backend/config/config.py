@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     timeout: int = Field(default=30, env="TIMEOUT")
     max_retries: int = Field(default=3, env="MAX_RETRIES")
     # Database
-    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
+    redis_url: str = Field(default="", env="REDIS_URL")
 
     # Conversation Storage - Redis Thread Configuration
     redis_thread_ttl: int = Field(default=600, env="REDIS_THREAD_TTL")  # 10 minutes
