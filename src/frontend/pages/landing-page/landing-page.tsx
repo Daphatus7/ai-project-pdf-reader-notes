@@ -201,34 +201,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Trusted Organizations Section */}
-      <section className="w-full px-4 py-20 bg-gradient-to-b from-secondary/50 to-card">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="font-bold text-4xl text-foreground mb-4">
-            Trusted by leading organizations
-          </h2>
-          <p className="text-base text-muted-foreground mb-12">
-            Join thousands of researchers and teams using Atlas Notebook
-          </p>
-
-          {/* Placeholder for logos */}
-          <div className="h-60 mb-12 flex items-center justify-center">
-            <div className="text-muted-foreground text-sm">
-              {/* Logo area */}
-            </div>
-          </div>
-
-          {/* University Names */}
-          <div className="flex flex-wrap justify-center gap-12 opacity-30">
-            <span className="font-bold text-xl text-muted-foreground">MIT</span>
-            <span className="font-bold text-xl text-muted-foreground">Stanford</span>
-            <span className="font-bold text-xl text-muted-foreground">Berkeley</span>
-            <span className="font-bold text-xl text-muted-foreground">Oxford</span>
-            <span className="font-bold text-xl text-muted-foreground">Cambridge</span>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
       <section id="pricing" className="w-full px-4 py-20">
         <div className="max-w-7xl mx-auto">
