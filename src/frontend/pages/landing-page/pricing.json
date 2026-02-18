@@ -1,0 +1,32 @@
+{
+  "heading": "Choose your plan",
+  "subheading": "Start free, scale as you grow",
+  "free": [
+    { "included": true,  "label": "5 PDFs per month" },
+    { "included": true,  "label": "25 AI queries / month" },
+    { "included": true,  "label": "1 notebook" },
+    { "included": true,  "label": "Basic text analysis" },
+    { "included": false, "label": "Screenshot → AI" },
+    { "included": false, "label": "Table extraction" },
+    { "included": false, "label": "Math & LaTeX support" },
+    { "included": false, "label": "Export notes" },
+    { "included": false, "label": "Priority support" }
+  ],
+  "monthly": [
+    { "included": true, "label": "Unlimited PDFs" },
+    { "included": true, "label": "Unlimited AI queries" },
+    { "included": true, "label": "Unlimited notebooks" },
+    { "included": true, "label": "Advanced text analysis" },
+    { "included": true, "label": "Screenshot → AI" },
+    { "included": true, "label": "Table extraction" },
+    { "included": true, "label": "Math & LaTeX support" },
+    { "included": true, "label": "Export to Markdown & PDF" },
+    { "included": true, "label": "Priority support" }
+  ],
+  "yearly": [
+    "Everything in Monthly Pro",
+    "API access",
+    "Early feature access",
+    "30-day money-back guarantee"
+  ]
+}

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import {ArrowRightIcon, LucideCheckCheck, LucideCog, LucideHardHat, LucideLock, LucideSparkles} from "lucide-react";
 import DemoSection from "./components/demo";
 import DemoMathSection from "./components/demo-math";
+import PricingSection from "./pricing";
 
 const LandingPage = () => {
   return (
@@ -201,28 +202,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="w-full px-4 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
-              Choose your plan
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Start free, scale as you grow
-            </p>
-          </div>
-
-          {/* Pricing Cards Placeholder */}
-          <div className="h-[660px] flex items-center justify-center">
-            <p className="text-muted-foreground text-lg">Pricing plans coming soon</p>
-          </div>
-
-          <p className="text-sm text-muted-foreground text-center mt-8">
-            All plans include encryption, automatic backups, and version history
-          </p>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* CTA Section */}
       <section
