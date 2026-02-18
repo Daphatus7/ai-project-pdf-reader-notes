@@ -338,10 +338,10 @@ export default function DemoSection() {
 						{/* Notes Header with tabs */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<div className="flex items-center gap-0.5">
-								<button className="text-[10px] font-medium px-2 py-0.5 rounded bg-background border border-border text-foreground">
+								<button className="text-[10px] font-medium px-2 py-0.5 rounded text-muted-foreground hover:bg-border/50">
 									Markdown
 								</button>
-								<button className="text-[10px] font-medium px-2 py-0.5 rounded text-muted-foreground hover:bg-border/50">
+								<button className="text-[10px] font-medium px-2 py-0.5 rounded bg-background border border-border text-foreground">
 									Editor
 								</button>
 							</div>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {ArrowRightIcon, LucideCheckCheck, LucideCog, LucideHardHat, LucideLock, LucideSparkles} from "lucide-react";
 import DemoSection from "./components/demo";
+import DemoMathSection from "./components/demo-math";
 
 const LandingPage = () => {
   return (
@@ -127,6 +128,8 @@ const LandingPage = () => {
       </section>
 
       <DemoSection />
+
+      <DemoMathSection />
 
       {/* Features Section */}
       <section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
