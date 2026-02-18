@@ -19,7 +19,7 @@ export default function PricingSection() {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
 
 					{/* Free */}
-					<div className="bg-card rounded-2xl p-8 border border-border flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:border-[#006aff]/40">
+					<div className="bg-card rounded-2xl p-8 border border-border flex flex-col transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-md">
 						<div className="mb-6">
 							<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Free</p>
 							<div className="flex items-end gap-1 mb-1">
@@ -48,7 +48,7 @@ export default function PricingSection() {
 					</div>
 
 					{/* Monthly Pro */}
-					<div className="bg-card rounded-2xl p-8 border-2 border-[#006aff] flex flex-col relative transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#006aff]/20">
+					<div className="bg-card rounded-2xl p-8 border-2 border-[#006aff] flex flex-col relative transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-md">
 						<div className="absolute -top-4 left-1/2 -translate-x-1/2">
 							<span className="bg-[#006aff] text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap">
 								Most Popular
@@ -86,7 +86,7 @@ export default function PricingSection() {
 
 					{/* Yearly Pro */}
 					<div
-						className="rounded-2xl p-8 flex flex-col relative group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#4f39f6]/30"
+						className="rounded-2xl p-8 flex flex-col relative transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-md"
 						style={{ backgroundImage: "linear-gradient(163.293deg, rgb(15, 23, 43) 0%, rgb(29, 41, 61) 55%, rgb(49, 44, 133) 100%)" }}
 					>
 						<div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -97,7 +97,7 @@ export default function PricingSection() {
 						</div>
 
 						{/* Subtle glow */}
-						<div className="absolute top-0 right-0 w-48 h-48 bg-[#006aff]/20 rounded-full blur-3xl pointer-events-none transition-all duration-500 group-hover:scale-150 group-hover:bg-[#006aff]/40" />
+						<div className="absolute top-0 right-0 w-48 h-48 bg-[#006aff]/20 rounded-full blur-3xl pointer-events-none" />
 
 						<div className="mb-6 relative">
 							<p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-3">Pro Yearly</p>

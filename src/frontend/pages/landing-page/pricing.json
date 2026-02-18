@@ -1,32 +1,30 @@
 {
-  "heading": "Choose your plan",
-  "subheading": "Start free, scale as you grow",
+  "heading": "Invest in how you think",
+  "subheading": "Start exploring for free. Upgrade when you're ready to work without limits.",
+
   "free": [
-    { "included": true,  "label": "5 PDFs per month" },
-    { "included": true,  "label": "25 AI queries / month" },
-    { "included": true,  "label": "1 notebook" },
-    { "included": true,  "label": "Basic text analysis" },
-    { "included": false, "label": "Screenshot → AI" },
-    { "included": false, "label": "Table extraction" },
-    { "included": false, "label": "Math & LaTeX support" },
-    { "included": false, "label": "Export notes" },
-    { "included": false, "label": "Priority support" }
+    { "included": true, "label": "AI-native notebook experience" },
+    { "included": true, "label": "Notion-like editing experience" },
+    { "included": true, "label": "Table, Math & LaTeX support"},
+    { "included": true, "label": "limited AI assistance per day" },
+    { "included": true, "label": "Up to 4 PDFs" },
+    { "included": true, "label": "1 active projects" },
+    { "included": true, "label": "2 notebooks" },
+    { "included": true, "label": "Standard support" }
   ],
+
   "monthly": [
-    { "included": true, "label": "Unlimited PDFs" },
-    { "included": true, "label": "Unlimited AI queries" },
-    { "included": true, "label": "Unlimited notebooks" },
-    { "included": true, "label": "Advanced text analysis" },
-    { "included": true, "label": "Screenshot → AI" },
-    { "included": true, "label": "Table extraction" },
-    { "included": true, "label": "Math & LaTeX support" },
-    { "included": true, "label": "Export to Markdown & PDF" },
+    { "included": true, "label": "Everything in Free" },
+    { "included": true, "label": "High-volume AI assistance" },
+    { "included": true, "label": "Work across unlimited PDFs" },
+    { "included": true, "label": "Unlimited projects & notebooks" },
     { "included": true, "label": "Priority support" }
   ],
+
   "yearly": [
-    "Everything in Monthly Pro",
-    "API access",
-    "Early feature access",
-    "30-day money-back guarantee"
+    "Everything in Pro",
+    "Early access to new capabilities",
+    "30-day money-back guarantee",
+    "Best value for serious users"
   ]
 }
