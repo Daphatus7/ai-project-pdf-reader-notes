@@ -122,11 +122,21 @@ export const NoteRenderer = forwardRef<NoteRendererHandle, NoteRendererProps>(
 						if (!file) continue
 
 						event.preventDefault()
-						notesService.uploadImage(file, noteId).then((src) => {
-							const node = view.state.schema.nodes.image.create({ src, alt: file.name })
-							const tr = view.state.tr.replaceSelectionWith(node)
-							view.dispatch(tr)
-						})
+						notesService
+							.uploadImage(file, noteId)
+							.then((src) => {
+								const node = view.state.schema.nodes.image.create({ src, alt: file.name })
+								const tr = view.state.tr.replaceSelectionWith(node)
+								view.dispatch(tr)
+							})
+							.catch((error) => {
+								// Prevent unhandled promise rejection and inform the user
+								// eslint-disable-next-line no-console
+								console.error('Image upload failed during paste:', error)
+								if (typeof window !== 'undefined') {
+									window.alert('Image upload failed. Please try again.')
+								}
+							})
 						return true
 					}
 					return false
