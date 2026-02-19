@@ -14,6 +14,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import { ImageUploadNode } from '@/frontend/@/components/tiptap-node/image-upload-node'
 import { SimpleEditor } from '@/frontend/@/components/tiptap-templates/simple/simple-editor.tsx'
 import type { ContentInsertion } from '@/frontend/features/types/content-insertion.ts'
+import { notesService } from '@/frontend/api/services/notes.service'
 import 'katex/dist/katex.min.css'
 
 // --- Types ---
@@ -26,6 +27,7 @@ export interface NoteRendererHandle {
 
 interface NoteRendererProps {
 	value: string
+	noteId: string
 	onChange: (value: string) => void
 }
 
@@ -69,7 +71,7 @@ function normalizeMathHtml(htmlContent?: string): string | undefined {
 
 // --- Extensions ---
 
-function createExtensions() {
+function createExtensions(noteId: string) {
 	return [
 		Markdown,
 		Details,
@@ -77,7 +79,15 @@ function createExtensions() {
 		FontSize,
 		TextStyle,
 		StarterKit,
-		ImageUploadNode,
+		ImageUploadNode.configure({
+			maxSize: 10 * 1024 * 1024,
+			upload: async (file: File, onProgress) => {
+				onProgress?.({ progress: 30 })
+				const url = await notesService.uploadImage(file, noteId)
+				onProgress?.({ progress: 100 })
+				return url
+			},
+		}),
 		DetailsSummary,
 		DetailsContent,
 		TaskList,
@@ -93,13 +103,45 @@ function createExtensions() {
 // --- Component ---
 
 export const NoteRenderer = forwardRef<NoteRendererHandle, NoteRendererProps>(
-	function NoteRenderer({ value, onChange }, ref) {
+	function NoteRenderer({ value, noteId, onChange }, ref) {
 		const isPushing = useRef(false)
+		const prevValue = useRef(value)
 
 		const editor = useEditor({
-			extensions: createExtensions(),
+			extensions: createExtensions(noteId),
 			content: value,
 			contentType: 'markdown',
+			editorProps: {
+				handlePaste(view, event) {
+					const items = event.clipboardData?.items
+					if (!items) return false
+
+					for (const item of Array.from(items)) {
+						if (!item.type.startsWith('image/')) continue
+						const file = item.getAsFile()
+						if (!file) continue
+
+						event.preventDefault()
+						notesService
+							.uploadImage(file, noteId)
+							.then((src) => {
+								const node = view.state.schema.nodes.image.create({ src, alt: file.name })
+								const tr = view.state.tr.replaceSelectionWith(node)
+								view.dispatch(tr)
+							})
+							.catch((error) => {
+								// Prevent unhandled promise rejection and inform the user
+								// eslint-disable-next-line no-console
+								console.error('Image upload failed during paste:', error)
+								if (typeof window !== 'undefined') {
+									window.alert('Image upload failed. Please try again.')
+								}
+							})
+						return true
+					}
+					return false
+				},
+			},
 			onUpdate: ({ editor: currentEditor }) => {
 				if (isPushing.current) return
 				onChange(currentEditor.getMarkdown())
@@ -109,11 +151,12 @@ export const NoteRenderer = forwardRef<NoteRendererHandle, NoteRendererProps>(
 			},
 		})
 
-		// Sync external markdown changes into the editor
+		// Sync external markdown changes into the editor (note switch or tab switch)
 		useEffect(() => {
 			if (!editor) return
-			if (editor.getMarkdown() === value) return
+			if (prevValue.current === value) return
 
+			prevValue.current = value
 			isPushing.current = true
 			editor.commands.setContent(value, { contentType: 'markdown' })
 			requestAnimationFrame(() => {

@@ -22,6 +22,26 @@ export function useNotePad() {
 	const rendererRef = useRef<NoteRendererHandle>(null)
 	const lastSavedContent = useRef('')
 
+	// --- Auto-save ---
+	const AUTOSAVE_DELAY = 2000
+	const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	function scheduleAutoSave() {
+		if (debounceTimer.current) clearTimeout(debounceTimer.current)
+		debounceTimer.current = setTimeout(() => {
+			saveCurrentNote({ silent: true })
+		}, AUTOSAVE_DELAY)
+	}
+
+	function cancelAutoSave() {
+		if (debounceTimer.current) {
+			clearTimeout(debounceTimer.current)
+			debounceTimer.current = null
+		}
+	}
+
+	useEffect(() => () => cancelAutoSave(), [])
+
 	// --- Init ---
 
 	useEffect(() => {
@@ -56,6 +76,7 @@ export function useNotePad() {
 
 	function handleContentChange(value: string) {
 		contentRef.current = value
+		scheduleAutoSave()
 	}
 
 	function setActiveView(view: ViewMode) {
@@ -72,6 +93,7 @@ export function useNotePad() {
 	async function selectNote(id: string) {
 		if (id === selectedNoteId) return
 
+		cancelAutoSave()
 		if (selectedNoteId && isDirty()) {
 			await saveCurrentNote()
 		}
@@ -82,7 +104,7 @@ export function useNotePad() {
 
 	// --- Save ---
 
-	async function saveCurrentNote() {
+	async function saveCurrentNote({ silent = false } = {}) {
 		if (!selectedNoteId || !isDirty()) return
 
 		const note = notes.find(n => n.id === selectedNoteId)
@@ -96,10 +118,10 @@ export function useNotePad() {
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
 			lastSavedContent.current = contentRef.current
-			toast.success('Note saved')
+			if (!silent) toast.success('Note saved')
 		} catch (error) {
 			console.error('[useNotePad] Failed to save note:', error)
-			toast.error('Failed to save note')
+			if (!silent) toast.error('Failed to save note')
 		} finally {
 			setIsSaving(false)
 		}

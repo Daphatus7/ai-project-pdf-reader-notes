@@ -81,6 +81,7 @@ export const NotePad = forwardRef<NotePadHandler>(
 								<NoteRenderer
 									ref={pad.rendererRef}
 									value={pad.documentContent}
+									noteId={pad.selectedNoteId}
 									onChange={pad.handleContentChange}
 								/>
 							</TabsContent>

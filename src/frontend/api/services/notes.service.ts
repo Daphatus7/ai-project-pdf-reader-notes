@@ -11,7 +11,7 @@ import type {
 	UpdateNoteResponse,
 	DeleteNoteResponse,
 } from '../types/note/note.ts';
-import { get, post, put, del } from '../core/client';
+import { get, post, put, del, upload } from '../core/client';
 import { apiConfig } from '../core/config';
 
 const NOTES_BASE = apiConfig.endpoints.notes.base;
@@ -54,5 +54,16 @@ export const notesService = {
 	 */
 	async deleteNote(noteId: string): Promise<DeleteNoteResponse> {
 		return await del<DeleteNoteResponse>(`${NOTES_BASE}/${noteId}`);
+	},
+
+	/**
+	 * Upload an image for use in notes, returns a public URL
+	 */
+	async uploadImage(file: File, noteId: string): Promise<string> {
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('note_id', noteId);
+		const response = await upload<{ url: string }>(`${NOTES_BASE}/images`, formData);
+		return response.url;
 	},
 };
