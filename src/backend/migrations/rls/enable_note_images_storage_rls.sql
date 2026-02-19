@@ -20,7 +20,10 @@ USING (
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
--- Allow public read (bucket is public, this makes the policy explicit)
-CREATE POLICY "Public can read note images"
-ON storage.objects FOR SELECT TO public
-USING (bucket_id = 'note-images');
+-- Allow authenticated users to read only their own images
+CREATE POLICY "Users can read own note images"
+ON storage.objects FOR SELECT TO authenticated
+USING (
+    bucket_id = 'note-images'
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);
