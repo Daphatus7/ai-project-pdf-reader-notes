@@ -632,11 +632,15 @@ class SupabaseStorage(Service):
                 'storage_path': storage_path,
                 'url': public_url,
             }).execute()
+            logger.info(f'Note image uploaded and recorded: {storage_path}')
         except Exception as e:
             logger.error(f'Failed to record note asset for note {note_id}: {e}')
-            # Best-effort: image is uploaded, don't fail the request
-
-        logger.info(f'Note image uploaded and recorded: {storage_path}')
+            # Roll back uploaded image to avoid leaving untracked storage objects
+            try:
+                self._delete_note_images([storage_path])
+            except Exception as cleanup_err:
+                logger.error(f'Failed to roll back uploaded note image {storage_path}: {cleanup_err}')
+            internal_error('Failed to record note asset')
         return public_url
 
     # ==================== Usage Tracking Operations ====================
