@@ -497,6 +497,21 @@ class SupabaseStorage(Service):
 
     async def update_note(self, user_id: str, note_id: str, payload) -> dict:
         try:
+            # If content is changing, find orphaned images via note_assets table
+            orphaned_storage_paths: list[str] = []
+            orphaned_asset_ids: list[str] = []
+            if payload.content_markdown is not None:
+                assets = (self.__database.table('note_assets')
+                          .select('id, storage_path, url')
+                          .eq('note_id', note_id)
+                          .execute())
+                if assets.data:
+                    new_content = payload.content_markdown
+                    for asset in assets.data:
+                        if asset['url'] not in new_content:
+                            orphaned_storage_paths.append(asset['storage_path'])
+                            orphaned_asset_ids.append(asset['id'])
+
             update_data = {}
             if payload.title is not None:
                 update_data['title'] = payload.title
@@ -527,6 +542,14 @@ class SupabaseStorage(Service):
                 else:
                     not_found('Note')
 
+            # Update succeeded — clean up orphaned images (best-effort)
+            if orphaned_storage_paths:
+                self._delete_note_images(orphaned_storage_paths)
+                try:
+                    self.__database.table('note_assets').delete().in_('id', orphaned_asset_ids).execute()
+                except Exception as e:
+                    logger.error(f'Failed to delete orphaned note_assets records: {e}')
+
             logger.info(f'Note updated: user={user_id}, note={note_id}')
             return response.data[0]
 
@@ -537,7 +560,7 @@ class SupabaseStorage(Service):
             internal_error('Failed to update note')
 
     async def delete_note(self, user_id: str, note_id: str) -> dict:
-        """Delete a note and decrement usage."""
+        """Delete a note, its images from storage, and decrement usage."""
         try:
             note = (self.__database.table('notes')
                     .select('id')
@@ -546,6 +569,15 @@ class SupabaseStorage(Service):
                     .execute())
             if not note.data:
                 not_found('Note')
+
+            # Delete associated images from Storage (note_assets cascade-deleted with note)
+            assets = (self.__database.table('note_assets')
+                      .select('storage_path')
+                      .eq('note_id', note_id)
+                      .execute())
+            if assets.data:
+                storage_paths = [a['storage_path'] for a in assets.data]
+                self._delete_note_images(storage_paths)
 
             self.__database.table('notes').delete().eq('id', note_id).execute()
             logger.info(f'Note deleted: user={user_id}, note={note_id}')
@@ -558,6 +590,54 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to delete note {note_id}: {e}')
             internal_error('Failed to delete note')
+
+    # ==================== Note Image Operations ====================
+
+    def _delete_note_images(self, paths: list[str]) -> None:
+        """Delete images from note-images storage bucket (best-effort)."""
+        if not paths:
+            return
+        try:
+            self.__database.storage.from_('note-images').remove(paths)
+            logger.info(f'Deleted {len(paths)} note image(s) from storage')
+        except Exception as e:
+            logger.error(f'Failed to delete note images from storage: {e}')
+
+    async def upload_note_image(
+        self, user_id: str, note_id: str, file_data: bytes, filename: str, content_type: str
+    ) -> str:
+        """Upload an image to Supabase Storage, record in note_assets, return public URL."""
+        import uuid as uuid_lib
+        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+        image_id = uuid_lib.uuid4().hex
+        storage_path = f"{user_id}/{image_id}.{ext}"
+
+        try:
+            self.__database.storage.from_('note-images').upload(
+                path=storage_path,
+                file=file_data,
+                file_options={"content-type": content_type},
+            )
+        except Exception as e:
+            logger.error(f'Failed to upload note image for user {user_id}: {e}')
+            internal_error('Failed to upload image')
+
+        supabase_url = os.environ.get('SUPABASE_URL', '')
+        public_url = f"{supabase_url}/storage/v1/object/public/note-images/{storage_path}"
+
+        try:
+            self.__database.table('note_assets').insert({
+                'note_id': note_id,
+                'user_id': user_id,
+                'storage_path': storage_path,
+                'url': public_url,
+            }).execute()
+        except Exception as e:
+            logger.error(f'Failed to record note asset for note {note_id}: {e}')
+            # Best-effort: image is uploaded, don't fail the request
+
+        logger.info(f'Note image uploaded and recorded: {storage_path}')
+        return public_url
 
     # ==================== Usage Tracking Operations ====================
 

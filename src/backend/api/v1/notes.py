@@ -3,9 +3,10 @@
 # @author      [Peiyu Wang]
 # @date        30/1/2026
 # @license     © 2026 . All rights reserved.
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, UploadFile, File, Form
 
 from src.backend.api.deps import get_database_service, get_user
+from src.backend.schemas.error import validation_error
 from src.backend.schemas.note import (
     ListNotesResponse,
     NoteResponse,
@@ -89,3 +90,29 @@ async def delete_note(
     user_id = user['sub']
     result = await database_service.delete_note(user_id, note_id)
     return DeleteNoteResponse(**result)
+
+
+_ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
+_MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
+
+
+@router.post('/images')
+async def upload_note_image(
+    file: UploadFile = File(..., description='Image file to upload'),
+    note_id: str = Form(..., description='Note ID this image belongs to'),
+    user=Depends(get_user),
+    database_service=Depends(get_database_service),
+):
+    """Upload an image for use in notes. Records in note_assets. Returns a public URL."""
+    if file.content_type not in _ALLOWED_IMAGE_TYPES:
+        validation_error('Invalid file type. Allowed: JPEG, PNG, GIF, WebP')
+
+    content = await file.read()
+    if len(content) > _MAX_IMAGE_SIZE:
+        validation_error('File too large. Max: 10MB')
+
+    user_id = user['sub']
+    url = await database_service.upload_note_image(
+        user_id, note_id, content, file.filename or 'image', file.content_type or 'image/jpeg'
+    )
+    return {'url': url}
