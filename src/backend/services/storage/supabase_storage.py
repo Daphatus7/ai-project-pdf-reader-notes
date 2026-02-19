@@ -12,6 +12,7 @@ from supabase import create_client, Client
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 from src.backend.config.config import settings
+from src.backend.config.plans import get_plan_quotas
 from src.backend.schemas.error import (
     AppError, not_found, conflict, internal_error, quota_exceeded,
 )
@@ -105,42 +106,34 @@ class SupabaseStorage(Service):
     # ==================== Quota Enforcement ====================
 
     async def enforce_quota(self, user_id: str, resource: str) -> bool:
-        """Check plan, atomically increment quota. Raises AppError(429) if exceeded.
-        Returns True if counter was incremented (free plan), False otherwise."""
+        """Check plan quotas from plan JSON, atomically increment. Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return False
-        limits = {
-            'project_count': settings.free_max_projects,
-            'doc_count': settings.free_max_documents,
-            'note_count': settings.free_max_notes,
+        quotas = get_plan_quotas(plan)
+        resource_map = {
+            'project_count': ('max_projects',  'projects'),
+            'doc_count':     ('max_documents', 'documents'),
+            'note_count':    ('max_notes',     'notes'),
         }
-        limit = limits[resource]
+        quota_key, display_name = resource_map[resource]
+        limit = quotas[quota_key]
         result = await self.check_and_increment_usage(user_id, resource, limit)
         if not result['allowed']:
-            resource_names = {
-                'project_count': 'projects',
-                'doc_count': 'documents',
-                'note_count': 'notes',
-            }
-            quota_exceeded(resource_names[resource], result['current'], limit)
+            quota_exceeded(display_name, result['current'], limit)
         return True
 
     async def enforce_token_quota(self, user_id: str):
         """Check token quota (read-only, no increment). Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return
-        result = await self.check_token_limit(user_id, settings.free_max_tokens)
+        quotas = get_plan_quotas(plan)
+        limit = quotas['max_tokens']
+        result = await self.check_token_limit(user_id, limit)
         if not result['allowed']:
-            quota_exceeded('tokens', result['current'], settings.free_max_tokens)
+            quota_exceeded('tokens', result['current'], limit)
 
     async def track_token_usage(self, user_id: str, tokens: int):
-        """Increment token usage if on free plan and tokens > 0."""
+        """Increment token usage for all plans."""
         if tokens and tokens > 0:
-            plan = await self.get_user_plan(user_id)
-            if plan == 'free':
-                await self.increment_token_usage(user_id, tokens)
+            await self.increment_token_usage(user_id, tokens)
 
     # ==================== Projects Operations ====================
 
