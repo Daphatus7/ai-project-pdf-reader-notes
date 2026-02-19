@@ -504,6 +504,7 @@ class SupabaseStorage(Service):
                 assets = (self.__database.table('note_assets')
                           .select('id, storage_path, url')
                           .eq('note_id', note_id)
+                          .eq('user_id', user_id)
                           .execute())
                 if assets.data:
                     new_content = payload.content_markdown
