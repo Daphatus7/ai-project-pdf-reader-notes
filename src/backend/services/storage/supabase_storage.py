@@ -608,7 +608,16 @@ class SupabaseStorage(Service):
     ) -> str:
         """Upload an image to Supabase Storage, record in note_assets, return public URL."""
         import uuid as uuid_lib
-        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+        
+        # Map extension from validated content_type to prevent content-type/extension mismatches
+        content_type_to_ext = {
+            'image/jpeg': 'jpg',
+            'image/png': 'png',
+            'image/gif': 'gif',
+            'image/webp': 'webp',
+        }
+        ext = content_type_to_ext.get(content_type, 'jpg')
+        
         image_id = uuid_lib.uuid4().hex
         storage_path = f"{user_id}/{image_id}.{ext}"
 
