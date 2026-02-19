@@ -12,6 +12,7 @@ export function useNotePad() {
 	// --- Notes list ---
 	const [notes, setNotes] = useState<Note[]>([])
 	const [selectedNoteId, setSelectedNoteId] = useState('')
+	const selectedNoteIdRef = useRef('')
 	const [isLoading, setIsLoading] = useState(true)
 	const [isSaving, setIsSaving] = useState(false)
 
@@ -29,7 +30,39 @@ export function useNotePad() {
 	function scheduleAutoSave() {
 		if (debounceTimer.current) clearTimeout(debounceTimer.current)
 		debounceTimer.current = setTimeout(() => {
-			saveCurrentNote({ silent: true })
+			// Use ref to avoid stale closure - get current selectedNoteId
+			const currentNoteId = selectedNoteIdRef.current
+			if (!currentNoteId) return
+			
+			// Check if content is dirty
+			if (contentRef.current === lastSavedContent.current) return
+			
+			// Perform the save with current ref values
+			setIsSaving(true)
+			setNotes(prevNotes => {
+				const note = prevNotes.find(n => n.id === currentNoteId)
+				if (!note) {
+					setIsSaving(false)
+					return prevNotes
+				}
+				
+				notesService.updateNote(currentNoteId, {
+					content_markdown: contentRef.current,
+					version: note.version,
+				})
+					.then(updated => {
+						setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
+						lastSavedContent.current = contentRef.current
+					})
+					.catch(error => {
+						console.error('[useNotePad] Failed to auto-save note:', error)
+					})
+					.finally(() => {
+						setIsSaving(false)
+					})
+				
+				return prevNotes
+			})
 		}, AUTOSAVE_DELAY)
 	}
 
@@ -69,6 +102,7 @@ export function useNotePad() {
 
 	function applyNote(note: Note) {
 		setSelectedNoteId(note.id)
+		selectedNoteIdRef.current = note.id
 		contentRef.current = note.content_markdown
 		setDocumentContent(note.content_markdown)
 		lastSavedContent.current = note.content_markdown
@@ -131,6 +165,7 @@ export function useNotePad() {
 
 	async function addNote() {
 		try {
+			cancelAutoSave()
 			if (selectedNoteId && isDirty()) {
 				await saveCurrentNote()
 			}
@@ -150,6 +185,7 @@ export function useNotePad() {
 
 	async function deleteNote(id: string) {
 		try {
+			cancelAutoSave()
 			await notesService.deleteNote(id)
 			const remaining = notes.filter(n => n.id !== id)
 			setNotes(remaining)
@@ -159,6 +195,7 @@ export function useNotePad() {
 					applyNote(remaining[0])
 				} else {
 					setSelectedNoteId('')
+					selectedNoteIdRef.current = ''
 					contentRef.current = ''
 					setDocumentContent('')
 					lastSavedContent.current = ''
