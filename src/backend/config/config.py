@@ -72,6 +72,9 @@ class Settings(BaseSettings):
     stripe_payment_link_monthly: str = Field(default="", env="STRIPE_PAYMENT_LINK_MONTHLY")
     stripe_payment_link_yearly: str = Field(default="", env="STRIPE_PAYMENT_LINK_YEARLY")
 
+    # Monitoring
+    sentry_dsn: str = Field(default="", env="SENTRY_DSN")
+
 class Config:
         env_file = Path(__file__).resolve().parent / '.env'
         case_sensitive = False
