@@ -114,18 +114,16 @@ async def stripe_webhook(
 
     event_type = event.type
     event_id = event.id
-    logger.info(f"Stripe webhook received: event_type={event_type} event_id={event_id}")
 
     if event_type == 'checkout.session.completed':
+        logger.info(f"[{event_id}] Received checkout.session.completed event")
         await _handle_checkout_completed(event.data.object, database_service, event_id)
     elif event_type == 'customer.subscription.updated':
+        logger.info(f"[{event_id}] Received customer.subscription.updated event")
         await _handle_subscription_updated(event.data.object, database_service, event_id)
     elif event_type == 'customer.subscription.deleted':
+        logger.info(f"[{event_id}] Received customer.subscription.deleted event")
         await _handle_subscription_deleted(event.data.object, database_service, event_id)
-    elif event_type == 'invoice.payment_failed':
-        await _handle_payment_failed(event.data.object, database_service, event_id)
-    elif event_type == 'invoice.payment_succeeded':
-        await _handle_payment_succeeded(event.data.object, database_service, event_id)
 
     # Return 200 only after successful handling
     return {'status': 'ok'}
@@ -161,9 +159,10 @@ async def _handle_checkout_completed(session, database_service, event_id: str) -
         return
 
     interval = items[0]['price']['recurring']['interval']
-    period_end = datetime.fromtimestamp(sub['current_period_end']).isoformat()
 
     # DB write — let exceptions propagate so Stripe retries
+    # current_period_end is NOT set here — subscription may not be fully settled yet (race condition).
+    # customer.subscription.updated fires immediately after and sets it.
     await database_service.update_profile_stripe(
         user_id,
         stripe_customer_id=stripe_customer_id,
@@ -171,13 +170,12 @@ async def _handle_checkout_completed(session, database_service, event_id: str) -
         subscription_status='active',
         plan='pro',
         plan_interval=interval,
-        current_period_end=period_end,
         cancel_at_period_end=False,
     )
     logger.info(
         f"[{event_id}] checkout.session.completed: activated pro "
         f"user={user_id} customer={stripe_customer_id} "
-        f"subscription={subscription_id} interval={interval} period_end={period_end}"
+        f"subscription={subscription_id} interval={interval}"
     )
 
 
@@ -188,12 +186,8 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         logger.warning(f"[{event_id}] subscription.updated: missing customer, skipping")
         return
 
-    current_period_end = sub.get('current_period_end')
-    if not current_period_end:
-        logger.warning(f"[{event_id}] subscription.updated: missing current_period_end for customer={stripe_customer_id}, skipping")
-        return
-
-    new_period_end = datetime.fromtimestamp(current_period_end)
+    raw_period_end = sub.get('current_period_end')
+    new_period_end = datetime.fromtimestamp(raw_period_end) if raw_period_end else None
     new_status = sub.get('status')
     new_cancel_at_period_end = sub.get('cancel_at_period_end')
 
@@ -203,9 +197,9 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         logger.warning(f"[{event_id}] subscription.updated: no profile for customer={stripe_customer_id}, skipping")
         return
 
-    # Guard against out-of-order events
+    # Guard against out-of-order events (only when both sides have a period_end)
     existing_end = profile.get('current_period_end')
-    if existing_end:
+    if existing_end and new_period_end:
         try:
             existing_dt = datetime.fromisoformat(str(existing_end).replace('Z', '+00:00'))
             if new_period_end.replace(tzinfo=None) < existing_dt.replace(tzinfo=None):
@@ -214,18 +208,20 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         except ValueError:
             logger.warning(f"[{event_id}] subscription.updated: could not parse existing period_end='{existing_end}', proceeding anyway")
 
+    period_end_iso = new_period_end.isoformat() if new_period_end else None
+
     # DB write — let exceptions propagate so Stripe retries
     await database_service.update_profile_stripe(
         profile['id'],
         subscription_status=new_status,
         cancel_at_period_end=new_cancel_at_period_end,
-        current_period_end=new_period_end.isoformat(),
+        current_period_end=period_end_iso,
     )
     logger.info(
         f"[{event_id}] subscription.updated: customer={stripe_customer_id} "
         f"status={profile.get('subscription_status')} → {new_status} "
         f"cancel_at_period_end={new_cancel_at_period_end} "
-        f"period_end={new_period_end.isoformat()}"
+        f"period_end={period_end_iso}"
     )
 
 
@@ -245,61 +241,3 @@ async def _handle_subscription_deleted(sub, database_service, event_id: str) -> 
     )
 
 
-async def _handle_payment_failed(invoice, database_service, event_id: str) -> None:
-    """Payment failed — mark past_due (Pro access kept during Stripe retry window)."""
-    stripe_customer_id = invoice.get('customer')
-    if not stripe_customer_id:
-        logger.warning(f"[{event_id}] invoice.payment_failed: missing customer, skipping")
-        return
-
-    # DB read — let exceptions propagate so Stripe retries
-    profile = await database_service.get_profile_by_stripe_customer(stripe_customer_id)
-    if not profile:
-        logger.warning(f"[{event_id}] invoice.payment_failed: no profile for customer={stripe_customer_id}, skipping")
-        return
-
-    prev_status = profile.get('subscription_status')
-
-    # DB write — let exceptions propagate so Stripe retries
-    await database_service.update_profile_stripe(
-        profile['id'],
-        subscription_status='past_due',
-    )
-    logger.info(
-        f"[{event_id}] invoice.payment_failed: customer={stripe_customer_id} "
-        f"status={prev_status} → past_due (Pro access retained during retry window)"
-    )
-
-
-async def _handle_payment_succeeded(invoice, database_service, event_id: str) -> None:
-    """Renewal payment succeeded — restore active status and update period end."""
-    stripe_customer_id = invoice.get('customer')
-    if not stripe_customer_id:
-        logger.warning(f"[{event_id}] invoice.payment_succeeded: missing customer, skipping")
-        return
-
-    sub_id = invoice.get('subscription')
-    if not sub_id:
-        logger.warning(f"[{event_id}] invoice.payment_succeeded: missing subscription for customer={stripe_customer_id}, skipping")
-        return
-
-    # Network call — let exceptions propagate so Stripe retries
-    sub = stripe_lib.Subscription.retrieve(sub_id)
-    new_period_end = datetime.fromtimestamp(sub['current_period_end']).isoformat()
-
-    # DB read — let exceptions propagate so Stripe retries
-    profile = await database_service.get_profile_by_stripe_customer(stripe_customer_id)
-    if not profile:
-        logger.warning(f"[{event_id}] invoice.payment_succeeded: no profile for customer={stripe_customer_id}, skipping")
-        return
-
-    # DB write — let exceptions propagate so Stripe retries
-    await database_service.update_profile_stripe(
-        profile['id'],
-        subscription_status='active',
-        current_period_end=new_period_end,
-    )
-    logger.info(
-        f"[{event_id}] invoice.payment_succeeded: renewed subscription for customer={stripe_customer_id} "
-        f"subscription={sub_id} new_period_end={new_period_end}"
-    )

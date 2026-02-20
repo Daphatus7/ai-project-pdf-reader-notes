@@ -4,15 +4,27 @@
 CREATE TABLE IF NOT EXISTS profiles (
     -- Primary key (matches auth.users.id)
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    
+
     -- User information
-    display_name TEXT NOT NULL,    
+    display_name TEXT NOT NULL,
+
     -- User preferences
     preference JSONB DEFAULT '{}',
-    
+
     -- Last opened project
     last_project_id UUID,
-    
+
+    -- Plan: 'free' | 'pro'
+    plan TEXT NOT NULL DEFAULT 'free',
+
+    -- Stripe billing
+    stripe_customer_id     TEXT UNIQUE,
+    stripe_subscription_id TEXT UNIQUE,
+    subscription_status    TEXT DEFAULT 'inactive',  -- active | past_due | canceled | inactive
+    plan_interval          TEXT,                      -- 'month' | 'year'
+    current_period_end     TIMESTAMPTZ,
+    cancel_at_period_end   BOOLEAN DEFAULT FALSE,
+
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
