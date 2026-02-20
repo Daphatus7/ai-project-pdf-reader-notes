@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     free_max_notes: int = Field(default=10, env="FREE_MAX_NOTES")
     free_max_tokens: int = Field(default=100000, env="FREE_MAX_TOKENS")
 
+    # Stripe
+    stripe_secret_key: str = Field(default="", env="STRIPE_SECRET_KEY")
+    stripe_webhook_secret: str = Field(default="", env="STRIPE_WEBHOOK_SECRET")
+    stripe_payment_link_monthly: str = Field(default="", env="STRIPE_PAYMENT_LINK_MONTHLY")
+    stripe_payment_link_yearly: str = Field(default="", env="STRIPE_PAYMENT_LINK_YEARLY")
+
 class Config:
         env_file = Path(__file__).resolve().parent / '.env'
         case_sensitive = False

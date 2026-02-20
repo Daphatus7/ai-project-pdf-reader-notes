@@ -69,14 +69,21 @@ def get_rag_service():
 
 def get_database_service():
     """
-    
-    :return: 
+
+    :return:
     """
     try:
         return services.get_service('database_service')
     except ValueError as e:
         logger.error(f'Failed to get database service: {e}')
         service_unavailable("Database service")
+
+def get_stripe_service():
+    try:
+        return services.get_service('stripe_service')
+    except ValueError as e:
+        logger.error(f'Failed to get stripe service: {e}')
+        service_unavailable("Stripe service")
 
 
 # Authentication Dependency

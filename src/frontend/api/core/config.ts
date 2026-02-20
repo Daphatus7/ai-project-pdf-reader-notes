@@ -25,6 +25,12 @@ export const apiConfig = {
 			base: '/api/v1/notes',
 		},
 		usage: '/api/v1/usage',
+		billing: {
+			checkout: '/api/v1/billing/checkout',
+			portal: '/api/v1/billing/portal',
+			cancel: '/api/v1/billing/cancel',
+			resume: '/api/v1/billing/resume',
+		},
 		projects: {
 			base: '/api/v1/projects',
 			documents: (projectId: string) => `/api/v1/projects/${projectId}/documents`,

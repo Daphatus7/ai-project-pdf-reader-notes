@@ -709,3 +709,49 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to get usage for {user_id}: {e}')
             return {'project_count': 0, 'doc_count': 0, 'note_count': 0, 'token_used': 0}
+
+    # ==================== Stripe / Subscription Operations ====================
+
+    async def get_stripe_customer_id(self, user_id: str) -> str | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('stripe_customer_id')
+                        .eq('id', user_id)
+                        .execute())
+            if response.data:
+                return response.data[0].get('stripe_customer_id')
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get stripe_customer_id for {user_id}: {e}')
+            return None
+
+    async def get_profile_by_stripe_customer(self, stripe_customer_id: str) -> dict | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('id, stripe_customer_id, stripe_subscription_id, subscription_status, plan, current_period_end')
+                        .eq('stripe_customer_id', stripe_customer_id)
+                        .execute())
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get profile for stripe_customer {stripe_customer_id}: {e}')
+            return None
+
+    async def update_profile_stripe(self, user_id: str, **fields) -> None:
+        try:
+            self.__database.table('profiles').update(fields).eq('id', user_id).execute()
+            logger.info(f'Updated stripe fields for user {user_id}: {list(fields.keys())}')
+        except Exception as e:
+            logger.error(f'Failed to update stripe fields for {user_id}: {e}')
+            internal_error('Failed to update subscription')
+
+    async def downgrade_to_free(self, stripe_customer_id: str) -> None:
+        self.__database.table('profiles').update({
+            'plan': 'free',
+            'subscription_status': 'canceled',
+            'stripe_subscription_id': None,
+            'cancel_at_period_end': False,
+            'current_period_end': None,
+        }).eq('stripe_customer_id', stripe_customer_id).execute()
+        logger.info(f'Downgraded to free: stripe_customer={stripe_customer_id}')
