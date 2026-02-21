@@ -123,6 +123,7 @@ export function ManagementPanel({
 			isLoading={project.isLoadingProjects}
 			error={project.error}
 			canCreateProject={quota.canCreate('projects')}
+			plan={quota.quota?.plan}
 			projectUsageLabel={projectUsageLabel}
 			onOpenProject={handleOpenProject}
 			onCreateProject={handleCreateProject}
