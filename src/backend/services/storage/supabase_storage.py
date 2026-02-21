@@ -818,15 +818,6 @@ class SupabaseStorage(Service):
                 return
 
             user_id = profile_resp.data[0]['id']
-
-            # downgrade to usage limits of free plan
-            logger.info(f"downgrading usage limits to free plan quotas for user={user_id}")
-            resp = self.__database.table('user_usages').update({
-                'max_projects': get_plan_quotas('free')['max_projects'],
-                'max_documents': get_plan_quotas('free')['max_documents'],
-                'max_notes': get_plan_quotas('free')['max_notes'],
-                'max_tokens': get_plan_quotas('free')['max_tokens'],
-            }).eq('user_id', user_id).execute()
-            logger.info(f"result of usage limits downgrade for user={user_id}: {resp.data}")
+            logger.info(f"downgrade complete for user={user_id}, quotas enforced via plan config")
         except Exception as e:
             logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')

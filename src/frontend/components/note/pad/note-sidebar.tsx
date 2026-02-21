@@ -17,7 +17,6 @@ interface NoteSidebarProps {
 	notes: Note[]
 	selectedNoteId: string
 	canCreateNote?: boolean
-	noteUsageLabel?: string
 	onSelectNote: (id: string) => void
 	onAddNote: () => void
 	onDeleteNote: (id: string) => void
@@ -29,7 +28,6 @@ export function NoteSidebar({
 	notes,
 	selectedNoteId,
 	canCreateNote = true,
-	noteUsageLabel,
 	onSelectNote,
 	onAddNote,
 	onDeleteNote,
@@ -50,10 +48,7 @@ export function NoteSidebar({
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
 			<div className="p-3 border-b flex items-center justify-between h-13">
 				<span className="text-sm font-medium">Notes</span>
-				{noteUsageLabel && (
-					<span className="text-xs text-muted-foreground">{noteUsageLabel}</span>
-				)}
-				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+	<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />
 				</Button>
 			</div>

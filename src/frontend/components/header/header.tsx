@@ -19,11 +19,14 @@ import {
 import {PricingDialog} from "@/frontend/features/pricing/PricingDialog.tsx";
 import { SubscriptionDialog } from "@/frontend/features/user/SubscriptionDialog.tsx";
 import { useAuth } from "@/frontend/features/auth";
+import { useQuota } from "@/frontend/features/quota/use-quota";
 
 export function Header() {
 	const [pricingOpen, setPricingOpen] = useState(false);
 	const [subscriptionOpen, setSubscriptionOpen] = useState(false);
 	const { user, signOut } = useAuth();
+	const { quota } = useQuota();
+	const isPro = quota?.plan === 'pro';
 	const navigate = useNavigate();
 
 	const handleLogin = () => {
@@ -43,25 +46,27 @@ export function Header() {
 			</div>
 
 			<div className="flex items-center gap-2 mr-2">
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={() => setPricingOpen(true)}
-					className="text-xs h-8 px-3"
-				>
-					<CreditCard className="w-4 h-4" />
-					Upgrade
-				</Button>
+				{/* Show Pro badge when on Pro plan, otherwise show Upgrade button */}
+				{isPro ? (
+					<span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-accent border ">
+						Pro
+					</span>
+				) : (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => setPricingOpen(true)}
+						className="text-xs h-8 px-3"
+					>
+						<CreditCard className="w-4 h-4" />
+						Upgrade
+					</Button>
+				)}
 
 				<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Contact support">
 					<LucideMail className="w-4 h-4 mr-2" />
 				</Button>
-
-				<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Join Discord community">
-					<img className="w-4 h-4 mr-2" src="/discord-logo.svg"
-					 alt="discord portal"/>
-				</Button>
-
+				
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">

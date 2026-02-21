@@ -22,7 +22,6 @@ interface ProjectPanelProps {
 	error: string | null;
 	canCreateProject: boolean;
 	plan?: string;
-	projectUsageLabel?: string;
 	onOpenProject: (projectId: string) => void;
 	onCreateProject: (name: string, description?: string) => Promise<void>;
 	onDeleteProject: (projectId: string) => Promise<void>;

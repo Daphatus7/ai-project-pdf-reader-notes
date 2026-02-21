@@ -16,12 +16,7 @@ export const NotePad = forwardRef<NotePadHandler>(
 		const quota = useQuota()
 		const [showSidebar, setShowSidebar] = useState(false)
 
-		const noteUsage = quota.getUsage('notes')
-		const noteUsageLabel = noteUsage && noteUsage.limit !== -1
-			? `${noteUsage.current}/${noteUsage.limit}`
-			: undefined
-
-		useImperativeHandle(ref, () => ({
+useImperativeHandle(ref, () => ({
 			insertContent: pad.insertContent,
 			focus: pad.focus,
 			getContent: pad.getContent,
@@ -94,7 +89,6 @@ export const NotePad = forwardRef<NotePadHandler>(
 						notes={pad.notes}
 						selectedNoteId={pad.selectedNoteId}
 						canCreateNote={quota.canCreate('notes')}
-						noteUsageLabel={noteUsageLabel}
 						onSelectNote={pad.selectNote}
 						onAddNote={pad.addNote}
 						onDeleteNote={pad.deleteNote}
