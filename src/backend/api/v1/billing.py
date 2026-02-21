@@ -94,6 +94,25 @@ async def resume_subscription(
     return {'message': 'Subscription resumed'}
 
 
+# ==================== Subscription Status ====================
+
+@router.get('/subscription')
+async def get_subscription(
+    user=Depends(get_user),
+    database_service=Depends(get_database_service),
+):
+    """Return current subscription status for the authenticated user."""
+    user_id = user['sub']
+    profile = await database_service.get_subscription_status(user_id)
+    return {
+        'plan': profile.get('plan', 'free'),
+        'subscription_status': profile.get('subscription_status'),
+        'plan_interval': profile.get('plan_interval'),
+        'current_period_end': profile.get('current_period_end'),
+        'cancel_at_period_end': profile.get('cancel_at_period_end', False),
+    }
+
+
 # ==================== Webhook ====================
 
 @router.post('/webhook')
@@ -186,6 +205,7 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         logger.warning(f"[{event_id}] subscription.updated: missing customer, skipping")
         return
 
+    logger.warning(f"[{event_id}] subscription.updated raw keys: { {k: sub.get(k) for k in ['current_period_end', 'status', 'cancel_at_period_end']} }")
     raw_period_end = sub.get('current_period_end')
     new_period_end = datetime.fromtimestamp(raw_period_end) if raw_period_end else None
     new_status = sub.get('status')

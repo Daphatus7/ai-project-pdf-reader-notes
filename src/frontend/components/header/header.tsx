@@ -17,10 +17,12 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu.tsx";
 import {PricingDialog} from "@/frontend/features/pricing/PricingDialog.tsx";
+import { SubscriptionDialog } from "@/frontend/features/user/SubscriptionDialog.tsx";
 import { useAuth } from "@/frontend/features/auth";
 
 export function Header() {
 	const [pricingOpen, setPricingOpen] = useState(false);
+	const [subscriptionOpen, setSubscriptionOpen] = useState(false);
 	const { user, signOut } = useAuth();
 	const navigate = useNavigate();
 
@@ -92,7 +94,7 @@ export function Header() {
 							<>
 								<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem>
+								<DropdownMenuItem onClick={() => setSubscriptionOpen(true)}>
 									Profile Settings
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
@@ -116,6 +118,7 @@ export function Header() {
 			</div>
 
 			<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
+			<SubscriptionDialog open={subscriptionOpen} onOpenChange={setSubscriptionOpen} />
 		</header>
 	);
 }

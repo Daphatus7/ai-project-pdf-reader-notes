@@ -30,6 +30,7 @@ export const apiConfig = {
 			portal: '/api/v1/billing/portal',
 			cancel: '/api/v1/billing/cancel',
 			resume: '/api/v1/billing/resume',
+			subscription: '/api/v1/billing/subscription',
 		},
 		projects: {
 			base: '/api/v1/projects',

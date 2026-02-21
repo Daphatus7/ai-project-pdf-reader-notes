@@ -746,12 +746,42 @@ class SupabaseStorage(Service):
             logger.error(f'Failed to update stripe fields for {user_id}: {e}')
             internal_error('Failed to update subscription')
 
+    async def get_subscription_status(self, user_id: str) -> dict:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('plan, subscription_status, plan_interval, current_period_end, cancel_at_period_end')
+                        .eq('id', user_id)
+                        .execute())
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f'Failed to get subscription status for {user_id}: {e}')
+            return {}
+
     async def downgrade_to_free(self, stripe_customer_id: str) -> None:
-        self.__database.table('profiles').update({
-            'plan': 'free',
-            'subscription_status': 'canceled',
-            'stripe_subscription_id': None,
-            'cancel_at_period_end': False,
-            'current_period_end': None,
-        }).eq('stripe_customer_id', stripe_customer_id).execute()
-        logger.info(f'Downgraded to free: stripe_customer={stripe_customer_id}')
+        try:
+            profile_resp = self.__database.table('profiles').update({
+                'plan': 'free',
+                'subscription_status': 'canceled',
+                'stripe_subscription_id': None,
+                'cancel_at_period_end': False,
+                'current_period_end': None,
+            }).eq('stripe_customer_id', stripe_customer_id).execute()
+            logger.info(f'Downgraded to free: stripe_customer={stripe_customer_id}')
+
+            if not profile_resp.data:
+                logger.warning(f'downgrade_to_free: no profile found for stripe_customer={stripe_customer_id}, skipping usage update')
+                return
+
+            user_id = profile_resp.data[0]['id']
+
+            # downgrade to usage limits of free plan
+            logger.info(f"downgrading usage limits to free plan quotas for user={user_id}")
+            resp = self.__database.table('user_usages').update({
+                'max_projects': get_plan_quotas('free')['max_projects'],
+                'max_documents': get_plan_quotas('free')['max_documents'],
+                'max_notes': get_plan_quotas('free')['max_notes'],
+                'max_tokens': get_plan_quotas('free')['max_tokens'],
+            }).eq('user_id', user_id).execute()
+            logger.info(f"result of usage limits downgrade for user={user_id}: {resp.data}")
+        except Exception as e:
+            logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')
