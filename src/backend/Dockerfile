@@ -5,18 +5,11 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # Install system dependencies needed for health checks
+# PDF/ML deps (libgl1, poppler-utils, tesseract-ocr) have moved to pdf_backend
 RUN apt-get update && apt-get install -y \
     curl \
-    libgl1 \
-    poppler-utils \
-    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
-# Layer 1: Heavy ML/PDF deps — rarely change, cached separately
-COPY src/backend/requirements-heavy.txt ./
-RUN pip install --no-cache-dir -r requirements-heavy.txt
-
-# Layer 2: Light deps — rebuild only this layer when changed
 COPY src/backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 

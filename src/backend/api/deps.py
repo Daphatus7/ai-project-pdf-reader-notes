@@ -56,17 +56,6 @@ def get_llm_service():
         logger.error(f'Failed to get LLM service: {e}')
         service_unavailable("LLM service")
 
-def get_rag_service():
-    """
-    
-    :return: 
-    """
-    try:
-        return services.get_service('rag_service')
-    except ValueError as e:
-        logger.error(f'Failed to get Rag service: {e}')
-        service_unavailable("RAG service")
-
 def get_database_service():
     """
 

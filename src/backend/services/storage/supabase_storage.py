@@ -210,6 +210,51 @@ class SupabaseStorage(Service):
 
     # ==================== Documents Operations ====================
 
+    async def upload_document(
+        self, user_id: str, project_id: str, document_name: str, file_data: bytes
+    ) -> dict:
+        """Create a document record and upload the PDF to Supabase Storage.
+        Returns the created document record (including its id).
+        Rolls back the DB record if storage upload fails.
+        """
+        try:
+            response = self.__database.table("documents").insert({
+                "user_id": user_id,
+                "project_id": project_id,
+                "document_name": document_name,
+                "document_dir": "",
+                "description": "",
+            }).execute()
+            if not response.data:
+                internal_error("Failed to create document record")
+            document = response.data[0]
+            document_id = document["id"]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to create document record: {e}")
+            internal_error("Failed to create document record")
+
+        storage_path = f"{user_id}/documents/{document_id}.pdf"
+        try:
+            self.__database.storage.from_("docs").upload(
+                path=storage_path,
+                file=file_data,
+                file_options={"content-type": "application/pdf"},
+            )
+            self.__database.table("documents").update(
+                {"document_dir": storage_path}
+            ).eq("id", document_id).execute()
+            logger.info(f"Document uploaded: user={user_id}, document={document_id}")
+            document["document_dir"] = storage_path
+            return document
+        except Exception as e:
+            self.__database.table("documents").delete().eq("id", document_id).execute()
+            logger.error(f"Storage upload failed, rolled back document record: {e}")
+            internal_error("Failed to upload document to storage")
+
+
+
     async def get_documents(self, user_id: str, project_id: str) -> list[dict]:
         try:
             project = self.__database.table('projects').select('id').eq('id', project_id).eq('user_id', user_id).execute()
