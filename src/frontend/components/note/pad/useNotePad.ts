@@ -6,6 +6,29 @@ import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'
 import { isQuotaError } from '@/frontend/features/quota/use-quota'
 
+// --- PDF export pipeline (unified + remark/rehype) ---
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import remarkRehype from 'remark-rehype'
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+import katexCss from 'katex/dist/katex.min.css?raw'
+
+// Convert markdown to HTML using the unified pipeline; rehype-katex handles math equations
+async function markdownToHtml(markdown: string): Promise<string> {
+	const file = await unified()
+		.use(remarkParse)
+		.use(remarkGfm)
+		.use(remarkMath)
+		.use(remarkRehype)
+		.use(rehypeKatex)
+		.use(rehypeStringify)
+		.process(markdown)
+	return String(file)
+}
+
 export type ViewMode = 'markdown' | 'editor'
 
 export function useNotePad() {
@@ -211,49 +234,133 @@ export function useNotePad() {
 		URL.revokeObjectURL(url)
 	}
 
-	function exportNoteAsPdf(id: string) {
+	async function exportNoteAsPdf(id: string) {
 		const note = notes.find(n => n.id === id)
 		if (!note) return
 
 		const title = note.title || 'Untitled'
+		const exportDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
 
-		// Use TipTap's rendered HTML for the active note, fall back to preformatted markdown
-		let bodyHtml: string
-		if (id === selectedNoteId && rendererRef.current) {
-			bodyHtml = rendererRef.current.getHtml()
-		} else {
-			const escaped = escapeHtml(note.content_markdown)
-			bodyHtml = `<pre style="white-space:pre-wrap;font-family:inherit">${escaped}</pre>`
-		}
+		// Always use the markdown source for a clean, library-rendered HTML (handles math, tables, GFM)
+		const content = id === selectedNoteId ? contentRef.current : note.content_markdown
+		const bodyHtml = await markdownToHtml(content)
 
 		const win = window.open('', '_blank')
 		if (!win) return
 
 		win.document.write(`<!DOCTYPE html>
-<html><head>
+<html lang="en"><head>
+  <meta charset="utf-8">
   <title>${escapeHtml(title)}</title>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:800px;margin:0 auto;padding:40px 32px;line-height:1.6;color:#1a1a1a}
-    h1{font-size:2em;border-bottom:1px solid #eee;padding-bottom:.3em;margin-top:0}
-    h2{font-size:1.5em;border-bottom:1px solid #eee;padding-bottom:.3em}
-    h3{font-size:1.25em}
-    code{background:#f6f8fa;padding:2px 5px;border-radius:3px;font-size:87.5%}
-    pre{background:#f6f8fa;padding:16px;border-radius:6px;overflow:auto}
-    pre code{background:transparent;padding:0}
-    blockquote{border-left:4px solid #d0d7de;margin:0;padding:0 16px;color:#57606a}
-    table{border-collapse:collapse;width:100%}
-    th,td{border:1px solid #d0d7de;padding:6px 13px}
-    th{background:#f6f8fa}
-    img{max-width:100%}
-    @media print{body{padding:0}}
+    /* KaTeX math styles (inlined from katex package) */
+    ${katexCss}
+
+    @page { size: A4; margin: 2.5cm 2cm 3cm; }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.65;
+      color: #1a1a1a;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Document title */
+    .doc-title {
+      font-size: 22pt;
+      font-weight: 700;
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 0.3em;
+      margin-bottom: 0.2em;
+    }
+    .doc-meta { font-size: 8.5pt; color: #6e7781; margin-bottom: 2em; }
+
+    /* Headings */
+    h1 { font-size: 17pt; font-weight: 700; margin: 1.4em 0 0.4em; break-after: avoid; }
+    h2 { font-size: 14pt; font-weight: 700; margin: 1.2em 0 0.35em; border-bottom: 1px solid #e8eaed; padding-bottom: 0.2em; break-after: avoid; }
+    h3 { font-size: 12pt; font-weight: 600; margin: 1em 0 0.3em; break-after: avoid; }
+    h4 { font-size: 10.5pt; font-weight: 600; margin: 0.8em 0 0.25em; break-after: avoid; }
+
+    p { margin: 0 0 0.8em; orphans: 3; widows: 3; }
+
+    /* Inline code */
+    code {
+      font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+      font-size: 8.5pt;
+      background: #f3f4f6;
+      border: 1px solid #e2e4e7;
+      border-radius: 3px;
+      padding: 1px 5px;
+    }
+
+    /* Code blocks */
+    pre {
+      font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.5;
+      background: #f3f4f6;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 12px 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 1em 0;
+      break-inside: avoid;
+    }
+    pre code { background: transparent; border: none; padding: 0; }
+
+    blockquote {
+      border-left: 4px solid #d0d7de;
+      padding: 0.4em 1em;
+      margin: 1em 0;
+      color: #57606a;
+      break-inside: avoid;
+    }
+
+    ul, ol { margin: 0.6em 0; padding-left: 1.5em; }
+    li { margin: 0.2em 0; }
+    li > ul, li > ol { margin: 0.2em 0; }
+
+    /* GFM task lists (remark-gfm outputs .contains-task-list / .task-list-item) */
+    ul.contains-task-list { list-style: none; padding-left: 0.25em; }
+    li.task-list-item { display: flex; align-items: flex-start; gap: 0.5em; }
+    li.task-list-item input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
+    li.task-list-item:has(input:checked) { color: #6e7781; text-decoration: line-through; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+      font-size: 9.5pt;
+      break-inside: avoid;
+    }
+    th, td { border: 1px solid #d0d7de; padding: 7px 12px; text-align: left; }
+    th { background: #f6f8fa; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+
+    img { max-width: 100%; height: auto; break-inside: avoid; display: block; margin: 0.75em 0; }
+
+    hr { border: none; border-top: 1px solid #d0d7de; margin: 1.5em 0; }
+
+    a { color: #0969da; text-decoration: underline; }
+
+    mark { background: #fff3b0; padding: 1px 2px; border-radius: 2px; }
+
+    /* KaTeX block math centering */
+    .math-display { text-align: center; margin: 1em 0; overflow-x: auto; }
   </style>
 </head><body>
-  <h1>${escapeHtml(title)}</h1>
+  <p class="doc-title">${escapeHtml(title)}</p>
+  <p class="doc-meta">Exported on ${exportDate}</p>
   ${bodyHtml}
+  <script>window.onload = function () { window.print(); }<\/script>
 </body></html>`)
 		win.document.close()
-		win.focus()
-		win.print()
 	}
 
 	function reorderNotes(dragIndex: number, hoverIndex: number) {
