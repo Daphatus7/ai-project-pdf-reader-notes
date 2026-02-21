@@ -1,5 +1,2 @@
-chonkie[neural]>=1.0.0
-unstructured[pdf]>=0.16.0
-unstructured
-langchain>=1.2.0
-langchain-openai>=1.1.0
+# PDF processing dependencies have moved to src/pdf_backend/requirements.txt
+# This file is kept as a placeholder.

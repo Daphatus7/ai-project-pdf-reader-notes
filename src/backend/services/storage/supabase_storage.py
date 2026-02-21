@@ -12,6 +12,7 @@ from supabase import create_client, Client
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 from src.backend.config.config import settings
+from src.backend.config.plans import get_plan_quotas
 from src.backend.schemas.error import (
     AppError, not_found, conflict, internal_error, quota_exceeded,
 )
@@ -105,42 +106,34 @@ class SupabaseStorage(Service):
     # ==================== Quota Enforcement ====================
 
     async def enforce_quota(self, user_id: str, resource: str) -> bool:
-        """Check plan, atomically increment quota. Raises AppError(429) if exceeded.
-        Returns True if counter was incremented (free plan), False otherwise."""
+        """Check plan quotas from plan JSON, atomically increment. Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return False
-        limits = {
-            'project_count': settings.free_max_projects,
-            'doc_count': settings.free_max_documents,
-            'note_count': settings.free_max_notes,
+        quotas = get_plan_quotas(plan)
+        resource_map = {
+            'project_count': ('max_projects',  'projects'),
+            'doc_count':     ('max_documents', 'documents'),
+            'note_count':    ('max_notes',     'notes'),
         }
-        limit = limits[resource]
+        quota_key, display_name = resource_map[resource]
+        limit = quotas[quota_key]
         result = await self.check_and_increment_usage(user_id, resource, limit)
         if not result['allowed']:
-            resource_names = {
-                'project_count': 'projects',
-                'doc_count': 'documents',
-                'note_count': 'notes',
-            }
-            quota_exceeded(resource_names[resource], result['current'], limit)
+            quota_exceeded(display_name, result['current'], limit)
         return True
 
     async def enforce_token_quota(self, user_id: str):
         """Check token quota (read-only, no increment). Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return
-        result = await self.check_token_limit(user_id, settings.free_max_tokens)
+        quotas = get_plan_quotas(plan)
+        limit = quotas['max_tokens']
+        result = await self.check_token_limit(user_id, limit)
         if not result['allowed']:
-            quota_exceeded('tokens', result['current'], settings.free_max_tokens)
+            quota_exceeded('tokens', result['current'], limit)
 
     async def track_token_usage(self, user_id: str, tokens: int):
-        """Increment token usage if on free plan and tokens > 0."""
+        """Increment token usage for all plans."""
         if tokens and tokens > 0:
-            plan = await self.get_user_plan(user_id)
-            if plan == 'free':
-                await self.increment_token_usage(user_id, tokens)
+            await self.increment_token_usage(user_id, tokens)
 
     # ==================== Projects Operations ====================
 
@@ -216,6 +209,51 @@ class SupabaseStorage(Service):
             internal_error('Failed to delete project')
 
     # ==================== Documents Operations ====================
+
+    async def upload_document(
+        self, user_id: str, project_id: str, document_name: str, file_data: bytes
+    ) -> dict:
+        """Create a document record and upload the PDF to Supabase Storage.
+        Returns the created document record (including its id).
+        Rolls back the DB record if storage upload fails.
+        """
+        try:
+            response = self.__database.table("documents").insert({
+                "user_id": user_id,
+                "project_id": project_id,
+                "document_name": document_name,
+                "document_dir": "",
+                "description": "",
+            }).execute()
+            if not response.data:
+                internal_error("Failed to create document record")
+            document = response.data[0]
+            document_id = document["id"]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to create document record: {e}")
+            internal_error("Failed to create document record")
+
+        storage_path = f"{user_id}/documents/{document_id}.pdf"
+        try:
+            self.__database.storage.from_("docs").upload(
+                path=storage_path,
+                file=file_data,
+                file_options={"content-type": "application/pdf"},
+            )
+            self.__database.table("documents").update(
+                {"document_dir": storage_path}
+            ).eq("id", document_id).execute()
+            logger.info(f"Document uploaded: user={user_id}, document={document_id}")
+            document["document_dir"] = storage_path
+            return document
+        except Exception as e:
+            self.__database.table("documents").delete().eq("id", document_id).execute()
+            logger.error(f"Storage upload failed, rolled back document record: {e}")
+            internal_error("Failed to upload document to storage")
+
+
 
     async def get_documents(self, user_id: str, project_id: str) -> list[dict]:
         try:
@@ -716,3 +754,70 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to get usage for {user_id}: {e}')
             return {'project_count': 0, 'doc_count': 0, 'note_count': 0, 'token_used': 0}
+
+    # ==================== Stripe / Subscription Operations ====================
+
+    async def get_stripe_customer_id(self, user_id: str) -> str | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('stripe_customer_id')
+                        .eq('id', user_id)
+                        .execute())
+            if response.data:
+                return response.data[0].get('stripe_customer_id')
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get stripe_customer_id for {user_id}: {e}')
+            return None
+
+    async def get_profile_by_stripe_customer(self, stripe_customer_id: str) -> dict | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('id, stripe_customer_id, stripe_subscription_id, subscription_status, plan, current_period_end')
+                        .eq('stripe_customer_id', stripe_customer_id)
+                        .execute())
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get profile for stripe_customer {stripe_customer_id}: {e}')
+            return None
+
+    async def update_profile_stripe(self, user_id: str, **fields) -> None:
+        try:
+            self.__database.table('profiles').update(fields).eq('id', user_id).execute()
+            logger.info(f'Updated stripe fields for user {user_id}: {list(fields.keys())}')
+        except Exception as e:
+            logger.error(f'Failed to update stripe fields for {user_id}: {e}')
+            internal_error('Failed to update subscription')
+
+    async def get_subscription_status(self, user_id: str) -> dict:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('plan, subscription_status, plan_interval, current_period_end, cancel_at_period_end')
+                        .eq('id', user_id)
+                        .execute())
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f'Failed to get subscription status for {user_id}: {e}')
+            return {}
+
+    async def downgrade_to_free(self, stripe_customer_id: str) -> None:
+        try:
+            profile_resp = self.__database.table('profiles').update({
+                'plan': 'free',
+                'subscription_status': 'canceled',
+                'stripe_subscription_id': None,
+                'cancel_at_period_end': False,
+                'current_period_end': None,
+            }).eq('stripe_customer_id', stripe_customer_id).execute()
+            logger.info(f'Downgraded to free: stripe_customer={stripe_customer_id}')
+
+            if not profile_resp.data:
+                logger.warning(f'downgrade_to_free: no profile found for stripe_customer={stripe_customer_id}, skipping usage update')
+                return
+
+            user_id = profile_resp.data[0]['id']
+            logger.info(f"downgrade complete for user={user_id}, quotas enforced via plan config")
+        except Exception as e:
+            logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')

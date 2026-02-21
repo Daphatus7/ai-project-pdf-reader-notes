@@ -39,7 +39,6 @@ interface SourcePanelProps {
 	onOpenDocument: (documentId: string) => void;
 	isLoadingDocument?: boolean;
 	canUploadDocument?: boolean;
-	documentUsageLabel?: string;
 	onDocumentChange?: () => void;
 	onSourceSelectionChange?: (selectedIds: string[]) => void;
 }
@@ -51,7 +50,6 @@ export function SourcePanel({
 	onOpenDocument,
 	isLoadingDocument,
 	canUploadDocument = true,
-	documentUsageLabel,
 	onDocumentChange,
 	onSourceSelectionChange,
 }: SourcePanelProps) {
@@ -86,10 +84,7 @@ export function SourcePanel({
 					{projectName}
 				</span>
 				<div className="flex items-center gap-2">
-					{documentUsageLabel && (
-						<span className="text-xs text-muted-foreground">{documentUsageLabel}</span>
-					)}
-					<Button
+	<Button
 						variant="ghost"
 						size="sm"
 						onClick={onBack}

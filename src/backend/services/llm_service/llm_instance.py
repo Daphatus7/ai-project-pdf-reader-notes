@@ -384,9 +384,10 @@ class LlmAgent:
 
 
         # Get token counts from usage_metadata
-        input_tokens = ai_msg.usage_metadata.get('input_tokens', 0)
+        usage = ai_msg.usage_metadata or {}
+        input_tokens = usage.get('input_tokens', 0)
         logging.info(f"input tokens: {input_tokens}")
-        output_tokens = ai_msg.usage_metadata.get('output_tokens', 0)
+        output_tokens = usage.get('output_tokens', 0)
         logging.info(f"output tokens: {output_tokens}")
 
         self._conversation_storage.refresh_ttl(request.thread_id)

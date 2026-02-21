@@ -1,0 +1,12 @@
+{
+  "_comment": "Free plan — source of truth for quota limits.",
+
+  "plan_id": "free",
+
+  "quotas": {
+    "max_projects":  2,
+    "max_documents": 4,
+    "max_notes":     10,
+    "max_tokens":    100000
+  }
+}

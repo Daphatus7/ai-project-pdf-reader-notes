@@ -77,17 +77,6 @@ export function ManagementPanel({
 		setActiveView('sources');
 	}, []);
 
-	// Build usage label
-	const projectUsage = quota.getUsage('projects');
-	const projectUsageLabel = projectUsage && projectUsage.limit !== -1
-		? `${projectUsage.current}/${projectUsage.limit}`
-		: undefined;
-
-	const docUsage = quota.getUsage('documents');
-	const docUsageLabel = docUsage && docUsage.limit !== -1
-		? `${docUsage.current}/${docUsage.limit}`
-		: undefined;
-
 	// Route to the active panel
 	if (activeView === 'reader' && currentDocumentUrl) {
 		return (
@@ -110,7 +99,6 @@ export function ManagementPanel({
 				onOpenDocument={handleOpenDocument}
 				isLoadingDocument={isLoadingDocument}
 				canUploadDocument={quota.canCreate('documents')}
-				documentUsageLabel={docUsageLabel}
 				onDocumentChange={quota.refresh}
 				onSourceSelectionChange={onSourceSelectionChange}
 			/>
@@ -123,7 +111,7 @@ export function ManagementPanel({
 			isLoading={project.isLoadingProjects}
 			error={project.error}
 			canCreateProject={quota.canCreate('projects')}
-			projectUsageLabel={projectUsageLabel}
+			plan={quota.quota?.plan}
 			onOpenProject={handleOpenProject}
 			onCreateProject={handleCreateProject}
 			onDeleteProject={handleDeleteProject}

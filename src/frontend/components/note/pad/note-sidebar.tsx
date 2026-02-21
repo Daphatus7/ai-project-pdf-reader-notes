@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { ScrollArea } from '@/frontend/components/ui/scroll-area.tsx'
 import { Input } from '@/frontend/components/ui/input.tsx'
-import { Sidebar as LucideSidebar, Plus, Crown, MoreVertical, EditIcon, Trash2 } from 'lucide-react'
+import { Sidebar as LucideSidebar, Plus, Crown, MoreVertical, EditIcon, Trash2, FileDown, Printer } from 'lucide-react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,11 +17,12 @@ interface NoteSidebarProps {
 	notes: Note[]
 	selectedNoteId: string
 	canCreateNote?: boolean
-	noteUsageLabel?: string
 	onSelectNote: (id: string) => void
 	onAddNote: () => void
 	onDeleteNote: (id: string) => void
 	onRenameNote: (id: string, title: string) => void
+	onExportMarkdown: (id: string) => void
+	onExportPdf: (id: string) => void
 	onClose: () => void
 }
 
@@ -29,11 +30,12 @@ export function NoteSidebar({
 	notes,
 	selectedNoteId,
 	canCreateNote = true,
-	noteUsageLabel,
 	onSelectNote,
 	onAddNote,
 	onDeleteNote,
 	onRenameNote,
+	onExportMarkdown,
+	onExportPdf,
 	onClose,
 }: NoteSidebarProps) {
 	const [pricingOpen, setPricingOpen] = useState(false)
@@ -50,10 +52,7 @@ export function NoteSidebar({
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
 			<div className="p-3 border-b flex items-center justify-between h-13">
 				<span className="text-sm font-medium">Notes</span>
-				{noteUsageLabel && (
-					<span className="text-xs text-muted-foreground">{noteUsageLabel}</span>
-				)}
-				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+	<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />
 				</Button>
 			</div>
@@ -78,6 +77,8 @@ export function NoteSidebar({
 							onSelect={() => onSelectNote(note.id)}
 							onDelete={() => onDeleteNote(note.id)}
 							onRename={(title) => onRenameNote(note.id, title)}
+							onExportMarkdown={() => onExportMarkdown(note.id)}
+							onExportPdf={() => onExportPdf(note.id)}
 						/>
 					))}
 				</div>
@@ -94,9 +95,11 @@ interface NoteItemProps {
 	onSelect: () => void
 	onDelete: () => void
 	onRename: (title: string) => void
+	onExportMarkdown: () => void
+	onExportPdf: () => void
 }
 
-function NoteItem({ note, isActive, onSelect, onDelete, onRename }: NoteItemProps) {
+function NoteItem({ note, isActive, onSelect, onDelete, onRename, onExportMarkdown, onExportPdf }: NoteItemProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [editValue, setEditValue] = useState(note.title)
 
@@ -164,6 +167,25 @@ function NoteItem({ note, isActive, onSelect, onDelete, onRename }: NoteItemProp
 					>
 						<EditIcon className="w-4 h-4 mr-2" />
 						Rename
+					</DropdownMenuItem>
+					{/* Export actions */}
+					<DropdownMenuItem
+						onClick={(e) => {
+							e.stopPropagation()
+							onExportMarkdown()
+						}}
+					>
+						<FileDown className="w-4 h-4 mr-2" />
+						Export as Markdown
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={(e) => {
+							e.stopPropagation()
+							onExportPdf()
+						}}
+					>
+						<Printer className="w-4 h-4 mr-2" />
+						Export as PDF
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						variant="destructive"

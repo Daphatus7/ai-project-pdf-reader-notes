@@ -4,6 +4,10 @@ FastAPI application entry point for LLM backend service
 import dotenv
 dotenv.load_dotenv()
 
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -16,6 +20,17 @@ from src.backend.servers import services
 from src.backend.config.config import settings
 from src.backend.api import v1_router
 from src.backend.schemas.error import AppError
+
+if settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        integrations=[
+            StarletteIntegration(),
+            FastApiIntegration(),
+        ],
+        traces_sample_rate=0.1,   # 10% of requests for performance tracing
+        send_default_pii=False,   # don't attach user IP / email automatically
+    )
 
 # Configure logging
 logging.basicConfig(
@@ -107,6 +122,7 @@ async def app_error_handler(request, exc: AppError):
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    sentry_sdk.capture_exception(exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error", "code": "INTERNAL_ERROR"}
