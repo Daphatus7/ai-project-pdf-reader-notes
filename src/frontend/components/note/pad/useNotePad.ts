@@ -188,6 +188,74 @@ export function useNotePad() {
 		}
 	}
 
+	// --- Export ---
+
+	// Escape special HTML characters to prevent injection in the print window
+	function escapeHtml(s: string) {
+		return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+	}
+
+	function exportNoteAsMarkdown(id: string) {
+		const note = notes.find(n => n.id === id)
+		if (!note) return
+
+		const content = id === selectedNoteId ? contentRef.current : note.content_markdown
+		const filename = `${note.title || 'Untitled'}.md`
+
+		const blob = new Blob([content], { type: 'text/markdown' })
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement('a')
+		a.href = url
+		a.download = filename
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
+	function exportNoteAsPdf(id: string) {
+		const note = notes.find(n => n.id === id)
+		if (!note) return
+
+		const title = note.title || 'Untitled'
+
+		// Use TipTap's rendered HTML for the active note, fall back to preformatted markdown
+		let bodyHtml: string
+		if (id === selectedNoteId && rendererRef.current) {
+			bodyHtml = rendererRef.current.getHtml()
+		} else {
+			const escaped = escapeHtml(note.content_markdown)
+			bodyHtml = `<pre style="white-space:pre-wrap;font-family:inherit">${escaped}</pre>`
+		}
+
+		const win = window.open('', '_blank')
+		if (!win) return
+
+		win.document.write(`<!DOCTYPE html>
+<html><head>
+  <title>${escapeHtml(title)}</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:800px;margin:0 auto;padding:40px 32px;line-height:1.6;color:#1a1a1a}
+    h1{font-size:2em;border-bottom:1px solid #eee;padding-bottom:.3em;margin-top:0}
+    h2{font-size:1.5em;border-bottom:1px solid #eee;padding-bottom:.3em}
+    h3{font-size:1.25em}
+    code{background:#f6f8fa;padding:2px 5px;border-radius:3px;font-size:87.5%}
+    pre{background:#f6f8fa;padding:16px;border-radius:6px;overflow:auto}
+    pre code{background:transparent;padding:0}
+    blockquote{border-left:4px solid #d0d7de;margin:0;padding:0 16px;color:#57606a}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #d0d7de;padding:6px 13px}
+    th{background:#f6f8fa}
+    img{max-width:100%}
+    @media print{body{padding:0}}
+  </style>
+</head><body>
+  <h1>${escapeHtml(title)}</h1>
+  ${bodyHtml}
+</body></html>`)
+		win.document.close()
+		win.focus()
+		win.print()
+	}
+
 	function reorderNotes(dragIndex: number, hoverIndex: number) {
 		setNotes(prev => {
 			const updated = [...prev]
@@ -237,6 +305,8 @@ export function useNotePad() {
 		deleteNote,
 		renameNote,
 		reorderNotes,
+		exportNoteAsMarkdown,
+		exportNoteAsPdf,
 
 		// Imperative handle
 		insertContent,

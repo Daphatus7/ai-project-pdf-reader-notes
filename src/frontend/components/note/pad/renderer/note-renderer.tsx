@@ -22,6 +22,7 @@ import 'katex/dist/katex.min.css'
 export interface NoteRendererHandle {
 	insertContent: (content: ContentInsertion, position: 'cursor' | 'end') => void
 	getMarkdown: () => string
+	getHtml: () => string
 	focus: () => void
 }
 
@@ -183,6 +184,7 @@ export const NoteRenderer = forwardRef<NoteRendererHandle, NoteRendererProps>(
 				}
 			},
 			getMarkdown: () => editor?.getMarkdown() ?? '',
+			getHtml: () => editor?.getHTML() ?? '',
 			focus: () => {
 				editor?.commands.focus()
 			},

@@ -93,6 +93,8 @@ useImperativeHandle(ref, () => ({
 						onAddNote={pad.addNote}
 						onDeleteNote={pad.deleteNote}
 						onRenameNote={pad.renameNote}
+						onExportMarkdown={pad.exportNoteAsMarkdown}
+						onExportPdf={pad.exportNoteAsPdf}
 						onClose={() => setShowSidebar(false)}
 					/>
 				)}
