@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button.tsx";
 import {
-	Settings,
 	User,
 	LogIn,
 	LogOut,
-	CreditCard, LucideMail
+	CreditCard
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -39,7 +38,7 @@ export function Header() {
 	};
 
 	return (
-		<header className=" backdrop-blur px-6 py-2 flex items-center justify-between ml-2 mr-2">
+		<header className=" backdrop-blur px-6 py-2 flex items-center justify-between ml-1 mr-1">
 			<div className="flex items-center gap-2 ml-2"
 			>
 				<img src="/logo.svg" alt="Atlas Notebook AI Logo" className="h-8" />
