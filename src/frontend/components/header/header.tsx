@@ -63,30 +63,30 @@ export function Header() {
 					</Button>
 				)}
 
-				<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Contact support">
-					<LucideMail className="w-4 h-4 mr-2" />
-				</Button>
+				{/*<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Contact support">*/}
+				{/*	<LucideMail className="w-4 h-4 mr-2" />*/}
+				{/*</Button>*/}
 				
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon" className="h-8 w-8">
-							<Settings className="w-4 h-4 " />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Settings</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							API Key Configuration
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							Preferences
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							Export Settings
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				{/*<DropdownMenu>*/}
+				{/*	<DropdownMenuTrigger asChild>*/}
+				{/*		<Button variant="ghost" size="icon" className="h-8 w-8">*/}
+				{/*			<Settings className="w-4 h-4 " />*/}
+				{/*		</Button>*/}
+				{/*	</DropdownMenuTrigger>*/}
+				{/*	<DropdownMenuContent align="end">*/}
+				{/*		<DropdownMenuLabel>Settings</DropdownMenuLabel>*/}
+				{/*		<DropdownMenuSeparator />*/}
+				{/*		<DropdownMenuItem>*/}
+				{/*			API Key Configuration*/}
+				{/*		</DropdownMenuItem>*/}
+				{/*		<DropdownMenuItem>*/}
+				{/*			Preferences*/}
+				{/*		</DropdownMenuItem>*/}
+				{/*		<DropdownMenuItem>*/}
+				{/*			Export Settings*/}
+				{/*		</DropdownMenuItem>*/}
+				{/*	</DropdownMenuContent>*/}
+				{/*</DropdownMenu>*/}
 
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -100,7 +100,7 @@ export function Header() {
 								<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={() => setSubscriptionOpen(true)}>
-									Profile Settings
+									Manage Subscription
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogout}>
