@@ -45,11 +45,15 @@ class ConversationStorage:
         return self._redis_storage.refresh_thread_ttl(thread_id)
 
     def thread_in_redis(self, thread_id: str) -> bool:
-        """Check if thread exists in Redis."""
+        """Check if thread exists in Redis. Returns False on any Redis failure (graceful degradation)."""
         if not self._redis_storage:
             logger.error("|----- No storage service configured, cannot check Redis")
             return False
-        return self._redis_storage.thread_exists_in_redis(thread_id)
+        try:
+            return self._redis_storage.thread_exists_in_redis(thread_id)
+        except Exception as e:
+            logger.error("Redis check failed for thread %s, treating as cold start: %s", thread_id, e)
+            return False
 
     async def thread_in_supabase(self, thread_id: str) -> bool:
         """Check if thread exists in Supabase."""

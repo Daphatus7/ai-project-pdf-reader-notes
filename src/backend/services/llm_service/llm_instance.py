@@ -146,42 +146,34 @@ def log_state(state: AgentState, runtime: Runtime) -> None:
         print(f"{key}: {value}")
     return None
 
-@before_model
-def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-    """Keep only the last few messages to fit context window.
+def _trim_messages_logic(messages: list, max_messages: int = 3) -> dict[str, Any] | None:
+    """Pure trimming logic — keeps the system message plus the most recent messages.
 
-    IMPORTANT: Preserves tool_calls and tool response pairs to avoid OpenAI API errors.
+    Extracted from the @before_model wrapper so it can be unit-tested directly.
+    Preserves AIMessage(tool_calls) / ToolMessage pairs to prevent OpenAI API errors.
     """
-    messages = state["messages"]
-    max_messages = 3  # Keep last N messages (adjustable)
-
     if len(messages) <= max_messages:
-        return None  # No changes needed
+        return None
 
-    first_msg = messages[0]  # Keep system message
+    first_msg = messages[0]  # Always preserve the system message
 
-    # Find a safe cut point that doesn't break tool call pairs
-    # Start from where we want to cut and move forward until we find a safe point
+    # Walk forward from the desired cut point until we land on a safe boundary
     cut_index = len(messages) - max_messages
 
-    # Move cut_index forward if it would split a tool call sequence
     while cut_index < len(messages) - 1:
         msg = messages[cut_index]
-        # Check if this message is a tool response (ToolMessage)
-        # If so, we need to include the preceding AIMessage with tool_calls
+        # Never start a cut at a ToolMessage; pull back to include its AIMessage
         if msg.__class__.__name__ == "ToolMessage":
             cut_index -= 1
             continue
-        # Check if previous message has tool_calls that we'd be cutting off
+        # Never cut between an AIMessage-with-tool_calls and its ToolMessage response
         if cut_index > 0:
             prev_msg = messages[cut_index - 1]
             if hasattr(prev_msg, "tool_calls") and prev_msg.tool_calls:
-                # Previous message has tool_calls, check if current is its response
                 cut_index += 1
                 continue
         break
 
-    # Ensure we don't cut too much
     if cut_index >= len(messages) - 2:
         return None  # Not safe to trim
 
@@ -194,6 +186,15 @@ def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
             *new_messages
         ]
     }
+
+
+@before_model
+def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
+    """Middleware hook: trim message history before each model call.
+
+    Delegates to _trim_messages_logic — unit-test that function directly.
+    """
+    return _trim_messages_logic(state["messages"])
 
 def _should_send_structured_update(chunk_count: int, text: str) -> bool:
     """Check if we should send a structured update."""

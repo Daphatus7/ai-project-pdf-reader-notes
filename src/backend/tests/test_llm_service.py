@@ -1,19 +1,23 @@
 """
-LLM Service Test Suite — 36 tests
+LLM Service Test Suite — 41 tests
 
 Run: pytest src/backend/tests/test_llm_service.py -v
 
 Sections:
-  1.  Unit tests         — pure functions, no external deps  (tests  1-11)
-  2.  Integration tests  — mocked Redis / Supabase / OpenAI  (tests 12-22)
-  3.  Concurrency tests  — multi-user parallel access         (tests 23-26)
-  4.  Security tests     — auth, quota, data isolation        (tests 27-30)
-  5.  Edge case tests    — boundary conditions                (tests 31-34)
-  6.  Fault tolerance    — graceful degradation               (tests 35-36)
+  1.  Unit tests           — pure functions, no external deps        (tests  1-11)
+  2.  Integration tests    — mocked Redis / Supabase / OpenAI        (tests 12-22)
+  3.  Concurrency tests    — multi-user parallel access              (tests 23-27)
+  4.  Security tests       — auth, quota, data isolation             (tests 28-31)
+  5.  Edge case tests      — boundary conditions                     (tests 32-35)
+  6.  Fault tolerance      — graceful degradation                    (tests 36-37)
+  7.  Full-chain tests     — end-to-end LlmAgent.chat() flow         (tests 38-39)
+  8.  Negative path tests  — failure and error propagation           (tests 40-41)
 """
 
 import asyncio
+import time
 from typing import Any
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -32,8 +36,8 @@ from src.backend.services.llm_service.llm_instance import (
     _build_human_message,
     _extract_text,
     _sanitize_text,
+    _trim_messages_logic,   # pure function — no decorator unwrapping needed
     make_retriever_tool,
-    trim_messages,
     LlmAgent,
 )
 
@@ -42,9 +46,18 @@ from src.backend.services.llm_service.llm_instance import (
 # Shared helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _raw(fn: Any) -> Any:
-    """Return the unwrapped function (handles @before_model decorator)."""
-    return getattr(fn, "__wrapped__", fn)
+def _make_ai_message(
+    content: str, input_tokens: int = 5, output_tokens: int = 10
+) -> AIMessage:
+    """Build an AIMessage with complete usage_metadata (all three fields required)."""
+    return AIMessage(
+        content=content,
+        usage_metadata={
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": input_tokens + output_tokens,
+        },
+    )
 
 
 def _make_conv_storage(
@@ -73,23 +86,20 @@ def _make_agent(
     mock_embeddings: Any,
     mock_openai: Any,
     user_responses: dict | None = None,
+    invoke_delay: float = 0.0,
 ) -> tuple["LlmAgent", MagicMock]:
     """Construct a LlmAgent where agent.invoke is mocked per-user.
 
-    Returns (agent, mock_agent_obj) so callers can override invoke behavior.
+    invoke_delay: seconds of blocking sleep inside the mock (0 = instant).
+    Returns (agent, mock_agent_obj).
     """
 
     def _invoke(messages: Any, config: Any) -> dict:
+        if invoke_delay > 0:
+            time.sleep(invoke_delay)  # Simulate blocking IO — runs in thread pool via run_in_executor
         uid = config["configurable"].get("user_id", "unknown")
         text = (user_responses or {}).get(uid, f"response-for-{uid}")
-        return {
-            "messages": [
-                AIMessage(
-                    content=text,
-                    usage_metadata={"input_tokens": 5, "output_tokens": 10, "total_tokens": 15},
-                )
-            ]
-        }
+        return {"messages": [_make_ai_message(text)]}
 
     mock_agent_obj = MagicMock()
     mock_agent_obj.invoke = MagicMock(side_effect=_invoke)
@@ -101,6 +111,7 @@ def _make_agent(
     mock_redis = MagicMock()
     mock_redis.checkpointer = MagicMock()
 
+    # Replace storage layer with a clean mock to keep tests focused on the agent logic
     mock_conv = MagicMock()
     mock_conv.cold_start_load = AsyncMock(return_value=None)
     mock_conv.refresh_ttl = MagicMock()
@@ -189,12 +200,14 @@ class TestSanitizeText:
 
 
 class TestTrimMessages:
-    """Tests 7-9: trim_messages() context-window middleware."""
+    """Tests 7-9: _trim_messages_logic() context-window trimming.
+
+    Tests call _trim_messages_logic directly — no decorator unwrapping needed.
+    """
 
     def _call(self, messages: list) -> Any:
-        """Invoke the trim function directly, bypassing the @before_model wrapper."""
-        fn = _raw(trim_messages)
-        return fn({"messages": messages}, MagicMock())
+        """Call the pure trim logic directly."""
+        return _trim_messages_logic(messages)
 
     def test_7_under_limit_no_change(self) -> None:
         """Fewer than max messages → returns None (no trimming needed)."""
@@ -212,7 +225,7 @@ class TestTrimMessages:
         assert len(result["messages"]) < len(msgs)
 
     def test_9_preserves_tool_call_pair(self) -> None:
-        """trim_messages never splits an AIMessage(tool_call) / ToolMessage pair."""
+        """_trim_messages_logic never splits an AIMessage(tool_call) / ToolMessage pair."""
         system = SystemMessage(content="sys")
         human1 = HumanMessage(content="q1")
         ai_tool = AIMessage(
@@ -385,11 +398,7 @@ class TestChatConfigBuilding:
 
         def _invoke(messages: Any, config: Any) -> dict:
             captured.append(config)
-            return {
-                "messages": [
-                    AIMessage(content="ok", usage_metadata={"input_tokens": 5, "output_tokens": 5, "total_tokens": 10})
-                ]
-            }
+            return {"messages": [_make_ai_message("ok")]}
 
         agent, mock_agent_obj = _make_agent(mock_create_agent, _emb, _oai)
         mock_agent_obj.invoke = MagicMock(side_effect=_invoke)
@@ -411,11 +420,11 @@ class TestChatConfigBuilding:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 3 — Concurrency tests  (tests 23-26)
+# SECTION 3 — Concurrency tests  (tests 23-27)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestConcurrency:
-    """Tests 23-26: multiple users sending requests in parallel."""
+    """Tests 23-27: multiple users sending requests in parallel."""
 
     @pytest.mark.asyncio
     @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
@@ -447,29 +456,61 @@ class TestConcurrency:
     @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
     @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
     @patch("src.backend.services.llm_service.llm_instance.create_agent")
-    async def test_24_50_concurrent_requests_95pct_success(
+    async def test_24_concurrent_requests_all_succeed(
         self, mock_ca: Any, _emb: Any, _oai: Any
     ) -> None:
-        """50 concurrent requests complete with ≥ 95 % success rate."""
+        """10 concurrent requests all succeed — zero failures expected with a healthy mock."""
         agent, _ = _make_agent(mock_ca, _emb, _oai)
 
         reqs = [
             ChatRequest(user_id=f"u{i}", thread_id=f"t{i}", project_id="p1",
                         content=[{"type": "text", "text": "hello"}])
-            for i in range(50)
+            for i in range(10)
         ]
         results = await asyncio.gather(*[agent.chat(r) for r in reqs], return_exceptions=True)
         errors = [r for r in results if isinstance(r, Exception)]
-        success_rate = 1 - len(errors) / len(results)
-        assert success_rate >= 0.95, (
-            f"Success rate {success_rate:.0%} < 95%. Errors: {errors[:3]}"
+        assert not errors, f"All requests should succeed; got errors: {errors}"
+
+    @pytest.mark.asyncio
+    @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
+    @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
+    @patch("src.backend.services.llm_service.llm_instance.create_agent")
+    async def test_25_blocking_calls_run_in_parallel_not_sequentially(
+        self, mock_ca: Any, _emb: Any, _oai: Any
+    ) -> None:
+        """run_in_executor genuinely parallelises blocking IO: N×50ms tasks finish in ~50ms."""
+        DELAY = 0.05   # Each invoke blocks the thread for 50 ms
+        N = 5
+
+        # invoke_delay causes time.sleep inside the mock — runs in thread pool
+        agent, _ = _make_agent(mock_ca, _emb, _oai, invoke_delay=DELAY)
+
+        reqs = [
+            ChatRequest(user_id=f"u{i}", thread_id=f"t{i}", project_id="p1",
+                        content=[{"type": "text", "text": "hi"}])
+            for i in range(N)
+        ]
+
+        start = time.perf_counter()
+        results = await asyncio.gather(*[agent.chat(r) for r in reqs], return_exceptions=True)
+        elapsed = time.perf_counter() - start
+
+        errors = [r for r in results if isinstance(r, Exception)]
+        assert not errors, f"Unexpected errors: {errors}"
+
+        # Sequential would take N × DELAY = 250 ms; parallel should be ~50 ms.
+        # Allow generous 3× overhead — still well under half the sequential budget.
+        sequential_budget = N * DELAY
+        assert elapsed < sequential_budget / 2, (
+            f"Requests appear sequential: elapsed={elapsed:.3f}s, "
+            f"sequential_budget/2={sequential_budget/2:.3f}s"
         )
 
     @pytest.mark.asyncio
     @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
     @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
     @patch("src.backend.services.llm_service.llm_instance.create_agent")
-    async def test_25_same_user_two_threads_both_answered(
+    async def test_26_same_user_two_threads_both_answered(
         self, mock_ca: Any, _emb: Any, _oai: Any
     ) -> None:
         """Same user, two different thread IDs → both requests complete successfully."""
@@ -487,7 +528,7 @@ class TestConcurrency:
     @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
     @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
     @patch("src.backend.services.llm_service.llm_instance.create_agent")
-    async def test_26_each_request_uses_own_thread_id(
+    async def test_27_each_request_uses_own_thread_id(
         self, mock_ca: Any, _emb: Any, _oai: Any
     ) -> None:
         """agent.invoke is called with the requesting user's thread_id, never another user's."""
@@ -495,11 +536,7 @@ class TestConcurrency:
 
         def _invoke(messages: Any, config: Any) -> dict:
             captured_threads.append(config["configurable"]["thread_id"])
-            return {
-                "messages": [
-                    AIMessage(content="ok", usage_metadata={"input_tokens": 2, "output_tokens": 2, "total_tokens": 4})
-                ]
-            }
+            return {"messages": [_make_ai_message("ok", 2, 2)]}
 
         agent, mock_agent_obj = _make_agent(mock_ca, _emb, _oai)
         mock_agent_obj.invoke = MagicMock(side_effect=_invoke)
@@ -516,14 +553,14 @@ class TestConcurrency:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 4 — Security tests  (tests 27-30)
+# SECTION 4 — Security tests  (tests 28-31)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestSecurity:
-    """Tests 27-30: authentication, quota enforcement, and data isolation."""
+    """Tests 28-31: authentication, quota enforcement, and data isolation."""
 
     def _make_client_no_auth_override(self) -> TestClient:
-        """Build a client where get_user is NOT overridden (real auth runs)."""
+        """Build a client where get_user is NOT overridden (real auth middleware runs)."""
         from src.backend.api.v1.llm import router
         from src.backend.api.deps import get_llm_service, get_database_service
 
@@ -538,7 +575,7 @@ class TestSecurity:
         app.dependency_overrides[get_database_service] = lambda: MagicMock()
         return TestClient(app, raise_server_exceptions=False)
 
-    def test_27_no_auth_token_returns_401_403_or_422(self) -> None:
+    def test_28_no_auth_token_returns_401_403_or_422(self) -> None:
         """Request without Authorization header → 401, 403, or 422."""
         client = self._make_client_no_auth_override()
         resp = client.post(
@@ -547,7 +584,7 @@ class TestSecurity:
         )
         assert resp.status_code in (401, 403, 422)
 
-    def test_28_invalid_jwt_returns_401_or_403(self) -> None:
+    def test_29_invalid_jwt_returns_401_or_403(self) -> None:
         """Request with a malformed JWT is rejected with 401 or 403."""
         client = self._make_client_no_auth_override()
         resp = client.post(
@@ -557,7 +594,7 @@ class TestSecurity:
         )
         assert resp.status_code in (401, 403)
 
-    def test_29_token_quota_exceeded_returns_429(self) -> None:
+    def test_30_token_quota_exceeded_returns_429(self) -> None:
         """User over token quota → HTTP 429 is returned before LLM is called."""
         llm_mock = AsyncMock()
         db_mock = MagicMock()
@@ -574,7 +611,7 @@ class TestSecurity:
         assert resp.status_code == 429
         llm_mock.chat.assert_not_called()
 
-    def test_30_thread_id_from_request_reaches_llm_service(self) -> None:
+    def test_31_thread_id_from_request_reaches_llm_service(self) -> None:
         """LLM service receives the exact thread_id sent in the request body."""
         captured: list[str] = []
 
@@ -601,32 +638,32 @@ class TestSecurity:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 5 — Edge case tests  (tests 31-34)
+# SECTION 5 — Edge case tests  (tests 32-35)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestEdgeCases:
-    """Tests 31-34: boundary conditions and unusual inputs."""
+    """Tests 32-35: boundary conditions and unusual inputs."""
 
-    def test_31_oversized_message_is_truncated(self) -> None:
+    def test_32_oversized_message_is_truncated(self) -> None:
         """A 10 000-char message is truncated and ends with the truncation marker."""
         result = _sanitize_text("x" * 10_000)
         assert result.endswith("…(truncated)")
         assert len(result) <= MAX_CHARS_PER_MSG + len("…(truncated)")
 
-    def test_32_empty_content_list_builds_empty_message(self) -> None:
+    def test_33_empty_content_list_builds_empty_message(self) -> None:
         """An empty content list produces a HumanMessage with no content parts."""
         msg = _build_human_message([])
         assert isinstance(msg, HumanMessage)
         assert msg.content == []
 
     @pytest.mark.asyncio
-    async def test_33_unknown_thread_id_treated_as_new_conversation(self) -> None:
+    async def test_34_unknown_thread_id_treated_as_new_conversation(self) -> None:
         """A non-existent thread_id is treated as a new conversation without crashing."""
         storage, _, _ = _make_conv_storage(redis_has=False, sb_has=False)
         assert await storage.cold_start_load("does-not-exist-xyz") is None
 
     @pytest.mark.asyncio
-    async def test_34_source_ids_empty_list_passes_through(self) -> None:
+    async def test_35_source_ids_empty_list_passes_through(self) -> None:
         """source_ids=[] is forwarded to Supabase RPC (not silently converted to None)."""
         mock_sb = MagicMock()
         mock_sb.rpc.return_value.execute.return_value = MagicMock(data=[])
@@ -643,14 +680,14 @@ class TestEdgeCases:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 6 — Fault tolerance tests  (tests 35-36)
+# SECTION 6 — Fault tolerance tests  (tests 36-37)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestFaultTolerance:
-    """Tests 35-36: graceful degradation when external services fail."""
+    """Tests 36-37: graceful degradation when external services fail."""
 
     @pytest.mark.asyncio
-    async def test_35_redis_error_does_not_propagate_from_cold_start(self) -> None:
+    async def test_36_redis_error_does_not_propagate_from_cold_start(self) -> None:
         """Redis connection failure during cold_start_load does not crash the caller."""
         mock_redis = MagicMock()
         mock_redis.thread_exists_in_redis.side_effect = Exception("Redis connection refused")
@@ -667,7 +704,7 @@ class TestFaultTolerance:
             pytest.fail(f"Redis failure leaked out of cold_start_load: {exc}")
 
     @pytest.mark.asyncio
-    async def test_36_supabase_persist_failure_returns_none(self) -> None:
+    async def test_37_supabase_persist_failure_returns_none(self) -> None:
         """Supabase timeout in persist() → returns None without raising."""
         storage, mock_sb, _ = _make_conv_storage(redis_has=False, sb_has=False)
         mock_sb.save_message = AsyncMock(side_effect=Exception("Supabase timeout"))  # type: ignore[union-attr]
@@ -677,3 +714,160 @@ class TestFaultTolerance:
             content=[{"type": "text", "text": "response"}], token_count=50,
         )
         assert result is None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 7 — Full-chain integration tests  (tests 38-39)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestFullChain:
+    """Tests 38-39: LlmAgent.chat() end-to-end with real ConversationStorage.
+
+    These tests do NOT replace agent._conversation_storage.
+    The complete call chain (cold_start_load → update_state → invoke → persist)
+    is exercised so that any integration regression is caught.
+    """
+
+    def _build_storage_mocks(
+        self,
+        redis_has: bool = False,
+        sb_has: bool = False,
+        history: list | None = None,
+    ) -> tuple[MagicMock, MagicMock]:
+        """Build SupabaseStorage and RedisStorage mock objects for LlmAgent.__init__."""
+        # SupabaseStorage service mock — exposes async methods used by ConversationStorage
+        mock_sb = MagicMock()
+        mock_sb.get.return_value = MagicMock()           # Supabase client for RAG tool
+        mock_sb.thread_exists = AsyncMock(return_value=sb_has)
+        mock_sb.load_recent_messages = AsyncMock(return_value=history or [])
+        mock_sb.save_message = AsyncMock(
+            return_value={"id": "resp-1", "role": "assistant", "created_at": "2026-01-01"}
+        )
+
+        # RedisStorage service mock — exposes sync methods used by ConversationStorage
+        mock_redis = MagicMock()
+        mock_redis.checkpointer = MagicMock()
+        mock_redis.thread_exists_in_redis.return_value = redis_has
+
+        return mock_sb, mock_redis
+
+    @pytest.mark.asyncio
+    @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
+    @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
+    @patch("src.backend.services.llm_service.llm_instance.create_agent")
+    async def test_38_cold_start_chain_all_components_called(
+        self, mock_ca: Any, _emb: Any, _oai: Any
+    ) -> None:
+        """Cold start: history loaded from Supabase, injected via update_state, then persisted."""
+        history = [{"role": "user", "content": [{"type": "text", "text": "prev question"}]}]
+        mock_sb, mock_redis = self._build_storage_mocks(
+            redis_has=False, sb_has=True, history=history
+        )
+
+        mock_agent_obj = MagicMock()
+        mock_agent_obj.invoke = MagicMock(
+            return_value={"messages": [_make_ai_message("AI reply")]}
+        )
+        mock_agent_obj.update_state = MagicMock()
+        mock_ca.return_value = mock_agent_obj
+
+        # Create agent WITHOUT replacing _conversation_storage
+        agent = LlmAgent(
+            checkpointer=mock_redis.checkpointer,
+            supabase_storage=mock_sb,
+            redis_storage=mock_redis,
+        )
+
+        await agent.chat(ChatRequest(
+            user_id="u1", project_id="p1", thread_id="t1",
+            content=[{"type": "text", "text": "hello"}],
+        ))
+
+        # Verify every stage of the call chain fired
+        mock_sb.thread_exists.assert_called_once_with("t1")         # cold start check
+        mock_sb.load_recent_messages.assert_called_once_with("t1")  # history fetched
+        mock_agent_obj.update_state.assert_called_once()             # history injected
+        mock_agent_obj.invoke.assert_called_once()                   # LLM invoked
+        assert mock_sb.save_message.call_count == 2                  # user + AI persisted
+
+    @pytest.mark.asyncio
+    @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
+    @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
+    @patch("src.backend.services.llm_service.llm_instance.create_agent")
+    async def test_39_hot_start_skips_supabase_load(
+        self, mock_ca: Any, _emb: Any, _oai: Any
+    ) -> None:
+        """Hot start (thread in Redis): Supabase load is skipped, invoke and persist still run."""
+        mock_sb, mock_redis = self._build_storage_mocks(redis_has=True, sb_has=True)
+
+        mock_agent_obj = MagicMock()
+        mock_agent_obj.invoke = MagicMock(
+            return_value={"messages": [_make_ai_message("pong")]}
+        )
+        mock_agent_obj.update_state = MagicMock()
+        mock_ca.return_value = mock_agent_obj
+
+        agent = LlmAgent(
+            checkpointer=mock_redis.checkpointer,
+            supabase_storage=mock_sb,
+            redis_storage=mock_redis,
+        )
+
+        await agent.chat(ChatRequest(
+            user_id="u1", project_id="p1", thread_id="t1",
+            content=[{"type": "text", "text": "ping"}],
+        ))
+
+        # Thread was in Redis → no cold start, no history injection
+        mock_sb.load_recent_messages.assert_not_called()
+        mock_agent_obj.update_state.assert_not_called()
+
+        # But the normal invoke + persist path still runs
+        mock_agent_obj.invoke.assert_called_once()
+        assert mock_sb.save_message.call_count == 2
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 8 — Negative path tests  (tests 40-41)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestNegativePaths:
+    """Tests 40-41: error propagation and token count correctness."""
+
+    @pytest.mark.asyncio
+    @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
+    @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
+    @patch("src.backend.services.llm_service.llm_instance.create_agent")
+    async def test_40_invoke_exception_propagates_out_of_chat(
+        self, mock_ca: Any, _emb: Any, _oai: Any
+    ) -> None:
+        """If agent.invoke raises, the exception is not swallowed — it propagates out of chat()."""
+        agent, mock_agent_obj = _make_agent(mock_ca, _emb, _oai)
+        mock_agent_obj.invoke = MagicMock(side_effect=RuntimeError("LLM timeout"))
+
+        with pytest.raises(RuntimeError, match="LLM timeout"):
+            await agent.chat(ChatRequest(
+                user_id="u1", thread_id="t1", project_id="p1",
+                content=[{"type": "text", "text": "hi"}],
+            ))
+
+    @pytest.mark.asyncio
+    @patch("src.backend.services.llm_service.llm_instance.ChatOpenAI")
+    @patch("src.backend.services.llm_service.llm_instance.OpenAIEmbeddings")
+    @patch("src.backend.services.llm_service.llm_instance.create_agent")
+    async def test_41_total_tokens_equals_input_plus_output(
+        self, mock_ca: Any, _emb: Any, _oai: Any
+    ) -> None:
+        """ChatResponse.total_tokens == input_tokens + output_tokens from usage_metadata."""
+        def _invoke(messages: Any, config: Any) -> dict:
+            return {"messages": [_make_ai_message("ok", input_tokens=7, output_tokens=13)]}
+
+        agent, mock_agent_obj = _make_agent(mock_ca, _emb, _oai)
+        mock_agent_obj.invoke = MagicMock(side_effect=_invoke)
+
+        resp = await agent.chat(ChatRequest(
+            user_id="u1", thread_id="t1", project_id="p1",
+            content=[{"type": "text", "text": "hi"}],
+        ))
+
+        assert resp.total_tokens == 20  # 7 input + 13 output
