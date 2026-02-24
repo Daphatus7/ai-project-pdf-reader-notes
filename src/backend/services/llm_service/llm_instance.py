@@ -288,10 +288,11 @@ class LlmAgent:
             redis_storage=redis_storage
         )
 
-        # LLM model
+        # LLM model — non-reasoning mode to reduce latency and cost
         self.model = ChatOpenAI(
             model="gpt-5-nano",
             temperature=0.1,
+            model_kwargs={"reasoning_effort": "minimal"},
         )
 
         # Embedding model for query vectors
