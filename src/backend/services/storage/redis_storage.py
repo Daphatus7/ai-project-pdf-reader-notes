@@ -41,11 +41,13 @@ class RedisStorage(Service):
 
         self._logger.info(f"Connecting to Redis: {settings.redis_url}")
 
-        # Create shared Redis connection
-        self._redis_conn = redis.Redis.from_url(
+        # 使用连接池，高并发时多用户不会排队等待同一个连接
+        pool = redis.ConnectionPool.from_url(
             settings.redis_url,
+            max_connections=50,
             decode_responses=False  # RedisSaver needs bytes
         )
+        self._redis_conn = redis.Redis(connection_pool=pool)
 
         # Verify connection
         self._redis_conn.ping()
