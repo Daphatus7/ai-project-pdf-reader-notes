@@ -7,18 +7,13 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # System dependencies required by:
-#   libgl1, libglib2.0-0 → OpenCV (cv2)
-#   poppler-utils         → unstructured PDF parsing
-#   tesseract-ocr         → OCR fallback in unstructured
-#   libmagic1             → file-type detection in unstructured
-#   curl                  → health checks
+#   poppler-utils → unstructured 'fast' strategy PDF parsing (pdfminer)
+#   libmagic1     → file-type detection in unstructured
+#   curl          → health checks
 RUN apt-get update && apt-get install -y \
     curl \
-    libgl1 \
-    libglib2.0-0 \
     libmagic1 \
     poppler-utils \
-    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
