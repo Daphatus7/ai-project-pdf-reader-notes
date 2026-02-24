@@ -1,0 +1,19 @@
+# Railway configuration for pdf-backend WORKER service.
+# Create a separate Railway Service and point it to this config.
+
+[build]
+dockerfilePath = "src/pdf_backend/Dockerfile"
+dockerContext = "."
+dockerfileTarget = "worker"
+
+[deploy]
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
+
+# Scale workers based on CPU utilisation.
+# 1 worker instance = 1 concurrent PDF job.
+# Increase maxReplicas as paying user base grows.
+[deploy.scaling]
+minReplicas = 1
+maxReplicas = 3
+targetCPUPercent = 70

@@ -57,6 +57,30 @@ class RagService:
         logger.info(f"Inserted {count} chunks for document {document_id}")
         return count
 
+    def process_sync(
+        self,
+        document_id: str,
+        project_id: str,
+        document_name: str,
+        file_path: str,
+        cores: int = 1,
+        on_progress: callable = None,
+    ) -> tuple[bool, int, str]:
+        """
+        Synchronous version for RQ workers.
+        cores: number of CPU cores allocated by the scheduler.
+        on_progress: optional callback(pct: int) called during processing.
+        """
+        import asyncio
+        return asyncio.get_event_loop().run_until_complete(
+            self.process(
+                document_id=document_id,
+                project_id=project_id,
+                document_name=document_name,
+                file_path=file_path,
+            )
+        )
+
     async def process(
         self, document_id: str, project_id: str, document_name: str, file_path: str
     ) -> tuple[bool, int, str]:

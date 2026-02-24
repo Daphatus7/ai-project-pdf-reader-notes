@@ -3,7 +3,7 @@ from typing import Any
 
 from chonkie import NeuralChunker
 
-from src.pdf_backend.schemas.rag import RagRequest
+from src.pdf_backend.schemas.rag import ProcessRequest
 from src.pdf_backend.services.pdf_extract import extract_pdf_elements
 
 
@@ -114,7 +114,7 @@ async def __process_pdf(payload: RawContextPayload) -> list[dict]:
     ]
 
 
-async def chonkie_chunk(rag_request: RagRequest, file_path: str) -> list[dict]:
+async def chonkie_chunk(rag_request: ProcessRequest, file_path: str) -> list[dict]:
     """
     Extract and chunk a PDF at file_path.
     file_path is the server-internal temp path, separate from the API contract.

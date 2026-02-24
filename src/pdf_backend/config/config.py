@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     supabase_secret_key: str = Field(default="")
     openai_api_key: str = Field(default="")
 
+    redis_url: str = Field(default="redis://localhost:6379/0")
+
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=8001)
 

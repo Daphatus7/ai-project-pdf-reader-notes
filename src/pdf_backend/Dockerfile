@@ -1,6 +1,8 @@
 # Multi-stage Dockerfile for pdf_backend microservice
 # Handles PDF extraction, chunking, and RAG vector storage.
-# Heavy ML dependencies (unstructured, cv2, chonkie) require numpy<2.
+# Builds two targets:
+#   production  → FastAPI API service (receives uploads, enqueues jobs)
+#   worker      → RQ worker service (processes jobs from Redis queue)
 
 FROM python:3.12-slim AS base
 
@@ -56,3 +58,16 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8001}/health || exit 1
 
 CMD ["sh", "-c", "uvicorn src.pdf_backend.main:app --host 0.0.0.0 --port ${PORT:-8001}"]
+
+
+# ── Worker stage ────────────────────────────────────────────────
+FROM base AS worker
+
+COPY src/pdf_backend/ ./src/pdf_backend/
+COPY src/__init__.py ./src/
+RUN chown -R app:app /app
+USER app
+
+# Workers don't expose HTTP — no HEALTHCHECK via curl
+# Railway monitors worker health via process exit code
+CMD ["python", "-m", "src.pdf_backend.worker"]
