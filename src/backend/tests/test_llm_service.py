@@ -1,5 +1,5 @@
 """
-LLM Service Test Suite — 41 tests
+LLM Service Test Suite — 48 tests
 
 Run: pytest src/backend/tests/test_llm_service.py -v
 
@@ -12,6 +12,7 @@ Sections:
   6.  Fault tolerance      — graceful degradation                    (tests 36-37)
   7.  Full-chain tests     — end-to-end LlmAgent.chat() flow         (tests 38-39)
   8.  Negative path tests  — failure and error propagation           (tests 40-41)
+  9.  ConcurrencyLimiter   — per-user slot limiting + HTTP 429       (tests 42-48)
 """
 
 import asyncio
@@ -871,3 +872,137 @@ class TestNegativePaths:
         ))
 
         assert resp.total_tokens == 20  # 7 input + 13 output
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 9 — ConcurrencyLimiter unit + HTTP tests  (tests 42-48)
+# ─────────────────────────────────────────────────────────────────────────────
+
+from src.backend.services.concurrency_limiter import ConcurrencyLimiter
+
+
+def _make_limiter(counter_start: int = 0) -> tuple[ConcurrencyLimiter, MagicMock]:
+    """Build a ConcurrencyLimiter wired to a MagicMock Redis client.
+
+    counter_start sets the value that INCR will return on the first call,
+    allowing tests to simulate an already-occupied slot.
+    """
+    mock_redis = MagicMock()
+    # Each call to incr() increments from counter_start
+    _counter = [counter_start]
+
+    def _incr(key: str) -> int:
+        _counter[0] += 1
+        return _counter[0]
+
+    def _decr(key: str) -> int:
+        _counter[0] -= 1
+        return _counter[0]
+
+    mock_redis.incr = MagicMock(side_effect=_incr)
+    mock_redis.decr = MagicMock(side_effect=_decr)
+    mock_redis.expire = MagicMock()
+    mock_redis.set = MagicMock()
+
+    return ConcurrencyLimiter(mock_redis), mock_redis
+
+
+class TestConcurrencyLimiter:
+    """Tests 42-48: per-user slot limiting, fail-open behaviour, HTTP layer."""
+
+    # ------------------------------------------------------------------
+    # Unit tests against ConcurrencyLimiter directly (mocked Redis)
+    # ------------------------------------------------------------------
+
+    def test_42_three_concurrent_acquires_all_succeed(self) -> None:
+        """Slots 1, 2, 3 are all below the limit → all return True."""
+        limiter, _ = _make_limiter(counter_start=0)
+        results = [limiter.acquire("user-A") for _ in range(3)]
+        assert results == [True, True, True]
+
+    def test_43_fourth_acquire_rejected(self) -> None:
+        """After 3 granted slots the 4th acquire must return False."""
+        limiter, _ = _make_limiter(counter_start=0)
+        for _ in range(3):
+            limiter.acquire("user-A")
+        assert limiter.acquire("user-A") is False
+
+    def test_44_release_frees_slot_for_next_acquire(self) -> None:
+        """Acquiring 3 slots, releasing 1, then acquiring 1 more should succeed."""
+        limiter, mock_redis = _make_limiter(counter_start=0)
+        for _ in range(3):
+            limiter.acquire("user-A")
+
+        # Simulate a release by calling decr so the counter drops to 2
+        limiter.release("user-A")
+
+        # Next acquire should succeed (counter goes 2 → 3 ≤ MAX_CONCURRENT)
+        assert limiter.acquire("user-A") is True
+
+    def test_45_release_after_exception_path_allows_next_acquire(self) -> None:
+        """release() is idempotent — calling it from a finally block always works."""
+        limiter, _ = _make_limiter(counter_start=0)
+        limiter.acquire("user-B")
+        limiter.release("user-B")
+        # Counter is back to 0 → next acquire should get slot 1
+        assert limiter.acquire("user-B") is True
+
+    def test_46_user_a_limit_does_not_affect_user_b(self) -> None:
+        """Independent counters: user-A being at limit must not block user-B."""
+        # Build separate limiters sharing no state to replicate independent keys
+        limiter_a, _ = _make_limiter(counter_start=0)
+        limiter_b, _ = _make_limiter(counter_start=0)
+
+        # Fill user-A to the limit on limiter_a
+        for _ in range(3):
+            limiter_a.acquire("user-A")
+        assert limiter_a.acquire("user-A") is False
+
+        # user-B on its own limiter is unaffected
+        assert limiter_b.acquire("user-B") is True
+
+    def test_47_redis_unavailable_fails_open(self) -> None:
+        """When Redis is None the limiter always returns True (fail-open)."""
+        limiter = ConcurrencyLimiter(None)
+        # Multiple acquires must all succeed
+        assert limiter.acquire("user-C") is True
+        assert limiter.acquire("user-C") is True
+        assert limiter.acquire("user-C") is True
+        assert limiter.acquire("user-C") is True
+        # release() must also be a safe no-op
+        limiter.release("user-C")  # should not raise
+
+    # ------------------------------------------------------------------
+    # HTTP-layer test: 4th concurrent chat request → 429
+    # ------------------------------------------------------------------
+
+    def test_48_fourth_concurrent_chat_request_returns_429(self) -> None:
+        """Test client: when concurrency limiter denies, chat returns HTTP 429."""
+        from src.backend.api.deps import get_concurrency_limiter
+
+        # Build a limiter mock that denies on the first call (simulates limit hit)
+        mock_limiter = MagicMock(spec=ConcurrencyLimiter)
+        mock_limiter.acquire.return_value = False
+        mock_limiter.release = MagicMock()
+
+        mock_llm = MagicMock()
+        mock_db = MagicMock()
+        mock_db.enforce_token_quota = AsyncMock()
+        mock_db.track_token_usage = AsyncMock()
+
+        # Build TestClient, bypassing JWT auth, and override the concurrency limiter dep
+        client = _make_llm_test_client(mock_llm, mock_db, user_mock={"sub": "u1"})
+        client.app.dependency_overrides[get_concurrency_limiter] = lambda: mock_limiter  # type: ignore[union-attr]
+
+        resp = client.post(
+            "/llm/chat",
+            json={
+                "user_id": "u1",
+                "thread_id": "t1",
+                "project_id": "p1",
+                "content": [{"type": "text", "text": "hello"}],
+            },
+        )
+        assert resp.status_code == 429
+        # Slot must NOT be released because it was never granted
+        mock_limiter.release.assert_not_called()

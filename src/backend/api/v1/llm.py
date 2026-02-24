@@ -13,9 +13,11 @@ from src.backend.schemas import (
     ChatResponse,
 )
 
-from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request
+from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request, get_concurrency_limiter
+from src.backend.schemas.error import AppError
+from src.backend.services.concurrency_limiter import ConcurrencyLimiter
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
-    ListThreadsRequest, DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse, ThreadInfo
+    DeleteThreadRequest, LoadThreadRequest, CreateThreadResponse, ThreadInfo
 
 router = APIRouter(prefix='/llm', tags=['llm'])
 
@@ -24,12 +26,24 @@ async def chat(
         request: ChatRequest = Depends(get_chat_request),
         llm_service=Depends(get_llm_service),
         database_service=Depends(get_database_service),
+        concurrency_limiter: ConcurrencyLimiter = Depends(get_concurrency_limiter),
 ):
     user_id = request.user_id
+
+    # Enforce per-user token budget before consuming a concurrency slot
     await database_service.enforce_token_quota(user_id)
-    response = await llm_service.chat(request=request)
-    await database_service.track_token_usage(user_id, response.total_tokens)
-    return response
+
+    # Reject the 4th simultaneous request from the same user
+    if not concurrency_limiter.acquire(user_id):
+        raise AppError(429, "CONCURRENT_LIMIT", "Too many concurrent requests")
+
+    try:
+        response = await llm_service.chat(request=request)
+        await database_service.track_token_usage(user_id, response.total_tokens)
+        return response
+    finally:
+        # Always release the slot — success, error, or cancellation
+        concurrency_limiter.release(user_id)
 
 #create a thread
 @router.post('/thread', response_model=CreateThreadResponse)

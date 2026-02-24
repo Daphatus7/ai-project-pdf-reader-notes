@@ -18,6 +18,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.backend.servers import services
 from src.backend.schemas import ChatRequest
 from src.backend.schemas.error import service_unavailable, auth_required
+from src.backend.services.concurrency_limiter import ConcurrencyLimiter
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +74,20 @@ def get_stripe_service():
     except ValueError as e:
         logger.error(f'Failed to get stripe service: {e}')
         service_unavailable("Stripe service")
+
+def get_concurrency_limiter() -> ConcurrencyLimiter:
+    """
+    Dependency that provides a per-user concurrency limiter.
+
+    Tries to obtain the Redis client from the storage service.
+    Falls back to None (fail-open mode) if storage is unavailable.
+    """
+    try:
+        redis_storage = services.get_service('storage')
+        return ConcurrencyLimiter(redis_storage.redis)
+    except Exception:
+        # Fail open: no Redis → limiter allows all requests
+        return ConcurrencyLimiter(None)
 
 
 # Authentication Dependency
