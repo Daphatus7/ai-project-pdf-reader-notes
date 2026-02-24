@@ -69,7 +69,25 @@ const LandingPage = () => {
 			<section className="w-full px-4 py-16 flex flex-col items-center">
 				{/* Powered by AI Badge */}
 				<div className="bg-secondary border border-border rounded-full px-6 py-2 mb-8 flex items-center gap-3">
-					<LucideSparkles />
+					{/* Inline SVG with linearGradient — purple→indigo→blue, Bay Area startup style */}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16" height="16" viewBox="0 0 24 24"
+						fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+					>
+						<defs>
+							<linearGradient id="sparkle-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+								<stop offset="0%"   stopColor="#a855f7" />
+								<stop offset="50%"  stopColor="#6366f1" />
+								<stop offset="100%" stopColor="#3b82f6" />
+							</linearGradient>
+						</defs>
+						<path stroke="url(#sparkle-gradient)" d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+						<path stroke="url(#sparkle-gradient)" d="M20 3v4" />
+						<path stroke="url(#sparkle-gradient)" d="M22 5h-4" />
+						<path stroke="url(#sparkle-gradient)" d="M4 17v2" />
+						<path stroke="url(#sparkle-gradient)" d="M5 18H3" />
+					</svg>
 					<span className="font-medium text-xs text-foreground">
             Powered by AI
           </span>
