@@ -94,15 +94,13 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 
 				<div className="mb-6 relative">
 					<p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-3">Pro Yearly</p>
+					{/* Show monthly equivalent rate as main price */}
 					<div className="flex items-end gap-1 mb-1">
-						<span className="text-5xl font-bold text-white">$199</span>
-						<span className="text-white/50 pb-1.5 ml-1">/ year</span>
+						<span className="text-5xl font-bold text-white">$16.58</span>
+						<span className="text-white/50 pb-1.5 ml-1">/ month</span>
 					</div>
-					<p className="text-sm text-white/60 mt-1">~$16.58 per month, billed annually</p>
-					<div className="flex items-center gap-2 mt-2">
-						<span className="text-sm text-white/40 line-through">$240 / year</span>
-						<span className="text-sm text-green-400 font-semibold">You save $41</span>
-					</div>
+					{/* Annual billing note in small text */}
+					<p className="text-sm text-white/60 mt-1">Billed annually · $199/year</p>
 				</div>
 
 				<Button
