@@ -1,12 +1,12 @@
+import asyncio
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Annotated
 from langchain.agents import create_agent, AgentState
 from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool, InjectedToolArg
-from typing import Annotated
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
@@ -203,28 +203,30 @@ def make_retriever_tool(supabase: Client, embedding_model: OpenAIEmbeddings):
     """Create retriever tool with injected config for multi-user safety."""
 
     @tool("argument_retriever")
-    def retrieve_context(
+    async def retrieve_context(
         query: str,
         config: Annotated[RunnableConfig, InjectedToolArg]
     ) -> tuple[list[Document], list[str]]:
         """Search stored documents for relevant context."""
-        print("RAG retriever activated")
+        logging.info("RAG retriever activated")
 
-        if supabase is None:
-            return [], []
+        # 从 config 获取请求级别的上下文 (线程安全，每个请求独立)
+        configurable = config.get("configurable", {})
+        user_id = configurable.get("user_id")
+        project_id = configurable.get("project_id")
+        source_ids = configurable.get("source_ids")
 
-        # 从 config 获取请求级别的上下文 (线程安全)
-        user_id = config["configurable"].get("user_id")
-        project_id = config["configurable"].get("project_id")
-        source_ids = config["configurable"].get("source_ids")
+        logging.info("Filter context - user_id: %s, project_id: %s", user_id, project_id)
 
-        print(f"Filter context - user_id: {user_id}, project_id: {project_id}, source_ids: {source_ids}")
+        loop = asyncio.get_event_loop()
 
-        # Generate query embedding
-        query_embedding = embedding_model.embed_query(query)
+        # 用 run_in_executor 包住同步阻塞调用，避免卡住事件循环
+        query_embedding = await loop.run_in_executor(
+            None, embedding_model.embed_query, query
+        )
 
-        # Call Supabase match_documents RPC
-        response = supabase.rpc(
+        # Supabase 同步 RPC 调用也放入 executor
+        rpc_call = lambda: supabase.rpc(
             "match_documents",
             {
                 "query_embedding": query_embedding,
@@ -232,9 +234,10 @@ def make_retriever_tool(supabase: Client, embedding_model: OpenAIEmbeddings):
                 "filter_user_id": user_id,
                 "filter_project_id": project_id,
                 "filter_source_ids": source_ids,
-                "similarity_threshold": 0.5
+                "similarity_threshold": 0.5,
             }
         ).execute()
+        response = await loop.run_in_executor(None, rpc_call)
 
         # Convert to LangChain Document format
         docs = []
@@ -255,7 +258,7 @@ def make_retriever_tool(supabase: Client, embedding_model: OpenAIEmbeddings):
             logging.info("Retrieved doc: %s (similarity: %.4f)", row["source_name"], row["similarity"])
 
         info_sources = [doc.metadata.get("source_name") for doc in docs]
-        print(f"Retrieved {len(docs)} documents from Supabase")
+        logging.info("Retrieved %d documents from Supabase", len(docs))
         return docs, info_sources
 
     return retrieve_context
@@ -354,28 +357,37 @@ class LlmAgent:
                 logger.debug("History accepted index=%s role=%s chars=%s", i, role, len(safe_text))
         
             if to_history:
-                self.agent.update_state(
-                    config={"configurable": {"thread_id": request.thread_id}},
-                    values={"messages": to_history},
-                    as_node="__start__",
+                # ShallowRedisSaver 不支持 async，用 run_in_executor 放入线程池
+                # 效果等同于 aupdate_state：事件循环不阻塞，多用户并发
+                loop = asyncio.get_event_loop()
+                await loop.run_in_executor(
+                    None,
+                    lambda: self.agent.update_state(
+                        config={"configurable": {"thread_id": request.thread_id}},
+                        values={"messages": to_history},
+                        as_node="__start__",
+                    )
                 )
             else:
                 logger.info("No valid history messages to inject (all skipped).")
-            
-        # 3. Build Configuration
+
+        # 3. Build Configuration — 传入完整用户上下文，RAG 检索工具按用户/项目过滤
         config: RunnableConfig = {
             "configurable": {
                 "thread_id": request.thread_id,
+                "user_id": request.user_id,
+                "project_id": request.project_id,
+                "source_ids": request.source_ids,
             }
         }
-        
-        system_msg = SystemMessage(content="""you are a helpful assistant, keep everything brief""") # 用户不允许编辑system message
+
         human_msg = _build_human_message(request.content)
 
-        # Run LLM call
-        response = self.agent.invoke(
-            {"messages": human_msg},  # todo weird bug why system_msg is not allowed here
-            config=config,
+        # invoke 放入线程池：sync 跑在独立线程，事件循环同时处理其他用户请求
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: self.agent.invoke({"messages": human_msg}, config=config)
         )
 
         ai_msg = response["messages"][-1]
