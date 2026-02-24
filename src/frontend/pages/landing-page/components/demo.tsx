@@ -38,6 +38,9 @@ const AI_RESPONSE = `The table summarizes Q3 performance metrics across three re
 
 Total consolidated revenue: $8.9M, up 14% from Q3 last year.`;
 
+// Pre-split for line-by-line streaming
+const AI_RESPONSE_LINES = AI_RESPONSE.split("\n");
+
 const STEP_DURATIONS: Record<DemoStep, number> = {
 	idle: 2000,
 	screenshotting: 1500,
@@ -100,7 +103,7 @@ export default function DemoSection() {
 		return () => clearTimeout(timer);
 	}, [step, isVisible, advanceStep]);
 
-	// Streaming text effect
+	// Streaming text effect — reveal one line at a time
 	useEffect(() => {
 		if (step !== "streaming" || !isVisible) return;
 
@@ -109,13 +112,12 @@ export default function DemoSection() {
 
 		const interval = setInterval(() => {
 			streamIndexRef.current += 1;
-			if (streamIndexRef.current >= AI_RESPONSE.length) {
+			setStreamedText(AI_RESPONSE_LINES.slice(0, streamIndexRef.current).join("\n"));
+			if (streamIndexRef.current >= AI_RESPONSE_LINES.length) {
 				clearInterval(interval);
 				advanceStep();
-				return;
 			}
-			setStreamedText(AI_RESPONSE.slice(0, streamIndexRef.current));
-		}, 20);
+		}, 150);
 
 		return () => clearInterval(interval);
 	}, [step, isVisible, advanceStep]);
@@ -134,6 +136,11 @@ export default function DemoSection() {
 	const showInsertButton = step === "done";
 	const askAiActive = step === "screenshotting" || step === "captured";
 
+	// Derive the active mobile panel from the current animation step
+	const mobilePanel =
+		step === "loading" || step === "streaming" || step === "done" ? "chat" :
+		step === "inserting" ? "notes" : "pdf";
+
 	return (
 		<section className="w-full px-4 py-16" ref={containerRef}>
 			{/* Demo Badge */}
@@ -144,12 +151,12 @@ export default function DemoSection() {
 				</div>
 			</div>
 
-			{/* 3-Panel Mockup */}
-			<div className="max-w-5/6 mx-auto">
-				<div className="grid grid-cols-3 h-[600px]">
+			{/* 3-Panel Mockup — desktop: 3 cols side-by-side; mobile: one panel at a time driven by step */}
+			<div className="w-full md:max-w-5/6 md:mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-3 h-[500px] md:h-[600px]">
 
 					{/* PDF Panel */}
-					<div className="bg-panel border rounded-xl ml-2 mr-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:ml-2 md:mr-1 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "pdf" ? "flex" : "hidden md:flex"}`}>
 						{/* PDF Toolbar */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<button className="p-1 hover:bg-border/50 rounded">
@@ -255,7 +262,7 @@ export default function DemoSection() {
 					</div>
 
 					{/* AI Chat Panel */}
-					<div className="bg-panel border rounded-xl mx-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:mx-1 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "chat" ? "flex" : "hidden md:flex"}`}>
 						{/* Chat Header */}
 						<div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-secondary/50 shrink-0">
 							<MessageSquare className="size-3.5 text-muted-foreground" />
@@ -273,7 +280,7 @@ export default function DemoSection() {
 							<div className="flex-1 space-y-3 overflow-hidden">
 								{/* User bubble */}
 								{showUserBubble && (
-									<div className="flex justify-end animate-[demo-fade-in_0.3s_ease-out]">
+									<div className="flex justify-end" style={{ animation: "demo-bubble-in 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
 										<div className="bg-secondary rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
 											<p className="text-[10px] text-muted-foreground mb-1.5">Analyze this table:</p>
 											<div className="bg-[#006aff]/5 border border-[#006aff]/20 rounded p-1.5 text-[9px] text-muted-foreground">
@@ -283,22 +290,22 @@ export default function DemoSection() {
 									</div>
 								)}
 
-								{/* Thinking dots */}
+								{/* Thinking dots — staggered bounce */}
 								{showThinking && (
-									<div className="flex items-start animate-[demo-fade-in_0.3s_ease-out]">
+									<div className="flex items-start" style={{ animation: "demo-bubble-in 0.35s cubic-bezier(0.16,1,0.3,1) both" }}>
 										<div className="bg-secondary rounded-xl rounded-tl-sm px-3 py-2.5">
-											<div className="flex gap-1">
-												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground" style={{ animationDelay: "0s" }} />
-												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground" style={{ animationDelay: "0.15s" }} />
-												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground" style={{ animationDelay: "0.3s" }} />
+											<div className="flex gap-1.5 items-center h-3">
+												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground/60" style={{ animationDelay: "0s" }} />
+												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.18s" }} />
+												<span className="thinking-dot w-1.5 h-1.5 rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.36s" }} />
 											</div>
 										</div>
 									</div>
 								)}
 
-								{/* AI response */}
+								{/* AI response — text grows naturally line by line */}
 								{showAiResponse && (
-									<div className="flex items-start animate-[demo-fade-in_0.3s_ease-out]">
+									<div className="flex items-start animate-[demo-fade-in_0.4s_ease-out]">
 										<div className="rounded-xl rounded-tl-sm px-1 py-2 max-w-[95%]">
 											<p className="text-[10px] leading-relaxed text-foreground whitespace-pre-wrap">
 												{step === "streaming" ? streamedText : AI_RESPONSE}
@@ -334,7 +341,7 @@ export default function DemoSection() {
 					</div>
 
 					{/* Notebook Panel */}
-					<div className="bg-panel border rounded-xl ml-1 mr-2 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:ml-1 md:mr-2 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "notes" ? "flex" : "hidden md:flex"}`}>
 						{/* Notes Header with tabs */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<div className="flex items-center gap-0.5">
@@ -431,6 +438,18 @@ export default function DemoSection() {
 						</div>
 					</div>
 
+				</div>
+
+				{/* Mobile panel progress indicator */}
+				<div className="flex md:hidden justify-center items-center gap-2 mt-3">
+					{(["pdf", "chat", "notes"] as const).map((p, i) => (
+						<span key={p} className="flex items-center gap-2">
+							<span className={`text-xs font-medium transition-colors duration-300 ${mobilePanel === p ? "text-foreground" : "text-muted-foreground/40"}`}>
+								{p === "pdf" ? "PDF" : p === "chat" ? "Chat" : "Notes"}
+							</span>
+							{i < 2 && <span className="text-muted-foreground/30 text-xs">→</span>}
+						</span>
+					))}
 				</div>
 			</div>
 

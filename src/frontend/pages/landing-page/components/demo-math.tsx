@@ -36,6 +36,9 @@ Found 5 functions: Sigmoid, Tanh, ReLU, Leaky ReLU, and Softmax.
 
 Extracting formulas, output ranges, and use cases for each. Building a structured comparison table...`;
 
+// Pre-split for line-by-line streaming
+const STREAMING_LINES = STREAMING_TEXT.split("\n");
+
 const STEP_DURATIONS: Record<DemoStep, number> = {
 	idle: 2000,
 	screenshotting: 1500,
@@ -130,19 +133,19 @@ export default function DemoMathSection() {
 		return () => clearTimeout(timer);
 	}, [step, isVisible, advanceStep]);
 
+	// Streaming text effect — reveal one line at a time
 	useEffect(() => {
 		if (step !== "streaming" || !isVisible) return;
 		streamIndexRef.current = 0;
 		setStreamedText("");
 		const interval = setInterval(() => {
 			streamIndexRef.current += 1;
-			if (streamIndexRef.current >= STREAMING_TEXT.length) {
+			setStreamedText(STREAMING_LINES.slice(0, streamIndexRef.current).join("\n"));
+			if (streamIndexRef.current >= STREAMING_LINES.length) {
 				clearInterval(interval);
 				advanceStep();
-				return;
 			}
-			setStreamedText(STREAMING_TEXT.slice(0, streamIndexRef.current));
-		}, 22);
+		}, 150);
 		return () => clearInterval(interval);
 	}, [step, isVisible, advanceStep]);
 
@@ -157,6 +160,11 @@ export default function DemoMathSection() {
 	const showTable = step === "done" || step === "inserting";
 	const showInsertButton = step === "done";
 	const askAiActive = step === "screenshotting" || step === "captured";
+
+	// Derive the active mobile panel from the current animation step
+	const mobilePanel =
+		step === "loading" || step === "streaming" || step === "done" ? "chat" :
+		step === "inserting" ? "notes" : "pdf";
 
 	return (
 		<section className="w-full px-4 py-16" ref={containerRef}>
@@ -174,12 +182,12 @@ export default function DemoMathSection() {
 				</p>
 			</div>
 
-			{/* 3-Panel Mockup */}
-			<div className="max-w-5/6 mx-auto">
-				<div className="grid grid-cols-3 h-[600px]">
+			{/* 3-Panel Mockup — desktop: 3 cols side-by-side; mobile: one panel at a time driven by step */}
+			<div className="w-full md:max-w-5/6 md:mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-3 h-[500px] md:h-[600px]">
 
 					{/* PDF Panel */}
-					<div className="bg-panel border rounded-xl ml-2 mr-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:ml-2 md:mr-1 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "pdf" ? "flex" : "hidden md:flex"}`}>
 						{/* Toolbar */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<button className="p-1 hover:bg-border/50 rounded">
@@ -283,7 +291,7 @@ export default function DemoMathSection() {
 					</div>
 
 					{/* AI Chat Panel */}
-					<div className="bg-panel border rounded-xl mx-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:mx-1 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "chat" ? "flex" : "hidden md:flex"}`}>
 						{/* Chat Header */}
 						<div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-secondary/50 shrink-0">
 							<MessageSquare className="size-3.5 text-muted-foreground" />
@@ -370,7 +378,7 @@ export default function DemoMathSection() {
 					</div>
 
 					{/* Notebook Panel */}
-					<div className="bg-panel border rounded-xl ml-1 mr-2 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mb-2 md:ml-1 md:mr-2 shadow hover:shadow-xl flex-col overflow-hidden ${mobilePanel === "notes" ? "flex" : "hidden md:flex"}`}>
 						{/* Notes Header */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<div className="flex items-center gap-0.5">
@@ -445,6 +453,18 @@ export default function DemoMathSection() {
 						</div>
 					</div>
 
+				</div>
+
+				{/* Mobile panel progress indicator */}
+				<div className="flex md:hidden justify-center items-center gap-2 mt-3">
+					{(["pdf", "chat", "notes"] as const).map((p, i) => (
+						<span key={p} className="flex items-center gap-2">
+							<span className={`text-xs font-medium transition-colors duration-300 ${mobilePanel === p ? "text-foreground" : "text-muted-foreground/40"}`}>
+								{p === "pdf" ? "PDF" : p === "chat" ? "Chat" : "Notes"}
+							</span>
+							{i < 2 && <span className="text-muted-foreground/30 text-xs">→</span>}
+						</span>
+					))}
 				</div>
 			</div>
 
