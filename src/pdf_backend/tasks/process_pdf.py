@@ -5,9 +5,9 @@ import tempfile
 import redis
 
 from src.pdf_backend.config.config import settings
-from src.pdf_backend.schemas.job import JobStatus, Tier
-from src.pdf_backend.services.cpu_scheduler import cpu_scheduler
-from src.pdf_backend.services.job_store import JobStore
+from src.pdf_backend.schemas.job import JobStatus
+from src.pdf_backend.services.multi_threading.cpu_scheduler import CpuScheduler
+from src.pdf_backend.services.multi_threading.job_store import JobStore
 from src.pdf_backend.services.rag_service import RagService
 from src.pdf_backend.services.webhook import send_webhook
 
@@ -31,11 +31,13 @@ def run_process_pdf(
     RQ task: full RAG pipeline for a single PDF.
     Runs inside a worker process — no async, plain blocking code.
     """
+    # Fresh connection per forked job — avoids sharing sockets across fork boundary.
     r = redis.from_url(settings.redis_url, decode_responses=False)
-    store = JobStore(r)
+    store     = JobStore(r)
+    scheduler = CpuScheduler(r)
 
-    # Acquire CPU tokens before doing any heavy work
-    allocated_cores = cpu_scheduler.acquire(tier)
+    # Block until global core quota (across all workers) is available.
+    allocated_cores = scheduler.acquire(tier)
     store.update(job_id, status=JobStatus.processing, progress_pct=0)
 
     suffix = ".pdf"
@@ -86,7 +88,7 @@ def run_process_pdf(
         )
 
     finally:
-        cpu_scheduler.release(allocated_cores)
+        scheduler.release(allocated_cores)
         store.delete_user_lock(user_id)
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)

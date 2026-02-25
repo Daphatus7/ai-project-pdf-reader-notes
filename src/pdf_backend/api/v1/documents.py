@@ -12,7 +12,7 @@ from src.pdf_backend.schemas.job import (
     JobStatus,
     Tier,
 )
-from src.pdf_backend.services.job_store import JobStore
+from src.pdf_backend.services.multi_threading.job_store import JobStore
 from src.pdf_backend.services.validator import validate_pdf, ValidationError
 
 logger = logging.getLogger(__name__)
