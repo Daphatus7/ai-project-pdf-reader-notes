@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
+import { isQuotaError } from '@/frontend/features/quota/use-quota';
 import type { Document } from './type';
 
 export interface UseSourceReturn {
@@ -62,8 +64,15 @@ export function useSource(projectId: string | null): UseSourceReturn {
 			try {
 				await projectsService.uploadDocument(projectId, file, sourceName);
 				await refreshDocuments();
+				toast.success('Document uploaded');
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to upload document');
+				if (isQuotaError(err)) {
+					toast.error('Document limit reached. Upgrade your plan to upload more.');
+				} else {
+					const msg = err instanceof Error ? err.message : 'Failed to upload document';
+					setError(msg);
+					toast.error(msg);
+				}
 				throw err;
 			} finally {
 				setIsUploading(false);
@@ -80,8 +89,11 @@ export function useSource(projectId: string | null): UseSourceReturn {
 				await projectsService.deleteDocument(projectId, documentId);
 				setSelectedDocumentIds((prev) => prev.filter((id) => id !== documentId));
 				await refreshDocuments();
+				toast.success('Document deleted');
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to delete document');
+				const msg = err instanceof Error ? err.message : 'Failed to delete document';
+				setError(msg);
+				toast.error(msg);
 				throw err;
 			}
 		},

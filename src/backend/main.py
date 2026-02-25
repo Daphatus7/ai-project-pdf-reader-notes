@@ -4,11 +4,16 @@ FastAPI application entry point for LLM backend service
 import dotenv
 dotenv.load_dotenv()
 
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
+
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 import logging
 import sys
 from src.backend.servers import services
@@ -16,13 +21,25 @@ from src.backend.config.config import settings
 from src.backend.api import v1_router
 from src.backend.schemas.error import AppError
 
+if settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        integrations=[
+            StarletteIntegration(),
+            FastApiIntegration(),
+        ],
+        traces_sample_rate=0.1,   # 10% of requests for performance tracing
+        send_default_pii=False,   # don't attach user IP / email automatically
+    )
+
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper()),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout)
-    ]
+    ],
+    force=True
 )
 
 logger = logging.getLogger(__name__)
@@ -69,14 +86,28 @@ app = FastAPI(
 # Include routers
 app.include_router(v1_router)
 
-# Configure CORS
+
+
+class LogOriginMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        origin = request.headers.get("origin", "no-origin")
+        logger.info(f"Request from origin: {origin} -> {request.method} {request.url.path}")
+        response = await call_next(request)
+        return response
+
+logger.info(f"CORS origins allowed: {settings.cors_origins_list}")
+
+
+# Configure CORS (added before LogOrigin so CORS runs first in the response)
 app.add_middleware(
     CORSMiddleware,
+    # allow_origins=["*"],
     allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET","POST","DELETE","OPTIONS","PUT"],
     allow_headers=["authorization","content-type","accept"],
 )
+app.add_middleware(LogOriginMiddleware)
 
 # AppError handler — returns flat JSON
 @app.exception_handler(AppError)
@@ -91,6 +122,7 @@ async def app_error_handler(request, exc: AppError):
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    sentry_sdk.capture_exception(exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error", "code": "INTERNAL_ERROR"}

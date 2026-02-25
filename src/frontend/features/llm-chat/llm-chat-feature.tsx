@@ -15,6 +15,7 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 			threads,
 			activeThreadId,
 			activeMessages,
+			isLoading: isThreadsLoading,
 			selectThread,
 			createThread,
 			deleteThread,
@@ -49,6 +50,7 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 				}}
 				messages={activeMessages}
 				isLoading={isLoading}
+				isThreadsLoading={isThreadsLoading}
 				onSendMessage={sendMessage}
 				onSelectContent={onSelectContent}
 			/>

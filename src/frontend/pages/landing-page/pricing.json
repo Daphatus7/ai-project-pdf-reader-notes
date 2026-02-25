@@ -1,0 +1,30 @@
+{
+  "heading": "Invest in how you think",
+  "subheading": "Start exploring for free. Upgrade when you're ready to work without limits.",
+
+  "free": [
+    { "included": true, "label": "AI-native notebook experience" },
+    { "included": true, "label": "Notion-like editing experience" },
+    { "included": true, "label": "Table, Math & LaTeX support"},
+    { "included": true, "label": "limited AI assistance per day" },
+    { "included": true, "label": "Up to 4 PDFs" },
+    { "included": true, "label": "1 active projects" },
+    { "included": true, "label": "2 notebooks" },
+    { "included": true, "label": "Standard support" }
+  ],
+
+  "monthly": [
+    { "included": true, "label": "Everything in Free" },
+    { "included": true, "label": "High-volume AI assistance" },
+    { "included": true, "label": "Work across unlimited PDFs" },
+    { "included": true, "label": "Unlimited projects & notebooks" },
+    { "included": true, "label": "Priority support" }
+  ],
+
+  "yearly": [
+    "Everything in Pro",
+    "Early access to new capabilities",
+    "30-day money-back guarantee",
+    "Best value for serious users"
+  ]
+}

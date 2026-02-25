@@ -4,6 +4,8 @@ import {
 	FileText,
 	Trash2,
 	Upload,
+	Loader2,
+	Crown,
 } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { Checkbox } from '@/frontend/components/ui/checkbox';
@@ -13,6 +15,7 @@ import {
 	Collapsible,
 } from '@/frontend/components/ui/collapsible';
 import { DocumentUpload } from './document-upload';
+import { PricingDialog } from '@/frontend/features/pricing/PricingDialog';
 import { useSource } from './useSource';
 
 const FADE_GRADIENT = 'linear-gradient(to right, black 90%, transparent)';
@@ -34,6 +37,9 @@ interface SourcePanelProps {
 	projectName: string;
 	onBack: () => void;
 	onOpenDocument: (documentId: string) => void;
+	isLoadingDocument?: boolean;
+	canUploadDocument?: boolean;
+	onDocumentChange?: () => void;
 	onSourceSelectionChange?: (selectedIds: string[]) => void;
 }
 
@@ -42,30 +48,50 @@ export function SourcePanel({
 	projectName,
 	onBack,
 	onOpenDocument,
+	isLoadingDocument,
+	canUploadDocument = true,
+	onDocumentChange,
 	onSourceSelectionChange,
 }: SourcePanelProps) {
 	const source = useSource(projectId);
 	const [isSourcesOpen, setIsSourcesOpen] = useState(true);
+	const [pricingOpen, setPricingOpen] = useState(false);
 
 	useEffect(() => {
 		onSourceSelectionChange?.(source.selectedDocumentIds);
 	}, [source.selectedDocumentIds, onSourceSelectionChange]);
 
+	const handleUpload = async (file: File, sourceName?: string) => {
+		await source.uploadDocument(file, sourceName);
+		onDocumentChange?.();
+	};
+
+	const handleDelete = async (documentId: string) => {
+		await source.deleteDocument(documentId);
+		onDocumentChange?.();
+	};
+
 	return (
-		<div className="h-full flex flex-col">
+		<div className="h-full flex flex-col relative">
+			{isLoadingDocument && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+					<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+				</div>
+			)}
 			{/* Header - for source list */}
 			<div className="border-b p-3 flex items-center justify-between gap-2 h-13">
 				<span className="text-sm font-medium truncate">
 					{projectName}
 				</span>
-				<Button
-					variant="ghost"
-					size="sm"
-					onClick={onBack}
-				>
-					<ArrowLeft className="h-4 w-4" />
-				</Button>
-
+				<div className="flex items-center gap-2">
+	<Button
+						variant="ghost"
+						size="sm"
+						onClick={onBack}
+					>
+						<ArrowLeft className="h-4 w-4" />
+					</Button>
+				</div>
 			</div>
 
 			{/* Error */}
@@ -82,10 +108,22 @@ export function SourcePanel({
 
 						{/* Upload Area */}
 						<div className="mb-4">
-							<DocumentUpload
-								onUpload={source.uploadDocument}
-								isUploading={source.isUploading}
-							/>
+							{canUploadDocument ? (
+								<DocumentUpload
+									onUpload={handleUpload}
+									isUploading={source.isUploading}
+								/>
+							) : (
+								<button
+									type="button"
+									onClick={() => setPricingOpen(true)}
+									className="w-full rounded-lg border border-dashed border-amber-300 bg-amber-50 p-4 text-center cursor-pointer hover:bg-amber-100 transition-colors"
+								>
+									<Crown className="h-6 w-6 mx-auto mb-1 text-amber-500" />
+									<p className="text-sm text-amber-700">Document limit reached</p>
+									<p className="text-xs text-amber-600">Upgrade to upload more</p>
+								</button>
+							)}
 						</div>
 
 						{/* Documents List */}
@@ -118,7 +156,7 @@ export function SourcePanel({
 											variant="ghost"
 											size="icon"
 											className="h-7 w-7 opacity-0 group-hover:opacity-100 shrink-0"
-											onClick={() => source.deleteDocument(doc.id)}
+											onClick={() => handleDelete(doc.id)}
 										>
 											<Trash2 className="h-3.5 w-3.5" />
 										</Button>
@@ -133,6 +171,8 @@ export function SourcePanel({
 					</Collapsible>
 				</div>
 			</ScrollArea>
+
+			<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
 		</div>
 	);
 }

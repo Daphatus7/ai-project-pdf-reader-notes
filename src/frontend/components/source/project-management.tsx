@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
 import { useProject } from './useProject';
+import { useQuota } from '@/frontend/features/quota/use-quota';
 import { ProjectPanel } from './project-panel';
 import { SourcePanel } from './source-panel';
 import { ReaderPanel } from './reader/reader-panel';
@@ -21,12 +23,14 @@ export function ManagementPanel({
 	onSourceSelectionChange,
 }: ManagementPanelProps) {
 	const project = useProject();
+	const quota = useQuota();
 
 	// Navigation state — owned exclusively by ManagementPanel
 	const [activeView, setActiveView] = useState<ActiveView>('projects');
 	const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
 	const [currentProjectName, setCurrentProjectName] = useState('');
 	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
+	const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
 	const handleOpenProject = useCallback((projectId: string) => {
 		const found = project.projects.find((p) => p.id === projectId);
@@ -43,20 +47,28 @@ export function ManagementPanel({
 
 	const handleDeleteProject = useCallback(async (projectId: string) => {
 		await project.deleteProject(projectId);
-		// If deleting the currently open project, go back to project list
+		quota.refresh();
 		if (projectId === currentProjectId) {
 			handleBackToProjects();
 		}
-	}, [project, currentProjectId, handleBackToProjects]);
+	}, [project, quota, currentProjectId, handleBackToProjects]);
+
+	const handleCreateProject = useCallback(async (name: string, description?: string) => {
+		await project.createProject(name, description);
+		quota.refresh();
+	}, [project, quota]);
 
 	const handleOpenDocument = useCallback(async (documentId: string) => {
 		if (!currentProjectId) return;
+		setIsLoadingDocument(true);
 		try {
 			const url = await projectsService.getDocumentUrl(currentProjectId, documentId);
 			setCurrentDocumentUrl(url);
 			setActiveView('reader');
 		} catch {
-			// Error is handled silently; SourcePanel can show its own errors
+			toast.error('Failed to open document');
+		} finally {
+			setIsLoadingDocument(false);
 		}
 	}, [currentProjectId]);
 
@@ -85,6 +97,9 @@ export function ManagementPanel({
 				projectName={currentProjectName}
 				onBack={handleBackToProjects}
 				onOpenDocument={handleOpenDocument}
+				isLoadingDocument={isLoadingDocument}
+				canUploadDocument={quota.canCreate('documents')}
+				onDocumentChange={quota.refresh}
 				onSourceSelectionChange={onSourceSelectionChange}
 			/>
 		);
@@ -95,8 +110,10 @@ export function ManagementPanel({
 			projects={project.projects}
 			isLoading={project.isLoadingProjects}
 			error={project.error}
+			canCreateProject={quota.canCreate('projects')}
+			plan={quota.quota?.plan}
 			onOpenProject={handleOpenProject}
-			onCreateProject={project.createProject}
+			onCreateProject={handleCreateProject}
 			onDeleteProject={handleDeleteProject}
 		/>
 	);

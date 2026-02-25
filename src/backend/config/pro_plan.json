@@ -1,0 +1,12 @@
+{
+  "_comment": "Pro plan — source of truth. Currently 5x free tier limits.",
+
+  "plan_id": "pro",
+
+  "quotas": {
+    "max_projects":  10,
+    "max_documents": 20,
+    "max_notes":     50,
+    "max_tokens":    500000
+  }
+}

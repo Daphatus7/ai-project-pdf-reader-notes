@@ -29,12 +29,14 @@ export interface ChatPanelProps {
 	threadProp: ThreadTabsProps;
 	messages: ChatMessage[];
 	isLoading: boolean;
+	isThreadsLoading?: boolean;
 	onSendMessage: (content: ChatContent[]) => void;
 	onSelectContent?: (content: string) => void;
 }
 
 export interface ChatBubblesProps {
 	messages: ChatMessage[];
+	isLoading?: boolean;
 	onSelectContent?: (content: string) => void;
 }
 

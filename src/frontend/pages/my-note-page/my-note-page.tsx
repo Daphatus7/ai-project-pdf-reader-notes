@@ -102,7 +102,7 @@ export default function NotePage() {
 	return (
 		<div className="h-screen w-screen flex flex-col bg-background">
 			<Header />
-			<ResizablePanelGroup direction="horizontal">
+			<ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
 				{/* Center Content - PDF Reader and AI Chat */}
 				<ResizablePanel
 					ref={centerPanelRef}

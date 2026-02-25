@@ -30,7 +30,7 @@ FROM base AS production
 # Copy all source files
 COPY . .
 
-# Build production bundle
+# Build production bundle (ARGs are available as env vars during RUN)
 RUN npm run build
 
 # Use Node.js to serve static files (simpler than nginx for MVP)
@@ -44,8 +44,8 @@ RUN npm install -g serve
 # Copy built files from production stage
 COPY --from=production /app/build ./build
 
-EXPOSE 3000
+EXPOSE ${PORT:-3000}
 
-# Serve static files
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Serve static files - Railway injects $PORT, local defaults to 3000
+CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]
 

@@ -6,7 +6,7 @@ from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
 from src.backend.services.storage import RedisStorage
 from src.backend.services.storage.supabase_storage import SupabaseStorage
-from src.backend.services.context_provider.rag_service import RagService
+from src.backend.services.stripe_service import StripeService
 class Services:
     """Dependency injection container"""
     
@@ -46,10 +46,10 @@ class Services:
         )
         self.register('llm_service', llm_service)
 
-        # Initialize RAG service (for document upload and processing)
-        rag_service = RagService()
-        rag_service.start()
-        self.register('rag_service', rag_service)
+        # Initialize Stripe service
+        stripe_service = StripeService()
+        stripe_service.start()
+        self.register('stripe_service', stripe_service)
         
     def get_service(self, service_name: str) -> Any:
         """Get a service by name"""

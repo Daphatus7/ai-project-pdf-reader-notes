@@ -6,9 +6,9 @@ avoid missing values when running FastAPI from the backend directory.
 """
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def read_secret_file(secret_name: str) -> str:
@@ -29,46 +29,58 @@ class Settings(BaseSettings):
     google_api_key: str = Field(default_factory=lambda: read_secret_file("google_api_key") or os.getenv("GOOGLE_API_KEY", ""))
     
     # Server Configuration
-    cors_origins: str = Field(
-        default="http://localhost:3000",
-        env="CORS_ORIGINS"
-    )
-    
+    cors_origins: str = Field(default="http://localhost:3000")
+
     @property
     def cors_origins_list(self) -> List[str]:
-        """Convert CORS_ORIGINS string to list"""
+        """Convert CORS_ORIGINS string to list, auto-adding https:// if no protocol specified"""
         return [origin.strip() for origin in self.cors_origins.split(',')]
-    log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    host: str = Field(default="0.0.0.0", env="HOST")
-    port: int = Field(default=8000, env="PORT")
-    
+
+    log_level: str = Field(default="INFO")
+    host: str = Field(default="0.0.0.0")
+    port: int = Field(default=8000)
+
     # LLM Configuration
-    default_provider: str = Field(default="openai", env="DEFAULT_PROVIDER")
-    default_model: str = Field(default="gpt-5-nano-2025-08-07", env="DEFAULT_MODEL")
-    max_tokens: int = Field(default=1000, env="MAX_TOKENS")
-    temperature: float = Field(default=0.7, env="TEMPERATURE")
-    timeout: int = Field(default=30, env="TIMEOUT")
-    max_retries: int = Field(default=3, env="MAX_RETRIES")
+    default_provider: str = Field(default="openai")
+    default_model: str = Field(default="gpt-5-nano-2025-08-07")
+    max_tokens: int = Field(default=1000)
+    temperature: float = Field(default=0.7)
+    timeout: int = Field(default=30)
+    max_retries: int = Field(default=3)
     # Database
-    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
+    redis_url: str = Field(default="")
 
     # Conversation Storage - Redis Thread Configuration
-    redis_thread_ttl: int = Field(default=600, env="REDIS_THREAD_TTL")  # 30 minutes
-    redis_max_tokens: int = Field(default=20000, env="REDIS_MAX_TOKENS")  # Max tokens in Redis thread
+    redis_thread_ttl: int = Field(default=600)   # 10 minutes
+    redis_max_tokens: int = Field(default=20000)  # Max tokens in Redis thread
 
     # Conversation Storage - Cold Start Configuration
-    cold_start_max_messages: int = Field(default=10, env="COLD_START_MAX_MESSAGES")  # Max messages to load
-    cold_start_max_tokens: int = Field(default=200000, env="COLD_START_MAX_TOKENS")  # Max tokens to load
+    cold_start_max_messages: int = Field(default=10)    # Max messages to load
+    cold_start_max_tokens: int = Field(default=200000)  # Max tokens to load
 
     # Free tier usage limits
-    free_max_projects: int = Field(default=2, env="FREE_MAX_PROJECTS")
-    free_max_documents: int = Field(default=4, env="FREE_MAX_DOCUMENTS")
-    free_max_notes: int = Field(default=10, env="FREE_MAX_NOTES")
-    free_max_tokens: int = Field(default=100000, env="FREE_MAX_TOKENS")
+    free_max_projects: int = Field(default=2)
+    free_max_documents: int = Field(default=4)
+    free_max_notes: int = Field(default=10)
+    free_max_tokens: int = Field(default=100000)
 
-class Config:
-        env_file = Path(__file__).resolve().parent / '.env'
-        case_sensitive = False
+    # Stripe
+    stripe_secret_key: str = Field(default="")
+    stripe_webhook_secret: str = Field(default="")
+    stripe_payment_link_monthly: str = Field(default="")
+    stripe_payment_link_yearly: str = Field(default="")
+
+    # Monitoring
+    sentry_dsn: str = Field(default="")
+
+    # Optional PDF processing service — leave empty to disable RAG
+    pdf_backend_url: str = Field(default="")
+
+    # Pydantic V2 style config (replaces deprecated inner class Config)
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parent / '.env',
+        case_sensitive=False,
+    )
 
 
 # Global settings instance

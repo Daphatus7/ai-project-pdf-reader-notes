@@ -3,13 +3,14 @@
 # @author      [Peiyu Wang]
 # @date        21/1/2026
 # @license     © 2026 . All rights reserved.
-import os
+import logging
 import uuid
-import tempfile
 
-from fastapi import APIRouter, Depends, UploadFile, File, Form, Path
+import httpx
+from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile, File, Form, Path
 
-from src.backend.api.deps import get_rag_service, get_database_service, get_user
+from src.backend.api.deps import get_database_service, get_user
+from src.backend.config.config import settings
 from src.backend.schemas.project import (
     ListProjectsResponse,
     CreateProjectResponse,
@@ -18,13 +19,20 @@ from src.backend.schemas.project import (
     ProjectDeleteResponse,
     DeleteDocumentResponse,
 )
-from src.backend.schemas.rag import RagRequest, UploadResponse
+from src.backend.schemas.rag import UploadResponse
 from src.backend.schemas.error import validation_error
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/projects', tags=['process'])
 
-ALLOWED_TYPES = {'application/pdf'}
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+try:
+    # Prefer configuration from config.py if available
+    from config import ALLOWED_TYPES, MAX_FILE_SIZE  # type: ignore
+except ImportError:
+    # Fallback to defaults if config module is not available
+    ALLOWED_TYPES = {'application/pdf'}
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 
 async def read_and_validate_file(file: UploadFile, allowed_types: set, max_size: int) -> bytes:
@@ -84,39 +92,68 @@ async def list_documents(
     return ListDocumentsResponse(documents=documents)
 
 
+async def _trigger_rag_processing(
+    document_id: str, project_id: str, document_name: str, file_data: bytes
+) -> None:
+    """Fire-and-forget: ask pdf_backend to chunk and embed the document."""
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(
+                f"{settings.pdf_backend_url}/api/v1/documents/process",
+                files={"file": ("document.pdf", file_data, "application/pdf")},
+                data={
+                    "document_id": document_id,
+                    "project_id": project_id,
+                    "document_name": document_name,
+                },
+            )
+        if response.status_code != 200:
+            logger.warning(
+                f"RAG processing failed for document {document_id}: {response.text}"
+            )
+    except Exception as e:
+        logger.warning(f"pdf_backend unreachable, RAG skipped for document {document_id}: {e}")
+
+
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
+        background_tasks: BackgroundTasks,
         project_id: str = Path(..., description='Project ID to upload document to'),
         file: UploadFile = File(..., description='PDF file to upload'),
         user=Depends(get_user),
         source_name: str = Form(None, description='Optional custom name for the document'),
-        rag_service=Depends(get_rag_service),
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
 
-    # validate
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
 
-    # action — quota enforcement handled by database_service.enforce_quota inside rag_service
-    temp_path = None
-    try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
-            tmp.write(content)
-            temp_path = tmp.name
+    incremented = await database_service.enforce_quota(user_id, 'doc_count')
 
-        rag_request = RagRequest(
+    try:
+        document = await database_service.upload_document(
             user_id=user_id,
             project_id=project_id,
             document_name=source,
-            document_dir=temp_path,
+            file_data=content,
         )
-        result = await rag_service.upload_document(rag_request)
-        return result
-    finally:
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
+    except Exception:
+        if incremented:
+            await database_service.decrement_usage(user_id, 'doc_count')
+        raise
+
+    # RAG processing via pdf_backend — disabled for now, uncomment when needed.
+    # if settings.pdf_backend_url:
+    #     background_tasks.add_task(
+    #         _trigger_rag_processing,
+    #         document_id=document['id'],
+    #         project_id=project_id,
+    #         document_name=source,
+    #         file_data=content,
+    #     )
+
+    return UploadResponse(success=True, message="Document uploaded successfully")
 
 
 @router.delete('/{project_id}/documents/{document_id}', response_model=DeleteDocumentResponse)

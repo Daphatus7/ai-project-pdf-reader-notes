@@ -12,6 +12,7 @@ from supabase import create_client, Client
 from src.backend.schemas.chat.llm import LoadThreadRequest
 from src.backend.services.service import Service
 from src.backend.config.config import settings
+from src.backend.config.plans import get_plan_quotas
 from src.backend.schemas.error import (
     AppError, not_found, conflict, internal_error, quota_exceeded,
 )
@@ -31,25 +32,23 @@ class SupabaseStorage(Service):
     def __init__(self):
         dotenv.load_dotenv()
         self.__database = None
+        self.__auth_client = None
 
     def get(self):
         return self.__database
 
     def start(self):
-        try:
-            url: str = os.environ.get('SUPABASE_URL')
-            if url is None:
-                raise ValueError('SUPABASE_URL environment variable is not set.')
-        except Exception as e:
-            raise ValueError('SUPABASE_URL environment variable is not set.') from e
-        try:
-            key: str = os.environ.get('SUPABASE_SECRET_KEY')
-            if key is None:
-                raise ValueError('SUPABASE_KEY environment variable is not set.')
-        except Exception as e:
-            raise ValueError('SUPABASE_KEY environment variable is not set.') from e
+        url: str = os.environ.get('SUPABASE_URL')
+        if url is None:
+            raise ValueError('SUPABASE_URL environment variable is not set.')
+        key: str = os.environ.get('SUPABASE_SECRET_KEY')
+        if key is None:
+            raise ValueError('SUPABASE_KEY environment variable is not set.')
 
+        # Separate clients: __database for DB operations (service_role, never mutated),
+        # __auth_client for login/register (its auth state will change per call).
         self.__database: Client = create_client(url, key)
+        self.__auth_client: Client = create_client(url, key)
         logger.info('Supabase database service started')
 
     # ==================== Auth Operations ====================
@@ -57,7 +56,7 @@ class SupabaseStorage(Service):
     async def register(self, request) -> dict:
         try:
             logger.info(f"Attempting to register {request.email}")
-            resp = self.__database.auth.sign_up({
+            resp = self.__auth_client.auth.sign_up({
                 "email": request.email,
                 "password": request.password,
                 "options": {
@@ -77,7 +76,7 @@ class SupabaseStorage(Service):
     async def login(self, email: str, password: str) -> dict:
         try:
             logger.info("Attempting to log in user with email: %s", email)
-            resp = self.__database.auth.sign_in_with_password({
+            resp = self.__auth_client.auth.sign_in_with_password({
                 'email': email,
                 'password': password,
             })
@@ -107,42 +106,34 @@ class SupabaseStorage(Service):
     # ==================== Quota Enforcement ====================
 
     async def enforce_quota(self, user_id: str, resource: str) -> bool:
-        """Check plan, atomically increment quota. Raises AppError(429) if exceeded.
-        Returns True if counter was incremented (free plan), False otherwise."""
+        """Check plan quotas from plan JSON, atomically increment. Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return False
-        limits = {
-            'project_count': settings.free_max_projects,
-            'doc_count': settings.free_max_documents,
-            'note_count': settings.free_max_notes,
+        quotas = get_plan_quotas(plan)
+        resource_map = {
+            'project_count': ('max_projects',  'projects'),
+            'doc_count':     ('max_documents', 'documents'),
+            'note_count':    ('max_notes',     'notes'),
         }
-        limit = limits[resource]
+        quota_key, display_name = resource_map[resource]
+        limit = quotas[quota_key]
         result = await self.check_and_increment_usage(user_id, resource, limit)
         if not result['allowed']:
-            resource_names = {
-                'project_count': 'projects',
-                'doc_count': 'documents',
-                'note_count': 'notes',
-            }
-            quota_exceeded(resource_names[resource], result['current'], limit)
+            quota_exceeded(display_name, result['current'], limit)
         return True
 
     async def enforce_token_quota(self, user_id: str):
         """Check token quota (read-only, no increment). Raises AppError(429) if exceeded."""
         plan = await self.get_user_plan(user_id)
-        if plan != 'free':
-            return
-        result = await self.check_token_limit(user_id, settings.free_max_tokens)
+        quotas = get_plan_quotas(plan)
+        limit = quotas['max_tokens']
+        result = await self.check_token_limit(user_id, limit)
         if not result['allowed']:
-            quota_exceeded('tokens', result['current'], settings.free_max_tokens)
+            quota_exceeded('tokens', result['current'], limit)
 
     async def track_token_usage(self, user_id: str, tokens: int):
-        """Increment token usage if on free plan and tokens > 0."""
+        """Increment token usage for all plans."""
         if tokens and tokens > 0:
-            plan = await self.get_user_plan(user_id)
-            if plan == 'free':
-                await self.increment_token_usage(user_id, tokens)
+            await self.increment_token_usage(user_id, tokens)
 
     # ==================== Projects Operations ====================
 
@@ -218,6 +209,51 @@ class SupabaseStorage(Service):
             internal_error('Failed to delete project')
 
     # ==================== Documents Operations ====================
+
+    async def upload_document(
+        self, user_id: str, project_id: str, document_name: str, file_data: bytes
+    ) -> dict:
+        """Create a document record and upload the PDF to Supabase Storage.
+        Returns the created document record (including its id).
+        Rolls back the DB record if storage upload fails.
+        """
+        try:
+            response = self.__database.table("documents").insert({
+                "user_id": user_id,
+                "project_id": project_id,
+                "document_name": document_name,
+                "document_dir": "",
+                "description": "",
+            }).execute()
+            if not response.data:
+                internal_error("Failed to create document record")
+            document = response.data[0]
+            document_id = document["id"]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to create document record: {e}")
+            internal_error("Failed to create document record")
+
+        storage_path = f"{user_id}/documents/{document_id}.pdf"
+        try:
+            self.__database.storage.from_("docs").upload(
+                path=storage_path,
+                file=file_data,
+                file_options={"content-type": "application/pdf"},
+            )
+            self.__database.table("documents").update(
+                {"document_dir": storage_path}
+            ).eq("id", document_id).execute()
+            logger.info(f"Document uploaded: user={user_id}, document={document_id}")
+            document["document_dir"] = storage_path
+            return document
+        except Exception as e:
+            self.__database.table("documents").delete().eq("id", document_id).execute()
+            logger.error(f"Storage upload failed, rolled back document record: {e}")
+            internal_error("Failed to upload document to storage")
+
+
 
     async def get_documents(self, user_id: str, project_id: str) -> list[dict]:
         try:
@@ -499,6 +535,21 @@ class SupabaseStorage(Service):
 
     async def update_note(self, user_id: str, note_id: str, payload) -> dict:
         try:
+            # If content is changing, find orphaned images via note_assets table
+            orphaned_storage_paths: list[str] = []
+            orphaned_asset_ids: list[str] = []
+            if payload.content_markdown is not None:
+                assets = (self.__database.table('note_assets')
+                          .select('id, storage_path, url')
+                          .eq('note_id', note_id)
+                          .execute())
+                if assets.data:
+                    new_content = payload.content_markdown
+                    for asset in assets.data:
+                        if asset['url'] not in new_content:
+                            orphaned_storage_paths.append(asset['storage_path'])
+                            orphaned_asset_ids.append(asset['id'])
+
             update_data = {}
             if payload.title is not None:
                 update_data['title'] = payload.title
@@ -529,6 +580,14 @@ class SupabaseStorage(Service):
                 else:
                     not_found('Note')
 
+            # Update succeeded — clean up orphaned images (best-effort)
+            if orphaned_storage_paths:
+                self._delete_note_images(orphaned_storage_paths)
+                try:
+                    self.__database.table('note_assets').delete().in_('id', orphaned_asset_ids).execute()
+                except Exception as e:
+                    logger.error(f'Failed to delete orphaned note_assets records: {e}')
+
             logger.info(f'Note updated: user={user_id}, note={note_id}')
             return response.data[0]
 
@@ -539,7 +598,7 @@ class SupabaseStorage(Service):
             internal_error('Failed to update note')
 
     async def delete_note(self, user_id: str, note_id: str) -> dict:
-        """Delete a note and decrement usage."""
+        """Delete a note, its images from storage, and decrement usage."""
         try:
             note = (self.__database.table('notes')
                     .select('id')
@@ -548,6 +607,15 @@ class SupabaseStorage(Service):
                     .execute())
             if not note.data:
                 not_found('Note')
+
+            # Delete associated images from Storage (note_assets cascade-deleted with note)
+            assets = (self.__database.table('note_assets')
+                      .select('storage_path')
+                      .eq('note_id', note_id)
+                      .execute())
+            if assets.data:
+                storage_paths = [a['storage_path'] for a in assets.data]
+                self._delete_note_images(storage_paths)
 
             self.__database.table('notes').delete().eq('id', note_id).execute()
             logger.info(f'Note deleted: user={user_id}, note={note_id}')
@@ -560,6 +628,58 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to delete note {note_id}: {e}')
             internal_error('Failed to delete note')
+
+    # ==================== Note Image Operations ====================
+
+    def _delete_note_images(self, paths: list[str]) -> None:
+        """Delete images from note-images storage bucket (best-effort)."""
+        if not paths:
+            return
+        try:
+            self.__database.storage.from_('note-images').remove(paths)
+            logger.info(f'Deleted {len(paths)} note image(s) from storage')
+        except Exception as e:
+            logger.error(f'Failed to delete note images from storage: {e}')
+
+    async def upload_note_image(
+        self, user_id: str, note_id: str, file_data: bytes, filename: str, content_type: str
+    ) -> str:
+        """Upload an image to Supabase Storage, record in note_assets, return public URL."""
+        import uuid as uuid_lib
+        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+        image_id = uuid_lib.uuid4().hex
+        storage_path = f"{user_id}/{image_id}.{ext}"
+
+        try:
+            self.__database.storage.from_('note-images').upload(
+                path=storage_path,
+                file=file_data,
+                file_options={"content-type": content_type},
+            )
+        except Exception as e:
+            logger.error(f'Failed to upload note image for user {user_id}: {e}')
+            internal_error('Failed to upload image')
+
+        supabase_url = os.environ.get('SUPABASE_URL', '')
+        public_url = f"{supabase_url}/storage/v1/object/public/note-images/{storage_path}"
+
+        try:
+            self.__database.table('note_assets').insert({
+                'note_id': note_id,
+                'user_id': user_id,
+                'storage_path': storage_path,
+                'url': public_url,
+            }).execute()
+            logger.info(f'Note image uploaded and recorded: {storage_path}')
+        except Exception as e:
+            logger.error(f'Failed to record note asset for note {note_id}: {e}')
+            # Roll back uploaded image to avoid leaving untracked storage objects
+            try:
+                self._delete_note_images([storage_path])
+            except Exception as cleanup_err:
+                logger.error(f'Failed to roll back uploaded note image {storage_path}: {cleanup_err}')
+            internal_error('Failed to record note asset')
+        return public_url
 
     # ==================== Usage Tracking Operations ====================
 
@@ -634,3 +754,70 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to get usage for {user_id}: {e}')
             return {'project_count': 0, 'doc_count': 0, 'note_count': 0, 'token_used': 0}
+
+    # ==================== Stripe / Subscription Operations ====================
+
+    async def get_stripe_customer_id(self, user_id: str) -> str | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('stripe_customer_id')
+                        .eq('id', user_id)
+                        .execute())
+            if response.data:
+                return response.data[0].get('stripe_customer_id')
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get stripe_customer_id for {user_id}: {e}')
+            return None
+
+    async def get_profile_by_stripe_customer(self, stripe_customer_id: str) -> dict | None:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('id, stripe_customer_id, stripe_subscription_id, subscription_status, plan, current_period_end')
+                        .eq('stripe_customer_id', stripe_customer_id)
+                        .execute())
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            logger.error(f'Failed to get profile for stripe_customer {stripe_customer_id}: {e}')
+            return None
+
+    async def update_profile_stripe(self, user_id: str, **fields) -> None:
+        try:
+            self.__database.table('profiles').update(fields).eq('id', user_id).execute()
+            logger.info(f'Updated stripe fields for user {user_id}: {list(fields.keys())}')
+        except Exception as e:
+            logger.error(f'Failed to update stripe fields for {user_id}: {e}')
+            internal_error('Failed to update subscription')
+
+    async def get_subscription_status(self, user_id: str) -> dict:
+        try:
+            response = (self.__database.table('profiles')
+                        .select('plan, subscription_status, plan_interval, current_period_end, cancel_at_period_end')
+                        .eq('id', user_id)
+                        .execute())
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f'Failed to get subscription status for {user_id}: {e}')
+            return {}
+
+    async def downgrade_to_free(self, stripe_customer_id: str) -> None:
+        try:
+            profile_resp = self.__database.table('profiles').update({
+                'plan': 'free',
+                'subscription_status': 'canceled',
+                'stripe_subscription_id': None,
+                'cancel_at_period_end': False,
+                'current_period_end': None,
+            }).eq('stripe_customer_id', stripe_customer_id).execute()
+            logger.info(f'Downgraded to free: stripe_customer={stripe_customer_id}')
+
+            if not profile_resp.data:
+                logger.warning(f'downgrade_to_free: no profile found for stripe_customer={stripe_customer_id}, skipping usage update')
+                return
+
+            user_id = profile_resp.data[0]['id']
+            logger.info(f"downgrade complete for user={user_id}, quotas enforced via plan config")
+        except Exception as e:
+            logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')

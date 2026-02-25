@@ -26,33 +26,44 @@ class RedisStorage(Service):
         self._redis_conn: redis.Redis | None = None
         self._checkpointer: ShallowRedisSaver | None = None
 
+    @property
+    def available(self) -> bool:
+        """Whether Redis is connected and available."""
+        return self._redis_conn is not None
+
     def start(self):
-        """Initialize Redis connection and checkpointer."""
+        """Initialize Redis connection and checkpointer. Skips if REDIS_URL is empty."""
         if self._redis_conn is not None:
             return  # Already initialized
 
+        if not settings.redis_url:
+            raise RuntimeError("REDIS_URL environment variable is not set. Please configure it before starting the service.")
+
         self._logger.info(f"Connecting to Redis: {settings.redis_url}")
 
-        # Create shared Redis connection
-        self._redis_conn = redis.Redis.from_url(
+        # 使用连接池，高并发时多用户不会排队等待同一个连接
+        pool = redis.ConnectionPool.from_url(
             settings.redis_url,
+            max_connections=50,
             decode_responses=False  # RedisSaver needs bytes
         )
+        self._redis_conn = redis.Redis(connection_pool=pool)
 
         # Verify connection
         self._redis_conn.ping()
         self._logger.info("Redis connection established")
 
         # Use ShallowRedisSaver: only keeps the latest checkpoint per thread
-
         self._checkpointer = ShallowRedisSaver(
             redis_client=self._redis_conn,
-            ttl= {
+            ttl={
                 "default": settings.redis_thread_ttl
             }
         )
         self._checkpointer.setup()
-        self._logger.info("ShallowRedisSaver checkpointer initialized with TTL=10min")
+        self._logger.info(
+            f"ShallowRedisSaver checkpointer initialized with TTL={settings.redis_thread_ttl}s"
+        )
 
     def get(self):
         """Get the storage service instance."""

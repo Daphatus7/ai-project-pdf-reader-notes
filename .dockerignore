@@ -33,6 +33,10 @@ compose.yaml
 # Logs
 *.log
 
+# Misc
+.cache
+*.md
+
 
 
 

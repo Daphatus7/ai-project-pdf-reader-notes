@@ -1,0 +1,2 @@
+# PDF processing dependencies have moved to src/pdf_backend/requirements.txt
+# This file is kept as a placeholder.

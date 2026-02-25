@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
+import { isQuotaError } from '@/frontend/features/quota/use-quota';
 import type { Project } from './type';
 
 export interface UseProjectReturn {
@@ -39,8 +41,15 @@ export function useProject(): UseProjectReturn {
 				await projectsService.createProject({ name, description });
 				const list = await projectsService.listProjects();
 				setProjects(list);
+				toast.success('Project created');
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to create project');
+				if (isQuotaError(err)) {
+					toast.error('Project limit reached. Upgrade your plan to create more.');
+				} else {
+					const msg = err instanceof Error ? err.message : 'Failed to create project';
+					setError(msg);
+					toast.error(msg);
+				}
 				throw err;
 			}
 		},
@@ -54,8 +63,11 @@ export function useProject(): UseProjectReturn {
 				await projectsService.deleteProject(projectId);
 				const list = await projectsService.listProjects();
 				setProjects(list);
+				toast.success('Project deleted');
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to delete project');
+				const msg = err instanceof Error ? err.message : 'Failed to delete project';
+				setError(msg);
+				toast.error(msg);
 				throw err;
 			}
 		},

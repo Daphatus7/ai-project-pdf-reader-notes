@@ -12,8 +12,9 @@ import { ThreadSidebar } from "@/frontend/components/chat/thread-sidebar/thread-
 import type {ChatPanelProps} from "@/frontend/api/types/llm.ts";
 import {Button} from "@/frontend/components/ui/button.tsx";
 import {LucideChefHat, LucidePlus, LucidePanelRight} from "lucide-react";
+import { Skeleton } from "@/frontend/components/ui/skeleton.tsx";
 
-export function ChatPanel({threadProp, messages, isLoading, onSendMessage, onSelectContent }:
+export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, onSendMessage, onSelectContent }:
 						  ChatPanelProps) {
 	const [showThreadSidebar, setShowThreadSidebar] = useState(false);
 
@@ -37,7 +38,21 @@ export function ChatPanel({threadProp, messages, isLoading, onSendMessage, onSel
 					</div>
 				</div>
 
-				<ChatBubbles messages={messages} onSelectContent={onSelectContent} />
+				{isThreadsLoading ? (
+					<div className="flex-1 p-4 space-y-4">
+						<div className="flex justify-start">
+							<Skeleton className="h-16 w-3/4 rounded-lg" />
+						</div>
+						<div className="flex justify-end">
+							<Skeleton className="h-10 w-1/2 rounded-lg" />
+						</div>
+						<div className="flex justify-start">
+							<Skeleton className="h-24 w-3/4 rounded-lg" />
+						</div>
+					</div>
+				) : (
+					<ChatBubbles messages={messages} isLoading={isLoading} onSelectContent={onSelectContent} />
+				)}
 
 				<ChatBar onSend={onSendMessage} isLoading={isLoading} />
 			</div>

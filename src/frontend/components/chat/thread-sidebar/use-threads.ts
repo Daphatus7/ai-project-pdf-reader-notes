@@ -28,9 +28,14 @@ export function useThreads() {
 			setIsLoading(true);
 			try {
 				const response = await llmService.listThreads();
-				setThreads(response.threads);
 				if (response.threads.length > 0) {
+					setThreads(response.threads);
 					setActiveThreadId(response.threads[0].thread_id);
+				} else {
+					const newThread = await llmService.createThread();
+					setThreads([newThread]);
+					setMessagesByThread(prev => ({ ...prev, [newThread.thread_id]: [] }));
+					setActiveThreadId(newThread.thread_id);
 				}
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Failed to load threads');
