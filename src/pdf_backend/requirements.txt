@@ -6,6 +6,7 @@ pydantic-settings>=2.0.0
 python-multipart>=0.0.9
 
 # PDF processing — fast strategy only, no Detectron2/OCR heavy deps
+pypdf>=4.0.0
 chonkie[neural]>=1.0.0
 unstructured>=0.16.0
 unstructured-inference>=0.7.0

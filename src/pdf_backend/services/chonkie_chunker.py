@@ -4,7 +4,7 @@ from typing import Any
 from chonkie import NeuralChunker
 
 from src.pdf_backend.schemas.rag import ProcessRequest
-from src.pdf_backend.services.pdf_extract import extract_pdf_elements
+from src.pdf_backend.services.pdf_extract import extract_pdf_elements, extract_pdf_elements_parallel
 
 
 @dataclass
@@ -114,22 +114,28 @@ async def __process_pdf(payload: RawContextPayload) -> list[dict]:
     ]
 
 
-async def chonkie_chunk(rag_request: ProcessRequest, file_path: str) -> list[dict]:
+async def chonkie_chunk(rag_request: ProcessRequest, file_path: str, cores: int = 1) -> list[dict]:
     """
     Extract and chunk a PDF at file_path.
     file_path is the server-internal temp path, separate from the API contract.
+    cores > 1 enables parallel page-range extraction via ProcessPoolExecutor.
     Returns list of chunk dicts.
     """
     if not file_path:
         raise ValueError("file_path cannot be empty")
 
-    extracted = extract_pdf_elements(file_path)
+    # Use parallel extraction when multiple cores are allocated; otherwise single-threaded.
+    if cores > 1:
+        extracted = extract_pdf_elements_parallel(file_path, cores)
+    else:
+        extracted = [el.to_dict() for el in extract_pdf_elements(file_path)]
+
     if not extracted:
         raise ValueError("No content extracted from PDF")
 
     return await __process_pdf(
         payload=RawContextPayload(
-            payload=[el.to_dict() for el in extracted],
+            payload=extracted,
             dir=file_path,
             name=rag_request.document_name,
         )

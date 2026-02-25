@@ -68,7 +68,7 @@ class RagService:
     ) -> tuple[bool, int, str]:
         """
         Synchronous version for RQ workers.
-        cores: number of CPU cores allocated by the scheduler.
+        cores: forwarded to the parallel PDF extractor.
         on_progress: optional callback(pct: int) called during processing.
         """
         import asyncio
@@ -78,11 +78,12 @@ class RagService:
                 project_id=project_id,
                 document_name=document_name,
                 file_path=file_path,
+                cores=cores,
             )
         )
 
     async def process(
-        self, document_id: str, project_id: str, document_name: str, file_path: str
+        self, document_id: str, project_id: str, document_name: str, file_path: str, cores: int = 1,
     ) -> tuple[bool, int, str]:
         """
         Full RAG pipeline for a PDF at file_path.
@@ -99,6 +100,7 @@ class RagService:
                     document_name=document_name,
                 ),
                 file_path=file_path,
+                cores=cores,
             )
         except Exception as e:
             logger.exception(f"Chunking failed for document {document_id}: {e}")
