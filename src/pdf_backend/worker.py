@@ -40,8 +40,11 @@ if __name__ == "__main__":
     worker_count = int(os.getenv("WORKER_COUNT", "8"))
     logger.info("Starting %d RQ worker processes", worker_count)
 
+    # daemon=False so that worker processes can spawn their own subprocesses
+    # (e.g. ProcessPoolExecutor for parallel PDF extraction).
+    # SIGTERM handler below ensures all children are still terminated on shutdown.
     processes: list[multiprocessing.Process] = [
-        multiprocessing.Process(target=_run_single_worker, daemon=True)
+        multiprocessing.Process(target=_run_single_worker, daemon=False)
         for _ in range(worker_count)
     ]
 
