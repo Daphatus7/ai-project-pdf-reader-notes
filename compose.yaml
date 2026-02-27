@@ -30,11 +30,6 @@ services:
       - .:/app
     ports:
       - "8001:8001"
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - ALLOWED_ORIGINS=["http://backend:8001"]
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
     depends_on:
       - redis
 
@@ -46,10 +41,6 @@ services:
       target: worker
     volumes:
       - .:/app
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
     depends_on:
       - redis
 
