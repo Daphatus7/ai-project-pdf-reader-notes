@@ -20,6 +20,39 @@ services:
     depends_on:
       - redis
 
+  # PDF backend - handles PDF extraction, chunking, and RAG vector storage
+  pdf-backend:
+    build:
+      context: .
+      dockerfile: ./src/pdf_backend/Dockerfile
+      target: development
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8001"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - ALLOWED_ORIGINS=["http://backend:8001"]
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
+    depends_on:
+      - redis
+
+  # PDF worker - processes jobs from Redis queue
+  pdf-worker:
+    build:
+      context: .
+      dockerfile: ./src/pdf_backend/Dockerfile
+      target: worker
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
+    depends_on:
+      - redis
+
   # Frontend service - React/Vite application
   frontend:
     build:

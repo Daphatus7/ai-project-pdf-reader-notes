@@ -37,6 +37,9 @@ async def process_document(
     Validate and enqueue a PDF for processing.
     Returns job_id immediately (202 Accepted); result is delivered via webhook + SSE.
     """
+    
+    logger.info("Received processing request for document_id=%s user_id=%s tier=%s", document_id, user_id, tier)
+    
     # Reject if user already has an active job
     existing = _job_store.active_job_for_user(user_id)
     if existing:

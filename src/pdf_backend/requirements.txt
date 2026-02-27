@@ -5,17 +5,21 @@ pydantic>=2.12.5
 pydantic-settings>=2.0.0
 python-multipart>=0.0.9
 
-# PDF processing — fast strategy only, no Detectron2/OCR heavy deps
-pypdf>=4.0.0
-chonkie[neural]>=1.0.0
-unstructured>=0.16.0
-unstructured-inference>=0.7.0
+unstructured[pdf]>=0.16.0
+nltk>=3.8
 pdfminer.six>=20221105
+pypdf>=4.0.0
+unstructured_inference
+
+# LLM / vector storage
 langchain-openai>=1.1.0
 supabase>=2.27
+
+# Neural chunking — NeuralChunker with ModernBERT model
+# model weights are downloaded on first container start (~300 MB)
+chonkie[neural]>=1.0.0
 
 # Job queue and async notifications
 rq>=1.16.0
 redis>=5.0.0
 httpx>=0.27.0
-numpy==2.2.6

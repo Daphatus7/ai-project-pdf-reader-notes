@@ -19,7 +19,7 @@ def extract_pdf_elements(pdf_path: str) -> list[Element]:
     elements = partition_pdf(
         filename=pdf_path,
         infer_table_structure=True,
-        strategy='fast',
+        strategy='hi_res',
         content_type='application/pdf',
         skip_infer_table_types=False,
         extract_images_in_pdf=False,
@@ -52,7 +52,7 @@ def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) ->
         elements = partition_pdf(
             filename=tmp_path,
             infer_table_structure=True,
-            strategy="fast",
+            strategy='hi_res',
             content_type="application/pdf",
             skip_infer_table_types=False,
             extract_images_in_pdf=False,

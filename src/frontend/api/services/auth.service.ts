@@ -1,10 +1,3 @@
-/**
- * @file        auth.service.ts
- *
- * @author      [Peiyu Wang]
- * @created     Sunday
- * @license     © 2026 . All rights reserved.
- */
 
 import { apiConfig } from '../core/config';
 import { ApiError } from '../core/errors';

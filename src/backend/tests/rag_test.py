@@ -23,8 +23,7 @@ import asyncio
 # =============================================================================
 # Test Configuration (based on server settings in config.py)
 # =============================================================================
-HOST = os.getenv("HOST", "0.0.0.0")
-PORT = int(os.getenv("PORT", "8000"))
+PORT = int(os.getenv("PORT", "8001"))
 BASE_URL = os.getenv("TEST_BASE_URL", f"http://localhost:{PORT}")
 
 # Test data
