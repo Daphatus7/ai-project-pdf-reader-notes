@@ -127,22 +127,15 @@ async def chonkie_chunk(rag_request: ProcessRequest, file_path: str, cores: int 
     if not file_path:
         raise ValueError("file_path cannot be empty")
 
-    # Use parallel extraction when multiple cores are allocated; otherwise single-threaded.
+
     logger.info("Extracting PDF (cores=%d): %s", cores, file_path)
-    if cores > 1:
+    # Extract Raw Elements from PDF
+    if cores > 1: # Multithreading
         extracted = extract_pdf_elements_parallel(file_path, cores)
-    else:
-        extracted = [el.to_dict() for el in extract_pdf_elements(file_path)]
-    logger.info("Extraction done: %d elements", len(extracted))
-    for i, el in enumerate(extracted):
-        text = (el.get("text") or "")[:200]
-        page = (el.get("metadata") or {}).get("page_number", "?")
-        logger.debug("[element %d] page=%s text=%r", i, page, text)
+    else: # single-threaded
+        extracted = extract_pdf_elements(file_path)
 
-    if not extracted:
-        raise ValueError("No content extracted from PDF")
-
-    logger.info("Starting neural chunking on %d elements", len(extracted))
+    
     result = await __process_pdf(
         payload=RawContextPayload(
             payload=extracted,

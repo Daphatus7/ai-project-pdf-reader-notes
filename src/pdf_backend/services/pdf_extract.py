@@ -4,34 +4,29 @@ import os
 import tempfile
 from concurrent.futures import ProcessPoolExecutor
 
-from unstructured.documents.elements import Element
-from unstructured.partition.pdf import partition_pdf
+from docling.document_converter import DocumentConverter
+from docling_core.types import DoclingDocument
+
 
 logger = logging.getLogger(__name__)
 
 # ── Single-threaded extraction (original) ─────────────────────────────────────
 
-def extract_pdf_elements(pdf_path: str) -> list[Element]:
+def extract_pdf_elements(pdf_path: str) -> DoclingDocument:
     """
     Parse a PDF into unstructured Element objects.
     Uses 'fast' strategy (pdfminer) — no Detectron2 or OCR required.
     Suitable for PDFs with an embedded text layer.
     """
     logger.info("Single-threaded extraction: %s", pdf_path)
-    elements = partition_pdf(
-        filename=pdf_path,
-        infer_table_structure=True,
-        strategy='hi_res',
-        content_type='application/pdf',
-        skip_infer_table_types=False,
-        extract_images_in_pdf=False,
-    )
-    return elements
+    converter = DocumentConverter()
+    doc = converter.convert(pdf_path).document
+    return doc
 
 
 # ── Parallel extraction ────────────────────────────────────────────────────────
 
-def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) -> list[dict]:
+def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) -> DoclingDocument:
     """
     Top-level worker for ProcessPoolExecutor — must be module-level to be picklable.
     Writes pages [start_page, end_page) to a temp PDF, runs partition_pdf on it,
@@ -51,43 +46,20 @@ def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) ->
             writer.write(tmp)
             tmp_path = tmp.name
 
-        elements = partition_pdf(
-            filename=tmp_path,
-            infer_table_structure=True,
-            strategy='hi_res',
-            content_type="application/pdf",
-            skip_infer_table_types=False,
-            extract_images_in_pdf=False,
-        )
-
-        # Convert to dicts and shift page numbers to match the original document.
-        # partition_pdf reports page 1 for the first page of the sub-PDF;
-        # adding start_page (0-indexed) gives the original 1-indexed page number.
-        result = []
-        for el in elements:
-            d = el.to_dict()
-            if d.get("metadata"):
-                reported = d["metadata"].get("page_number") or 1
-                d["metadata"]["page_number"] = reported + start_page
-            result.append(d)
-        return result
-
+            converter = DocumentConverter()
+            doc = converter.convert(pdf_path).document
+            return doc
+    except Exception as e:
+        logger.error("Error in page range worker (%d-%d): %s", start_page, end_page, e)
     finally:
-        if tmp_path and os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
 
 
-def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> list[dict]:
+def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> DoclingDocument:
     """
     Parallel PDF extraction: splits the document into up to `cores` page ranges
     and processes each range in a dedicated subprocess via ProcessPoolExecutor.
-
-    Returns element dicts (same schema as Element.to_dict()) sorted by page number.
-    Falls back to single-threaded extraction when cores <= 1 or the document has
-    fewer pages than the requested core count.
-
-    Caller's process must NOT be a daemon process (daemon processes cannot spawn
-    children). worker.py sets daemon=False for this reason.
     """
     from pypdf import PdfReader
 
@@ -99,7 +71,7 @@ def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> list[dict]:
     if cores <= 1 or total_pages <= 1 or multiprocessing.current_process().daemon:
         if multiprocessing.current_process().daemon:
             logger.warning("Running in daemon process — falling back to single-threaded extraction")
-        return [el.to_dict() for el in extract_pdf_elements(pdf_path)]
+        return extract_pdf_elements(pdf_path)
 
     # Clamp cores to the actual number of pages
     actual_cores = min(cores, total_pages)
