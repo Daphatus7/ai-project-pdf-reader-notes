@@ -72,6 +72,7 @@ class RagService:
         on_progress: optional callback(pct: int) called during processing.
         """
         import asyncio
+        logger.info("[%s] process_sync starting (cores=%d)", document_id, cores)
         return asyncio.get_event_loop().run_until_complete(
             self.process(
                 document_id=document_id,
@@ -93,6 +94,7 @@ class RagService:
         from src.pdf_backend.schemas.rag import ProcessRequest
 
         try:
+            logger.info("[%s] Starting extraction + chunking", document_id)
             chunks = await chonkie_chunk(
                 ProcessRequest(
                     document_id=document_id,
@@ -102,6 +104,7 @@ class RagService:
                 file_path=file_path,
                 cores=cores,
             )
+            logger.info("[%s] Chunking done: %d chunks", document_id, len(chunks))
         except Exception as e:
             logger.exception(f"Chunking failed for document {document_id}: {e}")
             return False, 0, f"PDF extraction/chunking failed: {e}"
@@ -110,6 +113,7 @@ class RagService:
             return False, 0, "No content extracted from PDF"
 
         try:
+            logger.info("[%s] Storing %d chunks to vector DB", document_id, len(chunks))
             count = self._store_to_vector(document_id, project_id, chunks)
         except Exception as e:
             logger.exception(f"Vector storage failed for document {document_id}: {e}")

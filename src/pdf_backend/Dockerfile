@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
     poppler-utils \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -35,6 +36,10 @@ print('NLTK data downloaded.')"
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+# Disable Numba JIT to avoid "no locator available" crash at startup.
+# Root installs site-packages; app user can't write cache next to them.
+# Impact: projection_by_bboxes runs as pure Python — negligible for PDF layout analysis.
+ENV NUMBA_DISABLE_JIT=1
 
 # Non-root user for security
 RUN useradd --create-home --shell /bin/bash app

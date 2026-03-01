@@ -80,6 +80,8 @@ class CpuScheduler:
         Returns the number of cores allocated.
         """
         requested = get_tier_config(tier)["cpu_cores"]
+        logger.info("acquire() tier=%s requested=%d available=%s active=%s",
+                     tier, requested, self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
 
         # Subscribe BEFORE the first attempt to avoid missing a release
         # notification that arrives between a failed attempt and subscribe.
@@ -95,8 +97,12 @@ class CpuScheduler:
                 cores = int(str(alloc)) if alloc is not None else -1
                 if cores > 0:
                     logger.info("Acquired %d cores for %s tier", cores, tier)
+                    logger.info("acquire() after: available=%s active=%s",
+                                 self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
                     return cores
 
+                logger.info("acquire() waiting — available=%s active=%s",
+                             self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
                 # Block up to 5 s for a release notification, then retry.
                 pubsub.get_message(timeout=5.0)
 
@@ -112,3 +118,5 @@ class CpuScheduler:
         pipe.publish(_RELEASE_CHANNEL, str(cores))
         pipe.execute()
         logger.info("Released %d cores", cores)
+        logger.info("release() after: available=%s active=%s",
+                     self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))

@@ -14,7 +14,6 @@ from src.pdf_backend.schemas.job import (
 )
 from src.pdf_backend.services.multi_threading.job_store import JobStore
 from src.pdf_backend.services.validator import validate_pdf, ValidationError
-
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -41,12 +40,12 @@ async def process_document(
     logger.info("Received processing request for document_id=%s user_id=%s tier=%s", document_id, user_id, tier)
     
     # Reject if user already has an active job
-    existing = _job_store.active_job_for_user(user_id)
-    if existing:
-        raise HTTPException(
-            status_code=409,
-            detail={"message": "You already have a job in progress.", "job_id": existing},
-        )
+    # existing = _job_store.active_job_for_user(user_id)
+    # if existing:
+    #     raise HTTPException(
+    #         status_code=409,
+    #         detail={"message": "You already have a job in progress.", "job_id": existing},
+    #     )
 
     # Validate file against tier limits — raises ValidationError on failure
     try:
@@ -79,7 +78,6 @@ async def process_document(
 
     logger.info("Enqueued job %s for user %s (tier=%s)", job_id, user_id, tier)
     return JobSubmitResponse(job_id=job_id, status=JobStatus.queued)
-
 
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)
 async def get_job_status(job_id: str):

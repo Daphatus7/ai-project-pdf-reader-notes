@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import os
 import tempfile
 from concurrent.futures import ProcessPoolExecutor
@@ -16,6 +17,7 @@ def extract_pdf_elements(pdf_path: str) -> list[Element]:
     Uses 'fast' strategy (pdfminer) — no Detectron2 or OCR required.
     Suitable for PDFs with an embedded text layer.
     """
+    logger.info("Single-threaded extraction: %s", pdf_path)
     elements = partition_pdf(
         filename=pdf_path,
         infer_table_structure=True,
@@ -92,8 +94,11 @@ def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> list[dict]:
     reader = PdfReader(pdf_path)
     total_pages = len(reader.pages)
 
-    # Single-threaded fallback for small docs or single-core allocation
-    if cores <= 1 or total_pages <= 1:
+    # Single-threaded fallback for small docs, single-core, or daemon processes.
+    # Daemon processes (e.g. RQ job forks) cannot spawn children via ProcessPoolExecutor.
+    if cores <= 1 or total_pages <= 1 or multiprocessing.current_process().daemon:
+        if multiprocessing.current_process().daemon:
+            logger.warning("Running in daemon process — falling back to single-threaded extraction")
         return [el.to_dict() for el in extract_pdf_elements(pdf_path)]
 
     # Clamp cores to the actual number of pages

@@ -30,6 +30,8 @@ services:
       - .:/app
     ports:
       - "8001:8001"
+    environment:
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
 
@@ -41,6 +43,8 @@ services:
       target: worker
     volumes:
       - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
 

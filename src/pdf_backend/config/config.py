@@ -1,20 +1,24 @@
 import json
-import os
 from pathlib import Path
 from typing import List
+from dotenv import load_dotenv
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Load .env into os.environ so that any code using os.environ directly also works
+_env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(_env_path, override=False)
 
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables and Docker secrets."""
-    # Supabase / API keys — try Docker secrets first, then env vars
-    supabase_url: str = Field(os.getenv("SUPABASE_URL"))
-    supabase_secret_key: str = Field(os.getenv("SUPABASE_SECRET_KEY"))
-    openai_api_key: str = Field(os.getenv("OPENAI_API_KEY"))
+    # Supabase / API keys — loaded from env vars or .env file by pydantic-settings
+    supabase_url: str
+    supabase_secret_key: str
+    openai_api_key: str
 
-    redis_url: str = Field(os.getenv("REDIS_URL"))
+    redis_url: str = Field(default="redis://localhost:6379")
 
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=8001)
@@ -39,16 +43,10 @@ class Settings(BaseSettings):
 
     # Pydantic V2 style config
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).resolve().parent / '.env',
+        env_file=Path(__file__).resolve().parent.parent / '.env',
         case_sensitive=False,
     )
 
 
-# Global settings instance
-settings = Settings(
-    # Docker secrets take precedence over env vars
-    supabase_url=os.getenv("SUPABASE_URL"),
-    supabase_secret_key=os.getenv("SUPABASE_SECRET_KEY"),
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
-    redis_url=os.getenv("REDIS_URL")
-)
+# Global settings instance — loaded from env vars and .env file via pydantic-settings
+settings = Settings()

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -5,6 +6,8 @@ from chonkie import NeuralChunker
 
 from src.pdf_backend.schemas.rag import ProcessRequest
 from src.pdf_backend.services.pdf_extract import extract_pdf_elements, extract_pdf_elements_parallel
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -125,18 +128,31 @@ async def chonkie_chunk(rag_request: ProcessRequest, file_path: str, cores: int 
         raise ValueError("file_path cannot be empty")
 
     # Use parallel extraction when multiple cores are allocated; otherwise single-threaded.
+    logger.info("Extracting PDF (cores=%d): %s", cores, file_path)
     if cores > 1:
         extracted = extract_pdf_elements_parallel(file_path, cores)
     else:
         extracted = [el.to_dict() for el in extract_pdf_elements(file_path)]
+    logger.info("Extraction done: %d elements", len(extracted))
+    for i, el in enumerate(extracted):
+        text = (el.get("text") or "")[:200]
+        page = (el.get("metadata") or {}).get("page_number", "?")
+        logger.debug("[element %d] page=%s text=%r", i, page, text)
 
     if not extracted:
         raise ValueError("No content extracted from PDF")
 
-    return await __process_pdf(
+    logger.info("Starting neural chunking on %d elements", len(extracted))
+    result = await __process_pdf(
         payload=RawContextPayload(
             payload=extracted,
             dir=file_path,
             name=rag_request.document_name,
         )
     )
+    logger.info("Neural chunking done: %d chunks", len(result))
+    for i, chunk in enumerate(result):
+        text = chunk.get("content", "")[:200]
+        meta = chunk.get("metadata", {})
+        logger.debug("[chunk %d] pages=%s tokens=%s text=%r", i, meta.get("page_number"), meta.get("token_count"), text)
+    return result
