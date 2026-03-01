@@ -2,7 +2,7 @@ import io
 import logging
 
 from fastapi import UploadFile
-from pdfminer.high_level import extract_pages
+from pypdf import PdfReader
 
 from src.pdf_backend.schemas.job import Tier
 from src.pdf_backend.services.server_config import get_tier_config
@@ -39,9 +39,9 @@ async def validate_pdf(file: UploadFile, tier: Tier) -> bytes:
             f"File exceeds the {cfg['max_file_size_mb']} MB limit for {tier} tier."
         )
 
-    # Check page count via pdfminer (fast, no full parse)
+    # Check page count via pypdf (fast, no full parse)
     try:
-        page_count = sum(1 for _ in extract_pages(io.BytesIO(content)))
+        page_count = len(PdfReader(io.BytesIO(content)).pages)
     except Exception as exc:
         logger.warning("Could not determine page count: %s", exc)
         raise ValidationError("File could not be read. Ensure it is a valid, non-encrypted PDF.")
