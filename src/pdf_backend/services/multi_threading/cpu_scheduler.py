@@ -5,22 +5,19 @@ All running worker processes share a single global view of core availability
 stored in Redis. A Lua script provides atomic check-and-acquire; pub/sub
 notifies waiting workers the moment cores are freed.
 
-Redis keys:
-  cpu:available   — integer, currently available cores
-  cpu:active_jobs — integer, number of jobs currently running
-  cpu:released    — pub/sub channel, published to on every release
+Redis keys (namespaced by instance_id):
+  cpu:{instance_id}:available   — integer, currently available cores
+  cpu:{instance_id}:active_jobs — integer, number of jobs currently running
+  cpu:{instance_id}:released    — pub/sub channel, published to on every release
 """
 import logging
+import os
 
 import redis as redis_lib
 
-from src.pdf_backend.services.server_config import get_worker_config, get_tier_config
+from src.pdf_backend.services.server_config import get_tier_config
 
 logger = logging.getLogger(__name__)
-
-_AVAILABLE_KEY   = "cpu:available"
-_ACTIVE_KEY      = "cpu:active_jobs"
-_RELEASE_CHANNEL = "cpu:released"
 
 # Atomically attempt to acquire cores.
 # Returns the number of cores allocated, or -1 if not enough are available.
@@ -51,23 +48,32 @@ class CpuScheduler:
     Token-bucket CPU scheduler backed by Redis.
 
     Each job calls acquire(tier) — blocks until the global core pool has enough
-    room — then calls release(cores) when done.  All worker processes coordinate
-    through the same Redis instance so the 32-core budget is enforced globally.
+    room — then calls release(cores) when done.
 
-    Pass in the job's own redis client; the scheduler opens a separate
-    connection internally for pub/sub (Redis-py requirement).
+    Keys are namespaced by instance_id so multiple Railway instances don't
+    interfere. Total cores are read from os.cpu_count() so the pool always
+    reflects actual hardware. State is reset on init so stale counters from
+    crashed jobs are cleared on every server startup.
     """
 
-    def __init__(self, redis_client: redis_lib.Redis) -> None:
-        cfg = get_worker_config()
-        self._total:   int  = cfg["total_cores"]
-        self._dynamic: bool = cfg["dynamic_scale"]
+    def __init__(self, redis_client: redis_lib.Redis, instance_id: str = "default") -> None:
+        self._total:   int  = os.cpu_count() or 1
+        self._dynamic: bool = True
         self._r = redis_client
+
+        # Namespace keys by instance so multiple deployments don't share state.
+        self._available_key   = f"cpu:{instance_id}:available"
+        self._active_key      = f"cpu:{instance_id}:active_jobs"
+        self._release_channel = f"cpu:{instance_id}:released"
+
         self._script = self._r.register_script(_ACQUIRE_LUA)
 
-        # Seed keys only if absent — NX ensures only the first worker sets them.
-        self._r.set(_AVAILABLE_KEY, self._total, nx=True)
-        self._r.set(_ACTIVE_KEY,    0,            nx=True)
+        # Always reset on init — reflects real CPU count and clears stale state
+        # from jobs that were killed without running their finally blocks.
+        self._r.set(self._available_key, self._total)
+        self._r.set(self._active_key, 0)
+        logger.info("CpuScheduler init: instance=%s total_cores=%d (from os.cpu_count())",
+                    instance_id, self._total)
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -81,42 +87,42 @@ class CpuScheduler:
         """
         requested = get_tier_config(tier)["cpu_cores"]
         logger.info("acquire() tier=%s requested=%d available=%s active=%s",
-                     tier, requested, self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
+                     tier, requested, self._r.get(self._available_key), self._r.get(self._active_key))
 
         # Subscribe BEFORE the first attempt to avoid missing a release
         # notification that arrives between a failed attempt and subscribe.
         pubsub = self._r.pubsub(ignore_subscribe_messages=True)
-        pubsub.subscribe(_RELEASE_CHANNEL)
+        pubsub.subscribe(self._release_channel)
 
         try:
             while True:
                 alloc = self._script(
-                    keys=[_ACTIVE_KEY, _AVAILABLE_KEY],
+                    keys=[self._active_key, self._available_key],
                     args=[requested, self._total, "1" if self._dynamic else "0"],
                 )
                 cores = int(str(alloc)) if alloc is not None else -1
                 if cores > 0:
                     logger.info("Acquired %d cores for %s tier", cores, tier)
                     logger.info("acquire() after: available=%s active=%s",
-                                 self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
+                                 self._r.get(self._available_key), self._r.get(self._active_key))
                     return cores
 
                 logger.info("acquire() waiting — available=%s active=%s",
-                             self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
+                             self._r.get(self._available_key), self._r.get(self._active_key))
                 # Block up to 5 s for a release notification, then retry.
                 pubsub.get_message(timeout=5.0)
 
         finally:
-            pubsub.unsubscribe(_RELEASE_CHANNEL)
+            pubsub.unsubscribe(self._release_channel)
             pubsub.close()
 
     def release(self, cores: int) -> None:
         """Return cores to the global pool and wake any waiting workers."""
         pipe = self._r.pipeline()
-        pipe.incrby(_AVAILABLE_KEY, cores)
-        pipe.decr(_ACTIVE_KEY)
-        pipe.publish(_RELEASE_CHANNEL, str(cores))
+        pipe.incrby(self._available_key, cores)
+        pipe.decr(self._active_key)
+        pipe.publish(self._release_channel, str(cores))
         pipe.execute()
         logger.info("Released %d cores", cores)
         logger.info("release() after: available=%s active=%s",
-                     self._r.get(_AVAILABLE_KEY), self._r.get(_ACTIVE_KEY))
+                     self._r.get(self._available_key), self._r.get(self._active_key))

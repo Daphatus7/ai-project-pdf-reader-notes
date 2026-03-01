@@ -35,7 +35,7 @@ def run_process_pdf(
     r = redis.from_url(settings.redis_url, decode_responses=False)
     logger.info("[%s] Worker picked up job (document_id=%s, tier=%s)", job_id, document_id, tier)
     store     = JobStore(r)
-    scheduler = CpuScheduler(r)
+    scheduler = CpuScheduler(r, instance_id=settings.instance_id)
 
     # Block until global core quota (across all workers) is available.
     logger.info("[%s] Waiting for CPU quota...", job_id)

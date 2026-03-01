@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     openai_api_key: str
 
     redis_url: str = Field(default="redis://localhost:6379")
+    instance_id: str = Field(default="default")
 
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=8001)
