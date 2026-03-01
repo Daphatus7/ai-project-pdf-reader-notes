@@ -46,17 +46,15 @@ def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) ->
             writer.write(tmp)
             tmp_path = tmp.name
 
-            converter = DocumentConverter()
-            doc = converter.convert(pdf_path).document
-            return doc
-    except Exception as e:
-        logger.error("Error in page range worker (%d-%d): %s", start_page, end_page, e)
+        # Convert the sliced temp PDF (not the original) with Docling
+        doc = DocumentConverter().convert(tmp_path).document
+        return doc
     finally:
-            if tmp_path and os.path.exists(tmp_path):
-                os.unlink(tmp_path)
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
-def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> DoclingDocument:
+def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> list[DoclingDocument]:
     """
     Parallel PDF extraction: splits the document into up to `cores` page ranges
     and processes each range in a dedicated subprocess via ProcessPoolExecutor.
@@ -71,7 +69,7 @@ def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> DoclingDocument:
     if cores <= 1 or total_pages <= 1 or multiprocessing.current_process().daemon:
         if multiprocessing.current_process().daemon:
             logger.warning("Running in daemon process — falling back to single-threaded extraction")
-        return extract_pdf_elements(pdf_path)
+        return [extract_pdf_elements(pdf_path)]
 
     # Clamp cores to the actual number of pages
     actual_cores = min(cores, total_pages)
@@ -96,7 +94,5 @@ def extract_pdf_elements_parallel(pdf_path: str, cores: int) -> DoclingDocument:
         ]
         chunks = [f.result() for f in futures]
 
-    # Flatten chunks and restore document order
-    all_elements = [el for chunk in chunks for el in chunk]
-    all_elements.sort(key=lambda d: (d.get("metadata") or {}).get("page_number") or 0)
-    return all_elements
+    # Return documents in page-range order for the caller to aggregate
+    return chunks

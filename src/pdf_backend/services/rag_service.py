@@ -4,7 +4,7 @@ import os
 from langchain_openai import OpenAIEmbeddings
 from supabase import create_client
 
-from src.pdf_backend.services.chonkie_chunker import chonkie_chunk
+from src.pdf_backend.services.chonkie_chunker import process_pdf_to_chunks
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class RagService:
 
         try:
             logger.info("[%s] Starting extraction + chunking", document_id)
-            chunks = await chonkie_chunk(
+            chunks = await process_pdf_to_chunks(
                 ProcessRequest(
                     document_id=document_id,
                     project_id=project_id,
@@ -114,6 +114,7 @@ class RagService:
 
         try:
             logger.info("[%s] Storing %d chunks to vector DB", document_id, len(chunks))
+            # store chunks to vector DB and get the count of inserted records
             count = self._store_to_vector(document_id, project_id, chunks)
         except Exception as e:
             logger.exception(f"Vector storage failed for document {document_id}: {e}")
