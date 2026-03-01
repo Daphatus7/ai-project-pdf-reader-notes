@@ -178,6 +178,12 @@ async def upload_document(
     # Submit to pdf_backend for RAG processing; returns job_id for SSE tracking
     job_id = None
     if settings.pdf_backend_url:
+        # Guard: BACKEND_URL must be an absolute URL so pdf_backend can call back.
+        if not settings.backend_url or not settings.backend_url.startswith("http"):
+            raise HTTPException(
+                status_code=500,
+                detail="Server misconfiguration: BACKEND_URL is not set or missing protocol (http/https).",
+            )
         plan = await database_service.get_user_plan(user_id)
         tier = "pro" if plan == "pro" else "free"
         webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf"

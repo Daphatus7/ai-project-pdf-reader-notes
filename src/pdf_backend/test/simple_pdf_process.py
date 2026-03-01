@@ -43,5 +43,8 @@ if __name__ == "__main__":
             skip_infer_table_types=False,
             extract_images_in_pdf=False,
         )
+        
+        for el in elements:
+            print(el)
     
     
