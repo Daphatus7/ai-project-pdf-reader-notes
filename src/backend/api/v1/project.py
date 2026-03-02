@@ -7,7 +7,7 @@ import logging
 import uuid
 
 import httpx
-from fastapi import APIRouter, Depends, UploadFile, File, Form, Path
+from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile, File, Form, Path
 
 from src.backend.api.deps import get_database_service, get_user
 from src.backend.config.config import settings
@@ -148,6 +148,7 @@ async def _submit_to_pdf_backend(
 
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
+        background_tasks: BackgroundTasks,
         project_id: str = Path(..., description='Project ID to upload document to'),
         file: UploadFile = File(..., description='PDF file to upload'),
         user=Depends(get_user),
@@ -175,7 +176,8 @@ async def upload_document(
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
 
-    # Submit to pdf_backend for RAG processing; returns job_id for SSE tracking
+    # Submit to pdf_backend for RAG processing via a background task so the upload
+    # response is returned immediately, decoupling user latency from pdf_backend availability.
     job_id = None
     if settings.pdf_backend_url:
         # Guard: BACKEND_URL must be an absolute URL so pdf_backend can call back.
@@ -186,8 +188,13 @@ async def upload_document(
             )
         plan = await database_service.get_user_plan(user_id)
         tier = "pro" if plan == "pro" else "free"
-        webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf"
-        job_id = await _submit_to_pdf_backend(
+        # Pre-generate a local job_id so the frontend can start polling/SSE immediately.
+        # It is embedded in the webhook URL so that pdf_backend's completion event is
+        # routed to the correct SSE channel without waiting for the background task.
+        job_id = str(uuid.uuid4())
+        webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf?local_job_id={job_id}"
+        background_tasks.add_task(
+            _submit_to_pdf_backend,
             document_id=document['id'],
             project_id=project_id,
             document_name=source,
