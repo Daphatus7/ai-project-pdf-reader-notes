@@ -67,7 +67,7 @@ class RagService:
         document_name: str,
         file_path: str,
         cores: int = 1,
-        on_progress: Callable | None = None,
+        on_progress: Callable[[int], None] | None = None,
     ) -> tuple[bool, int, str]:
         """
         Synchronous version for RQ workers.
@@ -76,7 +76,8 @@ class RagService:
         """
         import asyncio
         logger.info("[%s] process_sync starting (cores=%d)", document_id, cores)
-        return asyncio.get_event_loop().run_until_complete(
+        # asyncio.run() creates a fresh event loop, safe for Python 3.12+ worker threads
+        return asyncio.run(
             self.process(
                 document_id=document_id,
                 project_id=project_id,
@@ -84,16 +85,25 @@ class RagService:
                 document_name=document_name,
                 file_path=file_path,
                 cores=cores,
+                on_progress=on_progress,
             )
         )
 
     async def process(
-        self, document_id: str, project_id: str, user_id: str, document_name: str, file_path: str, cores: int = 1,
+        self,
+        document_id: str,
+        project_id: str,
+        user_id: str,
+        document_name: str,
+        file_path: str,
+        cores: int = 1,
+        on_progress: Callable[[int], None] | None = None,
     ) -> tuple[bool, int, str]:
         """
         Full RAG pipeline for a PDF at file_path.
         Returns (success, chunk_count, message).
         file_path is a server-internal temp path, not part of the API contract.
+        on_progress: optional callback(pct: int) called at pipeline milestones.
         """
         from src.pdf_backend.schemas.rag import ProcessRequest
 
@@ -110,6 +120,9 @@ class RagService:
                 cores=cores,
             )
             logger.info("[%s] Chunking done: %d chunks", document_id, len(chunks))
+            # Report 50% after extraction + chunking
+            if on_progress:
+                on_progress(50)
         except Exception as e:
             logger.exception(f"Chunking failed for document {document_id}: {e}")
             return False, 0, f"PDF extraction/chunking failed: {e}"
@@ -120,6 +133,9 @@ class RagService:
         try:
             logger.info("[%s] Storing %d chunks to vector DB", document_id, len(chunks))
             count = self._store_to_vector(document_id, project_id, user_id, chunks)
+            # Report 90% after vector storage; caller marks 100% on final success
+            if on_progress:
+                on_progress(90)
         except Exception as e:
             logger.exception(f"Vector storage failed for document {document_id}: {e}")
             return False, 0, f"Vector storage failed: {e}"
