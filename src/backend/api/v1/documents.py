@@ -6,6 +6,7 @@ Document job endpoints:
 import json
 import logging
 import asyncio
+from typing import Optional
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -28,20 +29,26 @@ class _WebhookPayload(BaseModel):
 
 
 @router.post("/webhook/pdf", include_in_schema=False)
-async def receive_pdf_webhook(payload: _WebhookPayload):
+async def receive_pdf_webhook(payload: _WebhookPayload, local_job_id: Optional[str] = None):
     """
     Receive job completion from pdf-backend and forward to the waiting SSE client.
     This endpoint should NOT be exposed publicly — restrict at the network/proxy level.
+
+    ``local_job_id`` is the pre-generated ID returned to the frontend at upload time
+    (passed via query param so the SSE channel matches without waiting for pdf_backend
+    to assign its own ID).  Falls back to ``payload.job_id`` for backward compatibility.
     """
+    # Prefer the pre-generated local_job_id so the frontend SSE subscription matches
+    tracking_key = local_job_id or payload.job_id
     event_data = json.dumps({
-        "job_id": payload.job_id,
+        "job_id": tracking_key,
         "document_id": payload.document_id,
         "status": payload.status,
         "chunk_count": payload.chunk_count,
         "message": payload.message,
     })
-    sse_manager.push(payload.job_id, event_data)
-    logger.info("Webhook received and forwarded for job %s (status=%s)", payload.job_id, payload.status)
+    sse_manager.push(tracking_key, event_data)
+    logger.info("Webhook received and forwarded for job %s (status=%s)", tracking_key, payload.status)
     return JSONResponse({"received": True})
 
 
