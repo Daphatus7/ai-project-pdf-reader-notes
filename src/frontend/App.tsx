@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -19,6 +19,16 @@ import { Toaster } from "sonner";
  * 4. RouterProvider - 路由
  */
 export default function App() {
+	/* 全局 dark mode 初始化：在任何组件挂载前同步系统偏好，并监听后续变化 */
+	useEffect(() => {
+		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+		document.documentElement.classList.toggle("dark", mediaQuery.matches)
+		const handleChange = (e: MediaQueryListEvent) =>
+			document.documentElement.classList.toggle("dark", e.matches)
+		mediaQuery.addEventListener("change", handleChange)
+		return () => mediaQuery.removeEventListener("change", handleChange)
+	}, [])
+
 	return (
 		<AuthProvider>
 			<DndProvider backend={HTML5Backend}>

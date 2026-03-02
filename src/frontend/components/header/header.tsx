@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button.tsx";
+import { ThemeToggle } from "@/frontend/@/components/tiptap-templates/simple/theme-toggle.tsx";
 import {
 	User,
 	LogIn,
@@ -45,6 +46,9 @@ export function Header() {
 			</div>
 
 			<div className="flex items-center gap-2 mr-2">
+				{/* Dark mode toggle */}
+				<ThemeToggle />
+
 				{/* Show Pro badge when on Pro plan, otherwise show Upgrade button */}
 				{isPro ? (
 					<span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-accent border ">
