@@ -55,8 +55,6 @@ import { useIsMobile } from "@/frontend/@/hooks/use-mobile.ts"
 import { useWindowSize } from "@/frontend/@/hooks/use-window-size.ts"
 import { useCursorVisibility } from "@/frontend/@/hooks/use-cursor-visibility.ts"
 
-// --- Components ---
-import { ThemeToggle } from "@/frontend/@/components/tiptap-templates/simple/theme-toggle.tsx"
 
 // --- Styles ---
 import "@/frontend/@/components/tiptap-templates/simple/simple-editor.scss"
@@ -136,12 +134,7 @@ const MainToolbarContent = ({
 
 			<Spacer />
 
-			{isMobile && <ToolbarSeparator />}
-
-			<ToolbarGroup>
-				<ThemeToggle />
-			</ToolbarGroup>
-		</>
+			</>
 	)
 }
 
