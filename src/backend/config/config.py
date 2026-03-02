@@ -80,7 +80,8 @@ class Settings(BaseSettings):
 
     # Pydantic V2 style config (replaces deprecated inner class Config)
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).resolve().parent / '.env',
+        # config.py lives in src/backend/config/; .env lives one level up at src/backend/.env
+        env_file=Path(__file__).resolve().parent.parent / '.env',
         case_sensitive=False,
     )
 

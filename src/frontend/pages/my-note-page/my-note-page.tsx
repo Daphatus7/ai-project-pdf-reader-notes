@@ -47,7 +47,7 @@ export default function NotePage() {
 	};
 
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
-		console.log(insertion);
+		// console.log(insertion);
 		if (!notePadRef.current) return;
 		notePadRef.current.insertContent(insertion, 'cursor');
 		notePadRef.current.focus();
@@ -66,7 +66,7 @@ export default function NotePage() {
 		// Extract base64 data and mime type from data URL
 		const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/);
 		if (!match) {
-			console.error('[NotePage] Invalid image data URL format');
+			// console.error('[NotePage] Invalid image data URL format');
 			return;
 		}
 
@@ -85,15 +85,15 @@ export default function NotePage() {
 				text: prompt || 'Please explain this screenshot.',
 			},
 		]);
-		console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
+		// console.log('[NotePage] Ask AI:', name, imageDataUrl.slice(0, 50) + '...');
 	}
 
 	const handleSaveToNote = (imageDataUrl: string, name: string) => {
-		console.log('[NotePage] Save to Note:', name);
+		// console.log('[NotePage] Save to Note:', name);
 	}
 
 	const handleDownload = (imageDataUrl: string, name: string) => {
-		console.log('[NotePage] Download:', name);
+		// console.log('[NotePage] Download:', name);
 	}
 
 	const chatRef = useRef<LLMChatFeatureHandle>(null);
