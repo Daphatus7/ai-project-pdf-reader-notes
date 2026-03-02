@@ -48,9 +48,9 @@ def extract_pdf_elements(pdf_path: str) -> DoclingDocument:
 def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) -> DoclingDocument:
     """
     Top-level worker for ProcessPoolExecutor — must be module-level to be picklable.
-    Writes pages [start_page, end_page) to a temp PDF, runs partition_pdf on it,
-    then corrects page numbers back to the original document's numbering.
-    Returns serialisable dicts (same schema as Element.to_dict()).
+    Writes pages [start_page, end_page) to a temporary PDF and converts it with
+    Docling DocumentConverter (OCR disabled).
+    Returns a DoclingDocument for the extracted page range.
     """
     from pypdf import PdfReader, PdfWriter
 
