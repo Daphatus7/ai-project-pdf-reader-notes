@@ -7,7 +7,7 @@ import logging
 import uuid
 
 import httpx
-from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile, File, Form, Path
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Path
 
 from src.backend.api.deps import get_database_service, get_user
 from src.backend.config.config import settings
@@ -92,32 +92,62 @@ async def list_documents(
     return ListDocumentsResponse(documents=documents)
 
 
-async def _trigger_rag_processing(
-    document_id: str, project_id: str, document_name: str, file_data: bytes
-) -> None:
-    """Fire-and-forget: ask pdf_backend to chunk and embed the document."""
+async def _submit_to_pdf_backend(
+    document_id: str,
+    project_id: str,
+    document_name: str,
+    user_id: str,
+    tier: str,
+    file_data: bytes,
+    webhook_url: str,
+) -> str | None:
+    """Submit PDF to pdf_backend for chunking/embedding. Returns job_id (202) or None on failure."""
+    target_url = f"{settings.pdf_backend_url}/api/v1/documents/process"
+    logger.debug(
+        "[pdf_backend] submitting document_id=%s size=%d bytes tier=%s webhook=%s target=%s",
+        document_id, len(file_data), tier, webhook_url, target_url,
+    )
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            logger.info(
+                f"document_id={document_id} "
+                f"project_id={project_id} "
+                f"document_name={document_name} "
+                f"user_id={user_id}"
+                f" tier={tier} webhook_url={webhook_url}"
+            )
             response = await client.post(
-                f"{settings.pdf_backend_url}/api/v1/documents/process",
+                target_url,
                 files={"file": ("document.pdf", file_data, "application/pdf")},
                 data={
                     "document_id": document_id,
                     "project_id": project_id,
                     "document_name": document_name,
+                    "user_id": user_id,
+                    "tier": tier,
+                    "webhook_url": webhook_url,
                 },
             )
-        if response.status_code != 200:
-            logger.warning(
-                f"RAG processing failed for document {document_id}: {response.text}"
-            )
+        logger.debug("[pdf_backend] response status=%d body=%s", response.status_code, response.text[:200])
+        if response.status_code == 202:
+            job_id = response.json().get("job_id")
+            logger.info("[pdf_backend] job queued job_id=%s document_id=%s", job_id, document_id)
+            return job_id
+        logger.error(
+            "[pdf_backend] unexpected status %d for document %s: %s",
+            response.status_code, document_id, response.text,
+        )
+    except httpx.ConnectError as e:
+        logger.error("[pdf_backend] connection refused — is pdf_backend running? url=%s error=%s", target_url, e)
+    except httpx.TimeoutException as e:
+        logger.error("[pdf_backend] request timed out after 30s for document %s: %s", document_id, e)
     except Exception as e:
-        logger.warning(f"pdf_backend unreachable, RAG skipped for document {document_id}: {e}")
+        logger.error("[pdf_backend] unexpected error for document %s: %s", document_id, e, exc_info=True)
+    return None
 
 
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
-        background_tasks: BackgroundTasks,
         project_id: str = Path(..., description='Project ID to upload document to'),
         file: UploadFile = File(..., description='PDF file to upload'),
         user=Depends(get_user),
@@ -128,6 +158,7 @@ async def upload_document(
 
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
+    logger.info("[upload_document] user=%s project=%s file=%s size=%d", user_id, project_id, source, len(content))
 
     incremented = await database_service.enforce_quota(user_id, 'doc_count')
 
@@ -138,22 +169,41 @@ async def upload_document(
             document_name=source,
             file_data=content,
         )
+        logger.debug("[upload_document] stored document_id=%s", document['id'])
     except Exception:
         if incremented:
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
 
-    # RAG processing via pdf_backend — disabled for now, uncomment when needed.
-    # if settings.pdf_backend_url:
-    #     background_tasks.add_task(
-    #         _trigger_rag_processing,
-    #         document_id=document['id'],
-    #         project_id=project_id,
-    #         document_name=source,
-    #         file_data=content,
-    #     )
+    # Submit to pdf_backend for RAG processing; returns job_id for SSE tracking
+    job_id = None
+    if settings.pdf_backend_url:
+        # Guard: BACKEND_URL must be an absolute URL so pdf_backend can call back.
+        if not settings.backend_url or not settings.backend_url.startswith("http"):
+            raise HTTPException(
+                status_code=500,
+                detail="Server misconfiguration: BACKEND_URL is not set or missing protocol (http/https).",
+            )
+        plan = await database_service.get_user_plan(user_id)
+        tier = "pro" if plan == "pro" else "free"
+        webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf"
+        job_id = await _submit_to_pdf_backend(
+            document_id=document['id'],
+            project_id=project_id,
+            document_name=source,
+            user_id=user_id,
+            tier=tier,
+            file_data=content,
+            webhook_url=webhook_url,
+        )
+    else:
+        logger.debug(
+            "[upload_document] RAG skipped — PDF_BACKEND_URL=%r BACKEND_URL=%r",
+            settings.pdf_backend_url or "(not set)",
+            settings.backend_url or "(not set)",
+        )
 
-    return UploadResponse(success=True, message="Document uploaded successfully")
+    return UploadResponse(success=True, message="Document uploaded successfully", job_id=job_id)
 
 
 @router.delete('/{project_id}/documents/{document_id}', response_model=DeleteDocumentResponse)

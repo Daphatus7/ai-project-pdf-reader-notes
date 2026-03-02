@@ -6,6 +6,7 @@ class ProcessRequest(BaseModel):
     document_id: str  # created by main backend, used to link vector chunks
     project_id: str
     document_name: str
+    user_id: str  # owner; required for RLS policy on document_chunks
 
 
 class ProcessResponse(BaseModel):

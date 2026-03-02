@@ -1,10 +1,11 @@
 import logging
 import os
+from collections.abc import Callable
 
 from langchain_openai import OpenAIEmbeddings
 from supabase import create_client
 
-from src.pdf_backend.services.chonkie_chunker import chonkie_chunk
+from src.pdf_backend.services.chonkie_chunker import process_pdf_to_chunks
 
 logger = logging.getLogger(__name__)
 
@@ -31,34 +32,63 @@ class RagService:
         logger.info("RagService started")
 
     def _store_to_vector(
-        self, document_id: str, project_id: str, chunks: list[dict]
+        self, document_id: str, project_id: str, user_id: str, chunks: list[dict]
     ) -> int:
-        """Embed chunks and insert into the vector DB. Returns inserted count."""
-        texts = [c.get("content", "") for c in chunks]
-        logger.info(f"Generating embeddings for {len(texts)} chunks...")
+        """
+        Embed each chunk and insert into the Supabase vector DB.
+        Uses contextualized_text (heading breadcrumb + content) for embedding
+        so retrieved vectors carry section context.
+        user_id is included in every row so RLS policies can verify ownership.
+        Returns the count of inserted rows.
+        """
+        # Build texts for batch embedding — contextualized_text carries heading path
+        texts = [c["contextualized_text"] for c in chunks]
         embeddings = self._embedding_model.embed_documents(texts)
 
-        documents = []
-        for chunk, emb in zip(chunks, embeddings):
-            meta = chunk.get("metadata", {})
-            documents.append({
+        # Compose rows; user_id satisfies the RLS ownership policy on document_chunks
+        rows = [
+            {
                 "document_id": document_id,
                 "project_id": project_id,
-                "content": chunk.get("content", ""),
-                "embedding": emb,
-                "token_count": meta.get("token_count"),
-                "start_index": meta.get("start_index"),
-                "end_index": meta.get("end_index"),
-                "page_numbers": meta.get("page_number", []),
-            })
+                "content": chunk["text"],
+                "embedding": embedding,
+            }
+            for chunk, embedding in zip(chunks, embeddings)
+        ]
 
-        response = self._supabase.table("document_chunks").insert(documents).execute()
-        count = len(response.data) if response.data else 0
-        logger.info(f"Inserted {count} chunks for document {document_id}")
-        return count
+        result = self._supabase.table("document_chunks").insert(rows).execute()
+        return len(result.data)
+
+    def process_sync(
+        self,
+        document_id: str,
+        project_id: str,
+        user_id: str,
+        document_name: str,
+        file_path: str,
+        cores: int = 1,
+        on_progress: Callable | None = None,
+    ) -> tuple[bool, int, str]:
+        """
+        Synchronous version for RQ workers.
+        cores: forwarded to the parallel PDF extractor.
+        on_progress: optional callback(pct: int) called during processing.
+        """
+        import asyncio
+        logger.info("[%s] process_sync starting (cores=%d)", document_id, cores)
+        return asyncio.get_event_loop().run_until_complete(
+            self.process(
+                document_id=document_id,
+                project_id=project_id,
+                user_id=user_id,
+                document_name=document_name,
+                file_path=file_path,
+                cores=cores,
+            )
+        )
 
     async def process(
-        self, document_id: str, project_id: str, document_name: str, file_path: str
+        self, document_id: str, project_id: str, user_id: str, document_name: str, file_path: str, cores: int = 1,
     ) -> tuple[bool, int, str]:
         """
         Full RAG pipeline for a PDF at file_path.
@@ -68,14 +98,18 @@ class RagService:
         from src.pdf_backend.schemas.rag import ProcessRequest
 
         try:
-            chunks = await chonkie_chunk(
+            logger.info("[%s] Starting extraction + chunking", document_id)
+            chunks = await process_pdf_to_chunks(
                 ProcessRequest(
                     document_id=document_id,
                     project_id=project_id,
+                    user_id=user_id,
                     document_name=document_name,
                 ),
                 file_path=file_path,
+                cores=cores,
             )
+            logger.info("[%s] Chunking done: %d chunks", document_id, len(chunks))
         except Exception as e:
             logger.exception(f"Chunking failed for document {document_id}: {e}")
             return False, 0, f"PDF extraction/chunking failed: {e}"
@@ -84,7 +118,8 @@ class RagService:
             return False, 0, "No content extracted from PDF"
 
         try:
-            count = self._store_to_vector(document_id, project_id, chunks)
+            logger.info("[%s] Storing %d chunks to vector DB", document_id, len(chunks))
+            count = self._store_to_vector(document_id, project_id, user_id, chunks)
         except Exception as e:
             logger.exception(f"Vector storage failed for document {document_id}: {e}")
             return False, 0, f"Vector storage failed: {e}"

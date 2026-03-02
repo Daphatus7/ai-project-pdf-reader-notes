@@ -34,14 +34,14 @@ export const projectsService = {
 		projectId: string,
 		file: File,
 		sourceName?: string,
-	): Promise<{ success: boolean; message: string }> {
+	): Promise<{ success: boolean; message: string; job_id?: string }> {
 		const formData = new FormData();
 		formData.append('file', file);
 		if (sourceName) {
 			formData.append('source_name', sourceName);
 		}
 		const endpoint = apiConfig.endpoints.projects.documents(projectId);
-		return await upload<{ success: boolean; message: string }>(endpoint, formData);
+		return await upload<{ success: boolean; message: string; job_id?: string }>(endpoint, formData);
 	},
 
 	async deleteDocument(projectId: string, documentId: string): Promise<string> {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
+import { apiConfig } from '@/frontend/api/core/config';
 import { isQuotaError } from '@/frontend/features/quota/use-quota';
 import type { Document } from './type';
 
@@ -17,6 +18,29 @@ export interface UseSourceReturn {
 	toggleDocumentSelection: (documentId: string) => void;
 	clearSelection: () => void;
 	refreshDocuments: () => Promise<void>;
+}
+
+/** Connect to backend SSE stream for a pdf processing job and show toast notifications. */
+function _watchJobStatus(jobId: string): void {
+	const url = `${apiConfig.baseUrl}${apiConfig.endpoints.documents.stream(jobId)}`;
+	const es = new EventSource(url);
+	const toastId = toast.loading('Processing document…');
+
+	es.addEventListener('status', (e: MessageEvent) => {
+		const data = JSON.parse(e.data) as { status: string; message?: string };
+		if (data.status === 'done') {
+			toast.success('Document ready for AI search', { id: toastId });
+			es.close();
+		} else if (data.status === 'failed' || data.status === 'not_supported') {
+			toast.error(data.message || 'Document processing failed', { id: toastId });
+			es.close();
+		}
+	});
+
+	es.onerror = () => {
+		toast.dismiss(toastId);
+		es.close();
+	};
 }
 
 export function useSource(projectId: string | null): UseSourceReturn {
@@ -62,9 +86,14 @@ export function useSource(projectId: string | null): UseSourceReturn {
 			setIsUploading(true);
 			setError(null);
 			try {
-				await projectsService.uploadDocument(projectId, file, sourceName);
+				const result = await projectsService.uploadDocument(projectId, file, sourceName);
 				await refreshDocuments();
 				toast.success('Document uploaded');
+
+				// If pdf_backend accepted the job, open an SSE stream and show processing status
+				if (result.job_id) {
+					_watchJobStatus(result.job_id);
+				}
 			} catch (err) {
 				if (isQuotaError(err)) {
 					toast.error('Document limit reached. Upgrade your plan to upload more.');

@@ -1,0 +1,21 @@
+{
+  "tiers": {
+    "free": {
+      "max_pages": 50,
+      "max_file_size_mb": 20,
+      "cpu_cores": 2
+    },
+    "pro": {
+      "max_pages": 500,
+      "max_file_size_mb": 100,
+      "cpu_cores": 8
+    }
+  },
+  "worker": {
+    "total_cores": 32,
+    "dynamic_scale": true
+  },
+  "policy": {
+    "max_jobs_per_user": 1
+  }
+}
