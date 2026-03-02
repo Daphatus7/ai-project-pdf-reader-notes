@@ -1,17 +1,33 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { loginViaApi, loginWithDebugCredentials, loginWithGoogle } from "../../api/services/auth.service";
+import { loginViaApi, loginWithGoogle } from "../../api/services/auth.service";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/frontend/components/ui/card";
 import { Input } from "@/frontend/components/ui/input";
 import { Button } from "@/frontend/components/ui/button";
 import { Label } from "@/frontend/components/ui/label";
 import { Checkbox } from "@/frontend/components/ui/checkbox";
 
+// Field-level validation helpers
+const validateEmail = (val: string) => {
+	if (!val) return "Email is required";
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Please enter a valid email address";
+	return null;
+};
+const validatePassword = (val: string) => {
+	if (!val) return "Password is required";
+	if (val.length < 6) return "Password must be at least 6 characters";
+	return null;
+};
+
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
+
+	// Per-field inline error states
+	const [emailError, setEmailError] = useState<string | null>(null);
+	const [passwordError, setPasswordError] = useState<string | null>(null);
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -20,6 +36,14 @@ const LoginPage = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		// Validate all fields before calling API
+		const eErr = validateEmail(email);
+		const pErr = validatePassword(password);
+		setEmailError(eErr);
+		setPasswordError(pErr);
+		if (eErr || pErr) return;
+
 		setError(null);
 		setLoading(true);
 
@@ -41,21 +65,7 @@ const LoginPage = () => {
 			setError(err instanceof Error ? err.message : "Google login failed");
 		}
 	};
-
-	const handleDebugLogin = async () => {
-		setError(null);
-		setLoading(true);
-
-		try {
-			await loginWithDebugCredentials();
-			navigate(from, { replace: true });
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Debug login failed");
-		} finally {
-			setLoading(false);
-		}
-	};
-
+	
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">
 			<Card className="w-full max-w-md">
@@ -84,9 +94,11 @@ const LoginPage = () => {
 								id="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
+								onBlur={() => setEmailError(validateEmail(email))}
 								placeholder="name@company.com"
 								required
 							/>
+							{emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="password">Password</Label>
@@ -95,9 +107,11 @@ const LoginPage = () => {
 								id="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
+								onBlur={() => setPasswordError(validatePassword(password))}
 								placeholder="••••••••"
 								required
 							/>
+							{passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
 						</div>
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2">
@@ -116,19 +130,6 @@ const LoginPage = () => {
 						<Button type="submit" disabled={loading} className="w-full">
 							{loading ? "Signing in..." : "Sign in"}
 						</Button>
-
-						{import.meta.env.DEV && (
-							<Button
-								type="button"
-								variant="secondary"
-								onClick={handleDebugLogin}
-								disabled={loading}
-								className="w-full"
-							>
-								{loading ? "Signing in..." : "Debug Login (Dev Only)"}
-							</Button>
-						)}
-
 					</form>
 
 					<div className="relative my-4">

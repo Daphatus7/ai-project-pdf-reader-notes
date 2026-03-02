@@ -7,12 +7,38 @@ import { Input } from "@/frontend/components/ui/input";
 import { Button } from "@/frontend/components/ui/button";
 import { Label } from "@/frontend/components/ui/label";
 
+// Field-level validation helpers
+const validateEmail = (val: string) => {
+	if (!val) return "Email is required";
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Please enter a valid email address";
+	return null;
+};
+const validateUsername = (val: string) => {
+	if (!val) return "Username is required";
+	return null;
+};
+const validatePassword = (val: string) => {
+	if (!val) return "Password is required";
+	if (val.length < 6) return "Password must be at least 6 characters";
+	return null;
+};
+const validateConfirmPassword = (val: string, pwd: string) => {
+	if (!val) return "Please confirm your password";
+	if (val !== pwd) return "Passwords do not match";
+	return null;
+};
+
 const SignupPage = () => {
 	const [email, setEmail] = useState("");
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
-	const [fullName, setFullName] = useState("");
+
+	// Per-field inline error states
+	const [emailError, setEmailError] = useState<string | null>(null);
+	const [usernameError, setUsernameError] = useState<string | null>(null);
+	const [passwordError, setPasswordError] = useState<string | null>(null);
+	const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
 
 	const [googleError, setGoogleError] = useState<string | null>(null);
 	const { signup, error, loading } = useSignup();
@@ -28,12 +54,23 @@ const SignupPage = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		// Validate all fields before calling API
+		const eErr = validateEmail(email);
+		const uErr = validateUsername(username);
+		const pErr = validatePassword(password);
+		const cErr = validateConfirmPassword(confirmPassword, password);
+		setEmailError(eErr);
+		setUsernameError(uErr);
+		setPasswordError(pErr);
+		setConfirmPasswordError(cErr);
+		if (eErr || uErr || pErr || cErr) return;
+
 		await signup({
 			email,
 			username,
 			password,
 			confirmPassword,
-			full_name: fullName || undefined,
 		});
 	};
 
@@ -59,9 +96,11 @@ const SignupPage = () => {
 								id="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
+								onBlur={() => setEmailError(validateEmail(email))}
 								placeholder="name@company.com"
 								required
 							/>
+							{emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="username">Username</Label>
@@ -70,21 +109,11 @@ const SignupPage = () => {
 								id="username"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
+								onBlur={() => setUsernameError(validateUsername(username))}
 								placeholder="johndoe"
 								required
 							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="fullName">
-								Full Name <span className="text-muted-foreground font-normal">(optional)</span>
-							</Label>
-							<Input
-								type="text"
-								id="fullName"
-								value={fullName}
-								onChange={(e) => setFullName(e.target.value)}
-								placeholder="John Doe"
-							/>
+							{usernameError && <p className="text-sm text-red-500 mt-1">{usernameError}</p>}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="password">Password</Label>
@@ -93,9 +122,11 @@ const SignupPage = () => {
 								id="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
+								onBlur={() => setPasswordError(validatePassword(password))}
 								placeholder="••••••••"
 								required
 							/>
+							{passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -104,9 +135,11 @@ const SignupPage = () => {
 								id="confirmPassword"
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
+								onBlur={() => setConfirmPasswordError(validateConfirmPassword(confirmPassword, password))}
 								placeholder="••••••••"
 								required
 							/>
+							{confirmPasswordError && <p className="text-sm text-red-500 mt-1">{confirmPasswordError}</p>}
 						</div>
 						<Button type="submit" disabled={loading} className="w-full">
 							{loading ? "Creating account..." : "Create account"}
