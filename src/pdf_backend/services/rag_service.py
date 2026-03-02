@@ -1,9 +1,7 @@
 import logging
 import os
-from typing import Any
+from collections.abc import Callable
 
-from docling_core.transforms.chunker.hierarchical_chunker import TripletTableSerializer
-from docling_core.transforms.serializer.markdown import MarkdownDocSerializer, MarkdownParams
 from langchain_openai import OpenAIEmbeddings
 from supabase import create_client
 
@@ -34,27 +32,42 @@ class RagService:
         logger.info("RagService started")
 
     def _store_to_vector(
-        self, document_id: str, project_id: str, chunks: list[Any]
+        self, document_id: str, project_id: str, user_id: str, chunks: list[dict]
     ) -> int:
-        """Embed chunks and insert into the vector DB. Returns inserted count."""
-        re = MarkdownDocSerializer(
-            doc=chunks,
-            table_serializer=TripletTableSerializer(),
-            params=MarkdownParams(
-                image_placeholder="<!-- demo picture placeholder -->",
-                # ...
-            ),
-        )
-        return re
+        """
+        Embed each chunk and insert into the Supabase vector DB.
+        Uses contextualized_text (heading breadcrumb + content) for embedding
+        so retrieved vectors carry section context.
+        user_id is included in every row so RLS policies can verify ownership.
+        Returns the count of inserted rows.
+        """
+        # Build texts for batch embedding — contextualized_text carries heading path
+        texts = [c["contextualized_text"] for c in chunks]
+        embeddings = self._embedding_model.embed_documents(texts)
+
+        # Compose rows; user_id satisfies the RLS ownership policy on document_chunks
+        rows = [
+            {
+                "document_id": document_id,
+                "project_id": project_id,
+                "content": chunk["text"],
+                "embedding": embedding,
+            }
+            for chunk, embedding in zip(chunks, embeddings)
+        ]
+
+        result = self._supabase.table("document_chunks").insert(rows).execute()
+        return len(result.data)
 
     def process_sync(
         self,
         document_id: str,
         project_id: str,
+        user_id: str,
         document_name: str,
         file_path: str,
         cores: int = 1,
-        on_progress: callable = None,
+        on_progress: Callable | None = None,
     ) -> tuple[bool, int, str]:
         """
         Synchronous version for RQ workers.
@@ -67,6 +80,7 @@ class RagService:
             self.process(
                 document_id=document_id,
                 project_id=project_id,
+                user_id=user_id,
                 document_name=document_name,
                 file_path=file_path,
                 cores=cores,
@@ -74,7 +88,7 @@ class RagService:
         )
 
     async def process(
-        self, document_id: str, project_id: str, document_name: str, file_path: str, cores: int = 1,
+        self, document_id: str, project_id: str, user_id: str, document_name: str, file_path: str, cores: int = 1,
     ) -> tuple[bool, int, str]:
         """
         Full RAG pipeline for a PDF at file_path.
@@ -89,6 +103,7 @@ class RagService:
                 ProcessRequest(
                     document_id=document_id,
                     project_id=project_id,
+                    user_id=user_id,
                     document_name=document_name,
                 ),
                 file_path=file_path,
@@ -104,8 +119,7 @@ class RagService:
 
         try:
             logger.info("[%s] Storing %d chunks to vector DB", document_id, len(chunks))
-            # store chunks to vector DB and get the count of inserted records
-            count = self._store_to_vector(document_id, project_id, chunks)
+            count = self._store_to_vector(document_id, project_id, user_id, chunks)
         except Exception as e:
             logger.exception(f"Vector storage failed for document {document_id}: {e}")
             return False, 0, f"Vector storage failed: {e}"

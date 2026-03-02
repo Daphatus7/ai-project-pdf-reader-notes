@@ -1,14 +1,19 @@
 import logging
 from dataclasses import dataclass
-from typing import Any
 
-from chonkie import NeuralChunker
-from docling_core.types import DoclingDocument
+from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
+from docling_core.types.doc.document import DoclingDocument
+from transformers import AutoTokenizer
 
 from src.pdf_backend.schemas.rag import ProcessRequest
-from src.pdf_backend.services.pdf_extract import extract_pdf_elements, extract_pdf_elements_parallel
+from src.pdf_backend.services.pdf_extract import extract_pdf_elements
 
 logger = logging.getLogger(__name__)
+
+# Embedding model whose tokenizer determines per-chunk token budget
+EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+MAX_TOKENS = 512
 
 
 @dataclass
@@ -17,46 +22,68 @@ class RawContextPayload:
     name: str
     dir: str
 
-async def __chunking(payload: RawContextPayload) -> list[Any]:
-    """ Convert the input to chunks"""
-    chunker = NeuralChunker(
-        model="mirth/chonky_modernbert_base_1",
-        device_map="cpu",
-        min_characters_per_chunk=10,
+
+def _build_chunker() -> HybridChunker:
+    """Initialise HybridChunker with a HuggingFace tokenizer budget."""
+    tokenizer = HuggingFaceTokenizer(
+        tokenizer=AutoTokenizer.from_pretrained(EMBED_MODEL_ID),
+        max_tokens=MAX_TOKENS,
     )
-    chunk_content = ""
+    # merge_peers=True: adjacent same-level sibling chunks are merged
+    # when they fit within the token budget, reducing redundant context
+    return HybridChunker(tokenizer=tokenizer, merge_peers=True)
+
+
+def _chunk_docs(payload: RawContextPayload) -> list[dict]:
+    """
+    Chunk every DoclingDocument in the payload using document structure as
+    ground truth.
+
+    HybridChunker splits on the native heading/section hierarchy first,
+    then further splits oversized pieces by token count — so boundaries
+    respect the PDF layout rather than arbitrary character windows.
+
+    Each dict contains:
+      - text: raw chunk text (no heading prefix)
+      - contextualized_text: heading breadcrumb + text, ready for embedding
+      - meta: serialisable chunk metadata (page refs, label path, …)
+    """
+    chunker = _build_chunker()
+    results: list[dict] = []
+
     for doc in payload.payload:
-        chunk_content = doc.export_to_markdown()
-    chunked = chunker.chunk(chunk_content)
-    return chunked
+        for chunk in chunker.chunk(dl_doc=doc):
+            # contextualize() prepends the section heading path so the
+            # embedded text carries positional context even when retrieved
+            # out of order
+            contextualized = chunker.contextualize(chunk=chunk)
+            results.append({
+                "text": chunk.text,
+                "contextualized_text": contextualized,
+                "meta": chunk.meta.export_json_dict() if chunk.meta else {},
+            })
+
+    return results
 
 
 async def process_pdf_to_chunks(rag_request: ProcessRequest, file_path: str, cores: int = 1) -> list[dict]:
     """
     Extract and chunk a PDF at file_path.
     file_path is the server-internal temp path, separate from the API contract.
-    cores > 1 enables parallel page-range extraction via ProcessPoolExecutor.
-    Returns list of chunk dicts.
+    Returns list of chunk dicts with text, contextualized_text, and meta.
     """
     if not file_path:
         raise ValueError("file_path cannot be empty")
 
-
     logger.info("Extracting PDF (cores=%d): %s", cores, file_path)
-    # Extract and aggregate to markdown
-    docs: list[DoclingDocument]
-    # if cores > 1:  # Parallel: each worker returns a DoclingDocument; join their markdown in order
-    #     docs = extract_pdf_elements_parallel(file_path, cores)
-    # else:  # single-threaded
-    #     doc = extract_pdf_elements(file_path)
-    #     docs = [doc]
     doc = extract_pdf_elements(file_path)
-    docs = [doc]
-    chunked_blocks = await __chunking(
-        payload=RawContextPayload(
-            payload=docs,
+
+    chunks = _chunk_docs(
+        RawContextPayload(
+            payload=[doc],
             dir=file_path,
             name=rag_request.document_name,
         )
     )
-    return chunked_blocks
+    logger.info("Produced %d chunks from: %s", len(chunks), file_path)
+    return chunks

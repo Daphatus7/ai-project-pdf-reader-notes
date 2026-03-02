@@ -56,6 +56,7 @@ def run_process_pdf(
         success, chunk_count, message = _rag_service.process_sync(
             document_id=document_id,
             project_id=project_id,
+            user_id=user_id,
             document_name=document_name,
             file_path=tmp_path,
             cores=allocated_cores,
