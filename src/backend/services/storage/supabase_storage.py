@@ -62,7 +62,7 @@ class SupabaseStorage(Service):
                 "options": {
                     "data": {
                         "username": request.username,
-                        "full_name": request.full_name,
+                        "full_name": "atlas user", #todo placeholder, not actually used in production
                     }
                 }
             })
