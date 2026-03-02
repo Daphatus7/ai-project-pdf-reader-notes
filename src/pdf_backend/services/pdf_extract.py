@@ -4,11 +4,31 @@ import os
 import tempfile
 from concurrent.futures import ProcessPoolExecutor
 
-from docling.document_converter import DocumentConverter
-from docling_core.types import DoclingDocument
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling_core.types.doc.document import DoclingDocument
 
 
 logger = logging.getLogger(__name__)
+
+
+# ── Shared DocumentConverter factory ──────────────────────────────────────────
+
+def _make_converter() -> DocumentConverter:
+    """
+    Build a DocumentConverter with OCR disabled.
+    OCR (RapidOCR) is skipped because uploaded PDFs have embedded text layers;
+    disabling it avoids downloading ~300 MB of model weights at runtime.
+    """
+    pipeline_options = PdfPipelineOptions()
+    pipeline_options.do_ocr = False
+    return DocumentConverter(
+        format_options={
+            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+        }
+    )
+
 
 # ── Single-threaded extraction (original) ─────────────────────────────────────
 
@@ -19,8 +39,7 @@ def extract_pdf_elements(pdf_path: str) -> DoclingDocument:
     Suitable for PDFs with an embedded text layer.
     """
     logger.info("Single-threaded extraction: %s", pdf_path)
-    converter = DocumentConverter()
-    doc = converter.convert(pdf_path).document
+    doc = _make_converter().convert(pdf_path).document
     return doc
 
 
@@ -47,7 +66,7 @@ def _extract_page_range_worker(pdf_path: str, start_page: int, end_page: int) ->
             tmp_path = tmp.name
 
         # Convert the sliced temp PDF (not the original) with Docling
-        doc = DocumentConverter().convert(tmp_path).document
+        doc = _make_converter().convert(tmp_path).document
         return doc
     finally:
         if tmp_path and os.path.exists(tmp_path):

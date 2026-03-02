@@ -45,12 +45,13 @@ async def process_pdf_to_chunks(rag_request: ProcessRequest, file_path: str, cor
     logger.info("Extracting PDF (cores=%d): %s", cores, file_path)
     # Extract and aggregate to markdown
     docs: list[DoclingDocument]
-    if cores > 1:  # Parallel: each worker returns a DoclingDocument; join their markdown in order
-        docs = extract_pdf_elements_parallel(file_path, cores)
-    else:  # single-threaded
-        doc = extract_pdf_elements(file_path)
-        docs = [doc]
-
+    # if cores > 1:  # Parallel: each worker returns a DoclingDocument; join their markdown in order
+    #     docs = extract_pdf_elements_parallel(file_path, cores)
+    # else:  # single-threaded
+    #     doc = extract_pdf_elements(file_path)
+    #     docs = [doc]
+    doc = extract_pdf_elements(file_path)
+    docs = [doc]
     chunked_blocks = await __chunking(
         payload=RawContextPayload(
             payload=docs,

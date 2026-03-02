@@ -117,5 +117,6 @@ def _enqueue(
             "file_bytes": file_bytes,
         },
         job_id=job_id,
+        job_timeout=1800,  # 30 min — covers first-boot model downloads
         retry=None,  # retry logic handled inside the task
     )

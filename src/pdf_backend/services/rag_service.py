@@ -1,6 +1,9 @@
 import logging
 import os
+from typing import Any
 
+from docling_core.transforms.chunker.hierarchical_chunker import TripletTableSerializer
+from docling_core.transforms.serializer.markdown import MarkdownDocSerializer, MarkdownParams
 from langchain_openai import OpenAIEmbeddings
 from supabase import create_client
 
@@ -31,31 +34,18 @@ class RagService:
         logger.info("RagService started")
 
     def _store_to_vector(
-        self, document_id: str, project_id: str, chunks: list[dict]
+        self, document_id: str, project_id: str, chunks: list[Any]
     ) -> int:
         """Embed chunks and insert into the vector DB. Returns inserted count."""
-        texts = [c.get("content", "") for c in chunks]
-        logger.info(f"Generating embeddings for {len(texts)} chunks...")
-        embeddings = self._embedding_model.embed_documents(texts)
-
-        documents = []
-        for chunk, emb in zip(chunks, embeddings):
-            meta = chunk.get("metadata", {})
-            documents.append({
-                "document_id": document_id,
-                "project_id": project_id,
-                "content": chunk.get("content", ""),
-                "embedding": emb,
-                "token_count": meta.get("token_count"),
-                "start_index": meta.get("start_index"),
-                "end_index": meta.get("end_index"),
-                "page_numbers": meta.get("page_number", []),
-            })
-
-        response = self._supabase.table("document_chunks").insert(documents).execute()
-        count = len(response.data) if response.data else 0
-        logger.info(f"Inserted {count} chunks for document {document_id}")
-        return count
+        re = MarkdownDocSerializer(
+            doc=chunks,
+            table_serializer=TripletTableSerializer(),
+            params=MarkdownParams(
+                image_placeholder="<!-- demo picture placeholder -->",
+                # ...
+            ),
+        )
+        return re
 
     def process_sync(
         self,
