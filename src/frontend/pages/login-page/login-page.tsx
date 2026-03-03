@@ -68,7 +68,10 @@ const LoginPage = () => {
 	
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">
-			<Card className="w-full max-w-md">
+			{/* Logo above the card */}
+			<div className="flex flex-col items-center gap-6 w-full max-w-md">
+			<img src="/logo.svg" alt="Logo" className="h-12" />
+			<Card className="w-full">
 				<CardHeader>
 					<CardTitle className="text-xl">Sign in to your account</CardTitle>
 					<CardDescription>Enter your credentials to continue</CardDescription>
@@ -179,6 +182,7 @@ const LoginPage = () => {
 					</p>
 				</CardContent>
 			</Card>
+			</div>
 		</div>
 	);
 };

@@ -76,7 +76,10 @@ const SignupPage = () => {
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">
-			<Card className="w-full max-w-md">
+			{/* Logo above the card */}
+			<div className="flex flex-col items-center gap-6 w-full max-w-md">
+			<img src="/logo.svg" alt="Logo" className="h-12" />
+			<Card className="w-full">
 				<CardHeader>
 					<CardTitle className="text-xl">Create an account</CardTitle>
 					<CardDescription>Fill in your details to get started</CardDescription>
@@ -97,7 +100,7 @@ const SignupPage = () => {
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								onBlur={() => setEmailError(validateEmail(email))}
-								placeholder="name@company.com"
+								placeholder="name@email.com"
 								required
 							/>
 							{emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
@@ -106,11 +109,11 @@ const SignupPage = () => {
 							<Label htmlFor="username">Username</Label>
 							<Input
 								type="text"
-								id="username"
+								id="name"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 								onBlur={() => setUsernameError(validateUsername(username))}
-								placeholder="johndoe"
+								placeholder="Your name"
 								required
 							/>
 							{usernameError && <p className="text-sm text-red-500 mt-1">{usernameError}</p>}
@@ -194,6 +197,7 @@ const SignupPage = () => {
 					</p>
 				</CardContent>
 			</Card>
+			</div>
 		</div>
 	);
 };
