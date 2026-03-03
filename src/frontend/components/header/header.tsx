@@ -6,7 +6,6 @@ import {
 	LogIn,
 	LogOut,
 	CreditCard,
-	MessageSquare,
 } from "lucide-react";
 
 import {
@@ -23,7 +22,7 @@ import { useAuth } from "@/frontend/features/auth";
 import { useQuota } from "@/frontend/features/quota/use-quota";
 
 export function Header() {
-	
+
 	const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeovhE8I9CxKiTGm3Y97c3rNAkuKMSq7UeYnMLKKumXQ_-8Xw/viewform?usp=dialog";
 	const [pricingOpen, setPricingOpen] = useState(false);
 	const [subscriptionOpen, setSubscriptionOpen] = useState(false);
@@ -51,7 +50,7 @@ export function Header() {
 			<div className="flex items-center gap-2 mr-2">
 				{/* Show Pro badge when on Pro plan, otherwise show Upgrade button */}
 				{isPro ? (
-					<span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-accent border ">
+					<span className="text-xs font-semibold rounded-full bg-accent border ">
 						Pro
 					</span>
 				) : (
@@ -66,31 +65,16 @@ export function Header() {
 					</Button>
 				)}
 
-				{/*<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Contact support">*/}
-				{/*	<LucideMail className="w-4 h-4 mr-2" />*/}
-				{/*</Button>*/}
+				{/* Direct feedback link shown in header */}
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={() => window.open(FEEDBACK_FORM_URL, '_blank')}
+					className="text-xs h-8 px-3"
+				>
+					Feedback
+				</Button>
 				
-				{/*<DropdownMenu>*/}
-				{/*	<DropdownMenuTrigger asChild>*/}
-				{/*		<Button variant="ghost" size="icon" className="h-8 w-8">*/}
-				{/*			<Settings className="w-4 h-4 " />*/}
-				{/*		</Button>*/}
-				{/*	</DropdownMenuTrigger>*/}
-				{/*	<DropdownMenuContent align="end">*/}
-				{/*		<DropdownMenuLabel>Settings</DropdownMenuLabel>*/}
-				{/*		<DropdownMenuSeparator />*/}
-				{/*		<DropdownMenuItem>*/}
-				{/*			API Key Configuration*/}
-				{/*		</DropdownMenuItem>*/}
-				{/*		<DropdownMenuItem>*/}
-				{/*			Preferences*/}
-				{/*		</DropdownMenuItem>*/}
-				{/*		<DropdownMenuItem>*/}
-				{/*			Export Settings*/}
-				{/*		</DropdownMenuItem>*/}
-				{/*	</DropdownMenuContent>*/}
-				{/*</DropdownMenu>*/}
-
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">
@@ -104,10 +88,6 @@ export function Header() {
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={() => setSubscriptionOpen(true)}>
 									Manage Subscription
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => window.open(FEEDBACK_FORM_URL, '_blank')}>
-									<MessageSquare className="w-4 h-4 mr-2" />
-									Send Feedback
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogout}>
