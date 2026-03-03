@@ -113,7 +113,7 @@ async def get_subscription(
     }
 
 
-# ==================== Webhook ====================
+# ==================== Webhook (high security risks)====================
 
 @router.post('/webhook')
 async def stripe_webhook(

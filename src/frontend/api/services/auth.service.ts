@@ -12,7 +12,6 @@ export interface RegisterRequest {
 	email: string;
 	username: string;
 	password: string;
-	full_name?: string;
 }
 
 export interface RegisterResponse {
