@@ -5,8 +5,10 @@ import {
 	User,
 	LogIn,
 	LogOut,
-	CreditCard
+	CreditCard,
+	MessageSquare,
 } from "lucide-react";
+
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,6 +23,8 @@ import { useAuth } from "@/frontend/features/auth";
 import { useQuota } from "@/frontend/features/quota/use-quota";
 
 export function Header() {
+	
+	const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeovhE8I9CxKiTGm3Y97c3rNAkuKMSq7UeYnMLKKumXQ_-8Xw/viewform?usp=dialog";
 	const [pricingOpen, setPricingOpen] = useState(false);
 	const [subscriptionOpen, setSubscriptionOpen] = useState(false);
 	const { user, signOut } = useAuth();
@@ -100,6 +104,10 @@ export function Header() {
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={() => setSubscriptionOpen(true)}>
 									Manage Subscription
+								</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => window.open(FEEDBACK_FORM_URL, '_blank')}>
+									<MessageSquare className="w-4 h-4 mr-2" />
+									Send Feedback
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogout}>
