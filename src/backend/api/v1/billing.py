@@ -1,6 +1,4 @@
 import logging
-from datetime import datetime
-
 import stripe as stripe_lib
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
@@ -21,9 +19,9 @@ router = APIRouter(prefix='/billing', tags=['billing'])
 
 @router.get('/checkout')
 async def get_checkout_url(
-    interval: str = 'month',
-    user=Depends(get_user),
-    stripe_service=Depends(get_stripe_service),
+        interval: str = 'month',
+        user=Depends(get_user),
+        stripe_service=Depends(get_stripe_service),
 ):
     """Return a Payment Link URL with client_reference_id for the authenticated user."""
     if interval not in ('month', 'year'):
@@ -39,10 +37,10 @@ async def get_checkout_url(
 
 @router.post('/portal')
 async def create_portal(
-    body: PortalRequest,
-    user=Depends(get_user),
-    database_service=Depends(get_database_service),
-    stripe_service=Depends(get_stripe_service),
+        body: PortalRequest,
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+        stripe_service=Depends(get_stripe_service),
 ):
     """Create a Stripe Customer Portal session for managing an existing subscription."""
     user_id = user['sub']
@@ -60,9 +58,9 @@ async def create_portal(
 
 @router.post('/cancel')
 async def cancel_subscription(
-    user=Depends(get_user),
-    database_service=Depends(get_database_service),
-    stripe_service=Depends(get_stripe_service),
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+        stripe_service=Depends(get_stripe_service),
 ):
     """Set subscription to cancel at period end."""
     user_id = user['sub']
@@ -78,9 +76,9 @@ async def cancel_subscription(
 
 @router.post('/resume')
 async def resume_subscription(
-    user=Depends(get_user),
-    database_service=Depends(get_database_service),
-    stripe_service=Depends(get_stripe_service),
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
+        stripe_service=Depends(get_stripe_service),
 ):
     """Resume a subscription that was set to cancel."""
     user_id = user['sub']
@@ -98,8 +96,8 @@ async def resume_subscription(
 
 @router.get('/subscription')
 async def get_subscription(
-    user=Depends(get_user),
-    database_service=Depends(get_database_service),
+        user=Depends(get_user),
+        database_service=Depends(get_database_service),
 ):
     """Return current subscription status for the authenticated user."""
     user_id = user['sub']
@@ -117,9 +115,9 @@ async def get_subscription(
 
 @router.post('/webhook')
 async def stripe_webhook(
-    request: Request,
-    database_service=Depends(get_database_service),
-    stripe_service=Depends(get_stripe_service),
+        request: Request,
+        database_service=Depends(get_database_service),
+        stripe_service=Depends(get_stripe_service),
 ):
     """Receive and process Stripe webhook events."""
     payload = await request.body()
@@ -153,17 +151,19 @@ async def stripe_webhook(
 async def _handle_checkout_completed(session, database_service, event_id: str) -> None:
     """Payment succeeded — activate Pro subscription."""
 
-    # Data validation — retrying won't fix missing fields, log and skip
+    #the user id assigned when making payment
     user_id = session.get('client_reference_id')
     if not user_id:
         logger.warning(f"[{event_id}] checkout.session.completed: missing client_reference_id, skipping")
         return
 
+    # subscription ID from stripe
     subscription_id = session.get('subscription')
     if not subscription_id:
         logger.warning(f"[{event_id}] checkout.session.completed: missing subscription for user={user_id}, skipping")
         return
 
+    # stripe customer id
     stripe_customer_id = session.get('customer')
     if not stripe_customer_id:
         logger.warning(f"[{event_id}] checkout.session.completed: missing customer for user={user_id}, skipping")
@@ -205,11 +205,11 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         logger.warning(f"[{event_id}] subscription.updated: missing customer, skipping")
         return
 
-    logger.warning(f"[{event_id}] subscription.updated raw keys: { {k: sub.get(k) for k in ['current_period_end', 'status', 'cancel_at_period_end']} }")
-    raw_period_end = sub.get('current_period_end')
-    new_period_end = datetime.fromtimestamp(raw_period_end) if raw_period_end else None
-    new_status = sub.get('status')
-    new_cancel_at_period_end = sub.get('cancel_at_period_end')
+    items = sub.get('items', {}).get('data', [])
+    if not items:
+        logger.warning(f"[{event_id}] subscription.updated: no items for customer={stripe_customer_id}, skipping")
+        return
+    new_interval = items[0]['price']['recurring']['interval']
 
     # DB read — let exceptions propagate so Stripe retries
     profile = await database_service.get_profile_by_stripe_customer(stripe_customer_id)
@@ -217,32 +217,9 @@ async def _handle_subscription_updated(sub, database_service, event_id: str) -> 
         logger.warning(f"[{event_id}] subscription.updated: no profile for customer={stripe_customer_id}, skipping")
         return
 
-    # Guard against out-of-order events (only when both sides have a period_end)
-    existing_end = profile.get('current_period_end')
-    if existing_end and new_period_end:
-        try:
-            existing_dt = datetime.fromisoformat(str(existing_end).replace('Z', '+00:00'))
-            if new_period_end.replace(tzinfo=None) < existing_dt.replace(tzinfo=None):
-                logger.info(f"[{event_id}] subscription.updated: stale event for customer={stripe_customer_id}, skipping")
-                return
-        except ValueError:
-            logger.warning(f"[{event_id}] subscription.updated: could not parse existing period_end='{existing_end}', proceeding anyway")
-
-    period_end_iso = new_period_end.isoformat() if new_period_end else None
-
     # DB write — let exceptions propagate so Stripe retries
-    await database_service.update_profile_stripe(
-        profile['id'],
-        subscription_status=new_status,
-        cancel_at_period_end=new_cancel_at_period_end,
-        current_period_end=period_end_iso,
-    )
-    logger.info(
-        f"[{event_id}] subscription.updated: customer={stripe_customer_id} "
-        f"status={profile.get('subscription_status')} → {new_status} "
-        f"cancel_at_period_end={new_cancel_at_period_end} "
-        f"period_end={period_end_iso}"
-    )
+    await database_service.update_profile_stripe(profile['id'], plan_interval=new_interval)
+    logger.info(f"[{event_id}] subscription.updated: plan_interval={new_interval} customer={stripe_customer_id}")
 
 
 async def _handle_subscription_deleted(sub, database_service, event_id: str) -> None:
