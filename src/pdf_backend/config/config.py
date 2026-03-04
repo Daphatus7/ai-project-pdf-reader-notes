@@ -46,9 +46,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parent.parent / '.env',
         case_sensitive=False,
-        # Skip empty env vars (e.g. ALLOWED_ORIGINS="") and fall back to field defaults,
-        # preventing json.loads("") from crashing before field_validator runs.
-        env_ignore_empty=True,
     )
 
 
