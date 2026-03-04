@@ -38,7 +38,7 @@ app = FastAPI(title="PDF Backend", version="1.0.0", lifespan=lifespan)
 # All other origins are rejected at the CORS level.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.cors_origins_list,
     allow_methods=["POST"],
     allow_headers=["*"],
 )
