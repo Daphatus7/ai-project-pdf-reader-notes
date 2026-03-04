@@ -9,22 +9,26 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # System dependencies required by:
-#   poppler-utils → unstructured 'fast' strategy PDF parsing (pdfminer)
-#   libmagic1     → file-type detection in unstructured
+#   libgl1        → opencv requires libGL.so.1 (used by Docling table detection)
+#   libglib2.0-0  → opencv requires libgthread-2.0.so.0
 #   curl          → health checks
 RUN apt-get update && apt-get install -y \
     curl \
-    libmagic1 \
-    poppler-utils \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-# numpy must be pinned <2 — cv2 4.8.x was compiled against NumPy 1.x
 COPY src/pdf_backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+# Disable Numba JIT to avoid "no locator available" crash at startup.
+# Root installs site-packages; app user can't write cache next to them.
+# Impact: projection_by_bboxes runs as pure Python — negligible for PDF layout analysis.
+ENV NUMBA_DISABLE_JIT=1
 
 # Non-root user for security
 RUN useradd --create-home --shell /bin/bash app

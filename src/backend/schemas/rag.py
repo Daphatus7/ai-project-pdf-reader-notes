@@ -25,6 +25,8 @@ class UploadResponse(BaseModel):
     source_id: Optional[str] = None
     chunk_count: int = 0
     message: str
+    # job_id is set when pdf_backend accepted the processing job; use it for SSE tracking
+    job_id: Optional[str] = None
 
 
 class RagDeleteRequest(BaseModel):

@@ -40,5 +40,9 @@ export const apiConfig = {
 			documentUrl: (projectId: string, documentId: string) =>
 				`/api/v1/projects/${projectId}/documents/${documentId}/url`,
 		},
+		documents: {
+			// SSE stream endpoint; connect after upload to receive processing status
+			stream: (jobId: string) => `/api/v1/stream/${jobId}`,
+		},
 	},
 } as const;

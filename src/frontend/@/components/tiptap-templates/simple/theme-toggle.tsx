@@ -3,30 +3,19 @@ import { Button } from "@/frontend/@/components/tiptap-ui-primitive/button"
 // --- Icons ---
 import { MoonStarIcon } from "@/frontend/@/components/tiptap-icons/moon-star-icon.tsx"
 import { SunIcon } from "@/frontend/@/components/tiptap-icons/sun-icon.tsx"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
+/* 纯 UI 按钮：只负责切换 <html> 上的 .dark class，不做任何初始化 */
 export function ThemeToggle() {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(
+    document.documentElement.classList.contains("dark")
+  )
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    const handleChange = () => setIsDarkMode(mediaQuery.matches)
-    mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
-  }, [])
-
-  useEffect(() => {
-    const initialDarkMode =
-      !!document.querySelector('meta[name="color-scheme"][content="dark"]') ||
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    setIsDarkMode(initialDarkMode)
-  }, [])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode)
-  }, [isDarkMode])
-
-  const toggleDarkMode = () => setIsDarkMode((isDark) => !isDark)
+  const toggleDarkMode = () => {
+    const next = !isDarkMode
+    document.documentElement.classList.toggle("dark", next)
+    setIsDarkMode(next)
+  }
 
   return (
     <Button

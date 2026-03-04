@@ -22,12 +22,12 @@ def read_secret_file(secret_name: str) -> str:
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables and Docker secrets."""
-    
+
     # LLM API Keys - read from Docker secrets first, then environment variables
     openai_api_key: str = Field(default_factory=lambda: read_secret_file("openai_api_key") or os.getenv("OPENAI_API_KEY", ""))
     anthropic_api_key: str = Field(default_factory=lambda: read_secret_file("anthropic_api_key") or os.getenv("ANTHROPIC_API_KEY", ""))
     google_api_key: str = Field(default_factory=lambda: read_secret_file("google_api_key") or os.getenv("GOOGLE_API_KEY", ""))
-    
+
     # Server Configuration
     cors_origins: str = Field(default="http://localhost:3000")
 
@@ -75,6 +75,8 @@ class Settings(BaseSettings):
 
     # Optional PDF processing service — leave empty to disable RAG
     pdf_backend_url: str = Field(default="")
+    # Self-referencing URL for pdf_backend to call back (webhook)
+    backend_url: str = Field(default="")
 
     # Pydantic V2 style config (replaces deprecated inner class Config)
     model_config = SettingsConfigDict(

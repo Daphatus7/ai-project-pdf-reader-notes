@@ -1,142 +1,89 @@
+import logging
 from dataclasses import dataclass
-from typing import Any
 
-from chonkie import NeuralChunker
+from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
+from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
+from docling_core.types.doc.document import DoclingDocument
+from transformers import AutoTokenizer
 
 from src.pdf_backend.schemas.rag import ProcessRequest
-from src.pdf_backend.services.pdf_extract import extract_pdf_elements, extract_pdf_elements_parallel
+from src.pdf_backend.services.pdf_extract import extract_pdf_elements
+
+logger = logging.getLogger(__name__)
+
+# Embedding model whose tokenizer determines per-chunk token budget
+EMBED_MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+MAX_TOKENS = 512
 
 
 @dataclass
 class RawContextPayload:
-    payload: list[dict]
+    payload: list[DoclingDocument]
     name: str
     dir: str
 
 
-def __process_raw_to_internal_format(blocks: list[dict]) -> list[dict]:
-    """Merge block-level extracts into one item per page."""
-    if not blocks:
-        return []
-
-    def _page_num(b: dict[str, Any]) -> int:
-        meta = b.get("metadata") or {}
-        p_number = meta.get("page_number")
-        if not isinstance(p_number, int):
-            raise ValueError(f"Invalid or missing metadata.page_number: {p_number!r}")
-        return p_number
-
-    blocks_sorted = sorted(blocks, key=_page_num)
-
-    result: list[dict[str, Any]] = []
-    current_page_number: int | None = None
-    current_page: dict[str, Any] | None = None
-
-    for block in blocks_sorted:
-        text = block.get("text", "")
-        if not isinstance(text, str):
-            raise ValueError(f"Invalid block.text (expected str): {text!r}")
-
-        md = block.get("metadata") or {}
-        page_number = _page_num(block)
-
-        if current_page_number is None or page_number != current_page_number:
-            if current_page is not None:
-                result.append(current_page)
-
-            current_page_number = page_number
-            current_page = {
-                "content": text,
-                "metadata": {
-                    "source_id": md.get("source_id", ""),
-                    "page_id": md.get("page_id", ""),
-                    "source_name": md.get("source_name", "source_name"),
-                    "file_directory": md.get("file_directory", ""),
-                    "page_number": page_number,
-                    "last_modified": md.get("last_modified"),
-                    "filetype": md.get("filetype", ""),
-                },
-            }
-        else:
-            assert current_page is not None
-            current_page["content"] += " " + text
-
-    if current_page is not None:
-        result.append(current_page)
-
-    return result
-
-
-async def __process_pdf(payload: RawContextPayload) -> list[dict]:
-    cleaned_data = __process_raw_to_internal_format(payload.payload)
-    merged_data = ["".join(item["content"]) for item in cleaned_data]
-
-    chunker = NeuralChunker(
-        model="mirth/chonky_modernbert_base_1",
-        device_map="cpu",
-        min_characters_per_chunk=10,
+def _build_chunker() -> HybridChunker:
+    """Initialise HybridChunker with a HuggingFace tokenizer budget."""
+    tokenizer = HuggingFaceTokenizer(
+        tokenizer=AutoTokenizer.from_pretrained(EMBED_MODEL_ID),
+        max_tokens=MAX_TOKENS,
     )
-
-    chunk_content = ""
-    page_boundaries = []
-    current_index = 0
-
-    for page_idx, item in enumerate(merged_data):
-        page_start = current_index
-        page_content = item + "\n"
-        page_end = current_index + len(page_content)
-        page_boundaries.append((page_start, page_end, page_idx))
-        chunk_content += page_content
-        current_index = page_end
-
-    chunked = chunker.chunk(chunk_content)
-
-    def get_page_numbers(chunk_start: int, chunk_end: int) -> list[int]:
-        return [
-            page_idx
-            for page_start, page_end, page_idx in page_boundaries
-            if chunk_start < page_end and chunk_end > page_start
-        ]
-
-    return [
-        {
-            "content": c.text,
-            "metadata": {
-                "document_id": "",
-                "source_dir": payload.dir,
-                "token_count": c.token_count,
-                "start_index": c.start_index,
-                "end_index": c.end_index,
-                "page_number": get_page_numbers(c.start_index, c.end_index),
-            },
-        }
-        for c in chunked
-    ]
+    # merge_peers=True: adjacent same-level sibling chunks are merged
+    # when they fit within the token budget, reducing redundant context
+    return HybridChunker(tokenizer=tokenizer, merge_peers=True)
 
 
-async def chonkie_chunk(rag_request: ProcessRequest, file_path: str, cores: int = 1) -> list[dict]:
+def _chunk_docs(payload: RawContextPayload) -> list[dict]:
+    """
+    Chunk every DoclingDocument in the payload using document structure as
+    ground truth.
+
+    HybridChunker splits on the native heading/section hierarchy first,
+    then further splits oversized pieces by token count — so boundaries
+    respect the PDF layout rather than arbitrary character windows.
+
+    Each dict contains:
+      - text: raw chunk text (no heading prefix)
+      - contextualized_text: heading breadcrumb + text, ready for embedding
+      - meta: serialisable chunk metadata (page refs, label path, …)
+    """
+    chunker = _build_chunker()
+    results: list[dict] = []
+
+    for doc in payload.payload:
+        for chunk in chunker.chunk(dl_doc=doc):
+            # contextualize() prepends the section heading path so the
+            # embedded text carries positional context even when retrieved
+            # out of order
+            contextualized = chunker.contextualize(chunk=chunk)
+            results.append({
+                "text": chunk.text,
+                "contextualized_text": contextualized,
+                "meta": chunk.meta.export_json_dict() if chunk.meta else {},
+            })
+
+    return results
+
+
+async def process_pdf_to_chunks(rag_request: ProcessRequest, file_path: str, cores: int = 1) -> list[dict]:
     """
     Extract and chunk a PDF at file_path.
     file_path is the server-internal temp path, separate from the API contract.
-    cores > 1 enables parallel page-range extraction via ProcessPoolExecutor.
-    Returns list of chunk dicts.
+    Returns list of chunk dicts with text, contextualized_text, and meta.
     """
     if not file_path:
         raise ValueError("file_path cannot be empty")
 
-    # Use parallel extraction when multiple cores are allocated; otherwise single-threaded.
-    if cores > 1:
-        extracted = extract_pdf_elements_parallel(file_path, cores)
-    else:
-        extracted = [el.to_dict() for el in extract_pdf_elements(file_path)]
+    logger.info("Extracting PDF (cores=%d): %s", cores, file_path)
+    doc = extract_pdf_elements(file_path)
 
-    if not extracted:
-        raise ValueError("No content extracted from PDF")
-
-    return await __process_pdf(
-        payload=RawContextPayload(
-            payload=extracted,
+    chunks = _chunk_docs(
+        RawContextPayload(
+            payload=[doc],
             dir=file_path,
             name=rag_request.document_name,
         )
     )
+    logger.info("Produced %d chunks from: %s", len(chunks), file_path)
+    return chunks

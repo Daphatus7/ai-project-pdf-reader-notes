@@ -90,8 +90,9 @@ app.include_router(v1_router)
 
 class LogOriginMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        origin = request.headers.get("origin", "no-origin")
-        logger.info(f"Request from origin: {origin} -> {request.method} {request.url.path}")
+        # debug incoming request
+        # origin = request.headers.get("origin", "no-origin")
+        # logger.info(f"Request from origin: {origin} -> {request.method} {request.url.path}")
         response = await call_next(request)
         return response
 

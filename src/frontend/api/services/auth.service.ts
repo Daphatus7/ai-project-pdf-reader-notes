@@ -1,10 +1,3 @@
-/**
- * @file        auth.service.ts
- *
- * @author      [Peiyu Wang]
- * @created     Sunday
- * @license     © 2026 . All rights reserved.
- */
 
 import { apiConfig } from '../core/config';
 import { ApiError } from '../core/errors';
@@ -19,7 +12,6 @@ export interface RegisterRequest {
 	email: string;
 	username: string;
 	password: string;
-	full_name?: string;
 }
 
 export interface RegisterResponse {

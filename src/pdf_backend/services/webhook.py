@@ -24,6 +24,7 @@ def send_webhook(
     Retries up to 3 times with exponential backoff on failure.
     Runs synchronously — called from within the RQ worker process.
     """
+    logger.info("Sending webhook to url=%r job_id=%s status=%s", webhook_url, job_id, status)
     payload = WebhookPayload(
         job_id=job_id,
         document_id=document_id,
