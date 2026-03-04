@@ -27,20 +27,12 @@ class Settings(BaseSettings):
     # Only the main backend is allowed to call this service.
     # Accepts JSON array: '["https://a.com","https://b.com"]'
     # or comma-separated:  'https://a.com,https://b.com'
-    allowed_origins: List[str] = Field(default=["http://localhost:8000"])
-    
+    allowed_origins: str = Field(default="http://localhost:8000")
 
-    @field_validator("allowed_origins", mode="before")
-    @classmethod
-    def parse_origins(cls, v: object) -> object:
-        if isinstance(v, list):
-            return v
-        if isinstance(v, str):
-            stripped = v.strip()
-            if stripped.startswith("["):
-                return json.loads(stripped)
-            return [o.strip() for o in stripped.split(",") if o.strip()]
-        return v
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Convert CORS_ORIGINS string to list, auto-adding https:// if no protocol specified"""
+        return [origin.strip() for origin in self.allowed_origins.split(',')]
 
     # Pydantic V2 style config
     model_config = SettingsConfigDict(
