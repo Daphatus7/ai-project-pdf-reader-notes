@@ -28,7 +28,7 @@ def upload_document(collection_id: str):
         data=b"...",
     )
     return document
-def search(selected_files: Sequence[str], query: str) -> SearchResponse:
+def search_collection(selected_files: Sequence[str], query: str) -> SearchResponse:
     """
     :param query: 
     :param selected_files: 
