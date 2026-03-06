@@ -2,13 +2,15 @@ import dotenv
 import logging
 from typing import TypeVar, AsyncGenerator, Any, TYPE_CHECKING
 from pydantic import BaseModel
-from langgraph.checkpoint.base import BaseCheckpointSaver
+# from langgraph.checkpoint.base import BaseCheckpointSaver
 from src.backend.schemas import ChatRequest
-from src.backend.services.llm_service.llm_instance import LlmAgent
+from src.backend.services.llm_service.grok.grok import LlmGrok
+from src.backend.services.llm_service.llm_instance import LangchainChat
+from src.backend.services.storage.redis_storage import RedisStorage
 
 if TYPE_CHECKING:
     from src.backend.services.storage.supabase_storage import SupabaseStorage
-    from src.backend.services.storage.redis_storage import RedisStorage
+    from src.backend.services.storage.lang_redis_storage import LangRedisStorage
 
 logger = logging.getLogger(__name__)
 
@@ -31,17 +33,12 @@ class LlmService:
 
     def __init__(
         self,
-        checkpointer: BaseCheckpointSaver,
-        database: "SupabaseStorage | None" = None,
-        storage_service: "RedisStorage | None" = None
+        redis_storage: RedisStorage,
+        database: SupabaseStorage,
     ):
         super().__init__()
         dotenv.load_dotenv()
-        self.model = LlmAgent(
-            checkpointer=checkpointer,
-            supabase_storage=database,
-            redis_storage=storage_service
-        )
+        self.model=LlmGrok()
 
     def get_usage(self):
         ... #todo 

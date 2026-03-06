@@ -4,7 +4,8 @@ Dependency injection container for the LLM backend service
 import logging
 from typing import Dict, Any
 from src.backend.services.llm_service.llm_service import LlmService
-from src.backend.services.storage import RedisStorage
+from src.backend.services.storage import LangRedisStorage
+from src.backend.services.storage.redis_storage import RedisStorage
 from src.backend.services.storage.supabase_storage import SupabaseStorage
 from src.backend.services.stripe_service import StripeService
 class Services:
@@ -30,7 +31,6 @@ class Services:
         """Initialize LLM-related services"""
         # Initialize storage service first (other services depend on it)
         redis_storage = RedisStorage()
-        redis_storage.start()
         self.register('storage', redis_storage)
 
         # Initialize Supabase database
@@ -40,9 +40,8 @@ class Services:
 
         # Initialize LLM service (uses storage service for checkpointer and database for persistence)
         llm_service = LlmService(
-            checkpointer=redis_storage.checkpointer,
-            database=supabase_storage,
-            storage_service=redis_storage
+            redis_storage=redis_storage,
+            database=supabase_storage
         )
         self.register('llm_service', llm_service)
 

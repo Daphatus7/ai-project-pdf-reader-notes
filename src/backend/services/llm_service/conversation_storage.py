@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.backend.services.storage.supabase_storage import SupabaseStorage
-    from src.backend.services.storage.redis_storage import RedisStorage
+    from src.backend.services.storage.lang_redis_storage import LangRedisStorage
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class ConversationStorage:
     def __init__(
         self,
         supabase_storage: "SupabaseStorage | None" = None,
-        redis_storage: "RedisStorage | None" = None
+        redis_storage: "LangRedisStorage | None" = None
     ):
         self._supabase_storage = supabase_storage
         self._redis_storage = redis_storage

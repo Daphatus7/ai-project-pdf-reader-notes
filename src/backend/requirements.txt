@@ -3,7 +3,6 @@ fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.9  # required for FastAPI file upload / Form data
 python-dotenv>=1.0.1
-openai>=1.54.0
 
 pydantic>=2.12.5
 pydantic-settings>=2.0.0

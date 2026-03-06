@@ -3,6 +3,6 @@
 # @author      [Peiyu Wang]
 # @date        2026-01-19
 
-from src.backend.services.storage.redis_storage import RedisStorage
+from src.backend.services.storage.lang_redis_storage import LangRedisStorage
 
-__all__ = ["RedisStorage"]
+__all__ = ["LangRedisStorage"]

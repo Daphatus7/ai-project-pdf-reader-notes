@@ -20,7 +20,7 @@ from src.backend.services.llm_service.conversation_storage import ConversationSt
 
 if TYPE_CHECKING:
     from src.backend.services.storage.supabase_storage import SupabaseStorage
-    from src.backend.services.storage.redis_storage import RedisStorage
+    from src.backend.services.storage.lang_redis_storage import LangRedisStorage
 
 
 import logging
@@ -264,7 +264,7 @@ def make_retriever_tool(supabase: Client, embedding_model: OpenAIEmbeddings):
 
     return retrieve_context
 
-class LlmAgent:
+class LangchainChat:
     """
     Multi-user safe LLM agent.
 
@@ -279,7 +279,7 @@ class LlmAgent:
         self,
         checkpointer: BaseCheckpointSaver,
         supabase_storage: "SupabaseStorage | None" = None,
-        redis_storage: "RedisStorage | None" = None
+        redis_storage: "LangRedisStorage | None" = None
     ):
         self._checkpointer = checkpointer
 
