@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS projects (
     -- Project information
     name TEXT NOT NULL,
     description TEXT,
-    
+
+    -- xAI collection mapping (nullable: set after collection is created)
+    xai_collection_id TEXT,
+
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

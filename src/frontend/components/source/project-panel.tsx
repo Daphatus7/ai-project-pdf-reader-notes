@@ -157,7 +157,7 @@ export function ProjectPanel({
 							value={newProjectName}
 							onChange={(e) => setNewProjectName(e.target.value)}
 							onKeyDown={(e) => {
-								if (e.key === 'Enter') handleCreateProject();
+								if (e.key === 'Enter' && !isCreating) handleCreateProject();
 							}}
 						/>
 						<Input

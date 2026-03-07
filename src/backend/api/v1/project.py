@@ -5,12 +5,9 @@
 # @license     © 2026 . All rights reserved.
 import logging
 import uuid
-
-import httpx
-from fastapi import APIRouter, Depends, UploadFile, File, Form, Path
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Path, HTTPException
 
 from src.backend.api.deps import get_database_service, get_user
-from src.backend.config.config import settings
 from src.backend.schemas.project import (
     ListProjectsResponse,
     CreateProjectResponse,
@@ -21,6 +18,10 @@ from src.backend.schemas.project import (
 )
 from src.backend.schemas.rag import UploadResponse
 from src.backend.schemas.error import validation_error
+from src.backend.services.llm_service.grok.grok_collection import GrokCollection
+
+# module-level singleton
+grok_collection = GrokCollection()
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +65,16 @@ async def create_project(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
-    response = await database_service.create_project(user_id, payload)
-    return CreateProjectResponse(response=response)
+    # supabase create project
+    project_id = await database_service.create_project(user_id, payload)
+    # create xAI collection and store mapping
+    try:
+        xai_collection_id = grok_collection.create_collection(project_id)
+        await database_service.update_project_collection_id(project_id, xai_collection_id)
+        logger.info(f"create_project xai_collection_id={xai_collection_id}")
+    except Exception as e:
+        logger.error(f"create_project collection ------> {e}")
+    return CreateProjectResponse(response=project_id)
 
 
 @router.delete('/{project_id}', response_model=ProjectDeleteResponse)
@@ -75,7 +84,20 @@ async def delete_project(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
+    # get xai_collection_id before cascade delete removes it
+    xai_collection_id = None
+    try:
+        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+    except Exception as e:
+        logger.error(f"delete_project but project not found ----> {e} ")
+    # supabase delete
     await database_service.delete_project(user_id, project_id)
+    # delete xAI collection (best-effort)
+    if xai_collection_id:
+        try:
+            grok_collection.delete_collection(xai_collection_id)
+        except Exception as e:
+            logger.error(f"trying to delete collection but ------> {e}")
     return ProjectDeleteResponse(response='Project deleted successfully')
 
 
@@ -92,60 +114,6 @@ async def list_documents(
     return ListDocumentsResponse(documents=documents)
 
 
-async def _submit_to_pdf_backend(
-    document_id: str,
-    project_id: str,
-    document_name: str,
-    user_id: str,
-    tier: str,
-    file_data: bytes,
-    webhook_url: str,
-) -> str | None:
-    """Submit PDF to pdf_backend for chunking/embedding. Returns job_id (202) or None on failure."""
-    target_url = f"{settings.pdf_backend_url}/api/v1/documents/process"
-    logger.debug(
-        "[pdf_backend] submitting document_id=%s size=%d bytes tier=%s webhook=%s target=%s",
-        document_id, len(file_data), tier, webhook_url, target_url,
-    )
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            logger.info(
-                f"document_id={document_id} "
-                f"project_id={project_id} "
-                f"document_name={document_name} "
-                f"user_id={user_id}"
-                f" tier={tier} webhook_url={webhook_url}"
-            )
-            response = await client.post(
-                target_url,
-                files={"file": ("document.pdf", file_data, "application/pdf")},
-                data={
-                    "document_id": document_id,
-                    "project_id": project_id,
-                    "document_name": document_name,
-                    "user_id": user_id,
-                    "tier": tier,
-                    "webhook_url": webhook_url,
-                },
-            )
-        logger.debug("[pdf_backend] response status=%d body=%s", response.status_code, response.text[:200])
-        if response.status_code == 202:
-            job_id = response.json().get("job_id")
-            logger.info("[pdf_backend] job queued job_id=%s document_id=%s", job_id, document_id)
-            return job_id
-        logger.error(
-            "[pdf_backend] unexpected status %d for document %s: %s",
-            response.status_code, document_id, response.text,
-        )
-    except httpx.ConnectError as e:
-        logger.error("[pdf_backend] connection refused — is pdf_backend running? url=%s error=%s", target_url, e)
-    except httpx.TimeoutException as e:
-        logger.error("[pdf_backend] request timed out after 30s for document %s: %s", document_id, e)
-    except Exception as e:
-        logger.error("[pdf_backend] unexpected error for document %s: %s", document_id, e, exc_info=True)
-    return None
-
-
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
         project_id: str = Path(..., description='Project ID to upload document to'),
@@ -155,13 +123,15 @@ async def upload_document(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
-
+    
+    # supabase upload
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
     logger.info("[upload_document] user=%s project=%s file=%s size=%d", user_id, project_id, source, len(content))
 
     incremented = await database_service.enforce_quota(user_id, 'doc_count')
 
+    # supabase upload
     try:
         document = await database_service.upload_document(
             user_id=user_id,
@@ -169,41 +139,27 @@ async def upload_document(
             document_name=source,
             file_data=content,
         )
-        logger.debug("[upload_document] stored document_id=%s", document['id'])
+        logger.info("[upload_document] stored document_id=%s", document['id'])
     except Exception:
         if incremented:
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
 
-    # Submit to pdf_backend for RAG processing; returns job_id for SSE tracking
-    job_id = None
-    if settings.pdf_backend_url:
-        # Guard: BACKEND_URL must be an absolute URL so pdf_backend can call back.
-        if not settings.backend_url or not settings.backend_url.startswith("http"):
-            raise HTTPException(
-                status_code=500,
-                detail="Server misconfiguration: BACKEND_URL is not set or missing protocol (http/https).",
-            )
-        plan = await database_service.get_user_plan(user_id)
-        tier = "pro" if plan == "pro" else "free"
-        webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf"
-        job_id = await _submit_to_pdf_backend(
-            document_id=document['id'],
-            project_id=project_id,
-            document_name=source,
-            user_id=user_id,
-            tier=tier,
-            file_data=content,
-            webhook_url=webhook_url,
+    # Upload to xAI collection and save the returned file ID for later RAG/delete (best-effort)
+    try:
+        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+        xai_doc = grok_collection.upload_document(
+            collection_id=xai_collection_id,
+            name=source,
+            data=content,
         )
-    else:
-        logger.debug(
-            "[upload_document] RAG skipped — PDF_BACKEND_URL=%r BACKEND_URL=%r",
-            settings.pdf_backend_url or "(not set)",
-            settings.backend_url or "(not set)",
-        )
+        if xai_doc and xai_doc.file_metadata:
+            await database_service.update_document_xai_id(document['id'], xai_doc.file_metadata.file_id)
+            logger.info("[upload_document] xai_file_id=%s", xai_doc.file_metadata.file_id)
+    except Exception as e:
+        logger.error(f"[upload_document] collection upload ------> {e}")
 
-    return UploadResponse(success=True, message="Document uploaded successfully", job_id=job_id)
+    return UploadResponse(success=True, source_id=document['id'], message="Document uploaded successfully")
 
 
 @router.delete('/{project_id}/documents/{document_id}', response_model=DeleteDocumentResponse)
@@ -214,7 +170,25 @@ async def delete_document(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
+
+    # Fetch xAI file ID before the DB record is deleted
+    xai_file_id = None
+    try:
+        xai_file_id = await database_service.get_collection_file_id(document_id)
+    except Exception as e:
+        logger.error(f"delete_document: could not fetch xai_file_id ------> {e}")
+
+    # Delete from Supabase storage + DB
     await database_service.delete_document(user_id, document_id, project_id)
+
+    # Remove file from xAI collection (best-effort)
+    if xai_file_id:
+        try:
+            grok_collection.delete_document(xai_file_id)
+            logger.info("[delete_document] removed xai_file_id=%s", xai_file_id)
+        except Exception as e:
+            logger.error(f"delete_document: xAI file delete failed ------> {e}")
+
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 

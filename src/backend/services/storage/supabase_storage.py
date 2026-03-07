@@ -159,7 +159,7 @@ class SupabaseStorage(Service):
                 internal_error('Failed to create project')
             project_id = response.data[0]['id']
             logger.info(f'Project created: user={user_id}, project={project_id}')
-            return f'Project created successfully with ID: {project_id}'
+            return project_id
         except AppError:
             if incremented:
                 await self.decrement_usage(user_id, 'project_count')
@@ -169,6 +169,22 @@ class SupabaseStorage(Service):
                 await self.decrement_usage(user_id, 'project_count')
             logger.error(f'Failed to create project for user {user_id}: {e}')
             internal_error('Failed to create project')
+
+    async def update_project_collection_id(self, project_id: str, xai_collection_id: str) -> None:
+        self.__database.table('projects').update(
+            {'xai_collection_id': xai_collection_id}
+        ).eq('id', project_id).execute()
+
+    async def get_project_collection_id(self, user_id: str, project_id: str) -> str:
+        response = (self.__database.table('projects')
+                    .select('xai_collection_id')
+                    .eq('id', project_id)
+                    .eq('user_id', user_id)
+                    .single()
+                    .execute())
+        if not response.data or not response.data.get('xai_collection_id'):
+            not_found('Project collection')
+        return response.data['xai_collection_id']
 
     async def delete_project(self, user_id: str, project_id: str) -> dict:
         """Delete a project: storage files → cascade delete → decrement usage."""
@@ -821,3 +837,54 @@ class SupabaseStorage(Service):
             logger.info(f"downgrade complete for user={user_id}, quotas enforced via plan config")
         except Exception as e:
             logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')
+    
+    async def update_document_xai_id(self, document_id: str, xai_document_id: str) -> None:
+        """Persist the xAI file ID returned after uploading a document to a collection."""
+        self.__database.table("documents").update(
+            {"xai_document_id": xai_document_id}
+        ).eq("id", document_id).execute()
+
+    async def get_collection_file_id(self, source_id: str) -> str:
+        """Get the xAI collection file ID for a document by its document ID."""
+        try:
+            response = (self.__database.table("documents")
+                        .select("xai_document_id")
+                        .eq("id", source_id)
+                        .single()
+                        .execute())
+            if not response.data or not response.data.get("xai_document_id"):
+                not_found("Document file")
+            return response.data["xai_document_id"]
+        except Exception as e:
+            logger.error(f"Failed to get xai_document_id for source {source_id}: {e}")
+        return ""
+
+    async def get_document_collection_id(self, source_id: str) -> str:
+        """Get the xAI collection ID for a document by looking up its project.
+        documents.project_id → projects.xai_collection_id
+        """
+        try:
+            # Step 1: get project_id from the document
+            doc = (self.__database.table("documents")
+                   .select("project_id")
+                   .eq("id", source_id)
+                   .single()
+                   .execute())
+            if not doc.data or not doc.data.get("project_id"):
+                not_found("Document")
+            project_id = doc.data["project_id"]
+
+            # Step 2: get xai_collection_id from the project
+            proj = (self.__database.table("projects")
+                    .select("xai_collection_id")
+                    .eq("id", project_id)
+                    .single()
+                    .execute())
+            if not proj.data or not proj.data.get("xai_collection_id"):
+                not_found("Project collection")
+            return proj.data["xai_collection_id"]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to get xai_collection_id for document {source_id}: {e}")
+        return ""

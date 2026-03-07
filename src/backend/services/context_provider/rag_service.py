@@ -1,28 +1,26 @@
-# @file        rag_service.py
-# @description
-# @author      [Peiyu Wang]
-# @date        21/1/2026
-# @license     © 2026 . All rights reserved.
 import logging
 import os
+from typing import Any
 
-from langchain_openai import OpenAIEmbeddings
-from supabase import create_client
+from supabase import create_client, Client as SupabaseClient
+from xai_sdk import Client
 
 from src.backend.schemas.rag import RagRequest, RagDeleteRequest, RagDeleteResponse, UploadResponse
-from src.backend.services.context_provider.chonkie_chunker import chonkie_chunk
 from src.backend.services.service import Service
 
 logger = logging.getLogger(__name__)
 
 class RagService(Service):
     def __init__(self):
-        self.embedding_model = None
-        self.supabase = None
+        self.supabase: SupabaseClient | None = None
+        self._xai_client: Client | None = None
 
     def start(self):
         self.supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
-        self.embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+        self._xai_client = Client(
+            api_key=os.getenv("XAI_API_KEY"),
+            management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
+        )
 
     def get(self):
         return self
@@ -48,39 +46,19 @@ class RagService(Service):
             return False
         return True
 
-    def store_to_vector(self, rag_request: RagRequest,
-                        document_id:str,
-                        chunks: list[dict]) -> int:
-        """Store chunks with embeddings in Supabase. Returns count of inserted docs."""
-        # content the of the chunks is embedded
-        texts = [c.get("content", "") for c in chunks]
-        logger.info(f"Generating embeddings for {len(texts)} chunks...")
-        embeddings = self.embedding_model.embed_documents(texts)
-        
-        #store to json for debugging 
-        with open("embeddings_debug.json", "w") as f:
-            import json
-            json.dump(chunks, f)
-        
-        documents = []
-        for chunk, emb in zip(chunks, embeddings):
-            meta = chunk.get("metadata", {})
-            documents.append({
-                #id created by supabase
-                "document_id": document_id,
-                "project_id": rag_request.project_id,
-                "content": chunk.get("content", ""),
-                "embedding": emb,
-                "token_count": meta.get("token_count"),
-                "start_index": meta.get("start_index"),
-                "end_index": meta.get("end_index"),
-                "page_numbers": meta.get("page_number", []),
-            })
 
-        response = self.supabase.table("document_chunks").insert(documents).execute()
-        inserted_count = len(response.data) if response.data else 0
-        logger.info(f"Inserted {inserted_count} documents for user {rag_request.user_id}")
-        return inserted_count
+    def upload_to_collection(self, project_id: str, document_id: str, document_name: str, file_data: bytes) -> None:
+        """Upload PDF to xAI Collection for RAG. xAI handles chunking and embedding.
+
+        project_id = collection_id, document_id = document identifier in the collection.
+        """
+        
+        
+        self._xai_client.collections.upload_document(
+            collection_id=project_id,
+            data=file_data,
+        )
+        logger.info(f"Uploaded to xAI collection={project_id} document={document_id}")
 
     async def create_document_table(self, rag_request: RagRequest)-> None:
         """
@@ -102,21 +80,20 @@ class RagService(Service):
             logger.exception(f"Failed to create document table: {e}")
             raise e
         
-
     async def upload_document(self, rag_request: RagRequest) -> UploadResponse:
-        """Upload PDF to storage and create document record (no RAG processing)."""
+        """Upload PDF to Supabase Storage (for viewing) and xAI Collection (for RAG).
+
+        project_id = xAI collection_id, document_id (Supabase) = xAI document identifier.
+        """
         # Create document record
         try:
             response = await self.create_document_table(rag_request)
             document_id = response.data[0]['id']
         except Exception as e:
-            logger.exception(f"Failed to create document table entry: {e}")
-            return UploadResponse(
-                success=False,
-                message=f"Failed to create document record: {str(e)}"
-            )
+            logger.exception(f"Failed to create document record: {e}")
+            return UploadResponse(success=False, message=f"Failed to create document record: {str(e)}")
 
-        # Upload PDF to Supabase Storage
+        # Upload PDF to Supabase Storage for viewing
         try:
             storage_path = self.upload_to_storage(
                 rag_request.document_dir, rag_request.user_id, document_id
@@ -126,88 +103,20 @@ class RagService(Service):
             }).eq("id", document_id).execute()
         except Exception as e:
             self.supabase.table("documents").delete().eq("id", document_id).execute()
-            logger.exception(f"Storage upload failed: {e}")
-            return UploadResponse(
-                success=False,
-                message=f"PDF storage failed: {str(e)}"
-            )
+            logger.exception(f"Supabase storage upload failed: {e}")
+            return UploadResponse(success=False, message=f"PDF storage failed: {str(e)}")
+
+        # Upload PDF to xAI Collection for RAG (project_id = collection_id)
+        try:
+            with open(rag_request.document_dir, "rb") as f:
+                file_data = f.read()
+            self.upload_to_collection(rag_request.project_id, document_id, rag_request.document_name, file_data)
+        except Exception as e:
+            logger.exception(f"xAI collection upload failed: {e}")
+            return UploadResponse(success=False, message=f"xAI collection upload failed: {str(e)}")
 
         return UploadResponse(
             success=True,
-            message=f"Document uploaded successfully"
+            source_id=document_id,
+            message="Document uploaded successfully",
         )
-
-    async def chunking_document(self, rag_request: RagRequest) -> UploadResponse:
-        """
-        Process incoming pdf file and store to vector database.
-        Returns UploadResponse with status.
-        """
-        
-        # Extract and chunk
-        try:
-            chunks = await chonkie_chunk(rag_request)
-        except Exception as e:
-            logger.exception(f"Chunking failed: {e}")
-            return UploadResponse(
-                success=False,
-                message=f"PDF extraction/chunking failed: {str(e)}"
-            )
-
-        if not chunks:
-            return UploadResponse(
-                success=False,
-                message="No content extracted from PDF"
-            )
-
-        # Get source_id from first chunk metadata
-        source_id = chunks[0].get("metadata", {}).get("source_id")
-
-        # Create document record
-        try:
-            response = await self.create_document_table(rag_request)
-            document_id = response.data[0]['id']
-        except Exception as e:
-            logger.exception(f"Failed to create document table entry: {e}")
-            return UploadResponse(
-                success=False,
-                source_id=source_id,
-                message=f"Failed to create document record: {str(e)}"
-            )
-
-        # Upload PDF to Supabase Storage for later viewing
-        try:
-            storage_path = self.upload_to_storage(
-                rag_request.document_dir, rag_request.user_id, document_id
-            )
-            self.supabase.table("documents").update({
-                "document_dir": storage_path
-            }).eq("id", document_id).execute()
-        except Exception as e:
-            # Rollback document record
-            self.supabase.table("documents").delete().eq("id", document_id).execute()
-            logger.exception(f"Storage upload failed: {e}")
-            return UploadResponse(
-                success=False,
-                source_id=source_id,
-                message=f"PDF storage failed: {str(e)}"
-            )
-
-        # Store vector embeddings
-        try:
-            inserted_count = self.store_to_vector(rag_request, document_id, chunks)
-        except Exception as e:
-            logger.exception(f"Vector storage failed: {e}")
-            return UploadResponse(
-                success=False,
-                source_id=source_id,
-                message=f"Vector storage failed: {str(e)}"
-            )
-
-        return UploadResponse(
-            success=True,
-            source_id=source_id,
-            chunk_count=inserted_count,
-            message=f"Successfully processed and stored {inserted_count} chunks"
-        )            
-    
-    
