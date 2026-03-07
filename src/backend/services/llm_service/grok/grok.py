@@ -31,7 +31,8 @@ SYSTEM_PROMPT = (
 class LlmGrok:
 
     def __init__(self, supabase_storage: SupabaseStorage):
-        self._client = Client(api_key=os.getenv("XAI_API_KEY"))
+        # timeout=3600 required for reasoning models to avoid premature connection closure during streaming
+        self._client = Client(api_key=os.getenv("XAI_API_KEY"), timeout=600)
         self._supabase = supabase_storage
         self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
         self._collection = GrokCollection()

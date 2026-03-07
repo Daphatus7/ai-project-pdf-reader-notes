@@ -8,6 +8,7 @@
 
 import { post, get, del } from '../core/client';
 import { apiConfig } from '../core/config';
+import { supabase } from './supabase';
 import type {
 	DeleteThreadRequest,
 	DeleteThreadResponse, ListThreadsResponse,
@@ -54,6 +55,60 @@ export const llmService = {
 		const resp = await post<ChatResponse>(apiConfig.endpoints.llm.chat, request);
 		console.log(resp);
 		return resp;
+	},
+
+	/**
+	 * Send a chat message with SSE streaming.
+	 * Calls onChunk for each text delta, onDone when complete, onError on failure.
+	 */
+	async chatStream(
+		request: ChatRequest,
+		onChunk: (text: string) => void,
+		onDone: (id: string, createdAt: string, totalTokens: number) => void,
+		onError: (message: string) => void,
+	): Promise<void> {
+		const { data: { session } } = await supabase.auth.getSession();
+		const url = `${apiConfig.baseUrl}${apiConfig.endpoints.llm.chatStream}`;
+
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...(session?.access_token && { Authorization: `Bearer ${session.access_token}` }),
+			},
+			body: JSON.stringify(request),
+		});
+
+		if (!response.ok || !response.body) {
+			onError(`HTTP error: ${response.status}`);
+			return;
+		}
+
+		// Parse SSE line-by-line from the readable stream
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+		let buffer = '';
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+
+			buffer += decoder.decode(value, { stream: true });
+			const lines = buffer.split('\n');
+			buffer = lines.pop() ?? '';
+
+			for (const line of lines) {
+				if (!line.startsWith('data: ')) continue;
+				const jsonStr = line.slice(6).trim();
+				if (!jsonStr) continue;
+				try {
+					const event = JSON.parse(jsonStr);
+					if (event.type === 'chunk') onChunk(event.text);
+					else if (event.type === 'done') onDone(event.id, event.created_at, event.total_tokens);
+					else if (event.type === 'error') onError(event.message);
+				} catch { /* ignore malformed lines */ }
+			}
+		}
 	},
 
 	/**

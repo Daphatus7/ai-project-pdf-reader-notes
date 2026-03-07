@@ -20,13 +20,15 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 			createThread,
 			deleteThread,
 			addUserMessage,
-			addAIMessage,
+			startStreamingMessage,
+			appendStreamingChunk,
+			finalizeStreamingMessage,
 		} = useThreads();
 
 		const {
 			isLoading,
 			sendMessage
-		} = useChat(activeThreadId, addUserMessage, addAIMessage, sourceIds);
+		} = useChat(activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, sourceIds);
 
 		useImperativeHandle(
 			ref,

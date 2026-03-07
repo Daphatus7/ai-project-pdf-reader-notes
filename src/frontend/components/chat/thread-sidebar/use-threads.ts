@@ -11,6 +11,9 @@ import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage, UserMessage, AIMessage} from "@/frontend/api/types/chat.ts";
 
 
+// Placeholder id used while the AI response is streaming in
+const STREAMING_ID = '__streaming__';
+
 // ============ Hook ============
 
 export function useThreads() {
@@ -124,6 +127,46 @@ export function useThreads() {
 		}));
 	}, [activeThreadId]);
 
+	// Add an empty streaming placeholder at the end of the active thread's messages
+	const startStreamingMessage = useCallback(() => {
+		if (!activeThreadId) return;
+		setMessagesByThread(prev => ({
+			...prev,
+			[activeThreadId]: [
+				...(prev[activeThreadId] || []),
+				{ id: STREAMING_ID, role: 'assistant' as const, content: [{ type: 'text' as const, text: '' }] },
+			],
+		}));
+	}, [activeThreadId]);
+
+	// Append a text chunk to the streaming placeholder
+	const appendStreamingChunk = useCallback((chunk: string) => {
+		if (!activeThreadId) return;
+		setMessagesByThread(prev => {
+			const msgs = prev[activeThreadId] || [];
+			return {
+				...prev,
+				[activeThreadId]: msgs.map(msg =>
+					msg.id === STREAMING_ID
+						? { ...msg, content: [{ type: 'text' as const, text: (msg.content[0]?.text ?? '') + chunk }] }
+						: msg
+				),
+			};
+		});
+	}, [activeThreadId]);
+
+	// Replace streaming placeholder id with the real message id from backend
+	const finalizeStreamingMessage = useCallback((id: string) => {
+		if (!activeThreadId) return;
+		setMessagesByThread(prev => {
+			const msgs = prev[activeThreadId] || [];
+			return {
+				...prev,
+				[activeThreadId]: msgs.map(msg => msg.id === STREAMING_ID ? { ...msg, id } : msg),
+			};
+		});
+	}, [activeThreadId]);
+
 	return {
 		threads,
 		activeThreadId,
@@ -136,6 +179,9 @@ export function useThreads() {
 		deleteThread,
 		addUserMessage,
 		addAIMessage,
+		startStreamingMessage,
+		appendStreamingChunk,
+		finalizeStreamingMessage,
 		setMessagesByThread,
 	};
 }

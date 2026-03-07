@@ -7,6 +7,7 @@ Provides endpoints for:
 - Structured output chat (enforces schema-conformant responses)
 """
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 
 from src.backend.schemas import (
     ChatRequest,
@@ -44,6 +45,33 @@ async def chat(
     finally:
         # Always release the slot — success, error, or cancellation
         concurrency_limiter.release(user_id)
+
+@router.post('/chat/stream')
+async def chat_stream(
+        request: ChatRequest = Depends(get_chat_request),
+        llm_service=Depends(get_llm_service),
+        database_service=Depends(get_database_service),
+        concurrency_limiter: ConcurrencyLimiter = Depends(get_concurrency_limiter),
+):
+    user_id = request.user_id
+    await database_service.enforce_token_quota(user_id)
+
+    if not concurrency_limiter.acquire(user_id):
+        raise AppError(429, "CONCURRENT_LIMIT", "Too many concurrent requests")
+
+    async def stream_with_release():
+        try:
+            async for chunk in llm_service.chat_stream(request=request):
+                yield chunk
+        finally:
+            concurrency_limiter.release(user_id)
+
+    return StreamingResponse(
+        stream_with_release(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
 
 #create a thread
 @router.post('/thread', response_model=CreateThreadResponse)

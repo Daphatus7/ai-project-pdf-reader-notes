@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, AsyncIterator
 
 from src.backend.schemas import ChatRequest
 from src.backend.services.llm_service.grok.grok import LlmGrok
@@ -16,3 +16,7 @@ class LlmService:
 
     async def chat(self, request: ChatRequest) -> Any:
         return await self.model.chat(request=request)
+
+    async def chat_stream(self, request: ChatRequest) -> AsyncIterator[str]:
+        async for chunk in self.model.chat_stream(request=request):
+            yield chunk

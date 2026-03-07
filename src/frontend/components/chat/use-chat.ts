@@ -7,7 +7,7 @@
 
 import { useState, useCallback } from 'react';
 import { llmService } from '../../api/services/llm.service.ts';
-import type {UserMessage, AIMessage} from '../../api/types/chat.ts';
+import type {UserMessage} from '../../api/types/chat.ts';
 import type {ChatContent} from "@/frontend/api";
 
 // ============ Hook ============
@@ -15,7 +15,9 @@ import type {ChatContent} from "@/frontend/api";
 export function useChat(
 	activeThreadId: string | null,
 	addUserMessage: (message: UserMessage) => void,
-	addAIMessage: (message: AIMessage) => void,
+	startStreamingMessage: () => void,
+	appendStreamingChunk: (chunk: string) => void,
+	finalizeStreamingMessage: (id: string) => void,
 	sourceIds: string[] = [],
 ) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,29 +27,23 @@ export function useChat(
 		if (!activeThreadId) return;
 
 		setError(null);
-
-		// Add user message immediately (optimistic update)
+		// Optimistically show user message and a streaming placeholder
 		addUserMessage({ content });
+		startStreamingMessage();
 		setIsLoading(true);
 
 		try {
-			const response = await llmService.chat({
-				thread_id: activeThreadId,
-				content,
-				source_ids: sourceIds,
-			});
-			// Add AI message with backend ID
-			addAIMessage({
-				id: response.id,
-				content: response.content,
-			});
+			await llmService.chatStream(
+				{ thread_id: activeThreadId, content, source_ids: sourceIds },
+				(chunk) => appendStreamingChunk(chunk),
+				(id) => { finalizeStreamingMessage(id); setIsLoading(false); },
+				(message) => { setError(message); setIsLoading(false); },
+			);
 		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
-			setError(errorMessage);
-		} finally {
+			setError(err instanceof Error ? err.message : 'Failed to send message');
 			setIsLoading(false);
 		}
-	}, [activeThreadId, addUserMessage, addAIMessage, sourceIds]);
+	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, sourceIds]);
 
 	const selectMessage = useCallback((messageId: string) => {
 		console.log('Selected message:', messageId);
