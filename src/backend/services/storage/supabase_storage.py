@@ -838,6 +838,12 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')
     
+    async def update_document_xai_id(self, document_id: str, xai_document_id: str) -> None:
+        """Persist the xAI file ID returned after uploading a document to a collection."""
+        self.__database.table("documents").update(
+            {"xai_document_id": xai_document_id}
+        ).eq("id", document_id).execute()
+
     async def get_collection_file_id(self, source_id: str) -> str:
         """Get the xAI collection file ID for a document by its document ID."""
         try:

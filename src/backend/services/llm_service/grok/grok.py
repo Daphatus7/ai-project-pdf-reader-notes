@@ -76,15 +76,17 @@ class LlmGrok:
         if history is None:
             history = await self._cold_start(request.thread_id)
 
-        # 2. Build user text
+        # 2. Build user text (original — used for history and storage)
         user_text = " ".join(item["text"] for item in request.content if item.get("type") == "text")
-        
-        # 3. get RAG context from selected documents
+
+        # 3. Get RAG context from selected documents
         context = await self.get_context(request)
-        
-        # Prepend RAG context to user message when relevant documents are selected
-        if len(context) > 0:
-            user_text = f"Given the context to assist you answer the question:\n\n{context}\n\nQuestion: {user_text}"
+
+        # Build prompt text: inject context only for the model call, keep user_text clean for history
+        if context:
+            prompt_text = f"Given the context to assist you answer the question:\n\n{context}\n\nQuestion: {user_text}"
+        else:
+            prompt_text = user_text
 
         # 4. Call xAI SDK — sync, run in executor to avoid blocking event loop
         def _call():
@@ -95,7 +97,7 @@ class LlmGrok:
                     chat.append(user(msg["content"]))
                 elif msg["role"] == "assistant":
                     chat.append(assistant(msg["content"]))
-            chat.append(user(user_text))
+            chat.append(user(prompt_text))
             return chat.sample()
 
         loop = asyncio.get_event_loop()

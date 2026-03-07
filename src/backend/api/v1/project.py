@@ -148,14 +148,17 @@ async def upload_document(
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
 
-    # collections upload (best-effort)
+    # Upload to xAI collection and save the returned file ID for later RAG/delete (best-effort)
     try:
         xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
-        grok_collection.upload_document(
+        xai_doc = grok_collection.upload_document(
             collection_id=xai_collection_id,
             name=source,
             data=content,
         )
+        if xai_doc and xai_doc.file_metadata:
+            await database_service.update_document_xai_id(document['id'], xai_doc.file_metadata.file_id)
+            logger.info("[upload_document] xai_file_id=%s", xai_doc.file_metadata.file_id)
     except Exception as e:
         logger.error(f"[upload_document] collection upload ------> {e}")
 
@@ -170,7 +173,25 @@ async def delete_document(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
+
+    # Fetch xAI file ID before the DB record is deleted
+    xai_file_id = None
+    try:
+        xai_file_id = await database_service.get_collection_file_id(document_id)
+    except Exception as e:
+        logger.error(f"delete_document: could not fetch xai_file_id ------> {e}")
+
+    # Delete from Supabase storage + DB
     await database_service.delete_document(user_id, document_id, project_id)
+
+    # Remove file from xAI collection (best-effort)
+    if xai_file_id:
+        try:
+            grok_collection.delete_document(xai_file_id)
+            logger.info("[delete_document] removed xai_file_id=%s", xai_file_id)
+        except Exception as e:
+            logger.error(f"delete_document: xAI file delete failed ------> {e}")
+
     return DeleteDocumentResponse(response='Document deleted successfully')
 
 
