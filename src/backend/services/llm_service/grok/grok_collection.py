@@ -7,95 +7,82 @@ from xai_sdk.chat import user
 from xai_sdk.proto.v6.documents_pb2 import SearchResponse
 
 #load env
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def create_collection(user_id: str, project_id: str):
-    """
-        Create a new collection for the user, essentially a new project
-    :param user_id: 
-    :param project_id: 
-    :return: 
-    """
-    collection = client.collections.create(
-        name=project_id,
-        model_name="grok-embedding-small"
-    )
-    
-def upload_document(collection_id: str):
-    document = client.collections.upload_document(
-        collection_id=collection_id,
-        name="ml-fundamentals.txt",
-        data=b"...",
-    )
-    return document
-def search_collection(selected_files: Sequence[str], query: str) -> SearchResponse:
-    """
-    :param query: 
-    :param selected_files: 
-    :return: 
-    """
-    results = client.collections.search(
-        query=query,
-        collection_ids=selected_files, #user selected ids
-        retrieval_mode="hybrid",
-    )
-    return results
+class GrokCollection:
 
-def delete_collection(collection_id: str):
-    """
-        删除整个collection文件夹, 包括里面的文件
-    :param collection_id: 
-    :return: nothing
-    """
-    client.collections.delete(collection_id)
-    
-def delete_document(document_id: str):
-    """
-        无视文件的删除
-    """
-    response = client.files.delete(
-        document_id
-    )
-    return response
-
-def download_document(document_id: str):
-    """
-        下载文件内容
-        Download the actual content of a file.
-    :param document_id: 
-    :return: 
-    """
-    response = client.files.content(
-        document_id
-    )
-    return response
-
-
-
-load_dotenv()
-
-
-client = Client(
-    management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
-    api_key=os.getenv("XAI_API_KEY"),
-)   
-
-if __name__ == "__main__":
-    # Example usage
-    try:
-        response = search(
-            selected_files=["collection_58e69554-1cc5-4388-92b4-8bad7385c45b"],
-            query="summarise this?"
+    def __init__(self):
+        load_dotenv()
+        self.xai_client = Client(
+            management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
+            api_key=os.getenv("XAI_API_KEY"),
         )
-        print(response)
-        chat = client.chat.create(model="grok-4-1-fast-reasoning")
-        chat.append(
-          user(
-            "总结一下文章内容 \n\n" + response.matches[0].chunk_content
-          )
+
+    def create_collection(self, project_id: str) -> str:
+        """Create an xAI Collection for a project. Returns the xAI collection_id."""
+        collection = self.xai_client.collections.create(
+            name=project_id,
+            model_name="grok-embedding-small",
         )
-        response = chat.sample()
-        print(f"Answer: {response.content}")
-        print(f"\nUsage: {response.usage}")
-    except Exception as e:
-        print(f"Error during search: {e}")
+        logger.info(f"Created xAI collection for project={project_id} collection_id={collection.collection_id}")
+        return collection.collection_id
+        
+    def upload_document(self, collection_id: str):
+        try:
+            document = self.xai_client.collections.upload_document(
+                collection_id=collection_id,
+                name="ml-fundamentals.txt",
+                data=b"...",
+            )
+        except Exception e:
+            logger.error(f"upload catch error----> {e}")
+        
+        return document
+    def search_collection(self,selected_files: Sequence[str], query: str) -> SearchResponse:
+        """
+        :param query: 
+        :param selected_files: 
+        :return: 
+        """
+        results = self.xai_client.collections.search(
+            query=query,
+            collection_ids=selected_files, #user selected ids
+            retrieval_mode="hybrid",
+        )
+        return results
+    
+    def delete_collection(self,collection_id: str):
+        """
+            删除整个collection文件夹, 包括里面的文件
+        :param collection_id: 
+        :return: nothing
+        """
+        self.xai_client.collections.delete(collection_id)
+        
+    def delete_document(self,document_id: str):
+        """
+            无视文件的删除
+        """
+        response = self.xai_client.files.delete(
+            document_id
+        )
+        return response
+    
+    def download_document(self,document_id: str):
+        """
+            下载文件内容
+            Download the actual content of a file.
+        :param document_id: 
+        :return: 
+        """
+        response = self.xai_client.files.content(
+            document_id
+        )
+        return response
+    
+    
+    
+    

@@ -1,12 +1,8 @@
-# @file        rag_service.py
-# @description
-# @author      [Peiyu Wang]
-# @date        21/1/2026
-# @license     © 2026 . All rights reserved.
 import logging
 import os
+from typing import Any
 
-from supabase import create_client
+from supabase import create_client, Client as SupabaseClient
 from xai_sdk import Client
 
 from src.backend.schemas.rag import RagRequest, RagDeleteRequest, RagDeleteResponse, UploadResponse
@@ -16,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 class RagService(Service):
     def __init__(self):
-        self.supabase = None
-        self._xai_client = None
+        self.supabase: SupabaseClient | None = None
+        self._xai_client: Client | None = None
 
     def start(self):
         self.supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
@@ -50,11 +46,15 @@ class RagService(Service):
             return False
         return True
 
+
+
     def upload_to_collection(self, project_id: str, document_id: str, document_name: str, file_data: bytes) -> None:
         """Upload PDF to xAI Collection for RAG. xAI handles chunking and embedding.
 
         project_id = collection_id, document_id = document identifier in the collection.
         """
+        
+        
         self._xai_client.collections.upload_document(
             collection_id=project_id,
             data=file_data,

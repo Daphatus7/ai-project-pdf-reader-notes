@@ -159,7 +159,7 @@ class SupabaseStorage(Service):
                 internal_error('Failed to create project')
             project_id = response.data[0]['id']
             logger.info(f'Project created: user={user_id}, project={project_id}')
-            return f'Project created successfully with ID: {project_id}'
+            return project_id
         except AppError:
             if incremented:
                 await self.decrement_usage(user_id, 'project_count')
@@ -169,6 +169,22 @@ class SupabaseStorage(Service):
                 await self.decrement_usage(user_id, 'project_count')
             logger.error(f'Failed to create project for user {user_id}: {e}')
             internal_error('Failed to create project')
+
+    def update_project_collection_id(self, project_id: str, xai_collection_id: str) -> None:
+        self.__database.table('projects').update(
+            {'xai_collection_id': xai_collection_id}
+        ).eq('id', project_id).execute()
+
+    async def get_project_collection_id(self, user_id: str, project_id: str) -> str:
+        response = (self.__database.table('projects')
+                    .select('xai_collection_id')
+                    .eq('id', project_id)
+                    .eq('user_id', user_id)
+                    .single()
+                    .execute())
+        if not response.data or not response.data.get('xai_collection_id'):
+            not_found('Project collection')
+        return response.data['xai_collection_id']
 
     async def delete_project(self, user_id: str, project_id: str) -> dict:
         """Delete a project: storage files → cascade delete → decrement usage."""

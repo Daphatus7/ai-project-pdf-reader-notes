@@ -7,7 +7,7 @@ import logging
 import uuid
 
 import httpx
-from fastapi import APIRouter, Depends, UploadFile, File, Form, Path
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Path, HTTPException
 
 from src.backend.api.deps import get_database_service, get_user
 from src.backend.config.config import settings
@@ -64,7 +64,18 @@ async def create_project(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
-    response = await database_service.create_project(user_id, payload)
+    try:
+        response = await database_service.create_project(user_id, payload)
+        try:
+            grok_collection_service.create_collection(
+                project_id=response['project_id']
+            )
+        except Exception as e:
+            logger.error(f"create_project ------> {e}")
+            raise e
+    except Exception as e:
+        logger.error(f"create_project ------> {e}")
+        raise e
     return CreateProjectResponse(response=response)
 
 
@@ -76,6 +87,11 @@ async def delete_project(
 ):
     user_id = user['sub']
     await database_service.delete_project(user_id, project_id)
+    try:
+        grok_collection.delete_collection(project_id)
+    except Exception e:
+        logger.error(f"trying to delete collection but ------> {e}")
+    
     return ProjectDeleteResponse(response='Project deleted successfully')
 
 
@@ -92,60 +108,6 @@ async def list_documents(
     return ListDocumentsResponse(documents=documents)
 
 
-async def _submit_to_pdf_backend(
-    document_id: str,
-    project_id: str,
-    document_name: str,
-    user_id: str,
-    tier: str,
-    file_data: bytes,
-    webhook_url: str,
-) -> str | None:
-    """Submit PDF to pdf_backend for chunking/embedding. Returns job_id (202) or None on failure."""
-    target_url = f"{settings.pdf_backend_url}/api/v1/documents/process"
-    logger.debug(
-        "[pdf_backend] submitting document_id=%s size=%d bytes tier=%s webhook=%s target=%s",
-        document_id, len(file_data), tier, webhook_url, target_url,
-    )
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            logger.info(
-                f"document_id={document_id} "
-                f"project_id={project_id} "
-                f"document_name={document_name} "
-                f"user_id={user_id}"
-                f" tier={tier} webhook_url={webhook_url}"
-            )
-            response = await client.post(
-                target_url,
-                files={"file": ("document.pdf", file_data, "application/pdf")},
-                data={
-                    "document_id": document_id,
-                    "project_id": project_id,
-                    "document_name": document_name,
-                    "user_id": user_id,
-                    "tier": tier,
-                    "webhook_url": webhook_url,
-                },
-            )
-        logger.debug("[pdf_backend] response status=%d body=%s", response.status_code, response.text[:200])
-        if response.status_code == 202:
-            job_id = response.json().get("job_id")
-            logger.info("[pdf_backend] job queued job_id=%s document_id=%s", job_id, document_id)
-            return job_id
-        logger.error(
-            "[pdf_backend] unexpected status %d for document %s: %s",
-            response.status_code, document_id, response.text,
-        )
-    except httpx.ConnectError as e:
-        logger.error("[pdf_backend] connection refused — is pdf_backend running? url=%s error=%s", target_url, e)
-    except httpx.TimeoutException as e:
-        logger.error("[pdf_backend] request timed out after 30s for document %s: %s", document_id, e)
-    except Exception as e:
-        logger.error("[pdf_backend] unexpected error for document %s: %s", document_id, e, exc_info=True)
-    return None
-
-
 @router.post('/{project_id}/documents', response_model=UploadResponse)
 async def upload_document(
         project_id: str = Path(..., description='Project ID to upload document to'),
@@ -155,7 +117,8 @@ async def upload_document(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
-
+    
+    # supabase upload
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
     logger.info("[upload_document] user=%s project=%s file=%s size=%d", user_id, project_id, source, len(content))
@@ -170,39 +133,13 @@ async def upload_document(
             file_data=content,
         )
         logger.debug("[upload_document] stored document_id=%s", document['id'])
+        try: # collections upload
+            grok_collection.upload_document()
     except Exception:
         if incremented:
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
-
-    # Submit to pdf_backend for RAG processing; returns job_id for SSE tracking
-    job_id = None
-    if settings.pdf_backend_url:
-        # Guard: BACKEND_URL must be an absolute URL so pdf_backend can call back.
-        if not settings.backend_url or not settings.backend_url.startswith("http"):
-            raise HTTPException(
-                status_code=500,
-                detail="Server misconfiguration: BACKEND_URL is not set or missing protocol (http/https).",
-            )
-        plan = await database_service.get_user_plan(user_id)
-        tier = "pro" if plan == "pro" else "free"
-        webhook_url = f"{settings.backend_url}/api/v1/webhook/pdf"
-        job_id = await _submit_to_pdf_backend(
-            document_id=document['id'],
-            project_id=project_id,
-            document_name=source,
-            user_id=user_id,
-            tier=tier,
-            file_data=content,
-            webhook_url=webhook_url,
-        )
-    else:
-        logger.debug(
-            "[upload_document] RAG skipped — PDF_BACKEND_URL=%r BACKEND_URL=%r",
-            settings.pdf_backend_url or "(not set)",
-            settings.backend_url or "(not set)",
-        )
-
+    
     return UploadResponse(success=True, message="Document uploaded successfully", job_id=job_id)
 
 
