@@ -73,7 +73,8 @@ async def create_project(
     # create xAI collection and store mapping
     try:
         xai_collection_id = grok_collection.create_collection(project_id)
-        logger.info(f"received collection_id == {xai_collection_id}")
+        await database_service.update_project_collection_id(project_id, xai_collection_id)
+        logger.info(f"create_project xai_collection_id={xai_collection_id}")
     except Exception as e:
         logger.error(f"create_project collection ------> {e}")
     return CreateProjectResponse(response=project_id)

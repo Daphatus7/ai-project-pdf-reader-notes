@@ -78,16 +78,13 @@ class LlmGrok:
 
         # 2. Build user text
         user_text = " ".join(item["text"] for item in request.content if item.get("type") == "text")
-
-        # 3. RAG: search xAI collection and inject context into user message
-        if request.source_ids:
-            results = self._collection.search_collection(selected_files=request.source_ids, query=user_text)
-            if results.matches:
-                context = "\n\n---\n\n".join(
-                    f"[Source {i + 1}]\n{m.chunk_content}"
-                    for i, m in enumerate(results.matches[:4])
-                )
-                user_text = f"{user_text}\n\n<context>\n{context}\n</context>"
+        
+        # 3. get RAG context from selected documents
+        context = await self.get_context(request)
+        
+        # Prepend RAG context to user message when relevant documents are selected
+        if len(context) > 0:
+            user_text = f"Given the context to assist you answer the question:\n\n{context}\n\nQuestion: {user_text}"
 
         # 4. Call xAI SDK — sync, run in executor to avoid blocking event loop
         def _call():
@@ -131,3 +128,23 @@ class LlmGrok:
             created_at=resp["created_at"],
             total_tokens=input_tokens + output_tokens,
         )
+    async def _source_ids_to_xai_file_ids(self, source_ids: list[str]) -> list[str]:
+        """Convert our DB document UUIDs to xAI file IDs for collection search."""
+        result = []
+        for source_id in source_ids:
+            result.append(await self._supabase.get_collection_file_id(source_id))
+        return result
+
+    async def get_context(self, request: ChatRequest) -> str:
+        """Search the xAI collection with selected documents and return joined context chunks."""
+        if not request.source_ids:
+            return ""
+        xai_file_ids = await self._source_ids_to_xai_file_ids(request.source_ids)
+        results = self._collection.search_collection(
+            selected_files=xai_file_ids,
+            query=request.content[0]["text"],
+        )
+        chunks = [match.chunk_content for match in results.matches if match.chunk_content]
+        context = "\n\n".join(chunks)
+        logger.info(f"RAG context ({len(chunks)} chunks): {context[:200]}...")
+        return context

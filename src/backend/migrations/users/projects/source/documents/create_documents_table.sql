@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS documents (
     document_dir TEXT,
     document_type TEXT,
     description TEXT NOT NULL,
+
+    -- xAI collection document ID (set after upload to xAI collection)
+    xai_document_id TEXT,
     
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),

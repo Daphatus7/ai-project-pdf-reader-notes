@@ -170,6 +170,11 @@ class SupabaseStorage(Service):
             logger.error(f'Failed to create project for user {user_id}: {e}')
             internal_error('Failed to create project')
 
+    async def update_project_collection_id(self, project_id: str, xai_collection_id: str) -> None:
+        self.__database.table('projects').update(
+            {'xai_collection_id': xai_collection_id}
+        ).eq('id', project_id).execute()
+
     async def get_project_collection_id(self, user_id: str, project_id: str) -> str:
         response = (self.__database.table('projects')
                     .select('xai_collection_id')
@@ -832,3 +837,18 @@ class SupabaseStorage(Service):
             logger.info(f"downgrade complete for user={user_id}, quotas enforced via plan config")
         except Exception as e:
             logger.error(f'Failed to downgrade stripe_customer {stripe_customer_id} to free: {e}')
+    
+    async def get_collection_file_id(self, source_id: str) -> str:
+        """Get the xAI collection file ID for a document by its document ID."""
+        try:
+            response = (self.__database.table("documents")
+                        .select("xai_document_id")
+                        .eq("id", source_id)
+                        .single()
+                        .execute())
+            if not response.data or not response.data.get("xai_document_id"):
+                not_found("Document file")
+            return response.data["xai_document_id"]
+        except Exception as e:
+            logger.error(f"Failed to get xai_document_id for source {source_id}: {e}")
+        return ""

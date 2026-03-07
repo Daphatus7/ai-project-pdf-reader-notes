@@ -37,11 +37,10 @@ class GrokCollection:
                 name=name,
                 data=data,
             )
-            logger.info(f"Uploaded document={name} to collection={collection_id}")
+            logger.info(f"Uploaded document={name} to xai_collection_id={collection_id}")
             return document
         except Exception as e:
-            logger.error(f"upload catch error----> {e}")
-            raise
+            logger.error(f"upload document got error ->>>>{e}")
     def search_collection(self,selected_files: Sequence[str], query: str) -> SearchResponse:
         """
         :param query: 
