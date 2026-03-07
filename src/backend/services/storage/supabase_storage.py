@@ -858,3 +858,33 @@ class SupabaseStorage(Service):
         except Exception as e:
             logger.error(f"Failed to get xai_document_id for source {source_id}: {e}")
         return ""
+
+    async def get_document_collection_id(self, source_id: str) -> str:
+        """Get the xAI collection ID for a document by looking up its project.
+        documents.project_id → projects.xai_collection_id
+        """
+        try:
+            # Step 1: get project_id from the document
+            doc = (self.__database.table("documents")
+                   .select("project_id")
+                   .eq("id", source_id)
+                   .single()
+                   .execute())
+            if not doc.data or not doc.data.get("project_id"):
+                not_found("Document")
+            project_id = doc.data["project_id"]
+
+            # Step 2: get xai_collection_id from the project
+            proj = (self.__database.table("projects")
+                    .select("xai_collection_id")
+                    .eq("id", project_id)
+                    .single()
+                    .execute())
+            if not proj.data or not proj.data.get("xai_collection_id"):
+                not_found("Project collection")
+            return proj.data["xai_collection_id"]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to get xai_collection_id for document {source_id}: {e}")
+        return ""

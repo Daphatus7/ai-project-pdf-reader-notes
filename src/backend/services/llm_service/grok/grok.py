@@ -130,20 +130,28 @@ class LlmGrok:
             created_at=resp["created_at"],
             total_tokens=input_tokens + output_tokens,
         )
-    async def _source_ids_to_xai_file_ids(self, source_ids: list[str]) -> list[str]:
-        """Convert our DB document UUIDs to xAI file IDs for collection search."""
-        result = []
+    async def _source_ids_to_collection_ids(self, source_ids: list[str]) -> list[str]:
+        """Convert DB document UUIDs to their project's xAI collection IDs (deduplicated).
+        xAI search API requires collection IDs, not file IDs.
+        """
+        seen: set[str] = set()
+        result: list[str] = []
         for source_id in source_ids:
-            result.append(await self._supabase.get_collection_file_id(source_id))
+            col_id = await self._supabase.get_document_collection_id(source_id)
+            if col_id and col_id not in seen:
+                seen.add(col_id)
+                result.append(col_id)
         return result
 
     async def get_context(self, request: ChatRequest) -> str:
         """Search the xAI collection with selected documents and return joined context chunks."""
         if not request.source_ids:
             return ""
-        xai_file_ids = await self._source_ids_to_xai_file_ids(request.source_ids)
+        collection_ids = await self._source_ids_to_collection_ids(request.source_ids)
+        if not collection_ids:
+            return ""
         results = self._collection.search_collection(
-            selected_files=xai_file_ids,
+            selected_files=collection_ids,
             query=request.content[0]["text"],
         )
         chunks = [match.chunk_content for match in results.matches if match.chunk_content]
