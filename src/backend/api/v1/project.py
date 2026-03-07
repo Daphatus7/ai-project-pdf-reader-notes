@@ -21,6 +21,10 @@ from src.backend.schemas.project import (
 )
 from src.backend.schemas.rag import UploadResponse
 from src.backend.schemas.error import validation_error
+from src.backend.services.llm_service.grok.grok_collection import GrokCollection
+
+# module-level singleton
+grok_collection = GrokCollection()
 
 logger = logging.getLogger(__name__)
 
@@ -64,19 +68,15 @@ async def create_project(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
+    # supabase create project
+    project_id = await database_service.create_project(user_id, payload)
+    # create xAI collection and store mapping
     try:
-        response = await database_service.create_project(user_id, payload)
-        try:
-            grok_collection_service.create_collection(
-                project_id=response['project_id']
-            )
-        except Exception as e:
-            logger.error(f"create_project ------> {e}")
-            raise e
+        xai_collection_id = grok_collection.create_collection(project_id)
+        logger.info(f"received collection_id == {xai_collection_id}")
     except Exception as e:
-        logger.error(f"create_project ------> {e}")
-        raise e
-    return CreateProjectResponse(response=response)
+        logger.error(f"create_project collection ------> {e}")
+    return CreateProjectResponse(response=project_id)
 
 
 @router.delete('/{project_id}', response_model=ProjectDeleteResponse)
@@ -86,12 +86,20 @@ async def delete_project(
         database_service=Depends(get_database_service),
 ):
     user_id = user['sub']
-    await database_service.delete_project(user_id, project_id)
+    # get xai_collection_id before cascade delete removes it
+    xai_collection_id = None
     try:
-        grok_collection.delete_collection(project_id)
-    except Exception e:
-        logger.error(f"trying to delete collection but ------> {e}")
-    
+        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+    except Exception as e:
+        logger.error(f"delete_project but project not found ----> {e} ")
+    # supabase delete
+    await database_service.delete_project(user_id, project_id)
+    # delete xAI collection (best-effort)
+    if xai_collection_id:
+        try:
+            grok_collection.delete_collection(xai_collection_id)
+        except Exception as e:
+            logger.error(f"trying to delete collection but ------> {e}")
     return ProjectDeleteResponse(response='Project deleted successfully')
 
 
@@ -125,6 +133,7 @@ async def upload_document(
 
     incremented = await database_service.enforce_quota(user_id, 'doc_count')
 
+    # supabase upload
     try:
         document = await database_service.upload_document(
             user_id=user_id,
@@ -132,15 +141,24 @@ async def upload_document(
             document_name=source,
             file_data=content,
         )
-        logger.debug("[upload_document] stored document_id=%s", document['id'])
-        try: # collections upload
-            grok_collection.upload_document()
+        logger.info("[upload_document] stored document_id=%s", document['id'])
     except Exception:
         if incremented:
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
-    
-    return UploadResponse(success=True, message="Document uploaded successfully", job_id=job_id)
+
+    # collections upload (best-effort)
+    try:
+        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+        grok_collection.upload_document(
+            collection_id=xai_collection_id,
+            name=source,
+            data=content,
+        )
+    except Exception as e:
+        logger.error(f"[upload_document] collection upload ------> {e}")
+
+    return UploadResponse(success=True, source_id=document['id'], message="Document uploaded successfully")
 
 
 @router.delete('/{project_id}/documents/{document_id}', response_model=DeleteDocumentResponse)

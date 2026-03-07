@@ -9,7 +9,7 @@ from xai_sdk.chat import user, system, assistant
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
-from src.backend.services.llm_service.grok.grok_collection import search_collection
+from src.backend.services.llm_service.grok.grok_collection import GrokCollection
 from src.backend.services.storage.supabase_storage import SupabaseStorage
 from xai_sdk.tools import web_search, x_search, code_execution
 
@@ -33,6 +33,7 @@ class LlmGrok:
         self._client = Client(api_key=os.getenv("XAI_API_KEY"))
         self._supabase = supabase_storage
         self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
+        self._collection = GrokCollection()
 
     # ── Redis ─────────────────────────────────────────────────────────────────
 
@@ -80,7 +81,7 @@ class LlmGrok:
 
         # 3. RAG: search xAI collection and inject context into user message
         if request.source_ids:
-            results = search_collection(selected_files=request.source_ids, query=user_text)
+            results = self._collection.search_collection(selected_files=request.source_ids, query=user_text)
             if results.matches:
                 context = "\n\n---\n\n".join(
                     f"[Source {i + 1}]\n{m.chunk_content}"

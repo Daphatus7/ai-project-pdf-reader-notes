@@ -30,17 +30,18 @@ class GrokCollection:
         logger.info(f"Created xAI collection for project={project_id} collection_id={collection.collection_id}")
         return collection.collection_id
         
-    def upload_document(self, collection_id: str):
+    def upload_document(self, collection_id: str, name: str, data: bytes):
         try:
             document = self.xai_client.collections.upload_document(
                 collection_id=collection_id,
-                name="ml-fundamentals.txt",
-                data=b"...",
+                name=name,
+                data=data,
             )
-        except Exception e:
+            logger.info(f"Uploaded document={name} to collection={collection_id}")
+            return document
+        except Exception as e:
             logger.error(f"upload catch error----> {e}")
-        
-        return document
+            raise
     def search_collection(self,selected_files: Sequence[str], query: str) -> SearchResponse:
         """
         :param query: 

@@ -170,11 +170,6 @@ class SupabaseStorage(Service):
             logger.error(f'Failed to create project for user {user_id}: {e}')
             internal_error('Failed to create project')
 
-    def update_project_collection_id(self, project_id: str, xai_collection_id: str) -> None:
-        self.__database.table('projects').update(
-            {'xai_collection_id': xai_collection_id}
-        ).eq('id', project_id).execute()
-
     async def get_project_collection_id(self, user_id: str, project_id: str) -> str:
         response = (self.__database.table('projects')
                     .select('xai_collection_id')

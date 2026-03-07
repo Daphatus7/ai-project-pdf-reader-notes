@@ -47,7 +47,6 @@ class RagService(Service):
         return True
 
 
-
     def upload_to_collection(self, project_id: str, document_id: str, document_name: str, file_data: bytes) -> None:
         """Upload PDF to xAI Collection for RAG. xAI handles chunking and embedding.
 
