@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     redis_max_tokens: int = Field(default=20000)  # Max tokens in Redis thread
 
     # Conversation Storage - Cold Start Configuration
-    cold_start_max_messages: int = Field(default=10)    # Max messages to load
+    cold_start_max_messages: int = Field(default=20)    # Max messages to load
     cold_start_max_tokens: int = Field(default=200000)  # Max tokens to load
 
     # Free tier usage limits
