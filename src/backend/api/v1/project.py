@@ -5,12 +5,9 @@
 # @license     © 2026 . All rights reserved.
 import logging
 import uuid
-
-import httpx
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Path, HTTPException
 
 from src.backend.api.deps import get_database_service, get_user
-from src.backend.config.config import settings
 from src.backend.schemas.project import (
     ListProjectsResponse,
     CreateProjectResponse,
