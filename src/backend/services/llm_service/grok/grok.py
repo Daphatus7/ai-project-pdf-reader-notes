@@ -6,7 +6,7 @@ from typing import AsyncIterator
 
 import redis
 from xai_sdk import Client
-from xai_sdk.chat import user, system, assistant
+from xai_sdk.chat import user, system, assistant, image as xai_image
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
@@ -71,14 +71,15 @@ class LlmGrok:
 
     # ── Shared setup ──────────────────────────────────────────────────────────
 
-    async def _prepare_request(self, request: ChatRequest) -> tuple[list[dict], str, str]:
-        """Load history, build user text and prompt text with optional RAG context."""
+    async def _prepare_request(self, request: ChatRequest) -> tuple[list[dict], str, str, list[dict]]:
+        """Load history, build user text, prompt text with optional RAG context, and image items."""
         self._refresh_ttl(request.thread_id)
         history = self._load_history(request.thread_id)
         if history is None:
             history = await self._cold_start(request.thread_id)
 
         user_text = " ".join(item["text"] for item in request.content if item.get("type") == "text")
+        image_items = [item for item in request.content if item.get("type") == "image"]
 
         context = await self.get_context(request)
         if context:
@@ -86,10 +87,10 @@ class LlmGrok:
         else:
             prompt_text = user_text
 
-        return history, user_text, prompt_text
+        return history, user_text, prompt_text, image_items
 
-    def _build_chat(self, history: list[dict], prompt_text: str):
-        """Create and populate an xAI chat object."""
+    def _build_chat(self, history: list[dict], prompt_text: str, image_items: list[dict] | None = None):
+        """Create and populate an xAI chat object, with optional multimodal image content."""
         chat = self._client.chat.create(model=MODEL)
         chat.append(system(SYSTEM_PROMPT))
         for msg in history:
@@ -97,17 +98,26 @@ class LlmGrok:
                 chat.append(user(msg["content"]))
             elif msg["role"] == "assistant":
                 chat.append(assistant(msg["content"]))
-        chat.append(user(prompt_text))
+
+        # Build multimodal user message: text + images (data URI format required by xAI)
+        if image_items:
+            contents = [prompt_text] + [
+                xai_image(image_url=f"data:{img['mime_type']};base64,{img['data']}", detail="high")
+                for img in image_items
+            ]
+            chat.append(user(*contents))
+        else:
+            chat.append(user(prompt_text))
         return chat
 
     # ── Chat (non-streaming) ──────────────────────────────────────────────────
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
-        history, user_text, prompt_text = await self._prepare_request(request)
+        history, user_text, prompt_text, image_items = await self._prepare_request(request)
 
         # Run sync xAI SDK call in executor to avoid blocking event loop
         def _call():
-            return self._build_chat(history, prompt_text).sample()
+            return self._build_chat(history, prompt_text, image_items).sample()
 
         loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(None, _call)
@@ -150,7 +160,7 @@ class LlmGrok:
           {"type": "done",  "id": "<msg_id>", "created_at": "<iso>", "total_tokens": N}
           {"type": "error", "message": "<description>"}
         """
-        history, user_text, prompt_text = await self._prepare_request(request)
+        history, user_text, prompt_text, image_items = await self._prepare_request(request)
 
         loop = asyncio.get_running_loop()
         # Queue bridges the sync gRPC streaming iterator → async generator
@@ -158,7 +168,7 @@ class LlmGrok:
 
         def _run_stream():
             try:
-                chat_obj = self._build_chat(history, prompt_text)
+                chat_obj = self._build_chat(history, prompt_text, image_items)
                 final_response = None
                 for response, chunk in chat_obj.stream():
                     if chunk.content:
@@ -232,9 +242,10 @@ class LlmGrok:
         collection_ids = await self._source_ids_to_collection_ids(request.source_ids)
         if not collection_ids:
             return ""
+        query = next((item["text"] for item in request.content if item.get("type") == "text"), "")
         results = self._collection.search_collection(
             selected_files=collection_ids,
-            query=request.content[0]["text"],
+            query=query,
         )
         chunks = [match.chunk_content for match in results.matches if match.chunk_content]
         context = "\n\n".join(chunks)

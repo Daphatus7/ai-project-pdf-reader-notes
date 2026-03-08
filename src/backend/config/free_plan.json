@@ -8,5 +8,6 @@
     "max_documents": 4,
     "max_notes":     10,
     "max_tokens":    100000
-  }
+  },
+  "token_weights": { "input": 1, "output": 5 }
 }
