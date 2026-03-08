@@ -6,6 +6,7 @@ import {
 	LogIn,
 	LogOut,
 	CreditCard,
+	Mail,
 } from "lucide-react";
 
 import {
@@ -46,10 +47,10 @@ export function Header() {
 				<img src="/logo.svg" alt="Atlas Notebook AI Logo" className="h-8" />
 			</div>
 
-			<div className="flex items-center gap-2 mr-2">
+			<div className="flex items-center gap-1 mr-1">
 				{/* Show Pro badge when on Pro plan, otherwise show Upgrade button */}
 				{isPro ? (
-					<span className="text-xs font-semibold rounded-full bg-accent border ">
+					<span className="text-xs font-semibold  ">
 						Pro
 					</span>
 				) : (
@@ -73,7 +74,6 @@ export function Header() {
 				>
 					Feedback
 				</Button>
-				
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">
@@ -89,6 +89,12 @@ export function Header() {
 									Manage Subscription
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
+								{/* Contact via email */}
+								<DropdownMenuItem onClick={() => window.location.href = 'mailto:example@example.com'}>
+									<Mail className="w-4 h-4 mr-2" />
+									Contact
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogout}>
 									<LogOut className="w-4 h-4 mr-2" />
 									Logout
@@ -97,6 +103,12 @@ export function Header() {
 						) : (
 							<>
 								<DropdownMenuLabel>My Account</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								{/* Contact via email */}
+								<DropdownMenuItem onClick={() => window.location.href = 'mailto:example@example.com'}>
+									<Mail className="w-4 h-4 mr-2" />
+									Contact us
+								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogin}>
 									<LogIn className="w-4 h-4 mr-2" />

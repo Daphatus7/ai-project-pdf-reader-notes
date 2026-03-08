@@ -169,8 +169,13 @@ export const NoteRenderer = forwardRef<NoteRendererHandle, NoteRendererProps>(
 			insertContent: (content, position) => {
 				if (!editor) return
 
+				// Move cursor to end of target block so new content always starts on a fresh line
 				if (position === 'end') {
 					editor.commands.setTextSelection(editor.state.doc.content.size)
+				} else {
+					// Move to end of current block node (depth = innermost block level)
+					const { $from } = editor.state.selection
+					editor.commands.setTextSelection($from.end($from.depth))
 				}
 
 				if (content.htmlContent) {

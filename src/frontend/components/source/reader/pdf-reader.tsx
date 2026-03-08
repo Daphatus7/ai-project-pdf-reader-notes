@@ -48,36 +48,35 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
       <Toolbar>
         {(props: ToolbarSlot) => (
           <div className="pdf-toolbar">
-            {/* Navigation */}
-            <div className="pdf-toolbar-group">
+            {/* Left: page navigation — always visible */}
+            <div className="pdf-toolbar-group pdf-toolbar__nav">
               <props.GoToPreviousPage />
               <props.CurrentPageInput />
               <span className="text-sm" style={{ color: 'var(--control-text)' }}>/ <props.NumberOfPages /></span>
               <props.GoToNextPage />
             </div>
 
-            <div className="pdf-toolbar-separator" />
+            {/* Middle: scrollable zone for zoom / rotate / fullscreen */}
+            <div className="pdf-toolbar__scroll">
+              <div className="pdf-toolbar-separator" />
 
-            {/* Zoom */}
-            <div className="pdf-toolbar-group">
-              <props.ZoomOut />
-              <props.Zoom />
-              <props.ZoomIn />
+              <div className="pdf-toolbar-group">
+                <props.ZoomOut />
+                <props.Zoom />
+                <props.ZoomIn />
+              </div>
+
+              <div className="pdf-toolbar-separator" />
+
+              <div className="pdf-toolbar-group">
+                <props.Rotate direction={RotateDirection.Backward} />
+                <props.EnterFullScreen />
+              </div>
             </div>
 
-            <div className="pdf-toolbar-separator" />
-
-            {/* Actions */}
-            <div className="pdf-toolbar-group">
-              <props.Rotate direction={RotateDirection.Backward} />
-              <props.EnterFullScreen />
-            </div>
-
-            <div className="pdf-toolbar-separator" />
-
-            {/* Screenshot */}
+            {/* Right: Ask AI — always pinned to the far right */}
             <Button
-              className={`pdf-toolbar-btn ${
+              className={`pdf-toolbar-btn pdf-toolbar__ai-btn ${
                 screenshot.isActive ? 'pdf-toolbar-btn--danger' : 'pdf-toolbar-btn--ai'
               }`}
               onClick={() => (screenshot.isActive ? screenshot.deactivate() : screenshot.activate())}

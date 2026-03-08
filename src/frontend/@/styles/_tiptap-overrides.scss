@@ -40,6 +40,9 @@
     padding: var(--content-codeblock-padding);
     font-size: var(--content-codeblock-font-size);
     border-radius: var(--content-codeblock-radius);
+
+    // Prevent generic `code` font-size from cascading into code blocks
+    code { font-size: inherit; padding: 0; }
   }
 
   // --- Blockquotes ---
