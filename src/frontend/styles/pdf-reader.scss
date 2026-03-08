@@ -6,15 +6,41 @@
    ========================================================== */
 
 .pdf-toolbar {
+  /* Three-column layout: [nav] [scroll zone] [ask ai]
+     nav and ask-ai are fixed; scroll zone takes remaining space */
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.25rem;
-  justify-content: space-between;
   height: var(--toolbar-height);
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--toolbar-border);
   padding: 0 0.5rem;
+  gap: 0;
+}
+
+/* Left: page navigation — fixed width, never shrinks */
+.pdf-toolbar__nav {
+  flex-shrink: 0;
+}
+
+/* Middle: horizontally scrollable zone for secondary controls */
+.pdf-toolbar__scroll {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome / Safari */
+  }
+}
+
+/* Right: Ask AI button — never shrinks, always visible */
+.pdf-toolbar__ai-btn {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
 }
 
 .pdf-toolbar-group {
