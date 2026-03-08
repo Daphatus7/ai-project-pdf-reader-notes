@@ -17,46 +17,54 @@
   --content-font-size: 0.875rem;
   --content-line-height: 1.6;
 
-  /* ---- Headings ---- */
-  --content-h1-size: 1.25em;
+  /* ---- Headings ----
+   * Notion-style hierarchy (at 14px base): H1=21px H2=17.5px H3=15.75px H4=14px
+   * margin-top shrinks as level increases (H4 < H3 < H2 < H1)
+   */
+  --content-h1-size: 1.5em;
   --content-h1-weight: 700;
-  --content-h1-margin-top: 1em;
+  --content-h1-margin-top: 1.25em;
 
-  --content-h2-size: 1.125em;
+  --content-h2-size: 1.25em;
   --content-h2-weight: 700;
-  --content-h2-margin-top: 0.875em;
+  --content-h2-margin-top: 1em;
 
-  --content-h3-size: 1em;
+  --content-h3-size: 1.125em;
   --content-h3-weight: 600;
-  --content-h3-margin-top: 0.7em;
+  --content-h3-margin-top: 0.875em;
 
-  --content-h4-size: 0.875em;
+  --content-h4-size: 1em;        /* same size as body, weight alone marks it */
   --content-h4-weight: 600;
-  --content-h4-margin-top: 2em;
+  --content-h4-margin-top: 0.75em;
 
   /* ---- Paragraph ---- */
-  --content-p-margin-top: 16px;
+  --content-p-margin-top: 0.75em; /* was 16px — use em for unit consistency */
 
-  /* ---- Code (inline) ---- */
-  --content-code-size: 0.5em;
+  /* ---- Code (inline) ----
+   * 0.875em ≈ Notion's ~87% of surrounding text; fixes 0.5em bug (was 7px)
+   */
+  --content-code-size: 0.875em;
   --content-code-line-height: 1.4;
-  --content-code-radius: 6px;
-  --content-code-padding: 0.1em 0.2em;
+  --content-code-radius: 4px;
+  --content-code-padding: 0.15em 0.4em;
 
-  /* ---- Code block ---- */
-  --content-codeblock-margin-y: 1.5em;
+  /* ---- Code block ----
+   * 0.875rem = 14px = same as body text; keeps code blocks from being larger
+   * than prose. pre > code must set font-size: inherit to prevent cascade.
+   */
+  --content-codeblock-margin-y: 1em;
   --content-codeblock-padding: 1em;
-  --content-codeblock-font-size: 1rem;
+  --content-codeblock-font-size: 0.875rem;
   --content-codeblock-radius: 6px;
 
   /* ---- Blockquote ---- */
   --content-blockquote-padding-left: 1em;
   --content-blockquote-padding-y: 0.375em;
-  --content-blockquote-margin-y: 1.5rem;
+  --content-blockquote-margin-y: 1rem;
   --content-blockquote-bar-width: 0.25em;
 
   /* ---- Lists ---- */
-  --content-list-margin-y: 1.5em;
+  --content-list-margin-y: 1em;  /* was 1.5em — tighter, closer to Notion */
   --content-list-padding-left: 1.5em;
 
   /* ---- Horizontal rule ---- */

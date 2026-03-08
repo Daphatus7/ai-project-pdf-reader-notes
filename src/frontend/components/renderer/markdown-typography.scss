@@ -99,9 +99,13 @@
     border-radius: var(--content-codeblock-radius);
 
     code {
+      /* Reset all inline-code overrides — size must inherit from pre, not from
+         the generic `code` rule above, which would make it 0.875em × 0.875rem */
+      font-size: inherit;
       background-color: transparent;
       border: none;
       border-radius: 0;
+      padding: 0;
       -webkit-text-fill-color: inherit;
       color: inherit;
     }
