@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { projectsService } from '@/frontend/api/services/projects.service';
 import { apiConfig } from '@/frontend/api/core/config';
 import { isQuotaError } from '@/frontend/features/quota/use-quota';
+import { useSourceStore } from '@/frontend/context/source-store';
 import type { Document } from './type';
 
 export interface UseSourceReturn {
@@ -45,7 +46,10 @@ function _watchJobStatus(jobId: string): void {
 
 export function useSource(projectId: string | null): UseSourceReturn {
 	const [documents, setDocuments] = useState<Document[]>([]);
-	const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
+
+	// Selection is persisted in localStorage via zustand, keyed by projectId
+	const { selectionByProject, setSelection, clearSelection } = useSourceStore();
+	const selectedDocumentIds = projectId ? (selectionByProject[projectId] ?? []) : [];
 
 	const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
@@ -64,14 +68,12 @@ export function useSource(projectId: string | null): UseSourceReturn {
 		}
 	}, []);
 
-	// Load documents when projectId changes
+	// Load documents when projectId changes (selection is preserved in store)
 	useEffect(() => {
 		if (projectId) {
-			setSelectedDocumentIds([]);
 			loadDocuments(projectId);
 		} else {
 			setDocuments([]);
-			setSelectedDocumentIds([]);
 		}
 	}, [projectId, loadDocuments]);
 
@@ -116,7 +118,7 @@ export function useSource(projectId: string | null): UseSourceReturn {
 			setError(null);
 			try {
 				await projectsService.deleteDocument(projectId, documentId);
-				setSelectedDocumentIds((prev) => prev.filter((id) => id !== documentId));
+				setSelection(projectId, selectedDocumentIds.filter((id) => id !== documentId));
 				await refreshDocuments();
 				toast.success('Document deleted');
 			} catch (err) {
@@ -126,18 +128,24 @@ export function useSource(projectId: string | null): UseSourceReturn {
 				throw err;
 			}
 		},
-		[projectId, refreshDocuments],
+		[projectId, refreshDocuments, selectedDocumentIds, setSelection],
 	);
 
-	const toggleDocumentSelection = useCallback((documentId: string) => {
-		setSelectedDocumentIds((prev) =>
-			prev.includes(documentId) ? prev.filter((id) => id !== documentId) : [...prev, documentId],
-		);
-	}, []);
+	const toggleDocumentSelection = useCallback(
+		(documentId: string) => {
+			if (!projectId) return;
+			const next = selectedDocumentIds.includes(documentId)
+				? selectedDocumentIds.filter((id) => id !== documentId)
+				: [...selectedDocumentIds, documentId];
+			setSelection(projectId, next);
+		},
+		[projectId, selectedDocumentIds, setSelection],
+	);
 
-	const clearSelection = useCallback(() => {
-		setSelectedDocumentIds([]);
-	}, []);
+	const clearSelectionForProject = useCallback(() => {
+		if (!projectId) return;
+		clearSelection(projectId);
+	}, [projectId, clearSelection]);
 
 	return {
 		documents,
@@ -148,7 +156,7 @@ export function useSource(projectId: string | null): UseSourceReturn {
 		uploadDocument,
 		deleteDocument,
 		toggleDocumentSelection,
-		clearSelection,
+		clearSelection: clearSelectionForProject,
 		refreshDocuments,
 	};
 }
