@@ -8,6 +8,23 @@ import { ApiError } from './errors';
 import { supabase } from '../services/supabase';
 
 /**
+ * Returns a valid session, refreshing the access token if it has expired or
+ * is within 60 seconds of expiry. Falls back to null if refresh fails.
+ */
+async function getValidSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return null;
+
+  const now = Math.floor(Date.now() / 1000);
+  const expiresAt = session.expires_at ?? 0;
+  if (now >= expiresAt - 60) {
+    const { data } = await supabase.auth.refreshSession();
+    return data.session;
+  }
+  return session;
+}
+
+/**
  * Base fetch wrapper with error handling
  */
 export async function request<T>(
@@ -16,11 +33,11 @@ export async function request<T>(
 ): Promise<T> {
   const url = `${apiConfig.baseUrl}${endpoint}`;
 
-  const{ data: { session } } = await supabase.auth.getSession();
+  const session = await getValidSession();
   
   const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json', 
-	  ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
+    'Content-Type': 'application/json',
+    ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
   };
 
   const config: RequestInit = {
@@ -109,7 +126,7 @@ export async function del<T>(endpoint: string, data?: unknown): Promise<T> {
  */
 export async function upload<T>(endpoint: string, formData: FormData): Promise<T> {
   const url = `${apiConfig.baseUrl}${endpoint}`;
-  const { data: { session } } = await supabase.auth.getSession();
+  const session = await getValidSession();
 
   const headers: HeadersInit = {
     ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` }),
