@@ -19,3 +19,7 @@ PLANS: dict[str, dict] = {
 def get_plan_quotas(plan_id: str) -> dict:
     """Return quotas dict for the given plan. Falls back to free if unknown."""
     return PLANS.get(plan_id, PLANS["free"])["quotas"]
+
+def calculate_token(input_tokens: int, output_tokens: int) -> int:
+    """Convert raw token counts to weighted credits. Output tokens cost 5x input (xAI pricing)."""
+    return input_tokens + output_tokens * 5

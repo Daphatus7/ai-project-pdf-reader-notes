@@ -6,6 +6,8 @@ Provides endpoints for:
 - Streaming chat
 - Structured output chat (enforces schema-conformant responses)
 """
+import json
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
@@ -15,6 +17,7 @@ from src.backend.schemas import (
 )
 
 from src.backend.api.deps import get_llm_service, get_user, get_database_service, get_chat_request, get_concurrency_limiter
+from src.backend.config.plans import calculate_token
 from src.backend.schemas.error import AppError
 from src.backend.services.concurrency_limiter import ConcurrencyLimiter
 from src.backend.schemas.chat.llm import ListThreadsResponse, DeleteThreadResponse, LoadThreadResponse, \
@@ -40,7 +43,7 @@ async def chat(
 
     try:
         response = await llm_service.chat(request=request)
-        await database_service.track_token_usage(user_id, response.total_tokens)
+        await database_service.track_token_usage(user_id, calculate_token(response.input_tokens, response.output_tokens))
         return response
     finally:
         # Always release the slot — success, error, or cancellation
@@ -60,11 +63,18 @@ async def chat_stream(
         raise AppError(429, "CONCURRENT_LIMIT", "Too many concurrent requests")
 
     async def stream_with_release():
+        total_credit = 0
         try:
             async for chunk in llm_service.chat_stream(request=request):
+                if chunk.startswith("data: "):
+                    data = json.loads(chunk[6:])
+                    if data.get("type") == "done":
+                        total_credit = calculate_token(data.get("input_tokens", 0), data.get("output_tokens", 0))
                 yield chunk
         finally:
             concurrency_limiter.release(user_id)
+            if total_credit > 0:
+                await database_service.track_token_usage(user_id, total_credit)
 
     return StreamingResponse(
         stream_with_release(),

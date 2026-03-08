@@ -148,6 +148,8 @@ class LlmGrok:
             content=[{"type": "text", "text": ai_text}],
             created_at=resp["created_at"],
             total_tokens=input_tokens + output_tokens,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
         )
 
     # ── Streaming chat ────────────────────────────────────────────────────────
@@ -213,7 +215,7 @@ class LlmGrok:
                     role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
                 )
 
-                yield f"data: {json.dumps({'type': 'done', 'id': resp['id'], 'created_at': resp['created_at'], 'total_tokens': input_tokens + output_tokens})}\n\n"
+                yield f"data: {json.dumps({'type': 'done', 'id': resp['id'], 'created_at': resp['created_at'], 'total_tokens': input_tokens + output_tokens, 'input_tokens': input_tokens, 'output_tokens': output_tokens})}\n\n"
                 break
 
             elif kind == "error":
