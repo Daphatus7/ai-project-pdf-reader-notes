@@ -14,7 +14,7 @@ async def upload_document(
     url: str,
     name: str,
     collection_id: str,
-) -> None:
+):
     try:
         # Download PDF bytes from remote URL
         print(f"Downloading {name}...")
@@ -25,6 +25,7 @@ async def upload_document(
 
         # Upload file to collection via Management API (multipart form)
         print(f"Uploading {name} to collection...")
+        response = None
         async with httpx.AsyncClient() as http:
             response = await http.post(
                 f"https://management-api.x.ai/v1/collections/{collection_id}/documents",
@@ -37,10 +38,10 @@ async def upload_document(
                 timeout=3600.0,
             )
         print(f"Uploaded {name}: {json.dumps(response.json(), indent=2)}")
-
+        return response
     except Exception as e:
         print(f"upload_document ERROR [{name}]: {type(e).__name__}: {e}")
-
+    return None
 
 async def search_collection(api_key: str, collection_id: str, query: str) -> None:
     # Search documents in a collection via REST API
@@ -69,8 +70,8 @@ async def main():
     collection_id = "collection_977a9697-4c8d-44f9-91c6-8ba5974acb03"
 
     # Upload documents to collection sequentially
-    await upload_document(management_api_key, TESLA_10_Q_PDF_URL, "tesla-10-Q-2024.pdf", collection_id)
-
+    response = await upload_document(management_api_key, TESLA_10_K_PDF_URL, "tesla-10-Q-2024.pdf", collection_id)
+    print(response)
 
 if __name__ == "__main__":
     asyncio.run(main())

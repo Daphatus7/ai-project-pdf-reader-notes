@@ -5,7 +5,6 @@ from collections.abc import Sequence
 import httpx
 from dotenv import load_dotenv
 from xai_sdk import AsyncClient
-from xai_sdk.proto import collections_pb2
 from xai_sdk.proto.v6.documents_pb2 import SearchMatch
 
 import logging
@@ -34,23 +33,30 @@ class GrokCollection:
         return collection.collection_id
 
     async def upload_document(self, data, name: str, collection_id: str) -> str:
-        """Fetch PDF from Supabase URL, upload to xAI collection, poll until processed.
+        """Upload PDF to xAI collection via REST API, wait 60s for indexing.
         Returns xAI file_id for storing in DB.
         """
         logger.info(f"Uploading {name} to collection {collection_id}")
-        response = await self.xai_client.collections.upload_document(
-            collection_id=collection_id,
-            name=name,
-            data=data,
+        response = await self.http_client.post(
+            f"https://management-api.x.ai/v1/collections/{collection_id}/documents",
+            headers={"Authorization": f"Bearer {os.getenv('XAI_MANAGEMENT_API_KEY')}"},
+            files={
+                "name": (None, name),
+                "data": (name, data, "application/pdf"),
+                "content_type": (None, "application/pdf"),
+            },
+            timeout=3600.0,
         )
-        file_id = response.file_metadata.file_id
-        # Poll until document is processed and ready for search
-        doc = await self.xai_client.collections.get_document(file_id, collection_id)
-        logger.info(f"Waiting for document {name} to be processed")
-        while doc.status != collections_pb2.DOCUMENT_STATUS_PROCESSED:
-            await asyncio.sleep(3)
-            doc = await self.xai_client.collections.get_document(file_id, collection_id)
-        logger.info(f"Document {name} processed, xai_file_id={file_id}")
+        result = response.json()
+        logger.info(f"Upload response for {name}: {result}")
+
+        file_id = result["file_metadata"]["file_id"]
+
+        # xAI indexes asynchronously — wait 60s before returning to caller
+        logger.info(f"Waiting 15s for {name} to be indexed...")
+        await asyncio.sleep(15)
+
+        logger.info(f"Document {name} ready, xai_file_id={file_id}")
         return file_id
 
     async def search_collection(self, collection_id: str, selected_files: Sequence[str], query: str) -> list[SearchMatch]:
