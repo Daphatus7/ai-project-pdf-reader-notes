@@ -5,7 +5,8 @@ from typing import AsyncIterator
 
 import redis
 from xai_sdk import AsyncClient
-from xai_sdk.chat import user, system, assistant, image as xai_image
+from xai_sdk.chat import user, system, assistant, image as xai_image, tool_result
+from xai_sdk.tools import web_search, x_search
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
@@ -17,7 +18,12 @@ logger = logging.getLogger(__name__)
 
 MODEL = "grok-4-1-fast-reasoning"
 MAX_MESSAGES = 20
+MAX_TOOL_ROUNDS = 5
 REDIS_KEY_PREFIX = "grok:messages"
+
+# Built-in tools that run on xAI servers — no local dispatch needed
+TOOLS = [web_search(), x_search()]
+BUILTIN_TOOLS = {"web_search", "x_search"}
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant. Keep responses concise. "
@@ -92,7 +98,7 @@ class LlmGrok:
 
     def _build_chat(self, history: list[dict], prompt_text: str, image_items: list[dict] | None = None):
         """Create and populate an xAI chat object, with optional multimodal image content."""
-        chat = self._client.chat.create(model=MODEL)
+        chat = self._client.chat.create(model=MODEL, tools=TOOLS)
         chat.append(system(SYSTEM_PROMPT))
         for msg in history:
             if msg["role"] == "user":
@@ -116,8 +122,17 @@ class LlmGrok:
     async def chat(self, request: ChatRequest) -> ChatResponse:
         history, user_text, prompt_text, image_items = await self._prepare_request(request)
 
-        # AsyncClient.sample() is a coroutine — await directly, no executor needed
-        response = await self._build_chat(history, prompt_text, image_items).sample()
+        chat_obj = self._build_chat(history, prompt_text, image_items)
+
+        # Tool call rounds: sample() silently until no tool calls or limit reached
+        response = await chat_obj.sample()
+        for _ in range(MAX_TOOL_ROUNDS):
+            if not response.tool_calls:
+                break
+            chat_obj.append(response)
+            response = await chat_obj.sample()
+        else:
+            logger.warning("Tool call loop hit MAX_TOOL_ROUNDS for thread %s", request.thread_id)
 
         ai_text = response.content
         u = response.usage
@@ -165,7 +180,17 @@ class LlmGrok:
         full_text = ""
         final_response = None
         try:
-            # AsyncClient.stream() is a native async iterator — no thread/queue bridge needed
+            # Tool call rounds: sample() silently until no tool calls or limit reached
+            response = await chat_obj.sample()
+            for _ in range(MAX_TOOL_ROUNDS):
+                if not response.tool_calls:
+                    break
+                chat_obj.append(response)
+                response = await chat_obj.sample()
+            else:
+                logger.warning("Tool call loop hit MAX_TOOL_ROUNDS for thread %s", request.thread_id)
+
+            # Stream only the final answer to the user
             async for response, chunk in chat_obj.stream():
                 if chunk.content:
                     full_text += chunk.content
