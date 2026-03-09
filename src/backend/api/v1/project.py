@@ -69,7 +69,7 @@ async def create_project(
     project_id = await database_service.create_project(user_id, payload)
     # create xAI collection and store mapping
     try:
-        xai_collection_id = grok_collection.create_collection(project_id)
+        xai_collection_id = await grok_collection.create_collection(project_id)
         await database_service.update_project_collection_id(project_id, xai_collection_id)
         logger.info(f"create_project xai_collection_id={xai_collection_id}")
     except Exception as e:
@@ -95,7 +95,7 @@ async def delete_project(
     # delete xAI collection (best-effort)
     if xai_collection_id:
         try:
-            grok_collection.delete_collection(xai_collection_id)
+            await grok_collection.delete_collection(xai_collection_id)
         except Exception as e:
             logger.error(f"trying to delete collection but ------> {e}")
     return ProjectDeleteResponse(response='Project deleted successfully')
@@ -124,14 +124,15 @@ async def upload_document(
 ):
     user_id = user['sub']
     
-    # supabase upload
+    # validate
     content = await read_and_validate_file(file, ALLOWED_TYPES, MAX_FILE_SIZE)
     source = source_name or file.filename or f"document_{uuid.uuid4().hex[:8]}"
     logger.info("[upload_document] user=%s project=%s file=%s size=%d", user_id, project_id, source, len(content))
 
+    # 1. increase usage
     incremented = await database_service.enforce_quota(user_id, 'doc_count')
 
-    # supabase upload
+    # 2. supabase upload
     try:
         document = await database_service.upload_document(
             user_id=user_id,
@@ -145,17 +146,23 @@ async def upload_document(
             await database_service.decrement_usage(user_id, 'doc_count')
         raise
 
-    # Upload to xAI collection and save the returned file ID for later RAG/delete (best-effort)
+    # 3. get collection ai for the project
     try:
         # get collection id
         xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
-        # upload the file to xAI collection
-        xai_doc = grok_collection.upload_document(
-            collection_id=xai_collection_id,
-            name=source,
+        logger.info(f"xai_collection_id ={xai_collection_id}")
+        # upload the file to xAI collection, get back xAI file_id
+        xai_file_id = await grok_collection.upload_document(
             data=content,
+            name=source,
+            collection_id=xai_collection_id,
         )
-        await database_service.update_document_xai_id(document['id'], xai_doc.file_metadata.file_id)
+        logger.info(f"xai_file_id ={xai_file_id}")
+        # store xAI file_id in DB for future RAG lookups
+        response = await database_service.update_document_xai_id(document['id'], xai_file_id)
+        
+        logger.info(f"upload to ai got response \n {response}")
+        # 5. store the response to document xai_document_id to supabase
     except Exception as e:
         logger.error(f"[upload_document] collection upload ------> {e}")
 
@@ -184,7 +191,7 @@ async def delete_document(
     # Remove file from xAI collection (best-effort)
     if xai_file_id:
         try:
-            grok_collection.delete_document(xai_file_id)
+            await grok_collection.delete_document(xai_file_id)
             logger.info("[delete_document] removed xai_file_id=%s", xai_file_id)
         except Exception as e:
             logger.error(f"delete_document: xAI file delete failed ------> {e}")

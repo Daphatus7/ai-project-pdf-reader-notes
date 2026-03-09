@@ -1,18 +1,16 @@
-import asyncio
 import json
 import logging
 import os
 from typing import AsyncIterator
 
 import redis
-from xai_sdk import Client
+from xai_sdk import AsyncClient
 from xai_sdk.chat import user, system, assistant, image as xai_image
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
 from src.backend.services.llm_service.grok.grok_collection import GrokCollection
 from src.backend.services.storage.supabase_storage import SupabaseStorage
-from xai_sdk.tools import web_search, x_search, code_execution
 
 
 logger = logging.getLogger(__name__)
@@ -31,8 +29,8 @@ SYSTEM_PROMPT = (
 class LlmGrok:
 
     def __init__(self, supabase_storage: SupabaseStorage):
-        # timeout=3600 required for reasoning models to avoid premature connection closure during streaming
-        self._client = Client(api_key=os.getenv("XAI_API_KEY"), timeout=600)
+        # timeout=600 required for reasoning models to avoid premature connection closure during streaming
+        self._client = AsyncClient(api_key=os.getenv("XAI_API_KEY"), timeout=600)
         self._supabase = supabase_storage
         self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
         self._collection = GrokCollection()
@@ -115,12 +113,8 @@ class LlmGrok:
     async def chat(self, request: ChatRequest) -> ChatResponse:
         history, user_text, prompt_text, image_items = await self._prepare_request(request)
 
-        # Run sync xAI SDK call in executor to avoid blocking event loop
-        def _call():
-            return self._build_chat(history, prompt_text, image_items).sample()
-
-        loop = asyncio.get_running_loop()
-        response = await loop.run_in_executor(None, _call)
+        # AsyncClient.sample() is a coroutine — await directly, no executor needed
+        response = await self._build_chat(history, prompt_text, image_items).sample()
 
         ai_text = response.content
         u = response.usage
@@ -163,64 +157,42 @@ class LlmGrok:
           {"type": "error", "message": "<description>"}
         """
         history, user_text, prompt_text, image_items = await self._prepare_request(request)
+        chat_obj = self._build_chat(history, prompt_text, image_items)
 
-        loop = asyncio.get_running_loop()
-        # Queue bridges the sync gRPC streaming iterator → async generator
-        queue: asyncio.Queue = asyncio.Queue()
-
-        def _run_stream():
-            try:
-                chat_obj = self._build_chat(history, prompt_text, image_items)
-                final_response = None
-                for response, chunk in chat_obj.stream():
-                    if chunk.content:
-                        asyncio.run_coroutine_threadsafe(
-                            queue.put(("chunk", chunk.content)), loop
-                        )
-                    final_response = response  # last response has full content + usage
-                asyncio.run_coroutine_threadsafe(queue.put(("done", final_response)), loop)
-            except Exception as exc:
-                asyncio.run_coroutine_threadsafe(queue.put(("error", str(exc))), loop)
-
-        loop.run_in_executor(None, _run_stream)
-
-        # Consume queue and yield SSE lines
         full_text = ""
-        while True:
-            kind, payload = await queue.get()
+        final_response = None
+        try:
+            # AsyncClient.stream() is a native async iterator — no thread/queue bridge needed
+            async for response, chunk in chat_obj.stream():
+                if chunk.content:
+                    full_text += chunk.content
+                    yield f"data: {json.dumps({'type': 'chunk', 'text': chunk.content})}\n\n"
+                final_response = response
+        except Exception as exc:
+            yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
+            return
 
-            if kind == "chunk":
-                full_text += payload
-                yield f"data: {json.dumps({'type': 'chunk', 'text': payload})}\n\n"
+        input_tokens, output_tokens = 0, 0
+        if final_response:
+            u = final_response.usage
+            input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
+            output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
 
-            elif kind == "done":
-                response = payload
-                input_tokens, output_tokens = 0, 0
-                if response:
-                    u = response.usage
-                    input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
-                    output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
+        # Persist history and messages after stream completes
+        history.append({"role": "user", "content": user_text})
+        history.append({"role": "assistant", "content": full_text})
+        self._save_history(request.thread_id, history)
 
-                # Persist history and messages after stream completes
-                history.append({"role": "user", "content": user_text})
-                history.append({"role": "assistant", "content": full_text})
-                self._save_history(request.thread_id, history)
+        await self._supabase.save_message(
+            user_id=request.user_id, thread_id=request.thread_id,
+            role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
+        )
+        resp = await self._supabase.save_message(
+            user_id=request.user_id, thread_id=request.thread_id,
+            role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
+        )
 
-                await self._supabase.save_message(
-                    user_id=request.user_id, thread_id=request.thread_id,
-                    role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
-                )
-                resp = await self._supabase.save_message(
-                    user_id=request.user_id, thread_id=request.thread_id,
-                    role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
-                )
-
-                yield f"data: {json.dumps({'type': 'done', 'id': resp['id'], 'created_at': resp['created_at'], 'total_tokens': input_tokens + output_tokens, 'input_tokens': input_tokens, 'output_tokens': output_tokens})}\n\n"
-                break
-
-            elif kind == "error":
-                yield f"data: {json.dumps({'type': 'error', 'message': payload})}\n\n"
-                break
+        yield f"data: {json.dumps({'type': 'done', 'id': resp['id'], 'created_at': resp['created_at'], 'total_tokens': input_tokens + output_tokens, 'input_tokens': input_tokens, 'output_tokens': output_tokens})}\n\n"
 
     # ── RAG context ───────────────────────────────────────────────────────────
 
@@ -245,11 +217,13 @@ class LlmGrok:
         if not collection_ids:
             return ""
         query = next((item["text"] for item in request.content if item.get("type") == "text"), "")
-        results = self._collection.search_collection(
-            selected_files=collection_ids,
+        # Search within the project's collection; filter chunks to user-selected files only
+        matches = await self._collection.search_collection(
+            collection_id=collection_ids[0],
+            selected_files=request.source_ids,
             query=query,
         )
-        chunks = [match.chunk_content for match in results.matches if match.chunk_content]
+        chunks = [match.chunk_content for match in matches if match.chunk_content]
         context = "\n\n".join(chunks)
         logger.info(f"RAG context ({len(chunks)} chunks): {context[:200]}...")
         return context

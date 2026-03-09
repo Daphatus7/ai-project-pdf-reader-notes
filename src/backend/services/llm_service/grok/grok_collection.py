@@ -34,25 +34,25 @@ class GrokCollection:
         logger.info(f"Created xAI collection for project={project_id} collection_id={collection.collection_id}")
         return collection.collection_id
 
-    # Step 2: Upload documents to the collection concurrently
-    async def upload_document(self,
-                              url: str, name: str, collection_id: str
-                              ) -> None:
-        pdf_response = await self.http_client.get(url, timeout=30.0)
-        pdf_content = pdf_response.content
-        logger.info(f"Uploading {name} document to collection")
+    async def upload_document(self, data, name: str, collection_id: str) -> str:
+        """Fetch PDF from Supabase URL, upload to xAI collection, poll until processed.
+        Returns xAI file_id for storing in DB.
+        """
+        logger.info(f"Uploading {name} to collection {collection_id}")
         response = await self.xai_client.collections.upload_document(
             collection_id=collection_id,
             name=name,
-            data=pdf_content,
+            data=data,
         )
+        file_id = response.file_metadata.file_id
         # Poll until document is processed and ready for search
-        response = await self.xai_client.collections.get_document(response.file_metadata.file_id, collection_id)
+        doc = await self.xai_client.collections.get_document(file_id, collection_id)
         logger.info(f"Waiting for document {name} to be processed")
-        while response.status != collections_pb2.DOCUMENT_STATUS_PROCESSED:
+        while doc.status != collections_pb2.DOCUMENT_STATUS_PROCESSED:
             await asyncio.sleep(3)
-            response = await self.xai_client.collections.get_document(response.file_metadata.file_id, collection_id)
-        logger.info(f"Document {name} processed")
+            doc = await self.xai_client.collections.get_document(file_id, collection_id)
+        logger.info(f"Document {name} processed, xai_file_id={file_id}")
+        return file_id
 
     async def search_collection(self, collection_id: str, selected_files: Sequence[str], query: str) -> list[SearchMatch]:
         """
