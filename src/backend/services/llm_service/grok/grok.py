@@ -30,7 +30,10 @@ class LlmGrok:
 
     def __init__(self, supabase_storage: SupabaseStorage):
         # timeout=600 required for reasoning models to avoid premature connection closure during streaming
-        self._client = AsyncClient(api_key=os.getenv("XAI_API_KEY"), timeout=600)
+        self._client = AsyncClient(
+            api_key=os.getenv("XAI_API_KEY"),
+            management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
+            timeout=600)
         self._supabase = supabase_storage
         self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
         self._collection = GrokCollection()

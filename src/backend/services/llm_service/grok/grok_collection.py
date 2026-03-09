@@ -1,12 +1,11 @@
 import asyncio
 import os
-import time
 from collections.abc import Sequence
 
 import httpx
 from dotenv import load_dotenv
 from xai_sdk import AsyncClient
-from xai_sdk.proto.v6 import collections_pb2
+from xai_sdk.proto import collections_pb2
 from xai_sdk.proto.v6.documents_pb2 import SearchMatch
 
 import logging

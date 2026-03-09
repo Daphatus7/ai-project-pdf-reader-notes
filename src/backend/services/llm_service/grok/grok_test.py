@@ -144,4 +144,3 @@ if __name__ == "__main__":
     grok_collection = GrokCollection()
     # test upload file: read example.pdf from disk and upload to the collection
     
-    #测试内容 1. upload  文件，目前xai id 就没传上去
