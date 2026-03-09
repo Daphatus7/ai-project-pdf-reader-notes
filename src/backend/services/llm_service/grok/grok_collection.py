@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 from dotenv import load_dotenv
 from xai_sdk import Client
-from xai_sdk.proto.v6.documents_pb2 import SearchResponse
+from xai_sdk.proto.v6.documents_pb2 import SearchResponse, SearchMatch
 
 import logging
 
@@ -36,7 +36,7 @@ class GrokCollection:
         )
         logger.info(f"Created xAI collection for project={project_id} collection_id={collection.collection_id}")
         return collection.collection_id
-        
+
     def upload_document(self, collection_id: str, name: str, data: bytes,
                         timeout_minutes: int = 5, poll_interval_seconds: int = 5):
         try:
@@ -78,19 +78,50 @@ class GrokCollection:
             raise TimeoutError(f"Document={name} indexing timed out after {timeout_minutes} minutes")
         except Exception as e:
             logger.error(f"upload document got error ->>>>{e}")
-    def search_collection(self,selected_files: Sequence[str], query: str) -> SearchResponse:
+    def search_collection(self, collection_id: str, selected_files: Sequence[str], query: str) -> list[SearchMatch]:
         """
+        Post
+            {
+                "query": "What is the revenue in the last quarter?",
+                "source": {
+                    "collection_ids": [
+                    "collection_80100614-300c-4609-959b-a138fa90f542"
+                    ]
+                },
+                "filter": "document_type = \"financial_report\" AND year > 2020"
+            }
+        Response 
+            {
+                "matches": [
+                    {
+                        "file_id": "file_ac3c5728-7399-41fc-bd62-0fef0042de9c",
+                        "chunk_id": "0199717c-511b-7a80-bab3-dfe9a27f82ab",
+                        "chunk_content": ", deferred revenue related to such customer payments amounted to $2.10 billion and $1.77 billion, respectively, mainly due to contractual payment terms. Revenue recognized from the deferred revenue balances as of December 31, 2024 and 2023 was $944 million and $873 million for the six months ended June 30, 2025 and 2024, respectively. We have elected the practical expedient to omit disclosure of the amount of the transaction price allocated to remaining performance obligations for contracts with an original expected contract length of one year or less. As of June 30, 2025, total transaction price allocated to performance obligations that were unsatisfied or partially unsatisfied for contracts with an original expected length of more than one year was $10.38 billion. Of this amount, we expect to recognize $5.47 billion in the next 12 months and the rest over the remaining performance obligation period. Changes in government and economic incentives or tariffs may impact the transaction price or our ability to e",
+                        "score": 1.1447691,
+                        "collection_ids": [
+                            "collection_80100614-300c-4609-959b-a138fa90f542"
+                            ]
+                    }
+                ]
+            }
+        :param collection_id: 
         :param query: 
         :param selected_files: 
-        :return: 
+        :return: 只返回1，file_id == selected_files中的文件；2，返回的结果数量限制在5条以内；3，返回的结果会被包含在后续的answer generation的context中
         """
+
+        # instructions = f"only search the named files: {selected_files}"
+        # print(f"given the instruction{instructions}")
         results = self.xai_client.collections.search(
             query=query,
-            collection_ids=selected_files, #user selected ids
+            collection_ids=[collection_id], #user selected ids
             retrieval_mode="hybrid",
         )
-        return results
-    
+        #only return the reuslts from the selected files
+        filtered_matches = [item for item in results.matches if match.file_id in selected_files]
+        # return top 5 results and the results will be included in the context for answer generation
+        return filtered_matches[:5]
+
     def delete_collection(self,collection_id: str):
         """
             删除整个collection文件夹, 包括里面的文件
@@ -98,7 +129,7 @@ class GrokCollection:
         :return: nothing
         """
         self.xai_client.collections.delete(collection_id)
-        
+
     def delete_document(self,document_id: str):
         """
             无视文件的删除
@@ -107,7 +138,7 @@ class GrokCollection:
             document_id
         )
         return response
-    
+
     def list_files(self, limit: int = 100) -> list[dict]:
         """List all files uploaded to xAI. Useful for debugging upload status."""
         response = self.xai_client.files.list(limit=limit)
@@ -132,10 +163,18 @@ class GrokCollection:
             document_id
         )
         return response
-    
-    
-    
+
+
+
 # if __name__ == "__main__":
 #     grok_collection = GrokCollection()
 #     # test upload file
-#     file = client.files.upload("/path/to/your/document.pdf")
+#     instruction = "file_id='file_c8b7f818-e4c8-44e8-8073-19dd7b77bd61'"
+#     response = grok_collection.search_collection(
+#         collection_id="collection_58e69554-1cc5-4388-92b4-8bad7385c45b",
+#         selected_files=["file_c8b7f818-e4c8-44e8-8073-19dd7b77bd61"],
+#         query="what is in the maribynong city council during 2025-2028?",
+#     )
+#     
+    
+        
