@@ -118,7 +118,7 @@ class GrokCollection:
             retrieval_mode="hybrid",
         )
         #only return the reuslts from the selected files
-        filtered_matches = [item for item in results.matches if match.file_id in selected_files]
+        filtered_matches = [item for item in results.matches if item.file_id in selected_files]
         # return top 5 results and the results will be included in the context for answer generation
         return filtered_matches[:5]
 
@@ -166,15 +166,18 @@ class GrokCollection:
 
 
 
-# if __name__ == "__main__":
-#     grok_collection = GrokCollection()
-#     # test upload file
-#     instruction = "file_id='file_c8b7f818-e4c8-44e8-8073-19dd7b77bd61'"
-#     response = grok_collection.search_collection(
-#         collection_id="collection_58e69554-1cc5-4388-92b4-8bad7385c45b",
-#         selected_files=["file_c8b7f818-e4c8-44e8-8073-19dd7b77bd61"],
-#         query="what is in the maribynong city council during 2025-2028?",
-#     )
-#     
+if __name__ == "__main__":
+    grok_collection = GrokCollection()
+    # test upload file: read example.pdf from disk and upload to the collection
+    path = "example.pdf"
+    with open(path, "rb") as f:
+        data = f.read()
+    resp = grok_collection.upload_document(
+        collection_id="collection_80100614-300c-4609-959b-a138fa90f542",
+        name="example.pdf",
+        data=data,
+    )
+
+    print(resp)
     
         

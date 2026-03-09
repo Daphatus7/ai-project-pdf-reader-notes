@@ -233,6 +233,8 @@ class SupabaseStorage(Service):
         Returns the created document record (including its id).
         Rolls back the DB record if storage upload fails.
         """
+        
+        #upload document to supabase first
         try:
             response = self.__database.table("documents").insert({
                 "user_id": user_id,

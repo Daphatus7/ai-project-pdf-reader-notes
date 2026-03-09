@@ -118,7 +118,7 @@ class GrokCollection:
             retrieval_mode="hybrid",
         )
         #only return the reuslts from the selected files
-        filtered_matches = [item for item in results.matches if match.file_id in selected_files]
+        filtered_matches = [item for item in results.matches if item.file_id in selected_files]
         # return top 5 results and the results will be included in the context for answer generation
         return filtered_matches[:5]
 
@@ -134,6 +134,7 @@ class GrokCollection:
         """
             无视文件的删除
         """
+        logger.info(f"trying to delete {document_id} from xAI")
         response = self.xai_client.files.delete(
             document_id
         )
