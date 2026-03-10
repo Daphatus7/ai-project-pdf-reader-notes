@@ -224,33 +224,24 @@ class LlmGrok:
 
     # ── RAG context ───────────────────────────────────────────────────────────
 
-    async def _source_ids_to_collection_ids(self, source_ids: list[str]) -> list[str]:
-        """Convert DB document UUIDs to their project's xAI collection IDs (deduplicated).
-        xAI search API requires collection IDs, not file IDs.
-        """
-        seen: set[str] = set()
-        result: list[str] = []
-        for source_id in source_ids:
-            col_id = await self._supabase.get_document_collection_id(source_id)
-            if col_id and col_id not in seen:
-                seen.add(col_id)
-                result.append(col_id)
-        return result
 
     async def get_context(self, request: ChatRequest) -> str:
         """Search the xAI collection with selected documents and return joined context chunks."""
         if not request.source_ids:
             return ""
-        collection_ids = await self._source_ids_to_collection_ids(request.source_ids)
-        if not collection_ids:
+        xai_collection_id = await self._supabase.get_project_collection_id# get supabase collection id via project_id
+        xai_source_ids = await self._supabase.get_xai_file_ids(request.source_ids)
+        # user file_id
+        if len(xai_source_ids) <= 0:
             return ""
         query = next((item["text"] for item in request.content if item.get("type") == "text"), "")
         # Search within the project's collection; filter chunks to user-selected files only
         matches = await self._collection.search_collection(
-            collection_id=collection_ids[0],
-            selected_files=request.source_ids,
+            collection_id=xai_collection_id,
+            selected_files=xai_source_ids,
             query=query,
         )
+        logger.info(matches)
         chunks = [match.chunk_content for match in matches if match.chunk_content]
         context = "\n\n".join(chunks)
         logger.info(f"RAG context ({len(chunks)} chunks): {context[:200]}...")
