@@ -178,11 +178,11 @@ class SupabaseStorage(Service):
     async def get_project_collection_id(self, project_id: str) -> str:
         """Get the xAI collection ID for a project by its project ID."""
         try:
-            proj = await (self.__database.table("projects")
-                          .select("xai_collection_id")
-                          .eq("id", project_id)
-                          .single()
-                          .execute())
+            proj = (self.__database.table("projects")
+                    .select("xai_collection_id")
+                    .eq("id", project_id)
+                    .single()
+                    .execute())
             if not proj.data or not proj.data.get("xai_collection_id"):
                 not_found("Project collection")
             return proj.data["xai_collection_id"]
@@ -195,10 +195,10 @@ class SupabaseStorage(Service):
         if not source_ids:
             return []
         try:
-            response = await (self.__database.table("documents")
-                              .select("xai_document_id")
-                              .in_("id", source_ids)
-                              .execute())
+            response = (self.__database.table("documents")
+                        .select("xai_document_id")
+                        .in_("id", source_ids)
+                        .execute())
             return [row["xai_document_id"] for row in response.data if row.get("xai_document_id")]
         except Exception as e:
             logger.error(f"Failed to get xai_document_ids for sources {source_ids}: {e}")
