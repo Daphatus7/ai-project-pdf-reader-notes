@@ -22,7 +22,10 @@ MAX_TOOL_ROUNDS = 5
 REDIS_KEY_PREFIX = "grok:messages"
 
 # Built-in tools that run on xAI servers — no local dispatch needed
-TOOLS = [web_search(), x_search()]
+TOOLS = [web_search(), 
+         x_search(),
+         search_document()
+         ]
 BUILTIN_TOOLS = {"web_search", "x_search"}
 
 SYSTEM_PROMPT = (
