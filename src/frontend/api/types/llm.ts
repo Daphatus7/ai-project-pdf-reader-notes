@@ -64,6 +64,8 @@ export interface LLMChatFeatureProps {
 	onSelectContent?: (content: string) => void;
 	/** Selected document IDs to use as context for LLM chat */
 	sourceIds?: string[];
+	/** Project ID for RAG context */
+	projectId?: string | null;
 }
 
 

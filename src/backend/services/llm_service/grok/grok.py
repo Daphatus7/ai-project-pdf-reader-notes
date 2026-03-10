@@ -229,11 +229,17 @@ class LlmGrok:
         """Search the xAI collection with selected documents and return joined context chunks."""
         if not request.source_ids:
             return ""
+        #get project_id
+        
+        logger.info(f"for given project {request.project_id} and  for source {request.source_ids} ")
+        
+        if request.project_id is None or request.source_ids is None:
+            return ""
+        
         xai_collection_id = await self._supabase.get_project_collection_id(request.project_id)# get supabase collection id via project_id
         xai_source_ids = await self._supabase.get_xai_file_ids(request.source_ids)
+        logger.info(f"currently reading {xai_collection_id} and {xai_source_ids}")
         # user file_id
-        if len(xai_source_ids) <= 0:
-            return ""
         query = next((item["text"] for item in request.content if item.get("type") == "text"), "")
         # Search within the project's collection; filter chunks to user-selected files only
         matches = await self._collection.search_collection(

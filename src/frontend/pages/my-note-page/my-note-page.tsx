@@ -48,6 +48,7 @@ export default function NotePage() {
 
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
 	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+	const [selectedProjectId, setSelectedProjectId] = useState<string>('');
 	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
@@ -125,6 +126,7 @@ export default function NotePage() {
 			onSaveToNote={handleSaveToNote}
 			onDownload={handleDownload}
 			onSourceSelectionChange={setSelectedSourceIds}
+			onProjectSelectionChange={setSelectedProjectId}
 		/>
 	);
 
@@ -132,6 +134,7 @@ export default function NotePage() {
 		<LLMChatFeature
 			ref={chatRef}
 			sourceIds={selectedSourceIds}
+			projectId={selectedProjectId}
 			onSelectContent={(content) => {
 				handleContentInsert({
 					content,

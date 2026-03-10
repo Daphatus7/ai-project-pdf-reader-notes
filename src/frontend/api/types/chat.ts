@@ -42,6 +42,7 @@ export interface ChatMessage {
  */
 export interface ChatRequest {
 	thread_id: string;
+	project_id: string | null;
 	content: any;
 	source_ids?: string[];
 }

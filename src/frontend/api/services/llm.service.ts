@@ -51,10 +51,7 @@ export const llmService = {
 	 * Send a chat message and get response
 	 */
 	async chat(request: ChatRequest): Promise<ChatResponse> {
-		console.log('Chat request:', request);
-		const resp = await post<ChatResponse>(apiConfig.endpoints.llm.chat, request);
-		console.log(resp);
-		return resp;
+		return await post<ChatResponse>(apiConfig.endpoints.llm.chat, request);
 	},
 
 	/**

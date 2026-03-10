@@ -14,11 +14,12 @@ import type {ChatContent} from "@/frontend/api";
 
 export function useChat(
 	activeThreadId: string | null,
+	projectId: string | null | undefined,
 	addUserMessage: (message: UserMessage) => void,
 	startStreamingMessage: () => void,
 	appendStreamingChunk: (chunk: string) => void,
 	finalizeStreamingMessage: (id: string) => void,
-	sourceIds: string[] = [],
+	sourceIds?: string[] | undefined,
 ) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -34,7 +35,10 @@ export function useChat(
 
 		try {
 			await llmService.chatStream(
-				{ thread_id: activeThreadId, content, source_ids: sourceIds },
+				{ thread_id: activeThreadId,
+					content: content,
+					project_id: projectId ?? null,
+					source_ids: sourceIds ?? [] },
 				(chunk) => appendStreamingChunk(chunk),
 				(id) => { finalizeStreamingMessage(id); setIsLoading(false); },
 				(message) => { setError(message); setIsLoading(false); },
@@ -46,7 +50,7 @@ export function useChat(
 	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, sourceIds]);
 
 	const selectMessage = useCallback((messageId: string) => {
-		console.log('Selected message:', messageId);
+		// console.log('Selected message:', messageId);
 	}, []);
 
 	return {
