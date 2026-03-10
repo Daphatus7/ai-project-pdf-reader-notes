@@ -48,12 +48,14 @@ class ChatResponse(BaseModel):
     content: list[dict] # create
     """
         example:
-             contents=[{"type": "text", 
+             contents=[{"type": "text",
                        "text": ai_msg.content}],
-        
+
     """
     created_at: str
     total_tokens: int | None = None  # for usage tracking
+    input_tokens: int = 0
+    output_tokens: int = 0
 
 # threads
 class CreateThreadRequest(BaseModel):

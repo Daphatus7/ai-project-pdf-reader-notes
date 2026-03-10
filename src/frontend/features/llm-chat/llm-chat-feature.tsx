@@ -10,7 +10,7 @@ export type LLMChatFeatureHandle = {
 };
 
 export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeatureProps>(
-	function LLMChatFeature({ onSelectContent, sourceIds = [] }: LLMChatFeatureProps, ref) {
+	function LLMChatFeature({ onSelectContent, sourceIds = [], projectId = null }: LLMChatFeatureProps, ref) {
 		const {
 			threads,
 			activeThreadId,
@@ -28,7 +28,14 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 		const {
 			isLoading,
 			sendMessage
-		} = useChat(activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, sourceIds);
+		} = useChat(
+			activeThreadId,
+			projectId,
+			addUserMessage, 
+			startStreamingMessage, 
+			appendStreamingChunk, 
+			finalizeStreamingMessage, 
+			sourceIds);
 
 		useImperativeHandle(
 			ref,

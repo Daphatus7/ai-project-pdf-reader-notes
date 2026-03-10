@@ -175,16 +175,36 @@ class SupabaseStorage(Service):
             {'xai_collection_id': xai_collection_id}
         ).eq('id', project_id).execute()
 
-    async def get_project_collection_id(self, user_id: str, project_id: str) -> str:
-        response = (self.__database.table('projects')
-                    .select('xai_collection_id')
-                    .eq('id', project_id)
-                    .eq('user_id', user_id)
+    async def get_project_collection_id(self, project_id: str) -> str:
+        """Get the xAI collection ID for a project by its project ID."""
+        try:
+            proj = (self.__database.table("projects")
+                    .select("xai_collection_id")
+                    .eq("id", project_id)
                     .single()
                     .execute())
-        if not response.data or not response.data.get('xai_collection_id'):
-            not_found('Project collection')
-        return response.data['xai_collection_id']
+            if not proj.data or not proj.data.get("xai_collection_id"):
+                not_found("Project collection")
+            return proj.data["xai_collection_id"]
+        except Exception as e:
+            logger.error(f"Failed to get xai_collection_id for project {project_id}: {e}")
+        return ""
+
+    async def get_xai_file_ids(self, source_ids: list[str]) -> list[str]:
+        """Get all xAI file IDs for a list of document IDs (skips docs with no xai_document_id)."""
+        if not source_ids:
+            return []
+        try:
+            response = (self.__database.table("documents")
+                        .select("xai_document_id")
+                        .in_("id", source_ids)
+                        .execute())
+            return [row["xai_document_id"] for row in response.data if row.get("xai_document_id")]
+        except Exception as e:
+            logger.error(f"Failed to get xai_document_ids for sources {source_ids}: {e}")
+            return []
+
+    
 
     async def delete_project(self, user_id: str, project_id: str) -> dict:
         """Delete a project: storage files → cascade delete → decrement usage."""
@@ -233,6 +253,8 @@ class SupabaseStorage(Service):
         Returns the created document record (including its id).
         Rolls back the DB record if storage upload fails.
         """
+        
+        #upload document to supabase first
         try:
             response = self.__database.table("documents").insert({
                 "user_id": user_id,
@@ -847,7 +869,7 @@ class SupabaseStorage(Service):
     async def get_collection_file_id(self, source_id: str) -> str:
         """Get the xAI collection file ID for a document by its document ID."""
         try:
-            response = (self.__database.table("documents")
+            response = await (self.__database.table("documents")
                         .select("xai_document_id")
                         .eq("id", source_id)
                         .single()

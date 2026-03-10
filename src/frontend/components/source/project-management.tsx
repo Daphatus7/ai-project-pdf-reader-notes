@@ -14,6 +14,7 @@ interface ManagementPanelProps {
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
 	onDownload?: (imageDataUrl: string, name: string) => void;
 	onSourceSelectionChange?: (selectedIds: string[]) => void;
+	onProjectSelectionChange?: (projectId: string | null) => void;
 }
 
 export function ManagementPanel({
@@ -21,6 +22,7 @@ export function ManagementPanel({
 	onSaveToNote,
 	onDownload,
 	onSourceSelectionChange,
+	onProjectSelectionChange,
 }: ManagementPanelProps) {
 	const project = useProject();
 	const quota = useQuota();
@@ -37,13 +39,15 @@ export function ManagementPanel({
 		setCurrentProjectId(projectId);
 		setCurrentProjectName(found?.name ?? '');
 		setActiveView('sources');
-	}, [project.projects]);
+		onProjectSelectionChange?.(projectId);
+	}, [project.projects, onProjectSelectionChange]);
 
 	const handleBackToProjects = useCallback(() => {
 		setCurrentProjectId(null);
 		setCurrentProjectName('');
 		setActiveView('projects');
-	}, []);
+		onProjectSelectionChange?.(null);
+	}, [onProjectSelectionChange]);
 
 	const handleDeleteProject = useCallback(async (projectId: string) => {
 		await project.deleteProject(projectId);
