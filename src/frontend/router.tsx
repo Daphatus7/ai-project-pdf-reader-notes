@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy } from "react";
 import AuthSwitch from "./features/auth/AuthSwitch.tsx";
 
@@ -19,4 +19,6 @@ export const router = createBrowserRouter([
 	},
 	{ path: "/login", element: <LoginPage /> },
 	{ path: "/signup", element: <SignupPage /> },
+	// Catch-all: redirect unknown paths to home
+	{ path: "*", element: <Navigate to="/" replace /> },
 ]);
