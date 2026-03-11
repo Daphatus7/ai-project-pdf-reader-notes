@@ -163,6 +163,7 @@ export function PricingDialog({ open, onOpenChange }: PricingDialogProps) {
 								<Input
 									id="auth-password"
 									type="password"
+									autoComplete="current-password"
 									placeholder="••••••••"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
