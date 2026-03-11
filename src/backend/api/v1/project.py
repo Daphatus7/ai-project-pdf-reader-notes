@@ -1,8 +1,3 @@
-# @file        project.py
-# @description Fast API endpoints for projects and documents management
-# @author      [Peiyu Wang]
-# @date        21/1/2026
-# @license     © 2026 . All rights reserved.
 import logging
 import uuid
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Path, HTTPException
@@ -18,10 +13,8 @@ from src.backend.schemas.project import (
 )
 from src.backend.schemas.rag import UploadResponse
 from src.backend.schemas.error import validation_error
-from src.backend.services.llm_service.grok.grok_collection import GrokCollection
-
-# module-level singleton
-grok_collection = GrokCollection()
+# shared module-level clients (connection pooling, concurrent-safe)
+from src.backend.services.llm_service.grok import grok_collection
 
 logger = logging.getLogger(__name__)
 
