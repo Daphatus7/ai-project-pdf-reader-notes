@@ -87,7 +87,7 @@ async def delete_project(
     # get xai_collection_id before cascade delete removes it
     xai_collection_id = None
     try:
-        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+        xai_collection_id = await database_service.get_project_collection_id(project_id)
     except Exception as e:
         logger.error(f"delete_project but project not found ----> {e} ")
     # supabase delete
@@ -122,6 +122,7 @@ async def upload_document(
         source_name: str = Form(None, description='Optional custom name for the document'),
         database_service=Depends(get_database_service),
 ):
+    # make sure it is valid user
     user_id = user['sub']
     
     # validate
@@ -149,7 +150,7 @@ async def upload_document(
     # 3. get collection ai for the project
     try:
         # get collection id
-        xai_collection_id = await database_service.get_project_collection_id(user_id, project_id)
+        xai_collection_id = await database_service.get_project_collection_id(project_id)
         logger.info(f"xai_collection_id ={xai_collection_id}")
         # upload the file to xAI collection, get back xAI file_id
         xai_file_id = await grok_collection.upload_document(
