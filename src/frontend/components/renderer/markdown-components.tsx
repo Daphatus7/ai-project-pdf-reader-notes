@@ -29,6 +29,43 @@ function sliceSource(source: string | undefined, node?: AstNode): string {
 	return source.slice(start, end);
 }
 
+/**
+ * KaTeX MathML always embeds the original LaTeX inside:
+ *   <annotation encoding="application/x-tex">LATEX</annotation>
+ * Traverses React children to extract it — reliable fallback when
+ * rehype-katex generates new hast nodes with no AST position info.
+ */
+function findKatexAnnotation(node: ReactNode): string | null {
+	if (!node || typeof node === 'string' || typeof node === 'number') return null;
+	if (Array.isArray(node)) {
+		for (const child of node) {
+			const r = findKatexAnnotation(child);
+			if (r !== null) return r;
+		}
+		return null;
+	}
+	if (typeof node === 'object' && 'type' in node && 'props' in node) {
+		const el = node as { type: unknown; props: Record<string, unknown> };
+		if (el.type === 'annotation' && el.props['encoding'] === 'application/x-tex') {
+			return typeof el.props['children'] === 'string' ? el.props['children'] : null;
+		}
+		if (el.props['children']) return findKatexAnnotation(el.props['children'] as ReactNode);
+	}
+	return null;
+}
+
+/** Check if KaTeX rendered display math by looking for <math display="block"> in children */
+function isKatexDisplay(node: ReactNode): boolean {
+	if (!node || typeof node === 'string' || typeof node === 'number') return false;
+	if (Array.isArray(node)) return node.some(isKatexDisplay);
+	if (typeof node === 'object' && 'type' in node && 'props' in node) {
+		const el = node as { type: unknown; props: Record<string, unknown> };
+		if (el.type === 'math' && el.props['display'] === 'block') return true;
+		if (el.props['children']) return isKatexDisplay(el.props['children'] as ReactNode);
+	}
+	return false;
+}
+
 /** Factory for heading components — eliminates h1/h2/h3/h4 duplication */
 function heading(
 	tag: keyof JSX.IntrinsicElements,
@@ -146,13 +183,26 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 		),
 
 		// --- KaTeX / Math Inline (span 拦截) ---
+		// Keep interception at the "katex" span level (same as before) to preserve
+		// the hover outline structure. Fix rawMarkdown via annotation extraction —
+		// rehype-katex nodes have no AST position, so sliceSource alone returns ''.
 		span: ({ className, children, node, ...props }) => {
 			const isMathRoot = typeof className === 'string' &&
 				(className.includes('math-inline') || className === 'katex');
 
 			if (isMathRoot) {
+				const latex = findKatexAnnotation(children);
+				const display = isKatexDisplay(children);
+				// Prefer AST slice; fall back to annotation + delimiters
+				const rawMd = sliceSource(source, node as AstNode)
+					|| (latex ? (display ? `$$${latex}$$` : `$${latex}$`) : '');
 				return (
-					<SelectableWrapper sectionType="math-inline" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="span">
+					<SelectableWrapper
+						sectionType={display ? 'math-display' : 'math-inline'}
+						rawMarkdown={rawMd}
+						onSelect={onSelect}
+						as="span"
+					>
 						<span className={className} {...props}>{children}</span>
 					</SelectableWrapper>
 				);
