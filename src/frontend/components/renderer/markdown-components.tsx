@@ -1,9 +1,9 @@
 /**
  * @file        markdown-components.tsx
  * @description Custom React components for markdown rendering.
- *              Typography is handled by markdown-typography.scss —
- *              components here only provide SelectableWrapper (click-to-select)
- *              and minimal structural classes.
+ * Typography is handled by markdown-typography.scss —
+ * components here only provide SelectableWrapper (click-to-select)
+ * and minimal structural classes.
  */
 import type { Components } from 'react-markdown';
 import type { ReactNode, JSX } from 'react';
@@ -51,17 +51,20 @@ function heading(
  */
 export function createMarkdownComponents(onSelect?: SectionClickHandler, source?: string): Components {
 	return {
+		// --- Headings ---
 		h1: heading('h1', 'heading-1', onSelect, source),
 		h2: heading('h2', 'heading-2', onSelect, source),
 		h3: heading('h3', 'heading-3', onSelect, source),
 		h4: heading('h4', 'heading-4', onSelect, source),
 
+		// --- Paragraph ---
 		p: ({ children, node }) => (
 			<SelectableWrapper sectionType="paragraph" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="p">
 				{children}
 			</SelectableWrapper>
 		),
 
+		// --- Code Blocks & Inline Code ---
 		code: ({ inline, className, children, node, ...props }: CodeProps) => {
 			const language = /language-(\w+)/.exec(className || '')?.[1] ?? '';
 
@@ -81,18 +84,29 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 						</div>
 					)}
 					<pre>
-						<code className={className} {...props}>{children}</code>
-					</pre>
+                   <code className={className} {...props}>{children}</code>
+                </pre>
 				</SelectableWrapper>
 			);
 		},
 
+		// --- Tables ---
 		table: ({ children, node }) => (
 			<SelectableWrapper sectionType="table" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect}>
 				<table>{children}</table>
 			</SelectableWrapper>
 		),
 
+		ul: ({ children, node }) => (
+			<SelectableWrapper sectionType="list-unordered" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="ul">
+				{children}
+			</SelectableWrapper>
+		),
+		ol: ({ children, node }) => (
+			<SelectableWrapper sectionType="list-ordered" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="ol">
+				{children}
+			</SelectableWrapper>
+		),
 		li: ({ children, node }) => (
 			<SelectableWrapper sectionType="list-item" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="li">
 				{children}
@@ -124,10 +138,46 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 			);
 		},
 
+		// --- Images ---
 		img: ({ src, alt, node }) => (
 			<SelectableWrapper sectionType="image" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect}>
 				<img src={src} alt={alt || ''} />
 			</SelectableWrapper>
 		),
+
+		// --- KaTeX / Math Blocks (div 拦截) ---
+		div: ({ className, children, node, ...props }) => {
+			// 判断是否为 KaTeX 渲染的块级公式容器
+			const isMathRoot = typeof className === 'string' &&
+				(className.includes('math-display') || className.includes('katex-display'));
+
+			if (isMathRoot) {
+				return (
+					<SelectableWrapper sectionType="math-block" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="div">
+						<div className={className} {...props}>{children}</div>
+					</SelectableWrapper>
+				);
+			}
+
+			// 普通 div 原样渲染
+			return <div className={className} {...props}>{children}</div>;
+		},
+
+		// --- KaTeX / Math Inline (span 拦截) ---
+		span: ({ className, children, node, ...props }) => {
+			// 判断是否为 KaTeX 渲染的行内公式容器
+			// 注意：rehype-katex 可能会输出 math-inline，且要避免拦截公式内部的细碎 span (如 mord, mrel)
+			const isMathRoot = typeof className === 'string' &&
+				(className.includes('math-inline') || className === 'katex');
+
+			if (isMathRoot) {
+				return (
+					<SelectableWrapper sectionType="math-inline" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="span">
+						<span className={className} {...props}>{children}</span>
+					</SelectableWrapper>
+				);
+			}
+			return <span className={className} {...props}>{children}</span>;
+		},
 	};
 }
