@@ -56,7 +56,7 @@ export function SelectableWrapper({
 		{
 			className: cn(
 				className,
-				isHovered && 'bg-primary/10 outline outline-2 outline-primary/30 rounded cursor-pointer',
+				isHovered && 'bg-primary/10 outline outline-1 outline-primary/30 rounded cursor-pointer',
 				'transition-all duration-150'
 			),
 			onMouseEnter: () => setIsHovered(true),
