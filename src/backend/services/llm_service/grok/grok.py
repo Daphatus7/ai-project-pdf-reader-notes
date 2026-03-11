@@ -45,8 +45,8 @@ TOOLS = [web_search(), x_search(), SEARCH_DOCUMENT_TOOL]
 BUILTIN_TOOLS = {"web_search", "x_search"}
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant. Keep responses concise. "
-    "Use markdown formatting. Wrap all math expressions in $...$ delimiters "
+    "You are a helpful assistant. "
+    "Make sure Wrap all math expressions in $...$ delimiters "
     "using LaTeX commands (e.g. $\\\\sum$, $\\\\omega$), never Unicode math symbols."
 )
 
