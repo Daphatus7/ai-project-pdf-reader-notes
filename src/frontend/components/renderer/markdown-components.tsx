@@ -147,8 +147,6 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 
 		// --- KaTeX / Math Inline (span 拦截) ---
 		span: ({ className, children, node, ...props }) => {
-			// 判断是否为 KaTeX 渲染的行内公式容器
-			// 注意：rehype-katex 可能会输出 math-inline，且要避免拦截公式内部的细碎 span (如 mord, mrel)
 			const isMathRoot = typeof className === 'string' &&
 				(className.includes('math-inline') || className === 'katex');
 
