@@ -3,12 +3,10 @@ import logging
 import os
 from typing import AsyncIterator
 
-import redis
 from xai_sdk import AsyncClient
 from xai_sdk.chat import user, system, assistant, image as xai_image, tool_result, tool
 from xai_sdk.tools import web_search
 
-from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
 from src.backend.services.llm_service.grok.grok_collection import GrokCollection
 from src.backend.services.storage.supabase_storage import SupabaseStorage
@@ -19,7 +17,6 @@ logger = logging.getLogger(__name__)
 MODEL = "grok-4-1-fast-reasoning"
 MAX_MESSAGES = 20
 MAX_TOOL_ROUNDS = 5
-REDIS_KEY_PREFIX = "grok:messages"
 
 # Custom tool definition — executed locally, result returned via tool_result()
 SEARCH_DOCUMENT_TOOL = tool(
@@ -60,30 +57,12 @@ class LlmGrok:
             management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
             timeout=600)
         self._supabase = supabase_storage
-        self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
         self._collection = GrokCollection()
 
-    # ── Redis ─────────────────────────────────────────────────────────────────
+    # ── History (loaded from Supabase on every request) ───────────────────────
 
-    def _rkey(self, thread_id: str) -> str:
-        return f"{REDIS_KEY_PREFIX}:{thread_id}"
-
-    def _load_history(self, thread_id: str) -> list[dict] | None:
-        raw = self._redis.get(self._rkey(thread_id))
-        return json.loads(raw) if raw else None
-
-    def _save_history(self, thread_id: str, messages: list[dict]) -> None:
-        self._redis.setex(self._rkey(thread_id), settings.redis_thread_ttl, json.dumps(messages[-MAX_MESSAGES:]))
-
-    def _refresh_ttl(self, thread_id: str) -> None:
-        self._redis.expire(self._rkey(thread_id), settings.redis_thread_ttl)
-
-    def delete_thread(self, thread_id: str) -> int:
-        return self._redis.delete(self._rkey(thread_id))
-
-    # ── Cold start ────────────────────────────────────────────────────────────
-
-    async def _cold_start(self, thread_id: str) -> list[dict]:
+    async def _load_history(self, thread_id: str) -> list[dict]:
+        """Load recent conversation history from Supabase."""
         if not await self._supabase.thread_exists(thread_id):
             return []
         rows = await self._supabase.load_recent_messages(thread_id, max_messages=MAX_MESSAGES)
@@ -92,22 +71,16 @@ class LlmGrok:
             content = row["content"]
             text = " ".join(b["text"] for b in content if b.get("type") == "text") if isinstance(content, list) else str(content)
             history.append({"role": row["role"], "content": text})
-        logger.info("Cold start: %d messages for thread %s", len(history), thread_id)
+        logger.info("Loaded %d messages for thread %s", len(history), thread_id)
         return history
 
     # ── Shared setup ──────────────────────────────────────────────────────────
 
     async def _prepare_request(self, request: ChatRequest) -> tuple[list[dict], str, list[dict]]:
-        """Load history, build user text, and image items.
-        RAG context is no longer injected here — the model calls search_document() as a tool."""
-        self._refresh_ttl(request.thread_id)
-        history = self._load_history(request.thread_id)
-        if history is None:
-            history = await self._cold_start(request.thread_id)
-
+        """Load history from Supabase, build user text and image items."""
+        history = await self._load_history(request.thread_id)
         user_text = " ".join(item["text"] for item in request.content if item.get("type") == "text")
         image_items = [item for item in request.content if item.get("type") == "image"]
-
         return history, user_text, image_items
 
     def _build_chat(self, history: list[dict], user_text: str, image_items: list[dict] | None = None):
@@ -179,18 +152,14 @@ class LlmGrok:
         input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
         output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
 
-        # Update Redis history
-        history.append({"role": "user", "content": user_text})
-        history.append({"role": "assistant", "content": ai_text})
-        self._save_history(request.thread_id, history)
-
-        # Persist to Supabase
+        # Persist to Supabase (source of truth for history); user_id injected from auth token
+        user_id = request.user_id or ""
         await self._supabase.save_message(
-            user_id=request.user_id, thread_id=request.thread_id,
+            user_id=user_id, thread_id=request.thread_id,
             role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
         )
         resp = await self._supabase.save_message(
-            user_id=request.user_id, thread_id=request.thread_id,
+            user_id=user_id, thread_id=request.thread_id,
             role="assistant", content=[{"type": "text", "text": ai_text}], token_count=output_tokens,
         )
 
@@ -239,17 +208,14 @@ class LlmGrok:
             input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
             output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
 
-        # Persist history and messages after stream completes
-        history.append({"role": "user", "content": user_text})
-        history.append({"role": "assistant", "content": full_text})
-        self._save_history(request.thread_id, history)
-
+        # Persist to Supabase after stream completes; user_id injected from auth token
+        user_id = request.user_id or ""
         await self._supabase.save_message(
-            user_id=request.user_id, thread_id=request.thread_id,
+            user_id=user_id, thread_id=request.thread_id,
             role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
         )
         resp = await self._supabase.save_message(
-            user_id=request.user_id, thread_id=request.thread_id,
+            user_id=user_id, thread_id=request.thread_id,
             role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
         )
 
