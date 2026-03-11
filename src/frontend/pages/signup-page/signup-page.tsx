@@ -123,6 +123,7 @@ const SignupPage = () => {
 							<Input
 								type="password"
 								id="password"
+								autoComplete="new-password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								onBlur={() => setPasswordError(validatePassword(password))}
@@ -136,6 +137,7 @@ const SignupPage = () => {
 							<Input
 								type="password"
 								id="confirmPassword"
+								autoComplete="new-password"
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
 								onBlur={() => setConfirmPasswordError(validateConfirmPassword(confirmPassword, password))}
