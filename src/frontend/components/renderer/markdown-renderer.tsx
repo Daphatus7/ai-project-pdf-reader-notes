@@ -23,6 +23,7 @@ export function MarkdownRenderer({ content, onSectionClick }: MarkdownRendererPr
 
 	return (
 		<div className="chat-typography">
+			{/*remarkGfm is for tables and remarkMath is for math*/}
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkMath]}
 				rehypePlugins={[rehypeKatex]}

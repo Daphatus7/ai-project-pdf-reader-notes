@@ -39,13 +39,13 @@ const AI_RESPONSE = `The table summarizes Q3 performance metrics across three re
 Total consolidated revenue: $8.9M, up 14% from Q3 last year.`;
 
 const STEP_DURATIONS: Record<DemoStep, number> = {
-	idle: 2000,
-	screenshotting: 1500,
-	captured: 800,
-	loading: 1500,
+	idle: 600,
+	screenshotting: 500,
+	captured: 400,   // brief pause: screenshot captured
+	loading: 600,
 	streaming: 0,
-	done: 3000,
-	inserting: 4000,
+	done: 1200,      // brief pause: full AI response visible
+	inserting: 1000, // brief pause: content inserted into notes
 };
 
 const NEXT_STEP: Record<DemoStep, DemoStep> = {
@@ -115,7 +115,7 @@ export default function DemoSection() {
 				return;
 			}
 			setStreamedText(AI_RESPONSE.slice(0, streamIndexRef.current));
-		}, 20);
+		}, 6);
 
 		return () => clearInterval(interval);
 	}, [step, isVisible, advanceStep]);
@@ -134,6 +134,14 @@ export default function DemoSection() {
 	const showInsertButton = step === "done";
 	const askAiActive = step === "screenshotting" || step === "captured";
 
+	// Mobile: only the relevant panel for each animation phase is visible
+	const activeMobilePanel =
+		step === "idle" || step === "screenshotting" || step === "captured"
+			? "pdf"
+			: step === "loading" || step === "streaming" || step === "done"
+				? "chat"
+				: "notebook";
+
 	return (
 		<section className="w-full px-4 py-16" ref={containerRef}>
 			{/* Demo Badge */}
@@ -146,10 +154,11 @@ export default function DemoSection() {
 
 			{/* 3-Panel Mockup */}
 			<div className="max-w-5/6 mx-auto">
-				<div className="grid grid-cols-3 h-[600px]">
+				{/* Mobile: single-column, only active panel shown; Desktop: 3-column fixed-height grid */}
+			<div className="grid grid-cols-1 md:grid-cols-3 h-[500px] md:h-[600px]">
 
 					{/* PDF Panel */}
-					<div className="bg-panel border rounded-xl ml-2 mr-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl ml-2 mr-1 mb-2 shadow hover:shadow-xl flex-col overflow-hidden ${activeMobilePanel === "pdf" ? "flex" : "hidden md:flex"}`}>
 						{/* PDF Toolbar */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<button className="p-1 hover:bg-border/50 rounded">
@@ -255,7 +264,7 @@ export default function DemoSection() {
 					</div>
 
 					{/* AI Chat Panel */}
-					<div className="bg-panel border rounded-xl mx-1 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl mx-1 mb-2 shadow hover:shadow-xl flex-col overflow-hidden ${activeMobilePanel === "chat" ? "flex" : "hidden md:flex"}`}>
 						{/* Chat Header */}
 						<div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-secondary/50 shrink-0">
 							<MessageSquare className="size-3.5 text-muted-foreground" />
@@ -334,7 +343,7 @@ export default function DemoSection() {
 					</div>
 
 					{/* Notebook Panel */}
-					<div className="bg-panel border rounded-xl ml-1 mr-2 mb-2 shadow hover:shadow-xl flex flex-col overflow-hidden">
+					<div className={`bg-panel border rounded-xl ml-1 mr-2 mb-2 shadow hover:shadow-xl flex-col overflow-hidden ${activeMobilePanel === "notebook" ? "flex" : "hidden md:flex"}`}>
 						{/* Notes Header with tabs */}
 						<div className="flex items-center gap-1 px-2 py-1.5 border-b border-border bg-secondary/50 shrink-0">
 							<div className="flex items-center gap-0.5">

@@ -118,28 +118,26 @@ const LandingPage = () => {
 					<div className="flex items-center gap-2">
 						<LucideCheckCheck />
 						<span className="text-sm text-muted-foreground">
-              No credit card required
+              50% faster Workflow
             </span>
 					</div>
 					<div className="flex items-center gap-2">
 						<LucideLock />
 						<span className="text-sm text-muted-foreground">
-              Enterprise-grade security
+              100% Focus
             </span>
 					</div>
 					<div className="flex items-center gap-2">
 						<LucideHardHat />
 						<span className="text-sm text-muted-foreground">
-              10,000+ researchers
+              200% productivity
             </span>
 					</div>
 				</div>
 			</section>
 
 			<DemoSection />
-
-			<DemoMathSection />
-
+			
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
 				<div className="max-w-7xl mx-auto">
