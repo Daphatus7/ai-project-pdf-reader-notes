@@ -50,7 +50,7 @@ async def startup_event():
     """Initialize services on startup"""
     logger.info("Starting LLM Backend Service...")
     try:
-        services.initialize()
+        await services.initialize()
         logger.info("Dependencies initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize dependencies: {e}")

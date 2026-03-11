@@ -15,20 +15,20 @@ class Services:
         self._initialized = False
         self._logger = logging.getLogger(__name__)
 
-    def initialize(self):
+    async def initialize(self):
         """Initialize all dependencies"""
         if self._initialized:
             return
-        
+
         # Initialize LLM services
-        self._initialize_llm_services()
-        
+        await self._initialize_llm_services()
+
         self._initialized = True
-    
-    def _initialize_llm_services(self):
+
+    async def _initialize_llm_services(self):
         """Initialize LLM-related services"""
         supabase_storage = SupabaseStorage()
-        supabase_storage.start()
+        await supabase_storage.start()
         self.register('database_service', supabase_storage)
 
         llm_service = LlmService(database=supabase_storage)
