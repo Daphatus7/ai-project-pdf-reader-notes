@@ -145,24 +145,6 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 			</SelectableWrapper>
 		),
 
-		// --- KaTeX / Math Blocks (div 拦截) ---
-		div: ({ className, children, node, ...props }) => {
-			// 判断是否为 KaTeX 渲染的块级公式容器
-			const isMathRoot = typeof className === 'string' &&
-				(className.includes('math-display') || className.includes('katex-display'));
-
-			if (isMathRoot) {
-				return (
-					<SelectableWrapper sectionType="math-block" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} as="div">
-						<div className={className} {...props}>{children}</div>
-					</SelectableWrapper>
-				);
-			}
-
-			// 普通 div 原样渲染
-			return <div className={className} {...props}>{children}</div>;
-		},
-
 		// --- KaTeX / Math Inline (span 拦截) ---
 		span: ({ className, children, node, ...props }) => {
 			// 判断是否为 KaTeX 渲染的行内公式容器
