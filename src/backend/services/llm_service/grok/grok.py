@@ -6,7 +6,7 @@ from typing import AsyncIterator
 import redis
 from xai_sdk import AsyncClient
 from xai_sdk.chat import user, system, assistant, image as xai_image, tool_result, tool
-from xai_sdk.tools import web_search, x_search
+from xai_sdk.tools import web_search
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
@@ -41,12 +41,12 @@ SEARCH_DOCUMENT_TOOL = tool(
 )
 
 # Built-in tools run on xAI servers (no local dispatch); custom tools require local execution
-TOOLS = [web_search(), x_search(), SEARCH_DOCUMENT_TOOL]
+TOOLS = [web_search(), SEARCH_DOCUMENT_TOOL]
 BUILTIN_TOOLS = {"web_search", "x_search"}
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant. Keep responses concise. "
-    "Use markdown formatting. Wrap all math expressions in $...$ delimiters "
+    "You are a helpful assistant. "
+    "Make sure Wrap all math expressions in $...$ delimiters "
     "using LaTeX commands (e.g. $\\\\sum$, $\\\\omega$), never Unicode math symbols."
 )
 
