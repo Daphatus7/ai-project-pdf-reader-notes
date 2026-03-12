@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSignup } from "@/frontend/features/auth";
@@ -75,6 +76,11 @@ const SignupPage = () => {
 	};
 
 	return (
+		<>
+			<Helmet>
+				<title>Sign up - Atlas Notebook</title>
+				<meta name="robots" content="noindex, nofollow" />
+			</Helmet>
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">
 			{/* Logo above the card */}
 			<div className="flex flex-col items-center gap-6 w-full max-w-md">
@@ -201,6 +207,7 @@ const SignupPage = () => {
 			</Card>
 			</div>
 		</div>
+		</>
 	);
 };
 

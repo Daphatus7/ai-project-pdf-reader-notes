@@ -8,7 +8,7 @@ from xai_sdk.chat import user, system, assistant, image as xai_image, tool_resul
 from xai_sdk.tools import web_search
 
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
-from src.backend.services.llm_service.grok.grok_collection import GrokCollection
+from src.backend.services.llm_service.grok.grok_collection import search_collection
 from src.backend.services.storage.supabase_storage import SupabaseStorage
 
 
@@ -57,7 +57,6 @@ class LlmGrok:
             management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
             timeout=600)
         self._supabase = supabase_storage
-        self._collection = GrokCollection()
 
     # ── History (loaded from Supabase on every request) ───────────────────────
 
@@ -233,7 +232,7 @@ class LlmGrok:
         xai_source_ids = await self._supabase.get_xai_file_ids(source_ids)
         logger.info("Searching collection %s with files %s", xai_collection_id, xai_source_ids)
 
-        matches = await self._collection.search_collection(
+        matches = await search_collection(
             collection_id=xai_collection_id,
             selected_files=xai_source_ids,
             query=query,

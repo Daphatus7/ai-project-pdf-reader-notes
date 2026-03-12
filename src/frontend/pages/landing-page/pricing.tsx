@@ -13,7 +13,7 @@ export default function PricingSection() {
 	const freeAction = (
 		<Link
 			to="/signup"
-			className="block text-center py-2.5 px-6 rounded-xl border-2 border-border text-foreground font-medium hover:border-[#006aff] hover:text-[#006aff] transition-colors mb-8"
+			className="flex items-center justify-center h-9 w-full px-4 rounded-md border border-input bg-background text-sm font-medium text-foreground hover:border-[#006aff] hover:text-[#006aff] transition-colors mb-8"
 		>
 			Get started free
 		</Link>

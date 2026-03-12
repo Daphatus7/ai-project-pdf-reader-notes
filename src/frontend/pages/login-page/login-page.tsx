@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginViaApi, loginWithGoogle } from "../../api/services/auth.service";
@@ -67,6 +68,11 @@ const LoginPage = () => {
 	};
 	
 	return (
+		<>
+			<Helmet>
+				<title>Atlas Notebook</title>
+				<meta name="robots" content="noindex, nofollow" />
+			</Helmet>
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">
 			{/* Logo above the card */}
 			<div className="flex flex-col items-center gap-6 w-full max-w-md">
@@ -185,6 +191,7 @@ const LoginPage = () => {
 			</Card>
 			</div>
 		</div>
+		</>
 	);
 };
 

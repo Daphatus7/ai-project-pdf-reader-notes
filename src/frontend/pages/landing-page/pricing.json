@@ -1,23 +1,20 @@
 {
   "heading": "Invest in how you think",
   "subheading": "Start exploring for free. Upgrade when you're ready to work without limits.",
-
   "free": [
     { "included": true, "label": "AI-native notebook experience" },
-    { "included": true, "label": "Notion-like editing experience" },
-    { "included": true, "label": "Table, Math & LaTeX support"},
-    { "included": true, "label": "limited AI assistance per day" },
-    { "included": true, "label": "Up to 4 PDFs" },
-    { "included": true, "label": "1 active projects" },
-    { "included": true, "label": "2 notebooks" },
-    { "included": true, "label": "Standard support" }
+    { "included": true, "label": "Limited AI usage" },
+    { "included": true, "label": "Basic project folder limits" },
+    { "included": true, "label": "Basic note limits" },
+    { "included": true, "label": "Basic document analysis" }
   ],
 
   "monthly": [
-    { "included": true, "label": "Everything in Free" },
-    { "included": true, "label": "High-volume AI assistance" },
-    { "included": true, "label": "Work across unlimited PDFs" },
-    { "included": true, "label": "Unlimited projects & notebooks" },
+    { "included": true, "label": "Everything in free" },
+    { "included": true, "label": "Uncapped AI usage & Reasoning Model" },
+    { "included": true, "label": "Unlimited Projects" },
+    { "included": true, "label": "Unlimited Notes" },
+    { "included": true, "label": "High-volume document uploads" },
     { "included": true, "label": "Priority support" }
   ],
 

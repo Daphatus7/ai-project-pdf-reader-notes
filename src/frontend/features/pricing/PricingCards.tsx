@@ -13,7 +13,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 		<div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
 
 			{/* Free */}
-			<div className="bg-card rounded-2xl p-8 border border-border flex flex-col transition-transform duration-500 ease-out hover:-translate-y-1">
+			<div className="bg-card rounded-2xl p-8 border border-border flex flex-col ">
 				<div className="mb-6">
 					<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Free</p>
 					<div className="flex items-end gap-1 mb-1">
@@ -43,7 +43,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 			</div>
 
 			{/* Monthly Pro */}
-			<div className="bg-card rounded-2xl p-8 border-2 border-[#006aff] flex flex-col relative transition-transform duration-500 ease-out hover:-translate-y-1">
+			<div className="bg-card rounded-2xl p-8 border-2 border-[#006aff] flex flex-col relative">
 				<div className="absolute -top-4 left-1/2 -translate-x-1/2">
 					<span className="bg-[#006aff] text-white text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap">
 						Most Popular
@@ -81,7 +81,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 
 			{/* Yearly Pro */}
 			<div
-				className="rounded-2xl p-8 flex flex-col relative transition-transform duration-500 ease-out hover:-translate-y-1"
+				className="rounded-2xl p-8 flex flex-col relative "
 				style={{ backgroundImage: "linear-gradient(163.293deg, rgb(15, 23, 43) 0%, rgb(29, 41, 61) 55%, rgb(49, 44, 133) 100%)" }}
 			>
 				<div className="absolute -top-4 left-1/2 -translate-x-1/2">

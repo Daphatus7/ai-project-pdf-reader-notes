@@ -8,8 +8,6 @@ Provides common dependencies used across API endpoints:
 """
 import logging
 import os
-from typing import Optional
-
 import jwt
 from jwt import PyJWKClient
 from fastapi import Depends
@@ -22,22 +20,18 @@ from src.backend.services.concurrency_limiter import ConcurrencyLimiter
 
 logger = logging.getLogger(__name__)
 
-# Initialize JWKS client for Supabase token verification
-_jwks_client: Optional[PyJWKClient] = None
-
 # Security scheme for Swagger UI
 security = HTTPBearer()
 
+# Initialize JWKS client at module load (import lock guarantees single-threaded, no race condition)
+_supabase_url = os.environ.get("SUPABASE_URL")
+if not _supabase_url:
+    raise ValueError("SUPABASE_URL environment variable is not set")
+_jwks_client = PyJWKClient(f"{_supabase_url}/auth/v1/.well-known/jwks.json", cache_keys=True)
+
 
 def get_jwks_client() -> PyJWKClient:
-    """Get or create the JWKS client for token verification."""
-    global _jwks_client
-    if _jwks_client is None:
-        supabase_url = os.environ.get("SUPABASE_URL")
-        if not supabase_url:
-            raise ValueError("SUPABASE_URL environment variable is not set")
-        jwks_url = f"{supabase_url}/auth/v1/.well-known/jwks.json"
-        _jwks_client = PyJWKClient(jwks_url, cache_keys=True)
+    """Return the shared JWKS client for token verification."""
     return _jwks_client
 
 

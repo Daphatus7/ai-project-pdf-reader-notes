@@ -1,5 +1,5 @@
 {
-      "name": "Design AI-Powered Note-Taking UI",
+      "name": "Atlas Notebook",
       "version": "0.1.0",
       "private": true,
       "type": "module",
@@ -75,6 +75,7 @@
             "react-dnd": "*",
             "react-dnd-html5-backend": "*",
             "react-dom": "^18.3.1",
+            "react-helmet-async": "^3.0.0",
             "react-hook-form": "^7.55.0",
             "react-hotkeys-hook": "^5.2.1",
             "react-markdown": "*",

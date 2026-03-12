@@ -10,7 +10,7 @@ from xai_sdk.tools import web_search
 
 from src.backend.config.config import settings
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
-from src.backend.services.llm_service.grok.grok_collection import GrokCollection
+from src.backend.services.llm_service.grok.grok_collection import search_collection
 from src.backend.services.storage.supabase_storage import SupabaseStorage
 
 
@@ -61,7 +61,6 @@ class LlmGrok:
             timeout=600)
         self._supabase = supabase_storage
         self._redis: redis.Redis = redis.Redis.from_url(settings.redis_url, decode_responses=False)
-        self._collection = GrokCollection()
 
     # ── Redis ─────────────────────────────────────────────────────────────────
 
@@ -267,7 +266,7 @@ class LlmGrok:
         xai_source_ids = await self._supabase.get_xai_file_ids(source_ids)
         logger.info("Searching collection %s with files %s", xai_collection_id, xai_source_ids)
 
-        matches = await self._collection.search_collection(
+        matches = await search_collection(
             collection_id=xai_collection_id,
             selected_files=xai_source_ids,
             query=query,
