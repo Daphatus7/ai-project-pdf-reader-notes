@@ -19,7 +19,7 @@ const LandingPage = () => {
 				<title>Atlas Notebook</title>
 
 				<meta name="description" content="
-					Faster reading, smarter notes — say goodbye to the frustration of clunky PDFs and rigid traditional documents.
+					Faster reading, smarter notes — say goodbye to the frustration of unreliable AI output.
 					Boost your productivity instantly:
 					What you see is exactly what you get — zero hallucinations, pure accuracy.
 					One-click AI-powered : no more drawing tables, rewriting equations, or manual cleanup. We perfectly match and structure any AI output format for you.
@@ -247,7 +247,7 @@ const LandingPage = () => {
 						Start reading smarter today
 					</h2>
 					<p className="text-lg text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
-						Join thousands of researchers who use Atlas Notebook to transform PDFs into structured, actionable knowledge.
+						
 					</p>
 					<div className="flex flex-col items-center gap-4">
 						<Link
