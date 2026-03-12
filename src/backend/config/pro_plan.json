@@ -4,9 +4,9 @@
   "plan_id": "pro",
 
   "quotas": {
-    "max_projects":  10,
-    "max_documents": 20,
-    "max_notes":     50,
-    "max_tokens":    500000
+    "max_projects":  100,
+    "max_documents": 200,
+    "max_notes":     100,
+    "max_tokens":    5000000
   }
 }
