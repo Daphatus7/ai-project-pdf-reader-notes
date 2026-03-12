@@ -63,12 +63,13 @@ const LandingPage = () => {
 						<a href="#solutions" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							Solutions
 						</a>
-						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Resources
-						</a>
 						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							Pricing
 						</a>
+						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+							Resources
+						</a>
+
 					</nav>
 
 					{/* Right side actions */}
@@ -331,7 +332,7 @@ const LandingPage = () => {
 								<li>
 									<a href="#api" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
 										API Reference
-									</a>
+									</a>		
 								</li>
 								<li>
 									<a href="#blog" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
