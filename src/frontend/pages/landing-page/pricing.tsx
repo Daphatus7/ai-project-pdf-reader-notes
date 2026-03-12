@@ -38,7 +38,7 @@ export default function PricingSection() {
 				/>
 
 				<p className="text-sm text-muted-foreground text-center mt-10">
-					All plans include end-to-end encryption, automatic backups, and version history.
+					All plans include end-to-end encryption, automatic backups.
 				</p>
 			</div>
 		</section>

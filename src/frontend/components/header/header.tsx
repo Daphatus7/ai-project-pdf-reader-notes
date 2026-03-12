@@ -65,6 +65,13 @@ export function Header() {
 					</Button>
 				)}
 
+				{/* Solutions — links to demo section on landing page */}
+				<a href="/#solutions">
+					<Button variant="ghost" size="sm" className="text-xs h-8 px-3">
+						Solutions
+					</Button>
+				</a>
+
 				{/* Direct feedback link shown in header */}
 				<Button
 					variant="ghost"

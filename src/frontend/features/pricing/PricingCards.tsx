@@ -89,9 +89,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						<Zap className="size-3" /> Best Value · Save $41
 					</span>
 				</div>
-
-				<div className="absolute top-0 right-0 w-48 h-48 bg-[#006aff]/20 rounded-full blur-3xl pointer-events-none" />
-
+				
 				<div className="mb-6 relative">
 					<p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-3">Pro Yearly</p>
 					<div className="flex items-end gap-1 mb-1">

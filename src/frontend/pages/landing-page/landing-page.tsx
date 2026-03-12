@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import {
 	ArrowRightIcon,
 	LucideArrowRight,
-	LucideCheckCheck,
 	LucideCog,
-	LucideHardHat,
-	LucideLock,
-	LucideSparkles
+	LucideSparkles,
+	LucideTarget,
+	LucideTrendingUp,
+	LucideZap
 } from "lucide-react";
 import DemoSection from "./components/demo";
 import PricingSection from "./pricing";
@@ -132,27 +132,28 @@ const LandingPage = () => {
 						Try for free
 						<ArrowRightIcon />
 					</Link>
-					<button className="px-8 py-4 rounded-xl bg-card border-2 border-border text-foreground font-medium text-base hover:border-[#006aff] transition-colors">
-						Watch Demo
-					</button>
+					{/*<button className="px-8 py-4 rounded-xl bg-card border-2 border-border text-foreground font-medium text-base hover:border-[#006aff] transition-colors">*/}
+					{/*	Watch Demo*/}
+					{/*</button>*/}
 				</div>
 
 				{/* Features Pills */}
 				<div className="flex flex-wrap justify-center gap-8 max-w-4xl">
-					<div className="flex items-center gap-2">
-						<LucideCheckCheck />
+					{/* Workflow speed / Focus / Productivity pills */}
+				<div className="flex items-center gap-2">
+						<LucideZap />
 						<span className="text-sm text-muted-foreground">
               50% faster Workflow
             </span>
 					</div>
 					<div className="flex items-center gap-2">
-						<LucideLock />
+						<LucideTarget />
 						<span className="text-sm text-muted-foreground">
               100% Focus
             </span>
 					</div>
 					<div className="flex items-center gap-2">
-						<LucideHardHat />
+						<LucideTrendingUp />
 						<span className="text-sm text-muted-foreground">
               200% productivity
             </span>
