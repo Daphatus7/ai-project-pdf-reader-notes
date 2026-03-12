@@ -63,11 +63,11 @@ const LandingPage = () => {
 						<a href="#solutions" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							Solutions
 						</a>
-						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Pricing
-						</a>
 						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							Resources
+						</a>
+						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+							Pricing
 						</a>
 					</nav>
 
@@ -260,7 +260,7 @@ const LandingPage = () => {
 						</Link>
 						<p className="text-sm text-primary-foreground/40">
 							Questions before getting started?{" "}
-							<a href="mailto:hello@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
+							<a href="mailto:contact@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
 								Talk to us.
 							</a>
 						</p>
