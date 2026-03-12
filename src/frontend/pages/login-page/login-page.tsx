@@ -70,7 +70,7 @@ const LoginPage = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Login - Atlas Notebook</title>
+				<title>Atlas Notebook</title>
 				<meta name="robots" content="noindex, nofollow" />
 			</Helmet>
 		<div className="flex min-h-screen items-center justify-center bg-background px-4">

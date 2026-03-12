@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import {
 	ArrowRightIcon,
@@ -9,11 +10,34 @@ import {
 	LucideSparkles
 } from "lucide-react";
 import DemoSection from "./components/demo";
-import DemoMathSection from "./components/demo-math";
 import PricingSection from "./pricing";
 
 const LandingPage = () => {
 	return (
+		<>
+			<Helmet>
+				<title>Atlas Notebook</title>
+
+				<meta name="description" content="
+					Faster reading, smarter notes — say goodbye to the frustration of clunky PDFs and rigid traditional documents.
+					Boost your productivity instantly:
+					What you see is exactly what you get — zero hallucinations, pure accuracy.
+					One-click AI-powered : no more drawing tables, rewriting equations, or manual cleanup. We perfectly match and structure any AI output format for you.
+					Side-by-side AI chat with zero fluff: 
+					point anywhere and get instant, 
+					precise explanations right there. 
+					Quickly capture, convert, and build your personal strategic knowledge base — effortless and hallucination-free.
+				" />
+
+				<meta property="og:title" content="Atlas Notebook: Your reliable AI-native notebook" />
+				<meta property="og:description" content="Keep your AI outputs exact. A Notion-like notebook with LaTeX support, designed for ADHD/Dyslexia focus. Start understanding PDFs better today." />
+				{/*<meta property="og:image" content="https://atlasnotebook.com/." />*/}
+				<meta property="og:url" content="https://atlasnotebook.com" />
+
+				<meta name="keywords" content="AI PDF Reader, reader for Dyslexia, reader for ADHD, LaTeX Notebook, KaTex Notebook, AI Research Assistant, Notion-style AI, Complex Math PDF Analyzer" />
+
+				<link rel="canonical" href="https://atlasnotebook.com" />
+			</Helmet>
 		<div className="bg-card min-h-screen w-full">
 			{/* Header */}
 			<header className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border">
@@ -338,6 +362,7 @@ const LandingPage = () => {
 				</div>
 			</footer>
 		</div>
+		</>
 	);
 };
 
