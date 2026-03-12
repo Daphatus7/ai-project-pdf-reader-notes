@@ -53,7 +53,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 				<div className="mb-6">
 					<p className="text-xs font-semibold uppercase tracking-widest text-[#006aff] mb-3">Pro Monthly</p>
 					<div className="flex items-end gap-1 mb-1">
-						<span className="text-5xl font-bold text-foreground">$20</span>
+						<span className="text-5xl font-bold text-foreground">$15</span>
 						<span className="text-muted-foreground pb-1.5 ml-1">/ month</span>
 					</div>
 					<p className="text-sm text-muted-foreground mt-1">Billed monthly · Cancel anytime</p>
@@ -86,21 +86,17 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 			>
 				<div className="absolute -top-4 left-1/2 -translate-x-1/2">
 					<span className="bg-yellow-400 text-yellow-900 text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1">
-						<Zap className="size-3" /> Best Value · Save $41
+						<Zap className="size-3" /> Best Value · Save $31
 					</span>
 				</div>
 				
 				<div className="mb-6 relative">
 					<p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-3">Pro Yearly</p>
 					<div className="flex items-end gap-1 mb-1">
-						<span className="text-5xl font-bold text-white">$199</span>
-						<span className="text-white/50 pb-1.5 ml-1">/ year</span>
+						<span className="text-5xl font-bold text-white">$12.42</span>
+						<span className="text-white/50 pb-1.5 ml-1">/ month</span>
 					</div>
-					<p className="text-sm text-white/60 mt-1">~$16.58 per month, billed annually</p>
-					<div className="flex items-center gap-2 mt-2">
-						<span className="text-sm text-white/40 line-through">$240 / year</span>
-						<span className="text-sm text-green-400 font-semibold">You save $41</span>
-					</div>
+					<p className="text-sm text-white/60 mt-1">$149 / year · billed annually</p>
 				</div>
 
 				<Button
