@@ -143,7 +143,7 @@ export default function DemoSection() {
 				: "notebook";
 
 	return (
-		<section className="w-full px-4 py-16" ref={containerRef}>
+		<section id="solutions" className="w-full px-4 py-16" ref={containerRef}>
 			{/* Demo Badge */}
 			<div className="flex justify-center mb-8">
 				<div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
