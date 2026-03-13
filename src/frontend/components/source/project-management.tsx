@@ -13,7 +13,7 @@ interface ManagementPanelProps {
 	onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
 	onDownload?: (imageDataUrl: string, name: string) => void;
-	onSourceSelectionChange?: (selectedIds: string[]) => void;
+	onSourceSelectionChange?: (selected: {id: string, document_name: string}[]) => void;
 	onProjectSelectionChange?: (projectId: string | null) => void;
 }
 

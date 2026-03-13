@@ -10,7 +10,7 @@ export type LLMChatFeatureHandle = {
 };
 
 export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeatureProps>(
-	function LLMChatFeature({ onSelectContent, sourceIds = [], projectId = null }: LLMChatFeatureProps, ref) {
+	function LLMChatFeature({ onSelectContent, sourceIds = [], selectedSources, onDeselectSource, projectId = null }: LLMChatFeatureProps, ref) {
 		const {
 			threads,
 			activeThreadId,
@@ -62,6 +62,8 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 				isThreadsLoading={isThreadsLoading}
 				onSendMessage={sendMessage}
 				onSelectContent={onSelectContent}
+				selectedSources={selectedSources}
+				onDeselectSource={onDeselectSource}
 			/>
 		);
 	}

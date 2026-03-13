@@ -11,6 +11,7 @@ import NotePad from "@/frontend/components/note/pad/note-pad.tsx";
 import {Header} from "@/frontend/components/header/header.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 import {ManagementPanel} from "@/frontend/components/source/project-management.tsx";
+import { useSourceStore } from "@/frontend/context/source-store.ts";
 
 type MobileTab = 'sources' | 'chat' | 'notes';
 
@@ -47,8 +48,10 @@ export default function NotePage() {
 	const [activeTab, setActiveTab] = useState<MobileTab>('chat');
 
 	const [isCenterCollapsed, setIsCenterCollapsed] = useState(false);
-	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+	// Full source objects for Cursor-style chips; IDs are derived from these
+	const [selectedSources, setSelectedSources] = useState<{id: string, document_name: string}[]>([]);
 	const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+	const { setSelection } = useSourceStore();
 	
 	const leftPanelRef = useRef<ImperativePanelHandle>(null);
 	const centerPanelRef = useRef<ImperativePanelHandle>(null);
@@ -65,6 +68,14 @@ export default function NotePage() {
 			centerPanelRef.current?.collapse();
 		}
 	};
+
+	// Remove a source from selection via the chat bar chip × button
+	const handleDeselectSource = useCallback((id: string) => {
+		if (!selectedProjectId) return;
+		const newSources = selectedSources.filter(s => s.id !== id);
+		setSelection(selectedProjectId, newSources.map(s => s.id));
+		setSelectedSources(newSources);
+	}, [selectedProjectId, selectedSources, setSelection]);
 
 	const handleContentInsert = useCallback((insertion: ContentInsertion) => {
 		// console.log(insertion);
@@ -125,7 +136,7 @@ export default function NotePage() {
 			onScreenshotCapture={handleAskAI}
 			onSaveToNote={handleSaveToNote}
 			onDownload={handleDownload}
-			onSourceSelectionChange={setSelectedSourceIds}
+			onSourceSelectionChange={setSelectedSources}
 			onProjectSelectionChange={setSelectedProjectId}
 		/>
 	);
@@ -133,7 +144,9 @@ export default function NotePage() {
 	const chatPanel = (
 		<LLMChatFeature
 			ref={chatRef}
-			sourceIds={selectedSourceIds}
+			sourceIds={selectedSources.map(s => s.id)}
+			selectedSources={selectedSources.map(s => ({ id: s.id, name: s.document_name }))}
+			onDeselectSource={handleDeselectSource}
 			projectId={selectedProjectId}
 			onSelectContent={(content) => {
 				handleContentInsert({

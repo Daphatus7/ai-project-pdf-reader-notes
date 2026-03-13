@@ -14,7 +14,7 @@ import {Button} from "@/frontend/components/ui/button.tsx";
 import {LucideChefHat, LucidePlus, LucidePanelRight} from "lucide-react";
 import { Skeleton } from "@/frontend/components/ui/skeleton.tsx";
 
-export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, onSendMessage, onSelectContent }:
+export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, onSendMessage, onSelectContent, selectedSources, onDeselectSource }:
 						  ChatPanelProps) {
 	const [showThreadSidebar, setShowThreadSidebar] = useState(false);
 
@@ -54,7 +54,7 @@ export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, on
 					<ChatBubbles messages={messages} isLoading={isLoading} onSelectContent={onSelectContent} />
 				)}
 
-				<ChatBar onSend={onSendMessage} isLoading={isLoading} />
+				<ChatBar onSend={onSendMessage} isLoading={isLoading} selectedSources={selectedSources} onDeselectSource={onDeselectSource} />
 			</div>
 
 			{showThreadSidebar && (

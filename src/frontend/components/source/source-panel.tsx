@@ -40,7 +40,7 @@ interface SourcePanelProps {
 	isLoadingDocument?: boolean;
 	canUploadDocument?: boolean;
 	onDocumentChange?: () => void;
-	onSourceSelectionChange?: (selectedIds: string[]) => void;
+	onSourceSelectionChange?: (selected: {id: string, document_name: string}[]) => void;
 }
 
 export function SourcePanel({
@@ -57,9 +57,13 @@ export function SourcePanel({
 	const [isSourcesOpen, setIsSourcesOpen] = useState(true);
 	const [pricingOpen, setPricingOpen] = useState(false);
 
+	// Pass full document objects (not just IDs) so consumers can display names
 	useEffect(() => {
-		onSourceSelectionChange?.(source.selectedDocumentIds);
-	}, [source.selectedDocumentIds, onSourceSelectionChange]);
+		const selected = source.documents
+			.filter(d => source.selectedDocumentIds.includes(d.id))
+			.map(d => ({ id: d.id, document_name: d.document_name }));
+		onSourceSelectionChange?.(selected);
+	}, [source.selectedDocumentIds, source.documents, onSourceSelectionChange]);
 
 	const handleUpload = async (file: File, sourceName?: string) => {
 		await source.uploadDocument(file, sourceName);

@@ -25,6 +25,12 @@ export interface ThreadTabsProps {
 	onDeleteThread: (threadId: string) => void;
 }
 
+/** A selected source document shown as a context chip in the chat bar */
+export interface SelectedSource {
+	id: string;
+	name: string;
+}
+
 export interface ChatPanelProps {
 	threadProp: ThreadTabsProps;
 	messages: ChatMessage[];
@@ -32,6 +38,8 @@ export interface ChatPanelProps {
 	isThreadsLoading?: boolean;
 	onSendMessage: (content: ChatContent[]) => void;
 	onSelectContent?: (content: string) => void;
+	selectedSources?: SelectedSource[];
+	onDeselectSource?: (id: string) => void;
 }
 
 export interface ChatBubblesProps {
@@ -44,6 +52,9 @@ export interface ChatBarProps {
 	onSend: (content: ChatContent[]) => void;
 	isLoading: boolean;
 	placeholder?: string;
+	/** Sources selected as RAG context — displayed as Cursor-style chips */
+	selectedSources?: SelectedSource[];
+	onDeselectSource?: (id: string) => void;
 }
 
 export interface ChatBubbleProps {
@@ -64,6 +75,10 @@ export interface LLMChatFeatureProps {
 	onSelectContent?: (content: string) => void;
 	/** Selected document IDs to use as context for LLM chat */
 	sourceIds?: string[];
+	/** Full selected source objects for displaying Cursor-style chips */
+	selectedSources?: SelectedSource[];
+	/** Called when user removes a source chip from the chat bar */
+	onDeselectSource?: (id: string) => void;
 	/** Project ID for RAG context */
 	projectId?: string | null;
 }
