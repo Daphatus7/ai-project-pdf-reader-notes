@@ -39,7 +39,7 @@ export function ThreadSidebar({
 
 			<ScrollArea className="flex-1">
 				<div className="p-2 flex flex-col gap-1">
-					{threads.map((thread) => {
+					{threads.map((thread, index) => {
 						const isActive = thread.thread_id === activeThreadId;
 						return (
 							<div
@@ -54,7 +54,7 @@ export function ThreadSidebar({
 								onClick={() => onSelectThread(thread.thread_id)}
 							>
 								<span className="truncate flex-1">
-									{thread.title || "new chat"}
+									{thread.title && thread.title !== "New Conversation" ? thread.title : `Thread ${index + 1}`}
 								</span>
 								<Button
 									variant="ghost"

@@ -35,7 +35,7 @@ export function useThreads() {
 					setThreads(response.threads);
 					setActiveThreadId(response.threads[0].thread_id);
 				} else {
-					const newThread = await llmService.createThread();
+					const newThread = await llmService.createThread(`Thread ${threads.length + 1}`);
 					setThreads([newThread]);
 					setMessagesByThread(prev => ({ ...prev, [newThread.thread_id]: [] }));
 					setActiveThreadId(newThread.thread_id);
