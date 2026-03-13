@@ -124,13 +124,20 @@ class LlmGrok:
     # ── Stage 2: reasoning chat (full history + injected tool context) ────────
 
     def _build_reasoning_chat(self, history: list[dict], user_text: str,
-                               image_items: list[dict] | None, extra_messages: list):
+                               image_items: list[dict] | None, extra_messages: list,
+                               doc_context: str | None = None):
         """Build reasoning model chat: system + history + user message + injected tool results.
 
+        doc_context: pre-fetched document chunks injected directly into system prompt (MVP fast path).
         web_search passed as built-in tool — xAI handles it transparently in the final call.
         """
         chat = self._client.chat.create(model=MODEL_REASONING, tools=REASONING_TOOLS)
-        chat.append(system(SYSTEM_PROMPT))
+
+        # Inject document context into system prompt when available (bypasses LLM tool routing)
+        system_content = SYSTEM_PROMPT
+        if doc_context:
+            system_content += f"\n\nRelevant document content for this query:\n{doc_context}"
+        chat.append(system(system_content))
 
         for msg in history:
             if msg["role"] == "user":
@@ -175,11 +182,16 @@ class LlmGrok:
     async def chat(self, request: ChatRequest) -> ChatResponse:
         history, user_text, image_items = await self._prepare_request(request)
 
-        # Stage 1: fast routing — determine and execute tools (no history, query only)
-        extra_messages = await self._route_tools(user_text, request)
+        # MVP fast path: documents selected → always search, skip LLM routing entirely
+        if request.source_ids and request.project_id:
+            doc_context = await self._get_context(user_text, request.project_id, request.source_ids)
+            extra_messages = []
+        else:
+            doc_context = None
+            extra_messages = await self._route_tools(user_text, request)
 
-        # Stage 2: single sample — reasoning model with full history + tool context
-        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages)
+        # Stage 2: single sample — reasoning model with full history + document context
+        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages, doc_context)
         response = await chat_obj.sample()
 
         ai_text = response.content
@@ -220,11 +232,16 @@ class LlmGrok:
         """
         history, user_text, image_items = await self._prepare_request(request)
 
-        # Stage 1: fast routing — determine and execute tools (no history, query only)
-        extra_messages = await self._route_tools(user_text, request)
+        # MVP fast path: documents selected → always search, skip LLM routing entirely
+        if request.source_ids and request.project_id:
+            doc_context = await self._get_context(user_text, request.project_id, request.source_ids)
+            extra_messages = []
+        else:
+            doc_context = None
+            extra_messages = await self._route_tools(user_text, request)
 
-        # Stage 2: stream final answer — reasoning model with full history + tool context
-        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages)
+        # Stage 2: stream final answer — reasoning model with full history + document context
+        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages, doc_context)
 
         full_text = ""
         final_response = None
