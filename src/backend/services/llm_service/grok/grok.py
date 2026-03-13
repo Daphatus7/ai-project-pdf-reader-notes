@@ -14,9 +14,12 @@ from src.backend.services.storage.supabase_storage import SupabaseStorage
 
 logger = logging.getLogger(__name__)
 
-MODEL = "grok-4-1-fast-reasoning"
+# Stage 1: fast non-reasoning model — tool routing only (no history, query only)
+MODEL_ROUTER = "grok-4-1-fast-non-reasoning"
+# Stage 2: reasoning model — final answer (full history + injected tool context)
+MODEL_REASONING = "grok-4-1-fast-reasoning"
+
 MAX_MESSAGES = 20
-MAX_TOOL_ROUNDS = 5
 
 # Custom tool definition — executed locally, result returned via tool_result()
 SEARCH_DOCUMENT_TOOL = tool(
@@ -24,6 +27,7 @@ SEARCH_DOCUMENT_TOOL = tool(
     description=(
         "Search the user's selected documents (PDFs) for content relevant to the query. "
         "Use this whenever the user asks a question about their documents."
+        "文档.文档内容. 报告"
     ),
     parameters={
         "type": "object",
@@ -37,9 +41,10 @@ SEARCH_DOCUMENT_TOOL = tool(
     },
 )
 
-# Built-in tools run on xAI servers (no local dispatch); custom tools require local execution
-TOOLS = [web_search(), SEARCH_DOCUMENT_TOOL]
-BUILTIN_TOOLS = {"web_search", "x_search"}
+# Stage 1: custom tools only — results can be captured locally and injected into stage 2
+ROUTER_TOOLS = [SEARCH_DOCUMENT_TOOL]
+# Stage 2: built-in tools only — xAI handles them transparently during the final stream/sample
+REASONING_TOOLS = [web_search()]
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant. "
@@ -76,23 +81,64 @@ class LlmGrok:
     # ── Shared setup ──────────────────────────────────────────────────────────
 
     async def _prepare_request(self, request: ChatRequest) -> tuple[list[dict], str, list[dict]]:
-        """Load history from Supabase, build user text and image items."""
+        """Load history from Supabase, extract user text and image items."""
         history = await self._load_history(request.thread_id)
         user_text = " ".join(item["text"] for item in request.content if item.get("type") == "text")
         image_items = [item for item in request.content if item.get("type") == "image"]
         return history, user_text, image_items
 
-    def _build_chat(self, history: list[dict], user_text: str, image_items: list[dict] | None = None):
-        """Create and populate an xAI chat object, with optional multimodal image content."""
-        chat = self._client.chat.create(model=MODEL, tools=TOOLS)
+    # ── Stage 1: tool routing (non-reasoning, user query only) ────────────────
+
+    async def _route_tools(self, user_text: str, request: ChatRequest) -> list:
+        """Stage 1: non-reasoning model receives only user query, decides and executes tool calls.
+
+        Follows the source-of-truth pattern (single round):
+          response = sample()
+          if tool_calls → append response → dispatch each custom tool → append results
+
+        Returns list of (assistant tool-call msg + tool_result msgs) to inject into stage 2.
+        Built-in tools (web_search) are handled transparently by xAI servers within sample().
+        """
+        router = self._client.chat.create(model=MODEL_ROUTER, tools=ROUTER_TOOLS)
+        router.append(system(SYSTEM_PROMPT))
+        router.append(user(user_text))
+
+        response = await router.sample()
+
+        if not response.tool_calls:
+            return []
+
+        # Collect messages to inject into the reasoning chat
+        extra = []
+        router.append(response)
+        extra.append(response)
+
+        for tc in response.tool_calls:
+            result = await self._dispatch_tool(tc, request)
+            tr = tool_result(result)
+            router.append(tr)
+            extra.append(tr)
+
+        return extra
+
+    # ── Stage 2: reasoning chat (full history + injected tool context) ────────
+
+    def _build_reasoning_chat(self, history: list[dict], user_text: str,
+                               image_items: list[dict] | None, extra_messages: list):
+        """Build reasoning model chat: system + history + user message + injected tool results.
+
+        web_search passed as built-in tool — xAI handles it transparently in the final call.
+        """
+        chat = self._client.chat.create(model=MODEL_REASONING, tools=REASONING_TOOLS)
         chat.append(system(SYSTEM_PROMPT))
+
         for msg in history:
             if msg["role"] == "user":
                 chat.append(user(msg["content"]))
             elif msg["role"] == "assistant":
                 chat.append(assistant(msg["content"]))
 
-        # Build multimodal user message: text + images (data URI format required by xAI)
+        # User message with optional multimodal images (data URI format required by xAI)
         if image_items:
             contents = [user_text] + [
                 xai_image(image_url=f"data:{img['mime_type']};base64,{img['data']}", detail="high")
@@ -101,6 +147,11 @@ class LlmGrok:
             chat.append(user(*contents))
         else:
             chat.append(user(user_text))
+
+        # Inject tool call + results from routing stage into reasoning context
+        for msg in extra_messages:
+            chat.append(msg)
+
         return chat
 
     # ── Custom tool dispatch ───────────────────────────────────────────────────
@@ -119,33 +170,18 @@ class LlmGrok:
 
         return json.dumps({"error": f"Unknown tool: {name}"})
 
-    async def _run_tool_loop(self, chat_obj, request: ChatRequest) -> None:
-        """Run tool call rounds until no tool calls remain or MAX_TOOL_ROUNDS is reached.
-        Built-in tools (web_search, x_search) are handled automatically by xAI servers.
-        Custom tools (search_document) are dispatched locally and returned via tool_result()."""
-        response = await chat_obj.sample()
-        for _ in range(MAX_TOOL_ROUNDS):
-            if not response.tool_calls:
-                break
-            chat_obj.append(response)
-            # Dispatch any custom (local) tool calls
-            for tc in response.tool_calls:
-                if tc.function.name not in BUILTIN_TOOLS:
-                    result = await self._dispatch_tool(tc, request)
-                    chat_obj.append(tool_result(result))
-            response = await chat_obj.sample()
-        else:
-            logger.warning("Tool call loop hit MAX_TOOL_ROUNDS for thread %s", request.thread_id)
-
     # ── Chat (non-streaming) ──────────────────────────────────────────────────
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
         history, user_text, image_items = await self._prepare_request(request)
-        chat_obj = self._build_chat(history, user_text, image_items)
 
-        await self._run_tool_loop(chat_obj, request)
+        # Stage 1: fast routing — determine and execute tools (no history, query only)
+        extra_messages = await self._route_tools(user_text, request)
 
+        # Stage 2: single sample — reasoning model with full history + tool context
+        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages)
         response = await chat_obj.sample()
+
         ai_text = response.content
         u = response.usage
         input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
@@ -183,15 +219,16 @@ class LlmGrok:
           {"type": "error", "message": "<description>"}
         """
         history, user_text, image_items = await self._prepare_request(request)
-        chat_obj = self._build_chat(history, user_text, image_items)
+
+        # Stage 1: fast routing — determine and execute tools (no history, query only)
+        extra_messages = await self._route_tools(user_text, request)
+
+        # Stage 2: stream final answer — reasoning model with full history + tool context
+        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages)
 
         full_text = ""
         final_response = None
         try:
-            # Tool call rounds before streaming the final answer
-            await self._run_tool_loop(chat_obj, request)
-
-            # Stream only the final answer to the user
             async for response, chunk in chat_obj.stream():
                 if chunk.content:
                     full_text += chunk.content
