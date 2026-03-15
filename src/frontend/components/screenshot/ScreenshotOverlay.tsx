@@ -3,6 +3,7 @@ import { Sparkles, StickyNote, Download, X } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { Separator } from '@/frontend/components/ui/separator';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/frontend/components/ui/tooltip';
+import { usePromptHistory } from './usePromptHistory';
 
 interface Rect {
 	x: number;
@@ -23,16 +24,10 @@ interface ScreenshotOverlayProps {
 
 const PANEL_GAP = 8;
 
-// Predefined quick-action prompts shown below the input for one-click access
-const QUICK_ACTIONS = [
-	{
-		label: 'Extract',
-		prompt: 'Extract exact content from the image only, no filler',
-	},
-	{
-		label: 'Summarise',
-		prompt: 'Summarise the key points from this image concisely.',
-	},
+// Fallback quick-actions shown when the user has no prompt history yet
+const DEFAULT_QUICK_ACTIONS = [
+	{ label: 'Extract', prompt: 'Extract exact content from the image only, no filler' },
+	{ label: 'Summarise', prompt: 'Summarise the key points from this image concisely.' },
 ] as const;
 
 export function ScreenshotOverlay({
@@ -47,6 +42,14 @@ export function ScreenshotOverlay({
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
 	const [prompt, setPrompt] = useState('');
+	const { history, push } = usePromptHistory();
+
+	// History first (newest at index 0), then defaults — skip history items that duplicate a default
+	const defaultPrompts = new Set(DEFAULT_QUICK_ACTIONS.map((a) => a.prompt));
+	const quickActions = [
+		...history.filter((item) => !defaultPrompts.has(item.prompt)),
+		...DEFAULT_QUICK_ACTIONS,
+	];
 
 	// Position panel: bottom-center of selection, flip to top if overflows
 	useLayoutEffect(() => {
@@ -73,7 +76,10 @@ export function ScreenshotOverlay({
 	});
 
 	const handleSubmit = () => {
-		onAskAI(prompt.trim() || undefined);
+		const trimmed = prompt.trim();
+		// Record non-empty custom prompts into history before firing
+		if (trimmed) push(trimmed);
+		onAskAI(trimmed || undefined);
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -135,19 +141,26 @@ export function ScreenshotOverlay({
 						</Button>
 					</div>
 
-					{/* Quick-action row: visible shortcuts below the input */}
+					{/* Quick-action row: history-driven shortcuts, falls back to defaults */}
 					<div className="flex gap-1 px-1.5 pb-1.5">
-						{QUICK_ACTIONS.map(({ label, prompt: presetPrompt }) => (
-							<Button
-								key={label}
-								variant="ghost"
-								size="sm"
-								className="h-6 text-xs text-muted-foreground"
-								onClick={() => onAskAI(presetPrompt)}
-								disabled={isCapturing}
-							>
-								{label}
-							</Button>
+						{quickActions.map(({ label, prompt: presetPrompt }) => (
+							<Tooltip key={presetPrompt}>
+								<TooltipTrigger asChild>
+									<Button
+										variant="ghost"
+										size="sm"
+										className="h-6 max-w-[7rem] truncate text-xs text-muted-foreground justify-start"
+										onClick={() => {
+											push(presetPrompt);
+											onAskAI(presetPrompt);
+										}}
+										disabled={isCapturing}
+									>
+										{label}
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent side="bottom" sideOffset={4}>{presetPrompt}</TooltipContent>
+							</Tooltip>
 						))}
 					</div>
 
