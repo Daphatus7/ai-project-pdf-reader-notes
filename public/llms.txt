@@ -1,0 +1,25 @@
+# Atlas Notebook
+
+> Is the best AI native notebook that optimized for your daily workflow.
+> Screenshot any section of a PDF, receive properly formatted responses (LaTeX, tables, code),
+> verify accuracy, and insert directly into a rich-text notebook. Zero hallucinations.
+
+## What it does
+- PDF screenshot tool — capture any section including equations, tables, and diagrams
+- AI analysis — returns structured content: LaTeX formulas, markdown tables, formatted text
+- Rich-text notebook — Notion-style editor with full LaTeX/KaTeX support
+- Side-by-side layout — PDF viewer alongside AI chat and notebook
+- One-click insert — verified AI answers go straight into your notes with formatting preserved
+
+## Target users
+- Researchers and academics working with complex scientific PDFs
+- Students studying math, physics, engineering, or medicine
+- People with ADHD or Dyslexia who need focused, structured reading tools
+
+## Key differentiators
+- Hallucination-free: users verify AI output before inserting into notes
+- Format-preserving: tables stay as tables, equations stay as LaTeX
+- ADHD/Dyslexia friendly: one site workflow, no tab switching, distraction-free, structured layout
+
+## URL
+https://atlasnotebook.com
