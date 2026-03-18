@@ -11,8 +11,38 @@ export interface Note {
   summary: string | null;
   version: number;
   metadata: Record<string, unknown> | null;
+  notebook_id: string | null;
   created_at: string; // ISO 8601
   updated_at: string; // ISO 8601
+}
+
+// === Notebook Types ===
+
+export interface Notebook {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateNotebookRequest {
+  name?: string;
+  color?: string;
+}
+
+export interface UpdateNotebookRequest {
+  name?: string;
+  color?: string;
+}
+
+export interface ListNotebooksResponse {
+  notebooks: Notebook[];
+}
+
+export interface DeleteNotebookResponse {
+  message: string;
 }
 
 // === Request Types ===
@@ -22,6 +52,7 @@ export interface CreateNoteRequest {
   content_markdown?: string;
   summary?: string;
   metadata?: Record<string, unknown>;
+  notebook_id?: string;
 }
 
 export interface UpdateNoteRequest {
@@ -30,6 +61,7 @@ export interface UpdateNoteRequest {
   summary?: string;
   metadata?: Record<string, unknown>;
   version: number; // Required for optimistic locking
+  notebook_id?: string | null; // null = remove from notebook
 }
 
 // === Response Types ===

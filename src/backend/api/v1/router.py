@@ -6,7 +6,7 @@ that can be included in the main FastAPI application.
 """
 from fastapi import APIRouter
 
-from src.backend.api.v1 import llm, auth, users, project, notes, usage, billing
+from src.backend.api.v1 import llm, auth, users, project, notes, notebooks, usage, billing
 
 # Create the main v1 router
 router = APIRouter(prefix='/api/v1')
@@ -17,5 +17,6 @@ router.include_router(auth.router)
 router.include_router(users.router)
 router.include_router(project.router)
 router.include_router(notes.router)
+router.include_router(notebooks.router)
 router.include_router(usage.router)
 router.include_router(billing.router)

@@ -25,6 +25,9 @@ export const apiConfig = {
 		notes: {
 			base: '/api/v1/notes',
 		},
+		notebooks: {
+			base: '/api/v1/notebooks',
+		},
 		usage: '/api/v1/usage',
 		billing: {
 			checkout: '/api/v1/billing/checkout',

@@ -551,6 +551,7 @@ class SupabaseStorage(Service):
                 'summary': payload.summary,
                 'metadata': payload.metadata or {},
                 'version': 1,
+                'notebook_id': payload.notebook_id,
             }
             response = await self.__database.table('notes').insert(note_data).execute()
             if not response.data:
@@ -593,6 +594,9 @@ class SupabaseStorage(Service):
                 update_data['summary'] = payload.summary
             if payload.metadata is not None:
                 update_data['metadata'] = payload.metadata
+            # notebook_id uses model_fields_set: explicit None = remove from notebook
+            if 'notebook_id' in payload.model_fields_set:
+                update_data['notebook_id'] = payload.notebook_id
 
             update_data['version'] = payload.version + 1
 
@@ -714,6 +718,80 @@ class SupabaseStorage(Service):
                 logger.error(f'Failed to roll back uploaded note image {storage_path}: {cleanup_err}')
             internal_error('Failed to record note asset')
         return public_url
+
+    # ==================== Notebook Operations ====================
+
+    async def list_notebooks(self, user_id: str) -> list[dict]:
+        try:
+            response = await self.__database.table('notebooks') \
+                        .select('*') \
+                        .eq('user_id', user_id) \
+                        .order('created_at', desc=False) \
+                        .execute()
+            return response.data
+        except Exception as e:
+            logger.error(f'Failed to get notebooks for user {user_id}: {e}')
+            internal_error('Failed to retrieve notebooks')
+
+    async def create_notebook(self, user_id: str, payload) -> dict:
+        try:
+            notebook_data = {
+                'user_id': user_id,
+                'name': payload.name,
+                'color': payload.color,
+            }
+            response = await self.__database.table('notebooks').insert(notebook_data).execute()
+            if not response.data:
+                internal_error('Failed to create notebook')
+            logger.info(f'Notebook created: user={user_id}, notebook={response.data[0]["id"]}')
+            return response.data[0]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to create notebook for user {user_id}: {e}')
+            internal_error('Failed to create notebook')
+
+    async def update_notebook(self, user_id: str, notebook_id: str, payload) -> dict:
+        try:
+            update_data = {}
+            if payload.name is not None:
+                update_data['name'] = payload.name
+            if payload.color is not None:
+                update_data['color'] = payload.color
+
+            response = await self.__database.table('notebooks') \
+                        .update(update_data) \
+                        .eq('id', notebook_id) \
+                        .eq('user_id', user_id) \
+                        .execute()
+            if not response.data:
+                not_found('Notebook')
+            logger.info(f'Notebook updated: user={user_id}, notebook={notebook_id}')
+            return response.data[0]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to update notebook {notebook_id}: {e}')
+            internal_error('Failed to update notebook')
+
+    async def delete_notebook(self, user_id: str, notebook_id: str) -> dict:
+        """Delete a notebook. Notes with this notebook_id become uncategorised via ON DELETE SET NULL."""
+        try:
+            notebook = await self.__database.table('notebooks') \
+                        .select('id') \
+                        .eq('id', notebook_id) \
+                        .eq('user_id', user_id) \
+                        .execute()
+            if not notebook.data:
+                not_found('Notebook')
+            await self.__database.table('notebooks').delete().eq('id', notebook_id).execute()
+            logger.info(f'Notebook deleted: user={user_id}, notebook={notebook_id}')
+            return {'message': 'Notebook deleted successfully'}
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to delete notebook {notebook_id}: {e}')
+            internal_error('Failed to delete notebook')
 
     # ==================== Usage Tracking Operations ====================
 

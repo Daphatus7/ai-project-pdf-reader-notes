@@ -87,6 +87,7 @@ useImperativeHandle(ref, () => ({
 				{showSidebar && (
 					<NoteSidebar
 						notes={pad.notes}
+						notebooks={pad.notebooks}
 						selectedNoteId={pad.selectedNoteId}
 						canCreateNote={quota.canCreate('notes')}
 						onSelectNote={pad.selectNote}
@@ -95,6 +96,10 @@ useImperativeHandle(ref, () => ({
 						onRenameNote={pad.renameNote}
 						onExportMarkdown={pad.exportNoteAsMarkdown}
 						onExportPdf={pad.exportNoteAsPdf}
+						onAddNotebook={pad.addNotebook}
+						onRenameNotebook={pad.renameNotebook}
+						onDeleteNotebook={pad.deleteNotebook}
+						onMoveNoteToNotebook={pad.moveNoteToNotebook}
 						onClose={() => setShowSidebar(false)}
 					/>
 				)}
