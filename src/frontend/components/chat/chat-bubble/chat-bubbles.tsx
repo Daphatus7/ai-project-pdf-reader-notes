@@ -5,22 +5,41 @@
  * @license     © 2026. All rights reserved.
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { ChatBubble } from './chat-bubble';
 import { AIChatBubble } from './ai-chat-bubble';
 import type {ChatBubblesProps} from "@/frontend/api/types/llm.ts";
 
 export function ChatBubbles({ messages, isLoading, onSelectContent }: ChatBubblesProps) {
+	const containerRef = useRef<HTMLDivElement>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	// Whether user is near bottom — if they scrolled up, leave them alone
+	const shouldAutoScrollRef = useRef(true);
 
-	// Auto-scroll to bottom when messages update or loading state changes
+	const handleScroll = useCallback(() => {
+		const el = containerRef.current;
+		if (!el) return;
+		const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+		shouldAutoScrollRef.current = distanceFromBottom < 80;
+	}, []);
+
+	// Reset lock when a new stream starts so it follows the new message
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-	}, [messages, isLoading]);
+		if (isLoading) shouldAutoScrollRef.current = true;
+	}, [isLoading]);
 
+	// During streaming use instant (no animation) to avoid bounce; smooth only when stream finishes
+	useEffect(() => {
+		if (!shouldAutoScrollRef.current) return;
+		messagesEndRef.current?.scrollIntoView({
+			behavior: isLoading ? 'instant' : 'smooth',
+		});
+	}, [messages, isLoading]);
 
 	return (
 		<div
+			ref={containerRef}
+			onScroll={handleScroll}
 			className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
 			style={{ contain: 'strict' }}
 		>
