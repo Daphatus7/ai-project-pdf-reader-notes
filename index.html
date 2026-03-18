@@ -55,16 +55,7 @@
 
     <!-- Tab favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Anti-FOUC: apply dark class before React renders, preventing flash of light mode -->
-    <script>
-      (function () {
-        var stored = localStorage.getItem('theme');
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (stored === 'dark' || (!stored && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
+    <!-- Dark mode is managed per-page in React, not globally here -->
     <script defer src="https://umami-production-8013.up.railway.app/script.js" data-website-id="7ee0b6de-84fc-40d7-b8bd-21893e820432"></script>
 </head>
 

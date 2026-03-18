@@ -44,6 +44,18 @@ const useIsMobile = () => {
 
 export default function NotePage() {
 	const isMobile = useIsMobile();
+
+	/* Dark mode is scoped to the note page only.
+	   On mount: apply .dark if user previously enabled it.
+	   On unmount: always remove .dark so other pages stay light. */
+	useEffect(() => {
+		if (localStorage.getItem('theme') === 'dark') {
+			document.documentElement.classList.add('dark');
+		}
+		return () => {
+			document.documentElement.classList.remove('dark');
+		};
+	}, []);
 	// Active tab for mobile layout
 	const [activeTab, setActiveTab] = useState<MobileTab>('chat');
 
