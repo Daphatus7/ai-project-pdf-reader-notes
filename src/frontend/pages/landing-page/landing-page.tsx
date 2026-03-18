@@ -249,7 +249,7 @@ const LandingPage = () => {
 						Start reading smarter today
 					</h2>
 					<p className="text-lg text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
-						Join thousands of researchers who use Atlas Notebook to transform PDFs into structured, actionable knowledge.
+						Join now. Get 1 hour of work done in 20 minutes.
 					</p>
 					<div className="flex flex-col items-center gap-4">
 						<Link
