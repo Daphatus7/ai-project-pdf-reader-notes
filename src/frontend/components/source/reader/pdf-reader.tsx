@@ -103,13 +103,13 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
         onMouseUp={screenshot.handleMouseUp}
       >
         {!isPdfLoaded && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-panel/60">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         )}
 
         {screenshot.isCapturing && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/40 backdrop-blur-sm">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-panel/40 backdrop-blur-sm">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         )}

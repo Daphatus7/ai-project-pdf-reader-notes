@@ -110,29 +110,29 @@
 }
 
 .dark {
-    
-    /*Chat bubble*/
-    --color-chat-bubble: #e1e7ee;
+    /* Chat bubble: dark slate so it doesn't glow against dark background */
+    --color-chat-bubble: #2d3748;
     --color-background: #25252e;
     --color-foreground: #fafafa;
-    --color-panel: #333;
-    --color-card: #25252e;
+    --color-panel: #2e2e38;
+    --color-card: #2e2e38;
     --color-card-foreground: #fafafa;
-    --color-popover: #25252e;
+    --color-popover: #2e2e38;
     --color-popover-foreground: #fafafa;
     --color-primary: #fafafa;
-    --color-primary-foreground: #333;
-    --color-secondary: #444;
+    --color-primary-foreground: #2e2e38;
+    --color-secondary: #3a3a46;
     --color-secondary-foreground: #fafafa;
-    --color-muted: #444;
-    --color-muted-foreground: #b3b3b3;
-    --color-accent: #444;
+    /* Staggered surface hierarchy: border < muted < accent so hover states are perceivable */
+    --color-border: #38383f;
+    --color-muted: #3a3a46;
+    --color-muted-foreground: #a0a0b0;
+    --color-accent: #46464f;
     --color-accent-foreground: #fafafa;
     --color-destructive: #dc2626;
     --color-destructive-foreground: #fca5a5;
-    --color-border: #444;
-    --color-input: #444;
-    --color-ring: #737373;
+    --color-input: #3a3a46;
+    --color-ring: #6b6b7e;
     --font-weight-medium: 500;
     --font-weight-normal: 400;
     --color-chart-1: #6366f1;
@@ -140,12 +140,12 @@
     --color-chart-3: #f97316;
     --color-chart-4: #a855f7;
     --color-chart-5: #ec4899;
-    --color-sidebar: #333;
+    --color-sidebar: #2e2e38;
     --color-sidebar-foreground: #fafafa;
     --color-sidebar-primary: #6366f1;
     --color-sidebar-primary-foreground: #fafafa;
-    --color-sidebar-accent: #444;
+    --color-sidebar-accent: #46464f;
     --color-sidebar-accent-foreground: #fafafa;
-    --color-sidebar-border: #444;
-    --color-sidebar-ring: #737373;
+    --color-sidebar-border: #38383f;
+    --color-sidebar-ring: #6b6b7e;
 }

@@ -163,7 +163,7 @@ export default function NotePage() {
 	const notesPanel = <NotePad ref={notePadRef} />;
 
 	return (
-		<div className="h-screen w-screen flex flex-col bg-background">
+		<div className="h-screen w-screen flex flex-col bg-panel">
 			<Header />
 
 			{/* ── Mobile Tab Layout (< 768px) ── */}
@@ -177,7 +177,7 @@ export default function NotePage() {
 					</div>
 
 					{/* Bottom navigation bar */}
-					<nav className="flex border-t bg-background shrink-0">
+					<nav className="flex border-t bg-panel shrink-0">
 						{tabs.map(({ id, label, icon: Icon }) => (
 							<button
 								key={id}

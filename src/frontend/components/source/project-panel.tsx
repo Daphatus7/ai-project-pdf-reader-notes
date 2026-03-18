@@ -87,10 +87,10 @@ export function ProjectPanel({
 	}
 
 	return (
-		// Project panel - displaying list of projects
-		<div className="h-full flex flex-col mg-2">
+		/* Project panel - displaying list of projects */
+		<div className="h-full flex flex-col">
 			{/* Header for list of projects */}
-			<div className=" p-3 flex items-center gap-2 border-b h-13">
+			<div className="p-3 flex items-center gap-2 border-b h-13">
 				<FolderOpen className="h-4 w-4 text-muted-foreground" />
 				<span className="text-sm font-medium">Project</span>
 			</div>
@@ -99,7 +99,7 @@ export function ProjectPanel({
 			<ScrollArea className="flex-1 min-h-0">
 				<div className="p-3 flex flex-col gap-3">
 					{projects.length === 0 ? (
-						<div className="text-center py-12 text-muted-foreground ">
+						<div className="text-center py-12 text-muted-foreground">
 							<FolderOpen className="h-12 w-12 mx-auto mb-3 opacity-40" />
 							<p className="text-sm font-medium">No projects yet</p>
 							<p className="text-xs mt-1">Create a project to get started</p>
@@ -118,20 +118,22 @@ export function ProjectPanel({
 			</ScrollArea>
 
 			{/* Add New Project button — pinned at bottom, outside scroll area */}
-			<div className="p-3 border-t">
+			<div className="p-3 border-t bg-panel">
 				<button
 					type="button"
 					onClick={handleAddClick}
-					className="cursor-pointer w-full rounded-xl border border-dashed border-gray-300 hover:border-blue-400 p-4 transition-all duration-200 bg-white hover:bg-blue-50 group"
+					/* bg-panel + border-border adapt to light/dark; hover uses accent variable */
+					className="cursor-pointer w-full rounded-xl border border-dashed border-border hover:border-blue-400 p-4 transition-all duration-200 bg-panel hover:bg-accent group"
 				>
 					<div className="flex items-center justify-center gap-2">
-						<div className="p-2 rounded-lg bg-gray-100 group-hover:bg-blue-100 transition-colors">
+						{/* Icon container: muted bg at rest, accent on hover */}
+						<div className="p-2 rounded-lg  group-hover:bg-accent transition-colors">
 							{canCreateProject
-								? <Plus className="size-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+								? <Plus className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" />
 								: <Crown className="size-5 text-amber-500" />
 							}
 						</div>
-						<span className="text-[14px] text-gray-600 group-hover:text-blue-600 transition-colors">
+						<span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
 							{canCreateProject
 								? 'Add New Project'
 								: plan === 'pro' ? 'Project Limit Reached' : 'Upgrade to Add More'
@@ -142,8 +144,7 @@ export function ProjectPanel({
 			</div>
 
 			{/* Create Project Dialog */}
-			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}
-			>
+			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Create Project</DialogTitle>
@@ -178,27 +179,27 @@ export function ProjectPanel({
 			</Dialog>
 
 			{/* Pro plan project limit dialog — shown when Pro users hit their hard cap */}
-		<Dialog open={proLimitOpen} onOpenChange={setProLimitOpen}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Project Limit Reached</DialogTitle>
-					<DialogDescription>
-						You have reached the maximum number of projects on your current plan.
-						If you have any questions or need assistance, please contact our support team.
-					</DialogDescription>
-				</DialogHeader>
-				<DialogFooter>
-					<Button variant="outline" onClick={() => setProLimitOpen(false)}>
-						Close
-					</Button>
-					<Button asChild>
-						<a href="vincent@atlasnotebook.com">Contact Support</a>
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+			<Dialog open={proLimitOpen} onOpenChange={setProLimitOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Project Limit Reached</DialogTitle>
+						<DialogDescription>
+							You have reached the maximum number of projects on your current plan.
+							If you have any questions or need assistance, please contact our support team.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setProLimitOpen(false)}>
+							Close
+						</Button>
+						<Button asChild>
+							<a href="vincent@atlasnotebook.com">Contact Support</a>
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
-		<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
+			<PricingDialog open={pricingOpen} onOpenChange={setPricingOpen} />
 		</div>
 	);
 }

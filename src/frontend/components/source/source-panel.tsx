@@ -78,7 +78,7 @@ export function SourcePanel({
 	return (
 		<div className="h-full flex flex-col relative">
 			{isLoadingDocument && (
-				<div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+				<div className="absolute inset-0 z-10 flex items-center justify-center bg-panel/60 backdrop-blur-sm">
 					<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
 				</div>
 			)}

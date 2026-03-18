@@ -7,6 +7,8 @@ import {
 	LogOut,
 	CreditCard,
 	Mail,
+	Moon,
+	Sun,
 } from "lucide-react";
 
 import {
@@ -31,6 +33,17 @@ export function Header() {
 	const { quota } = useQuota();
 	const isPro = quota?.plan === 'pro';
 	const navigate = useNavigate();
+
+	/* Dark mode toggle state — reads current class on mount */
+	const [isDark, setIsDark] = useState<boolean>(
+		document.documentElement.classList.contains("dark")
+	);
+	const toggleTheme = () => {
+		const next = !isDark;
+		document.documentElement.classList.toggle("dark", next);
+		localStorage.setItem("theme", next ? "dark" : "light");
+		setIsDark(next);
+	};
 
 	const handleLogin = () => {
 		navigate("/login");
@@ -74,6 +87,18 @@ export function Header() {
 				>
 					Feedback
 				</Button>
+
+				{/* Dark / light mode toggle */}
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-8 w-8"
+					onClick={toggleTheme}
+					aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+				>
+					{isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+				</Button>
+
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="h-8 w-8">

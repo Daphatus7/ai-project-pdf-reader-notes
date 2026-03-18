@@ -28,7 +28,8 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 	};
 
 	return (
-		<div className="border-t border-gray-200 bg-white">
+		/* Container: uses CSS variables to follow light/dark mode */
+		<div className="border-t border-border bg-panel">
 			{/* Cursor-style context chips: shows selected sources above input */}
 			{selectedSources && selectedSources.length > 0 && (
 				<div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-1">
@@ -60,12 +61,14 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 					onKeyPress={handleKeyPress}
 					placeholder={placeholder}
 					disabled={isLoading}
-					className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+					/* bg-panel + text-foreground ensure correct colors in both modes */
+					className="flex-1 px-4 py-2 border border-border bg-panel text-foreground placeholder:text-muted-foreground rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-muted disabled:text-muted-foreground"
 				/>
 				<button
 					onClick={handleSend}
 					disabled={isLoading || !input.trim()}
-					className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
+					/* Active: blue brand color; disabled: muted instead of hardcoded gray */
+					className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-sm"
 				>
 					<Send className="h-3.5 w-3.5" />
 					{isLoading ? 'Sending...' : 'Send'}

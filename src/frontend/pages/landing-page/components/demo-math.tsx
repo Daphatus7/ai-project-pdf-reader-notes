@@ -360,7 +360,7 @@ export default function DemoMathSection() {
 
 						{/* Chat Input */}
 						<div className="px-3 pb-3 shrink-0">
-							<div className="flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-background">
+							<div className="flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-panel">
 								<span className="text-[10px] text-muted-foreground flex-1">Type your message...</span>
 								<button className="bg-secondary text-foreground rounded-lg px-2.5 py-1 text-[10px] font-medium border border-border">
 									Send
@@ -377,7 +377,7 @@ export default function DemoMathSection() {
 								<button className="text-[10px] font-medium px-2 py-0.5 rounded text-muted-foreground hover:bg-border/50">
 									Markdown
 								</button>
-								<button className="text-[10px] font-medium px-2 py-0.5 rounded bg-background border border-border text-foreground">
+								<button className="text-[10px] font-medium px-2 py-0.5 rounded bg-panel border border-border text-foreground">
 								Editor
 								</button>
 							</div>
