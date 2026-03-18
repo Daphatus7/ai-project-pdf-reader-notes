@@ -208,7 +208,19 @@ function NotebookSection({
 	onDeleteNotebook,
 	onMoveNoteToNotebook,
 }: NotebookSectionProps) {
-	const [isExpanded, setIsExpanded] = useState(true)
+	// Persist expanded state per notebook in localStorage so it survives sidebar close/reopen
+	const storageKey = `notebook-expanded-${notebook.id}`
+	const [isExpanded, setIsExpanded] = useState(() => {
+		const saved = localStorage.getItem(storageKey)
+		return saved === null ? true : saved === 'true'
+	})
+	const toggleExpanded = () => {
+		setIsExpanded(prev => {
+			const next = !prev
+			localStorage.setItem(storageKey, String(next))
+			return next
+		})
+	}
 	const [isEditing, setIsEditing] = useState(false)
 	const [editName, setEditName] = useState(notebook.name)
 
@@ -247,7 +259,7 @@ function NotebookSection({
 					'flex items-center gap-1 px-2 py-1.5 rounded-md cursor-pointer group hover:bg-muted/50 transition-colors',
 					isOver && canDrop && 'bg-accent/30 ring-1 ring-accent',
 				)}
-				onClick={() => !isEditing && setIsExpanded(prev => !prev)}
+				onClick={() => !isEditing && toggleExpanded()}
 			>
 				{/* Expand / collapse chevron */}
 				{isExpanded
