@@ -16,6 +16,7 @@ class CreateNoteRequest(BaseModel):
     content_markdown: str = ""
     summary: str | None = None
     metadata: dict | None = None
+    notebook_id: str | None = None  # Optional notebook assignment on creation
 
 
 class UpdateNoteRequest(BaseModel):
@@ -25,6 +26,8 @@ class UpdateNoteRequest(BaseModel):
     summary: str | None = None
     metadata: dict | None = None
     version: int  # Required for optimistic locking
+    # checked via model_fields_set: explicit None = remove from notebook
+    notebook_id: str | None = None
 
 
 class NoteResponse(BaseModel):
@@ -36,6 +39,7 @@ class NoteResponse(BaseModel):
     summary: str | None
     version: int
     metadata: dict | None
+    notebook_id: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -57,4 +61,38 @@ class UpdateNoteResponse(BaseModel):
 
 class DeleteNoteResponse(BaseModel):
     """Response model for note deletion"""
+    message: str
+
+
+# ==================== Notebook Schemas ====================
+
+class CreateNotebookRequest(BaseModel):
+    """Request model for creating a notebook"""
+    name: str = "Untitled Notebook"
+    color: str | None = None
+
+
+class UpdateNotebookRequest(BaseModel):
+    """Request model for updating a notebook"""
+    name: str | None = None
+    color: str | None = None
+
+
+class NotebookResponse(BaseModel):
+    """Single notebook response"""
+    id: str
+    user_id: str
+    name: str
+    color: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class ListNotebooksResponse(BaseModel):
+    """Response model for listing notebooks — wraps array to avoid bare JSON arrays"""
+    notebooks: list[NotebookResponse]
+
+
+class DeleteNotebookResponse(BaseModel):
+    """Response model for notebook deletion"""
     message: str

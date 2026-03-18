@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { toast } from 'sonner'
-import type { Note } from '@/frontend/api/types/note/note.ts'
+import type { Note, Notebook } from '@/frontend/api/types/note/note.ts'
 import type { ContentInsertion } from '@/frontend/features/types/content-insertion.ts'
 import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'
+import { notebooksService } from '@/frontend/api/services/notebooks.service.ts'
 import { isQuotaError } from '@/frontend/features/quota/use-quota'
 
 // --- PDF export pipeline (unified + remark/rehype) ---
@@ -38,6 +39,9 @@ export function useNotePad() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [isSaving, setIsSaving] = useState(false)
 
+	// --- Notebooks ---
+	const [notebooks, setNotebooks] = useState<Notebook[]>([])
+
 	// --- Current document ---
 	const contentRef = useRef('')
 	const [documentContent, setDocumentContent] = useState('')
@@ -68,13 +72,18 @@ export function useNotePad() {
 	// --- Init ---
 
 	useEffect(() => {
-		fetchNotes()
+		fetchNotesAndNotebooks()
 	}, [])
 
-	async function fetchNotes() {
+	// Fetch notes and notebooks in parallel on init
+	async function fetchNotesAndNotebooks() {
 		try {
 			setIsLoading(true)
-			const fetched = await notesService.listNotes()
+			const [fetched, fetchedNotebooks] = await Promise.all([
+				notesService.listNotes(),
+				notebooksService.listNotebooks(),
+			])
+			setNotebooks(fetchedNotebooks)
 			if (fetched.length === 0) {
 				const created = await notesService.createNote({ title: 'Untitled' })
 				setNotes([created])
@@ -84,7 +93,7 @@ export function useNotePad() {
 				applyNote(fetched[0])
 			}
 		} catch (error) {
-			console.error('[useNotePad] Failed to fetch notes:', error)
+			console.error('[useNotePad] Failed to initialise:', error)
 		} finally {
 			setIsLoading(false)
 		}
@@ -152,12 +161,12 @@ export function useNotePad() {
 
 	// --- CRUD ---
 
-	async function addNote() {
+	async function addNote(notebookId?: string) {
 		try {
 			if (selectedNoteId && isDirty()) {
 				await saveCurrentNote()
 			}
-			const created = await notesService.createNote({ title: 'Untitled' })
+			const created = await notesService.createNote({ title: 'Untitled', notebook_id: notebookId })
 			setNotes(prev => [created, ...prev])
 			applyNote(created)
 			toast.success('Note created')
@@ -208,6 +217,57 @@ export function useNotePad() {
 		} catch (error) {
 			console.error('[useNotePad] Failed to rename note:', error)
 			toast.error('Failed to rename note')
+		}
+	}
+
+	// --- Notebook CRUD ---
+
+	async function addNotebook() {
+		try {
+			const created = await notebooksService.createNotebook({ name: 'Untitled Notebook' })
+			setNotebooks(prev => [...prev, created])
+			toast.success('Notebook created')
+		} catch (error) {
+			console.error('[useNotePad] Failed to create notebook:', error)
+			toast.error('Failed to create notebook')
+		}
+	}
+
+	async function renameNotebook(id: string, name: string) {
+		try {
+			const updated = await notebooksService.updateNotebook(id, { name })
+			setNotebooks(prev => prev.map(nb => nb.id === updated.id ? updated : nb))
+		} catch (error) {
+			console.error('[useNotePad] Failed to rename notebook:', error)
+			toast.error('Failed to rename notebook')
+		}
+	}
+
+	async function deleteNotebook(id: string) {
+		try {
+			await notebooksService.deleteNotebook(id)
+			setNotebooks(prev => prev.filter(nb => nb.id !== id))
+			// Reflect ON DELETE SET NULL — uncategorise notes that were in this notebook
+			setNotes(prev => prev.map(n => n.notebook_id === id ? { ...n, notebook_id: null } : n))
+			toast.success('Notebook deleted')
+		} catch (error) {
+			console.error('[useNotePad] Failed to delete notebook:', error)
+			toast.error('Failed to delete notebook')
+		}
+	}
+
+	async function moveNoteToNotebook(noteId: string, notebookId: string | null) {
+		const note = notes.find(n => n.id === noteId)
+		if (!note) return
+		try {
+			const updated = await notesService.updateNote(noteId, {
+				version: note.version,
+				notebook_id: notebookId,
+			})
+			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
+		} catch (error) {
+			console.error('[useNotePad] Failed to move note:', error)
+			toast.error('Failed to move note')
 		}
 	}
 
@@ -414,6 +474,15 @@ export function useNotePad() {
 		reorderNotes,
 		exportNoteAsMarkdown,
 		exportNoteAsPdf,
+
+		// Notebook state
+		notebooks,
+
+		// Notebook operations
+		addNotebook,
+		renameNotebook,
+		deleteNotebook,
+		moveNoteToNotebook,
 
 		// Imperative handle
 		insertContent,
