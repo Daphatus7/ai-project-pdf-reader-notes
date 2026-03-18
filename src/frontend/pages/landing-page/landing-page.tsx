@@ -261,7 +261,7 @@ const LandingPage = () => {
 						</Link>
 						<p className="text-sm text-primary-foreground/40">
 							Questions before getting started?{" "}
-							<a href="mailto:contact@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
+							<a href="mailto:support@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
 								Talk to us.
 							</a>
 						</p>

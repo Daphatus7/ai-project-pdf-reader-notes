@@ -132,7 +132,7 @@ const LoginPage = () => {
 							</div>
 							{/* Password reset: directs user to email support instead of a self-serve flow */}
 							<a
-								href="mailto:contact@atlasnotebook.com?subject=Password%20Reset%20Request"
+								href="mailto:support@atlasnotebook.com?subject=Password%20Reset%20Request"
 								className="text-sm font-medium text-primary hover:underline"
 							>
 								Forgot password?
