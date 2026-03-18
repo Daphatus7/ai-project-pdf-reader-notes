@@ -210,6 +210,14 @@ class LlmGrok:
             role="assistant", content=[{"type": "text", "text": ai_text}], token_count=output_tokens,
         )
 
+        # Auto-generate title on first exchange (history was empty before this request)
+        if not history:
+            try:
+                generated_title = await self._generate_title(user_text, ai_text)
+                await self._supabase.update_thread_title(request.thread_id, generated_title)
+            except Exception as exc:
+                logger.warning("Failed to generate thread title: %s", exc)
+
         return ChatResponse(
             id=resp["id"],
             role=resp["role"],
@@ -272,7 +280,39 @@ class LlmGrok:
             role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
         )
 
-        yield f"data: {json.dumps({'type': 'done', 'id': resp['id'], 'created_at': resp['created_at'], 'total_tokens': input_tokens + output_tokens, 'input_tokens': input_tokens, 'output_tokens': output_tokens})}\n\n"
+        # Auto-generate title on first exchange (history was empty before this request)
+        generated_title = None
+        if not history:
+            try:
+                generated_title = await self._generate_title(user_text, full_text)
+                await self._supabase.update_thread_title(request.thread_id, generated_title)
+            except Exception as exc:
+                logger.warning("Failed to generate thread title: %s", exc)
+
+        done_payload: dict = {
+            'type': 'done',
+            'id': resp['id'],
+            'created_at': resp['created_at'],
+            'total_tokens': input_tokens + output_tokens,
+            'input_tokens': input_tokens,
+            'output_tokens': output_tokens,
+        }
+        if generated_title:
+            done_payload['title'] = generated_title
+        yield f"data: {json.dumps(done_payload)}\n\n"
+
+    # ── Thread title generation ────────────────────────────────────────────────
+
+    async def _generate_title(self, user_text: str, ai_text: str) -> str:
+        """Generate a short thread title from the first exchange using the fast non-reasoning model."""
+        chat = self._client.chat.create(model=MODEL_ROUTER)
+        chat.append(system(
+            "Generate a short title (5-8 words) for a conversation based on the exchange below. "
+            "Reply with ONLY the title — no punctuation, no quotes, no extra text."
+        ))
+        chat.append(user(f"User: {user_text[:300]}\nAssistant: {ai_text[:300]}"))
+        response = await chat.sample()
+        return response.content.strip()[:80]
 
     # ── RAG search (called by search_document tool handler) ───────────────────
 

@@ -23,6 +23,7 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 			startStreamingMessage,
 			appendStreamingChunk,
 			finalizeStreamingMessage,
+			updateThreadTitle,
 		} = useThreads();
 
 		const {
@@ -31,10 +32,11 @@ export const LLMChatFeature = forwardRef<LLMChatFeatureHandle, LLMChatFeaturePro
 		} = useChat(
 			activeThreadId,
 			projectId,
-			addUserMessage, 
-			startStreamingMessage, 
-			appendStreamingChunk, 
-			finalizeStreamingMessage, 
+			addUserMessage,
+			startStreamingMessage,
+			appendStreamingChunk,
+			finalizeStreamingMessage,
+			updateThreadTitle,
 			sourceIds);
 
 		useImperativeHandle(
