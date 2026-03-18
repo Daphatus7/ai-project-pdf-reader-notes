@@ -61,7 +61,7 @@ export const llmService = {
 	async chatStream(
 		request: ChatRequest,
 		onChunk: (text: string) => void,
-		onDone: (id: string, createdAt: string, totalTokens: number) => void,
+		onDone: (id: string, createdAt: string, totalTokens: number, title?: string) => void,
 		onError: (message: string) => void,
 	): Promise<void> {
 		const { data: { session } } = await supabase.auth.getSession();
@@ -101,7 +101,7 @@ export const llmService = {
 				try {
 					const event = JSON.parse(jsonStr);
 					if (event.type === 'chunk') onChunk(event.text);
-					else if (event.type === 'done') onDone(event.id, event.created_at, event.total_tokens);
+					else if (event.type === 'done') onDone(event.id, event.created_at, event.total_tokens, event.title);
 					else if (event.type === 'error') onError(event.message);
 				} catch { /* ignore malformed lines */ }
 			}

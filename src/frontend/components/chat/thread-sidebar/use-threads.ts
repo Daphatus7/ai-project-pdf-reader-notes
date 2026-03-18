@@ -155,6 +155,11 @@ export function useThreads() {
 		});
 	}, [activeThreadId]);
 
+	// Update thread title in state (called after backend auto-generates it on first exchange)
+	const updateThreadTitle = useCallback((threadId: string, title: string) => {
+		setThreads(prev => prev.map(t => t.thread_id === threadId ? { ...t, title } : t));
+	}, []);
+
 	// Replace streaming placeholder id with the real message id from backend
 	const finalizeStreamingMessage = useCallback((id: string) => {
 		if (!activeThreadId) return;
@@ -182,6 +187,7 @@ export function useThreads() {
 		startStreamingMessage,
 		appendStreamingChunk,
 		finalizeStreamingMessage,
+		updateThreadTitle,
 		setMessagesByThread,
 	};
 }

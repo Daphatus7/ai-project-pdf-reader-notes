@@ -19,6 +19,7 @@ export function useChat(
 	startStreamingMessage: () => void,
 	appendStreamingChunk: (chunk: string) => void,
 	finalizeStreamingMessage: (id: string) => void,
+	updateThreadTitle: (threadId: string, title: string) => void,
 	sourceIds?: string[] | undefined,
 ) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -40,14 +41,18 @@ export function useChat(
 					project_id: projectId ?? null,
 					source_ids: sourceIds ?? [] },
 				(chunk) => appendStreamingChunk(chunk),
-				(id) => { finalizeStreamingMessage(id); setIsLoading(false); },
+				(id, _createdAt, _totalTokens, title) => {
+					finalizeStreamingMessage(id);
+					if (title && activeThreadId) updateThreadTitle(activeThreadId, title);
+					setIsLoading(false);
+				},
 				(message) => { setError(message); setIsLoading(false); },
 			);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to send message');
 			setIsLoading(false);
 		}
-	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, sourceIds]);
+	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, updateThreadTitle, sourceIds]);
 
 	const selectMessage = useCallback((messageId: string) => {
 		// console.log('Selected message:', messageId);

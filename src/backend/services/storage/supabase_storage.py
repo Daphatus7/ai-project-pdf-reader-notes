@@ -422,6 +422,17 @@ class SupabaseStorage(Service):
             logger.error(f'Failed to delete conversation thread {thread_id}: {e}')
             internal_error('Failed to delete conversation thread')
 
+    async def update_thread_title(self, thread_id: str, title: str) -> None:
+        """Update thread title after it has been auto-generated."""
+        try:
+            await self.__database.table('threads') \
+                .update({'title': title}) \
+                .eq('id', thread_id) \
+                .execute()
+            logger.info(f'Thread title updated: thread={thread_id}, title={title}')
+        except Exception as e:
+            logger.error(f'Failed to update thread title for {thread_id}: {e}')
+
     # ==================== Message Persistence Operations ====================
 
     async def save_message(
