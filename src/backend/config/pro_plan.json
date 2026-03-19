@@ -7,6 +7,6 @@
     "max_projects":  100,
     "max_documents": 200,
     "max_notes":     100,
-    "max_tokens":    10000000
+    "max_tokens":    3000000
   }
 }
