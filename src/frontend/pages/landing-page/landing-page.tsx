@@ -209,6 +209,24 @@ const LandingPage = () => {
 					</p>
 				</div>
 			</div>
+
+			{/* Card 4: The payoff */}
+			<div className="h-screen snap-start bg-secondary flex items-center justify-center px-8">
+				<div className="max-w-xl text-center">
+					<p className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+						Atlas is built for one thing.
+					</p>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-6">
+						The fastest path from reading to knowing.
+					</p>
+					<p className="text-lg text-muted-foreground mb-16">
+						Every unnecessary step — removed.
+					</p>
+					<a href="#product" className="inline-block bg-foreground text-background px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity">
+						See how it works
+					</a>
+				</div>
+			</div>
 			
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
