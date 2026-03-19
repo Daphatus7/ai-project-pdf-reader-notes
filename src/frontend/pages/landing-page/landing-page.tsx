@@ -5,8 +5,6 @@ import {
 	LucideArrowRight,
 	LucideCog, LucideMousePointer, LucideSigma,
 	LucideSparkles,
-	LucideTarget,
-	LucideTrendingUp,
 	LucideZap
 } from "lucide-react";
 import DemoSection from "./components/demo";
@@ -38,7 +36,7 @@ const LandingPage = () => {
 
 				<link rel="canonical" href="https://atlasnotebook.com" />
 			</Helmet>
-		<div className="bg-card min-h-screen w-full">
+		<div className="bg-card h-screen overflow-y-auto scroll-smooth w-full" style={{ scrollSnapType: 'y proximity' }}>
 			{/* Header */}
 			<header className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border">
 				<div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
@@ -169,27 +167,48 @@ const LandingPage = () => {
 
 			<DemoSection />
 
-			{/* Pain Point Section */}
-			<section className="w-full px-4 py-20 bg-card">
-				<div className="max-w-2xl mx-auto text-center">
-					<p className="text-2xl md:text-3xl text-foreground leading-relaxed font-medium">
-						You know what's wild?
+			{/* Pain Point Section — 3 full-screen cards in normal page flow, main scroll handles navigation */}
+
+			{/* Card 1: The observation */}
+			<div className="h-screen snap-start bg-card flex items-center justify-center px-8">
+				<div className="max-w-xl text-center">
+					<p className="text-4xl md:text-5xl text-foreground font-medium leading-snug">
+						Most of your "note-taking" time
 					</p>
-					<p className="text-2xl md:text-3xl text-muted-foreground leading-relaxed mt-4">
-						Most of your "note-taking" time isn't actually note-taking.
-					</p>
-					<p className="text-lg text-muted-foreground leading-relaxed mt-8">
-						It's switching tabs. Copy-pasting. Retyping formulas.
-						Fixing broken formatting. Hunting for that screenshot you took 10 minutes ago.
-						<br /><br />
-						That's not thinking. That's busywork.
-						<br /><br />
-						<span className="text-foreground font-medium">
-                Your best ideas deserve better than that.
-            </span>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium leading-snug mt-3">
+						isn't actually note-taking.
 					</p>
 				</div>
-			</section>
+			</div>
+
+			{/* Card 2: The reality — each line drops alone */}
+			<div className="h-screen snap-start bg-secondary flex items-center justify-center px-8">
+				<div className="max-w-xl text-center space-y-5">
+					{[
+						"Switching tabs.",
+						"Copy-pasting.",
+						"Retyping formulas.",
+						"Fixing broken formatting.",
+					].map((line) => (
+						<p key={line} className="text-2xl md:text-3xl text-muted-foreground">{line}</p>
+					))}
+				</div>
+			</div>
+
+			{/* Card 3: The verdict */}
+			<div className="h-screen snap-start bg-card flex items-center justify-center px-8">
+				<div className="max-w-xl text-center">
+					<p className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+						That's not thinking.
+					</p>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-12">
+						That's busywork.
+					</p>
+					<p className="text-lg text-muted-foreground">
+						Your best ideas deserve better than that.
+					</p>
+				</div>
+			</div>
 			
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
