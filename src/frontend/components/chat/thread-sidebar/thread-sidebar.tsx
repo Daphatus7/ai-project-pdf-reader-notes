@@ -8,6 +8,7 @@ import { Button } from "@/frontend/components/ui/button.tsx";
 import { ScrollArea } from "@/frontend/components/ui/scroll-area.tsx";
 import {LucideSidebar, Plus, X} from "lucide-react";
 import type { ThreadTabsProps } from "@/frontend/api/types/llm.ts";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 interface ThreadSidebarProps extends ThreadTabsProps {
 	onClose: () => void;
@@ -21,10 +22,11 @@ export function ThreadSidebar({
 	onDeleteThread,
 	onClose,
 }: ThreadSidebarProps) {
+	const { t } = useLanguage();
 	return (
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
 			<div className="p-3 border-b flex items-center justify-between h-13">
-				<span className="text-sm font-medium">Threads</span>
+				<span className="text-sm font-medium">{t.chat.threads}</span>
 				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />
 				</Button>
@@ -33,7 +35,7 @@ export function ThreadSidebar({
 			<div className="p-3 border-b">
 				<Button className="w-full" size="sm" onClick={onCreateThread}>
 					<Plus className="w-4 h-4 mr-2" />
-					New Thread
+					{t.chat.newThread}
 				</Button>
 			</div>
 
@@ -54,7 +56,7 @@ export function ThreadSidebar({
 								onClick={() => onSelectThread(thread.thread_id)}
 							>
 								<span className="truncate flex-1">
-									{thread.title && thread.title !== "New Conversation" ? thread.title : `Thread ${index + 1}`}
+									{thread.title && thread.title !== "New Conversation" ? thread.title : t.chat.threadTitle.replace('{n}', String(index + 1))}
 								</span>
 								<Button
 									variant="ghost"
@@ -64,7 +66,7 @@ export function ThreadSidebar({
 										e.stopPropagation();
 										onDeleteThread(thread.thread_id);
 									}}
-									aria-label="Delete thread"
+									aria-label={t.chat.deleteThread}
 								>
 									<X className="h-3 w-3" />
 								</Button>

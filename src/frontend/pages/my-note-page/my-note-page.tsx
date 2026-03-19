@@ -12,6 +12,7 @@ import {Header} from "@/frontend/components/header/header.tsx";
 import {LLMChatFeature, type LLMChatFeatureHandle} from "@/frontend/features/llm-chat/llm-chat-feature.tsx";
 import {ManagementPanel} from "@/frontend/components/source/project-management.tsx";
 import { useSourceStore } from "@/frontend/context/source-store.ts";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 type MobileTab = 'sources' | 'chat' | 'notes';
 
@@ -44,6 +45,7 @@ const useIsMobile = () => {
 
 export default function NotePage() {
 	const isMobile = useIsMobile();
+	const { t } = useLanguage();
 
 	/* Dark mode is scoped to the note page only.
 	   On mount: apply .dark if user previously enabled it.
@@ -122,7 +124,7 @@ export default function NotePage() {
 			},
 			{
 				type: 'text',
-				text: prompt || 'Please explain this screenshot.',
+				text: prompt || t.notePage.screenshotPrompt,
 			},
 		]);
 		// On mobile, auto-switch to chat tab after injecting screenshot
@@ -137,9 +139,9 @@ export default function NotePage() {
 
 	// Bottom tab definitions for mobile nav
 	const tabs = [
-		{ id: 'sources' as MobileTab, label: 'Sources', icon: Files },
-		{ id: 'chat' as MobileTab, label: 'Chat', icon: MessageSquare },
-		{ id: 'notes' as MobileTab, label: 'Notes', icon: NotebookPen },
+		{ id: 'sources' as MobileTab, label: t.notePage.tabSources, icon: Files },
+		{ id: 'chat' as MobileTab, label: t.notePage.tabChat, icon: MessageSquare },
+		{ id: 'notes' as MobileTab, label: t.notePage.tabNotes, icon: NotebookPen },
 	];
 
 	// Shared panel content — defined once, used by both layouts to keep refs valid

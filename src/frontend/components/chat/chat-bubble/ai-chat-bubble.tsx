@@ -9,13 +9,16 @@ import type {ChatContent} from "@/frontend/api";
 import {MarkdownRenderer} from "@/frontend/components/renderer/markdown-renderer.tsx";
 import {Button} from "@/frontend/components/ui/button.tsx";
 import {LucideArrowRight} from "lucide-react";
+import { useLanguage } from "@/frontend/i18n/language-context";
+import type { Translations } from "@/frontend/i18n/locales/en";
 
 /**
- * Render a single content item (text or image)
+ * Render a single content item (text or image); t is passed in from the parent component
  */
 function renderContentItem(
 	item: ChatContent,
 	index: number,
+	t: Translations,
 	onSelectContent?: (content: string) => void
 ) {
 	if (item.type === 'text') {
@@ -33,7 +36,7 @@ function renderContentItem(
 			<img
 				key={index}
 				src={src}
-				alt="AI generated image"
+				alt={t.chat.aiGeneratedImage}
 				className="max-w-full rounded mt-2"
 			/>
 		);
@@ -52,6 +55,7 @@ function extractTextContent(contents: ChatContent[]): string {
 }
 
 export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
+	const { t } = useLanguage();
 	const rawContents = message.content;
 	const contents: ChatContent[] = Array.isArray(rawContents) ? rawContents : [];
 
@@ -67,11 +71,11 @@ export function AIChatBubble({ message, onSelectContent }: AIChatBubbleProps) {
 			<div
 				className="px-4 py-2 w-full"
 			>
-				{contents.map((item, index) => renderContentItem(item, index, onSelectContent))}
+				{contents.map((item, index) => renderContentItem(item, index, t, onSelectContent))}
 				{onSelectContent && (
 					<div className='flex justify-end'>
 						<Button variant='secondary' className='bg-panel border rounded-2xl' size='sm' onClick={handleClick}>
-							Insert to note
+							{t.chat.insertToNote}
 							<LucideArrowRight className="size-4" />
 						</Button>
 					</div>

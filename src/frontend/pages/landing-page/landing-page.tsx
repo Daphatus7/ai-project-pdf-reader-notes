@@ -10,8 +10,11 @@ import {
 import DemoSection from "./components/demo";
 import PainPointSection from "./components/pain-point-section";
 import PricingSection from "./pricing";
+import { useLanguage } from "../../i18n/language-context";
 
 const LandingPage = () => {
+	const { t, lang, toggle } = useLanguage();
+
 	return (
 		<>
 			<Helmet>
@@ -22,9 +25,9 @@ const LandingPage = () => {
 					Boost your productivity instantly:
 					What you see is exactly what you get — zero hallucinations, pure accuracy.
 					One-click AI-powered : no more drawing tables, rewriting equations, or manual cleanup. We perfectly match and structure any AI output format for you.
-					Side-by-side AI chat with zero fluff: 
-					point anywhere and get instant, 
-					precise explanations right there. 
+					Side-by-side AI chat with zero fluff:
+					point anywhere and get instant,
+					precise explanations right there.
 					Quickly capture, convert, and build your personal strategic knowledge base — effortless and hallucination-free.
 				" />
 
@@ -57,33 +60,40 @@ const LandingPage = () => {
 					{/* Navigation */}
 					<nav className="hidden md:flex items-center gap-1">
 						<a href="#product" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Product
+							{t.nav.product}
 						</a>
 						<a href="#solutions" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Solutions
+							{t.nav.solutions}
 						</a>
 						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Pricing
+							{t.nav.pricing}
 						</a>
 						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							Resources
+							{t.nav.resources}
 						</a>
-
 					</nav>
 
-					{/* Right side actions */}
+					{/* Right side: language toggle + auth actions */}
 					<div className="flex items-center gap-2">
+						{/* Language toggle — label shows the language you'd switch TO */}
+						<button
+							onClick={toggle}
+							className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-md transition-colors"
+							aria-label="Switch language"
+						>
+							{lang === "en" ? "中文" : "EN"}
+						</button>
 						<Link
 							to="/login"
 							className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
 						>
-							Log in
+							{t.nav.login}
 						</Link>
 						<Link
 							to="/signup"
 							className="px-4 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:opacity-90 rounded transition-colors"
 						>
-							Try for free
+							{t.nav.tryForFree}
 						</Link>
 					</div>
 				</div>
@@ -95,7 +105,7 @@ const LandingPage = () => {
 				<div className="bg-secondary border border-border rounded-full px-6 py-2 mb-8 flex items-center gap-3">
 					<LucideSparkles />
 					<span className="font-medium text-xs text-foreground">
-            Powered by AI
+            {t.hero.badge}
           </span>
 				</div>
 
@@ -109,16 +119,16 @@ const LandingPage = () => {
 						WebkitBackgroundClip: "text",
 					}}
 				>
-					<div>You didn't spend years studying</div>
-					<div>just to copy-paste and fix formatting.</div>
+					<div>{t.hero.heading1}</div>
+					<div>{t.hero.heading2}</div>
 				</h1>
 
 				{/* Subtitle */}
 				<p className="text-foreground text-xl md:text-2xl text-center max-w-4xl mb-12 leading-relaxed">
-					Screenshot anything. AI answers instantly. Already in your notes —
-					formulas, tables, perfectly formatted.
+					{t.hero.subtitle1}
+					{t.hero.subtitle2}
 					<br />
-					The AI notebook that kills the busywork.
+					{t.hero.subtitle3}
 				</p>
 
 				{/* CTA Buttons */}
@@ -131,7 +141,7 @@ const LandingPage = () => {
 								"linear-gradient(74.7176deg, rgb(0, 106, 255) 0.60002%, rgb(0, 64, 153) 103.57%)",
 						}}
 					>
-						Try for free
+						{t.hero.cta}
 						<ArrowRightIcon />
 					</Link>
 					{/*<button className="px-8 py-4 rounded-xl bg-card border-2 border-border text-foreground font-medium text-base hover:border-[#006aff] transition-colors">*/}
@@ -145,24 +155,24 @@ const LandingPage = () => {
 					<div className="flex items-center gap-2">
 						<LucideZap />
 						<span className="text-sm text-muted-foreground">
-            Screenshot to notes in 3 seconds
+            {t.hero.features.screenshot}
 			</span>
 						</div>
-	
+
 						<div className="flex items-center gap-2">
-							<LucideSigma /> {/* or LucideSigma */}
+							<LucideSigma />
 							<span className="text-sm text-muted-foreground">
-				Formulas & tables, perfectly formatted
+				{t.hero.features.formulas}
 			</span>
 						</div>
-	
+
 						<div className="flex items-center gap-2">
 							<LucideMousePointer />
 							<span className="text-sm text-muted-foreground">
-				One-click AI macros
+				{t.hero.features.macros}
 			</span>
 						</div>
-	
+
 					</div>
 			</section>
 
@@ -170,7 +180,7 @@ const LandingPage = () => {
 
 			{/* Pain Point Section — Apple-style sticky scroll reveal */}
 			<PainPointSection />
-			
+
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
 				<div className="max-w-7xl mx-auto">
@@ -179,15 +189,15 @@ const LandingPage = () => {
 							<div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
 								<LucideCog />
 								<span className="font-medium text-xs text-foreground">
-                  How it works
+                  {t.features.badge}
                 </span>
 							</div>
 						</div>
 						<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
-							From PDF to structured notes
+							{t.features.heading}
 						</h2>
 						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-							Three simple steps to transform any document into actionable knowledge
+							{t.features.subheading}
 						</p>
 					</div>
 
@@ -201,10 +211,10 @@ const LandingPage = () => {
 								</svg>
 							</div>
 							<h3 className="font-bold text-xl text-foreground mb-3">
-								1. Screenshot any section
+								{t.features.step1Title}
 							</h3>
 							<p className="text-muted-foreground leading-relaxed">
-								Capture any part of your PDF — tables, equations, diagrams, or text blocks — with a simple screenshot tool.
+								{t.features.step1Desc}
 							</p>
 						</div>
 
@@ -216,10 +226,10 @@ const LandingPage = () => {
 								</svg>
 							</div>
 							<h3 className="font-bold text-xl text-foreground mb-3">
-								2. Get AI-structured answers
+								{t.features.step2Title}
 							</h3>
 							<p className="text-muted-foreground leading-relaxed">
-								AI analyzes your screenshot and returns properly formatted content — tables, LaTeX formulas, and structured text.
+								{t.features.step2Desc}
 							</p>
 						</div>
 
@@ -231,10 +241,10 @@ const LandingPage = () => {
 								</svg>
 							</div>
 							<h3 className="font-bold text-xl text-foreground mb-3">
-								3. Insert into your notebook
+								{t.features.step3Title}
 							</h3>
 							<p className="text-muted-foreground leading-relaxed">
-								Click to insert verified answers directly into your rich-text notebook, preserving all formatting and structure.
+								{t.features.step3Desc}
 							</p>
 						</div>
 					</div>
@@ -253,23 +263,23 @@ const LandingPage = () => {
 			>
 				<div className="max-w-4xl mx-auto text-center">
 					<h2 className="font-bold text-4xl md:text-5xl text-primary-foreground mb-6">
-						Start reading smarter today
+						{t.cta.heading}
 					</h2>
 					<p className="text-lg text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
-						Join now. Get 1 hour of work done in 20 minutes.
+						{t.cta.subheading}
 					</p>
 					<div className="flex flex-col items-center gap-4">
 						<Link
 							to="/signup"
 							className="px-8 py-4 rounded-xl text-foreground font-medium text-base bg-card hover:bg-card/90 transition-colors inline-flex items-center justify-center gap-3"
 						>
-							Get started for free
+							{t.cta.button}
 							<LucideArrowRight/>
 						</Link>
 						<p className="text-sm text-primary-foreground/40">
-							Questions before getting started?{" "}
+							{t.cta.questions}{" "}
 							<a href="mailto:support@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
-								Talk to us.
+								{t.cta.talkToUs}
 							</a>
 						</p>
 					</div>
@@ -297,29 +307,29 @@ const LandingPage = () => {
                 </span>
 							</div>
 							<p className="text-sm text-muted-foreground">
-								AI-powered document processing for the modern researcher.
+								{t.footer.tagline}
 							</p>
 						</div>
 
 						{/* Product */}
 						<div>
 							<h4 className="font-medium text-sm text-foreground mb-3">
-								Product
+								{t.footer.product}
 							</h4>
 							<ul className="space-y-2">
 								<li>
 									<a href="#product" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										Features
+										{t.footer.features}
 									</a>
 								</li>
 								<li>
 									<a href="#pricing" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										Pricing
+										{t.footer.pricing}
 									</a>
 								</li>
 								<li>
 									<a href="#roadmap" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										Roadmap
+										{t.footer.roadmap}
 									</a>
 								</li>
 							</ul>
@@ -328,22 +338,22 @@ const LandingPage = () => {
 						{/* Resources */}
 						<div>
 							<h4 className="font-medium text-sm text-foreground mb-3">
-								Resources
+								{t.footer.resources}
 							</h4>
 							<ul className="space-y-2">
 								<li>
 									<a href="#docs" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										Documentation
+										{t.footer.docs}
 									</a>
 								</li>
 								<li>
 									<a href="#api" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										API Reference
-									</a>		
+										{t.footer.api}
+									</a>
 								</li>
 								<li>
 									<a href="#blog" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										Blog
+										{t.footer.blog}
 									</a>
 								</li>
 							</ul>
@@ -354,17 +364,17 @@ const LandingPage = () => {
 					{/* Footer Bottom */}
 					<div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
 						<p className="text-sm text-muted-foreground">
-							&copy; 2026 Atlas Notebook. All rights reserved.
+							{t.footer.copyright}
 						</p>
 						<div className="flex gap-6">
 							<a href="#status" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								Status
+								{t.footer.status}
 							</a>
 							<a href="#security" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								Security
+								{t.footer.security}
 							</a>
 							<a href="#contact" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								Contact
+								{t.footer.contact}
 							</a>
 						</div>
 					</div>

@@ -7,25 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/fro
 import { Input } from "@/frontend/components/ui/input";
 import { Button } from "@/frontend/components/ui/button";
 import { Label } from "@/frontend/components/ui/label";
+import { useLanguage } from "../../i18n/language-context";
 
-// Field-level validation helpers
-const validateEmail = (val: string) => {
-	if (!val) return "Email is required";
-	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Please enter a valid email address";
+// Field-level validation helpers — take translated messages so errors match the UI language
+const validateEmail = (val: string, msgs: { required: string; invalid: string }) => {
+	if (!val) return msgs.required;
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return msgs.invalid;
 	return null;
 };
-const validateUsername = (val: string) => {
-	if (!val) return "Username is required";
+const validateUsername = (val: string, msgs: { required: string }) => {
+	if (!val) return msgs.required;
 	return null;
 };
-const validatePassword = (val: string) => {
-	if (!val) return "Password is required";
-	if (val.length < 6) return "Password must be at least 6 characters";
+const validatePassword = (val: string, msgs: { required: string; tooShort: string }) => {
+	if (!val) return msgs.required;
+	if (val.length < 6) return msgs.tooShort;
 	return null;
 };
-const validateConfirmPassword = (val: string, pwd: string) => {
-	if (!val) return "Please confirm your password";
-	if (val !== pwd) return "Passwords do not match";
+const validateConfirmPassword = (val: string, pwd: string, msgs: { required: string; mismatch: string }) => {
+	if (!val) return msgs.required;
+	if (val !== pwd) return msgs.mismatch;
 	return null;
 };
 
@@ -43,13 +44,19 @@ const SignupPage = () => {
 
 	const [googleError, setGoogleError] = useState<string | null>(null);
 	const { signup, error, loading } = useSignup();
+	const { t } = useLanguage();
+
+	const emailMsgs = { required: t.auth.emailRequired, invalid: t.auth.emailInvalid };
+	const usernameMsgs = { required: t.auth.usernameRequired };
+	const passwordMsgs = { required: t.auth.passwordRequired, tooShort: t.auth.passwordTooShort };
+	const confirmMsgs = { required: t.auth.confirmPasswordRequired, mismatch: t.auth.passwordsDoNotMatch };
 
 	const handleGoogleSignup = async () => {
 		setGoogleError(null);
 		try {
 			await loginWithGoogle();
 		} catch (err) {
-			setGoogleError(err instanceof Error ? err.message : "Google sign up failed");
+			setGoogleError(err instanceof Error ? err.message : t.auth.googleSignupFailed);
 		}
 	};
 
@@ -57,10 +64,10 @@ const SignupPage = () => {
 		e.preventDefault();
 
 		// Validate all fields before calling API
-		const eErr = validateEmail(email);
-		const uErr = validateUsername(username);
-		const pErr = validatePassword(password);
-		const cErr = validateConfirmPassword(confirmPassword, password);
+		const eErr = validateEmail(email, emailMsgs);
+		const uErr = validateUsername(username, usernameMsgs);
+		const pErr = validatePassword(password, passwordMsgs);
+		const cErr = validateConfirmPassword(confirmPassword, password, confirmMsgs);
 		setEmailError(eErr);
 		setUsernameError(uErr);
 		setPasswordError(pErr);
@@ -87,8 +94,8 @@ const SignupPage = () => {
 			<img src="/logo.svg" alt="Logo" className="h-12" />
 			<Card className="w-full">
 				<CardHeader>
-					<CardTitle className="text-xl">Create an account</CardTitle>
-					<CardDescription>Fill in your details to get started</CardDescription>
+					<CardTitle className="text-xl">{t.auth.signupTitle}</CardTitle>
+					<CardDescription>{t.auth.signupDescription}</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{(error || googleError) && (
@@ -99,61 +106,61 @@ const SignupPage = () => {
 
 					<form className="space-y-4" onSubmit={handleSubmit}>
 						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
+							<Label htmlFor="email">{t.auth.email}</Label>
 							<Input
 								type="email"
 								id="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								onBlur={() => setEmailError(validateEmail(email))}
+								onBlur={() => setEmailError(validateEmail(email, emailMsgs))}
 								placeholder="name@email.com"
 								required
 							/>
 							{emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="username">Username</Label>
+							<Label htmlFor="username">{t.auth.username}</Label>
 							<Input
 								type="text"
 								id="name"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
-								onBlur={() => setUsernameError(validateUsername(username))}
+								onBlur={() => setUsernameError(validateUsername(username, usernameMsgs))}
 								placeholder="Your name"
 								required
 							/>
 							{usernameError && <p className="text-sm text-red-500 mt-1">{usernameError}</p>}
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="password">Password</Label>
+							<Label htmlFor="password">{t.auth.password}</Label>
 							<Input
 								type="password"
 								id="password"
 								autoComplete="new-password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								onBlur={() => setPasswordError(validatePassword(password))}
+								onBlur={() => setPasswordError(validatePassword(password, passwordMsgs))}
 								placeholder="••••••••"
 								required
 							/>
 							{passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="confirmPassword">Confirm Password</Label>
+							<Label htmlFor="confirmPassword">{t.auth.confirmPassword}</Label>
 							<Input
 								type="password"
 								id="confirmPassword"
 								autoComplete="new-password"
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
-								onBlur={() => setConfirmPasswordError(validateConfirmPassword(confirmPassword, password))}
+								onBlur={() => setConfirmPasswordError(validateConfirmPassword(confirmPassword, password, confirmMsgs))}
 								placeholder="••••••••"
 								required
 							/>
 							{confirmPasswordError && <p className="text-sm text-red-500 mt-1">{confirmPasswordError}</p>}
 						</div>
 						<Button type="submit" disabled={loading} className="w-full">
-							{loading ? "Creating account..." : "Create account"}
+							{loading ? t.auth.creatingAccount : t.auth.createAccount}
 						</Button>
 
 					</form>
@@ -163,7 +170,7 @@ const SignupPage = () => {
 							<span className="w-full border-t" />
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
-							<span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+							<span className="bg-card px-2 text-muted-foreground">{t.auth.orContinueWith}</span>
 						</div>
 					</div>
 
@@ -191,16 +198,16 @@ const SignupPage = () => {
 								fill="#EA4335"
 							/>
 						</svg>
-						Sign up with Google
+						{t.auth.signUpWithGoogle}
 					</Button>
 
 					<p className="mt-4 text-center text-sm text-muted-foreground">
-						Already have an account?{" "}
+						{t.auth.hasAccount}{" "}
 						<Link
 							to="/login"
 							className="font-medium text-primary hover:underline"
 						>
-							Sign in
+							{t.auth.signIn}
 						</Link>
 					</p>
 				</CardContent>

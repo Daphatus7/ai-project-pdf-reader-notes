@@ -8,9 +8,13 @@
 import { useState } from 'react';
 import { FileText, X, Send } from 'lucide-react';
 import type {ChatBarProps} from "@/frontend/api/types/llm.ts";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
-export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...', selectedSources, onDeselectSource }: ChatBarProps) {
+export function ChatBar({ onSend, isLoading, placeholder, selectedSources, onDeselectSource }: ChatBarProps) {
 	const [input, setInput] = useState('');
+	const { t } = useLanguage();
+	/* Fall back to translated default when caller omits the placeholder prop */
+	const effectivePlaceholder = placeholder ?? t.chat.placeholder;
 
 	const handleSend = () => {
 		if (!input.trim() || isLoading) return;
@@ -43,7 +47,7 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 							<button
 								onClick={() => onDeselectSource?.(source.id)}
 								className="shrink-0 ml-0.5 hover:text-destructive transition-colors"
-								aria-label={`Remove ${source.name}`}
+								aria-label={t.chat.removeSource.replace('{name}', source.name)}
 							>
 								<X className="h-3 w-3" />
 							</button>
@@ -59,7 +63,7 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 					value={input}
 					onChange={(e) => setInput(e.target.value)}
 					onKeyPress={handleKeyPress}
-					placeholder={placeholder}
+					placeholder={effectivePlaceholder}
 					disabled={isLoading}
 					/* bg-panel + text-foreground ensure correct colors in both modes */
 					className="flex-1 px-4 py-2 border border-border bg-panel text-foreground placeholder:text-muted-foreground rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-muted disabled:text-muted-foreground"
@@ -71,7 +75,7 @@ export function ChatBar({ onSend, isLoading, placeholder = 'Type your message...
 					className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors text-sm"
 				>
 					<Send className="h-3.5 w-3.5" />
-					{isLoading ? 'Sending...' : 'Send'}
+					{isLoading ? t.chat.sending : t.chat.send}
 				</button>
 			</div>
 		</div>

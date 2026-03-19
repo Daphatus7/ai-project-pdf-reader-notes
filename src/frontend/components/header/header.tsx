@@ -23,6 +23,7 @@ import {PricingDialog} from "@/frontend/features/pricing/PricingDialog.tsx";
 import { SubscriptionDialog } from "@/frontend/features/user/SubscriptionDialog.tsx";
 import { useAuth } from "@/frontend/features/auth";
 import { useQuota } from "@/frontend/features/quota/use-quota";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 export function Header() {
 
@@ -33,6 +34,7 @@ export function Header() {
 	const { quota } = useQuota();
 	const isPro = quota?.plan === 'pro';
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 
 	/* Dark mode toggle state — reads current class on mount */
 	const [isDark, setIsDark] = useState<boolean>(
@@ -74,7 +76,7 @@ export function Header() {
 						className="text-xs h-8 px-3"
 					>
 						<CreditCard className="w-4 h-4" />
-						Upgrade
+						{t.header.upgrade}
 					</Button>
 				)}
 
@@ -85,7 +87,7 @@ export function Header() {
 					onClick={() => window.open(FEEDBACK_FORM_URL, '_blank')}
 					className="text-xs h-8 px-3"
 				>
-					Feedback
+					{t.header.feedback}
 				</Button>
 
 				{/* Dark / light mode toggle */}
@@ -94,7 +96,7 @@ export function Header() {
 					size="icon"
 					className="h-8 w-8"
 					onClick={toggleTheme}
-					aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+					aria-label={isDark ? t.header.switchToLight : t.header.switchToDark}
 				>
 					{isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
 				</Button>
@@ -111,33 +113,33 @@ export function Header() {
 								<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={() => setSubscriptionOpen(true)}>
-									Manage Subscription
+									{t.header.manageSubscription}
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								{/* Contact via email */}
 								<DropdownMenuItem onClick={() => window.location.href = 'mailto:support@atlasnotebook.com '}>
 									<Mail className="w-4 h-4 mr-2" />
-									Contact
+									{t.header.contact}
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogout}>
 									<LogOut className="w-4 h-4 mr-2" />
-									Logout
+									{t.header.logout}
 								</DropdownMenuItem>
 							</>
 						) : (
 							<>
-								<DropdownMenuLabel>My Account</DropdownMenuLabel>
+								<DropdownMenuLabel>{t.header.myAccount}</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								{/* Contact via email */}
 								<DropdownMenuItem onClick={() => window.location.href = 'mailto:example@example.com'}>
 									<Mail className="w-4 h-4 mr-2" />
-									Contact us
+									{t.header.contactUs}
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleLogin}>
 									<LogIn className="w-4 h-4 mr-2" />
-									Login / Sign Up
+									{t.header.loginSignUp}
 								</DropdownMenuItem>
 							</>
 						)}

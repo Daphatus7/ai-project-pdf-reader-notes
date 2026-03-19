@@ -15,6 +15,7 @@ import {
 import { ProjectItem } from './project-item';
 import { PricingDialog } from '@/frontend/features/pricing/PricingDialog';
 import type { Project } from './type';
+import { useLanguage } from '@/frontend/i18n/language-context';
 
 interface ProjectPanelProps {
 	projects: Project[];
@@ -38,6 +39,7 @@ export function ProjectPanel({
 	onDeleteProject,
 }: ProjectPanelProps) {
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
+	const { t } = useLanguage();
 	const [pricingOpen, setPricingOpen] = useState(false);
 	const [proLimitOpen, setProLimitOpen] = useState(false);
 	const [newProjectName, setNewProjectName] = useState('');
@@ -92,7 +94,7 @@ export function ProjectPanel({
 			{/* Header for list of projects */}
 			<div className="p-3 flex items-center gap-2 border-b h-13">
 				<FolderOpen className="h-4 w-4 text-muted-foreground" />
-				<span className="text-sm font-medium">Project</span>
+				<span className="text-sm font-medium">{t.projectPanel.title}</span>
 			</div>
 
 			{/* Scrollable project card list — min-h-0 allows flex shrink to enable scroll */}
@@ -101,8 +103,8 @@ export function ProjectPanel({
 					{projects.length === 0 ? (
 						<div className="text-center py-12 text-muted-foreground">
 							<FolderOpen className="h-12 w-12 mx-auto mb-3 opacity-40" />
-							<p className="text-sm font-medium">No projects yet</p>
-							<p className="text-xs mt-1">Create a project to get started</p>
+							<p className="text-sm font-medium">{t.projectPanel.emptyTitle}</p>
+							<p className="text-xs mt-1">{t.projectPanel.emptySubtitle}</p>
 						</div>
 					) : (
 						projects.map((project) => (
@@ -135,8 +137,8 @@ export function ProjectPanel({
 						</div>
 						<span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
 							{canCreateProject
-								? 'Add New Project'
-								: plan === 'pro' ? 'Project Limit Reached' : 'Upgrade to Add More'
+								? t.projectPanel.addNew
+								: plan === 'pro' ? t.projectPanel.limitReachedPro : t.projectPanel.limitReachedFree
 							}
 						</span>
 					</div>
@@ -147,14 +149,14 @@ export function ProjectPanel({
 			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Create Project</DialogTitle>
+						<DialogTitle>{t.projectPanel.createDialogTitle}</DialogTitle>
 						<DialogDescription>
-							Create a new project to organize your sources.
+							{t.projectPanel.createDialogDesc}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-3 py-2">
 						<Input
-							placeholder="Project name"
+							placeholder={t.projectPanel.projectNamePlaceholder}
 							value={newProjectName}
 							onChange={(e) => setNewProjectName(e.target.value)}
 							onKeyDown={(e) => {
@@ -162,7 +164,7 @@ export function ProjectPanel({
 							}}
 						/>
 						<Input
-							placeholder="Description (optional)"
+							placeholder={t.projectPanel.descriptionPlaceholder}
 							value={newProjectDesc}
 							onChange={(e) => setNewProjectDesc(e.target.value)}
 						/>
@@ -172,7 +174,7 @@ export function ProjectPanel({
 							onClick={handleCreateProject}
 							disabled={!newProjectName.trim() || isCreating}
 						>
-							{isCreating ? 'Creating...' : 'Create'}
+							{isCreating ? t.projectPanel.creating : t.projectPanel.create}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -182,18 +184,17 @@ export function ProjectPanel({
 			<Dialog open={proLimitOpen} onOpenChange={setProLimitOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Project Limit Reached</DialogTitle>
+						<DialogTitle>{t.projectPanel.limitDialogTitle}</DialogTitle>
 						<DialogDescription>
-							You have reached the maximum number of projects on your current plan.
-							If you have any questions or need assistance, please contact our support team.
+							{t.projectPanel.limitDialogDesc}
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => setProLimitOpen(false)}>
-							Close
+							{t.projectPanel.close}
 						</Button>
 						<Button asChild>
-							<a href="vincent@atlasnotebook.com">Contact Support</a>
+							<a href="vincent@atlasnotebook.com">{t.projectPanel.contactSupport}</a>
 						</Button>
 					</DialogFooter>
 				</DialogContent>

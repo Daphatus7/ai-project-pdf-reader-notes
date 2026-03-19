@@ -9,6 +9,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { llmService } from '@/frontend/api/services/llm.service.ts';
 import type {Thread} from "@/frontend/api/types/thread.ts";
 import type {ChatMessage, UserMessage, AIMessage} from "@/frontend/api/types/chat.ts";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 
 // Placeholder id used while the AI response is streaming in
@@ -17,6 +18,7 @@ const STREAMING_ID = '__streaming__';
 // ============ Hook ============
 
 export function useThreads() {
+	const { t } = useLanguage();
 	const [threads, setThreads] = useState<Thread[]>([]);
 	const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 	const [messagesByThread, setMessagesByThread] = useState<Record<string, ChatMessage[]>>({});
@@ -35,13 +37,13 @@ export function useThreads() {
 					setThreads(response.threads);
 					setActiveThreadId(response.threads[0].thread_id);
 				} else {
-					const newThread = await llmService.createThread(`Thread ${threads.length + 1}`);
+					const newThread = await llmService.createThread(t.chat.threadTitle.replace('{n}', String(threads.length + 1)));
 					setThreads([newThread]);
 					setMessagesByThread(prev => ({ ...prev, [newThread.thread_id]: [] }));
 					setActiveThreadId(newThread.thread_id);
 				}
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to load threads');
+				setError(err instanceof Error ? err.message : t.chat.errorLoadThreads);
 			} finally {
 				setIsLoading(false);
 			}
@@ -58,7 +60,7 @@ export function useThreads() {
 				const response = await llmService.loadThread(activeThreadId);
 				setMessagesByThread(prev => ({ ...prev, [activeThreadId]: response.messages }));
 			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to load messages');
+				setError(err instanceof Error ? err.message : t.chat.errorLoadMessages);
 			}
 		};
 		loadMessages();
@@ -75,9 +77,9 @@ export function useThreads() {
 			setMessagesByThread(prev => ({ ...prev, [response.thread_id]: [] }));
 			setActiveThreadId(response.thread_id);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to create thread');
+			setError(err instanceof Error ? err.message : t.chat.errorCreateThread);
 		}
-	}, []);
+	}, [t]);
 
 	const deleteThread = useCallback(async (threadId: string) => {
 		try {
@@ -96,9 +98,9 @@ export function useThreads() {
 				return rest;
 			});
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to delete thread');
+			setError(err instanceof Error ? err.message : t.chat.errorDeleteThread);
 		}
-	}, [activeThreadId]);
+	}, [activeThreadId, t]);
 
 	const addUserMessage = useCallback((message: UserMessage) => {
 		if (!activeThreadId) return;

@@ -13,10 +13,12 @@ import type {ChatPanelProps} from "@/frontend/api/types/llm.ts";
 import {Button} from "@/frontend/components/ui/button.tsx";
 import {LucideChefHat, LucidePlus, LucidePanelRight} from "lucide-react";
 import { Skeleton } from "@/frontend/components/ui/skeleton.tsx";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, onSendMessage, onSelectContent, selectedSources, onDeselectSource }:
 						  ChatPanelProps) {
 	const [showThreadSidebar, setShowThreadSidebar] = useState(false);
+	const { t } = useLanguage();
 
 	return (
 		<div className="flex flex-row h-full">
@@ -25,7 +27,7 @@ export function ChatPanel({threadProp, messages, isLoading, isThreadsLoading, on
 					{/*Left icons*/}
 					<div className="flex items-center gap-2">
 						<LucideChefHat className="h-4 w-4 text-muted-foreground" />
-						<span className="text-sm font-medium">Chat</span>
+						<span className="text-sm font-medium">{t.chat.panelTitle}</span>
 					</div>
 					{/*Right buttons*/}
 					<div className="flex items-center gap-1">

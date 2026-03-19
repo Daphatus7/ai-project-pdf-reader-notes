@@ -7,6 +7,8 @@ import {
 	DropdownMenuTrigger,
 } from '@/frontend/components/ui/dropdown-menu';
 import type { Project, ProjectCategory } from './type';
+import { useLanguage } from '@/frontend/i18n/language-context';
+import type { Translations } from '@/frontend/i18n/locales/en';
 
 /* Category badge colors — dark: variants keep hue while adapting brightness for dark mode */
 export const categoryColors: Record<ProjectCategory, string> = {
@@ -15,25 +17,19 @@ export const categoryColors: Record<ProjectCategory, string> = {
 	work:     'bg-green-100 text-green-600 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
 };
 
-const categoryLabels: Record<ProjectCategory, string> = {
-	research: 'Research',
-	personal: 'Personal',
-	work: 'Work',
-};
-
-export function formatRelativeDate(dateString: string): string {
+/* Relative date formatter — accepts t so it adapts to the active language */
+export function formatRelativeDate(dateString: string, t: Translations): string {
 	const date = new Date(dateString);
 	const now = new Date();
-	const diffMs = now.getTime() - date.getTime();
-	const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+	const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-	if (diffDays === 0) return 'Today';
-	if (diffDays === 1) return 'Yesterday';
-	if (diffDays < 7) return `${diffDays} days ago`;
-	if (diffDays < 14) return '1 week ago';
-	if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-	if (diffDays < 60) return '1 month ago';
-	return `${Math.floor(diffDays / 30)} months ago`;
+	if (diffDays === 0) return t.projectItem.dateToday;
+	if (diffDays === 1) return t.projectItem.dateYesterday;
+	if (diffDays < 7) return t.projectItem.dateDaysAgo.replace('{n}', String(diffDays));
+	if (diffDays < 14) return t.projectItem.date1WeekAgo;
+	if (diffDays < 30) return t.projectItem.dateWeeksAgo.replace('{n}', String(Math.floor(diffDays / 7)));
+	if (diffDays < 60) return t.projectItem.date1MonthAgo;
+	return t.projectItem.dateMonthsAgo.replace('{n}', String(Math.floor(diffDays / 30)));
 }
 
 interface ProjectItemProps {
@@ -43,7 +39,13 @@ interface ProjectItemProps {
 }
 
 export function ProjectItem({ project, onClick, onDelete }: ProjectItemProps) {
+	const { t } = useLanguage();
 	const category = project.category ?? 'research';
+	const categoryLabels: Record<ProjectCategory, string> = {
+		research: t.projectItem.categoryResearch,
+		personal: t.projectItem.categoryPersonal,
+		work: t.projectItem.categoryWork,
+	};
 
 	return (
 		<div
@@ -73,7 +75,7 @@ export function ProjectItem({ project, onClick, onDelete }: ProjectItemProps) {
 							{categoryLabels[category]}
 						</span>
 						<span className="text-xs text-muted-foreground">
-							{formatRelativeDate(project.updated_at)}
+							{formatRelativeDate(project.updated_at, t)}
 						</span>
 					</div>
 				</div>
@@ -100,7 +102,7 @@ export function ProjectItem({ project, onClick, onDelete }: ProjectItemProps) {
 								}}
 							>
 								<Trash2 className="size-4" />
-								Delete
+								{t.projectItem.delete}
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

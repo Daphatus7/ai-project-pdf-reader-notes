@@ -7,16 +7,17 @@ import { Input } from "@/frontend/components/ui/input";
 import { Button } from "@/frontend/components/ui/button";
 import { Label } from "@/frontend/components/ui/label";
 import { Checkbox } from "@/frontend/components/ui/checkbox";
+import { useLanguage } from "../../i18n/language-context";
 
-// Field-level validation helpers
-const validateEmail = (val: string) => {
-	if (!val) return "Email is required";
-	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Please enter a valid email address";
+// Field-level validation helpers — take translated messages so errors match the UI language
+const validateEmail = (val: string, msgs: { required: string; invalid: string }) => {
+	if (!val) return msgs.required;
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return msgs.invalid;
 	return null;
 };
-const validatePassword = (val: string) => {
-	if (!val) return "Password is required";
-	if (val.length < 6) return "Password must be at least 6 characters";
+const validatePassword = (val: string, msgs: { required: string; tooShort: string }) => {
+	if (!val) return msgs.required;
+	if (val.length < 6) return msgs.tooShort;
 	return null;
 };
 
@@ -34,13 +35,17 @@ const LoginPage = () => {
 	const location = useLocation();
 	const from = location.state?.from?.pathname || "/";
 	const successMessage = location.state?.message as string | undefined;
+	const { t } = useLanguage();
+
+	const emailMsgs = { required: t.auth.emailRequired, invalid: t.auth.emailInvalid };
+	const passwordMsgs = { required: t.auth.passwordRequired, tooShort: t.auth.passwordTooShort };
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
 		// Validate all fields before calling API
-		const eErr = validateEmail(email);
-		const pErr = validatePassword(password);
+		const eErr = validateEmail(email, emailMsgs);
+		const pErr = validatePassword(password, passwordMsgs);
 		setEmailError(eErr);
 		setPasswordError(pErr);
 		if (eErr || pErr) return;
@@ -52,7 +57,7 @@ const LoginPage = () => {
 			await loginViaApi(email, password);
 			navigate(from, { replace: true });
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Login failed");
+			setError(err instanceof Error ? err.message : t.auth.loginFailed);
 		} finally {
 			setLoading(false);
 		}
@@ -63,7 +68,7 @@ const LoginPage = () => {
 		try {
 			await loginWithGoogle();
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Google login failed");
+			setError(err instanceof Error ? err.message : t.auth.googleLoginFailed);
 		}
 	};
 
@@ -79,8 +84,8 @@ const LoginPage = () => {
 			<img src="/logo.svg" alt="Logo" className="h-12" />
 			<Card className="w-full">
 				<CardHeader>
-					<CardTitle className="text-xl">Sign in to your account</CardTitle>
-					<CardDescription>Enter your credentials to continue</CardDescription>
+					<CardTitle className="text-xl">{t.auth.loginTitle}</CardTitle>
+					<CardDescription>{t.auth.loginDescription}</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{successMessage && (
@@ -97,27 +102,27 @@ const LoginPage = () => {
 
 					<form className="space-y-4" onSubmit={handleSubmit}>
 						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
+							<Label htmlFor="email">{t.auth.email}</Label>
 							<Input
 								type="email"
 								id="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								onBlur={() => setEmailError(validateEmail(email))}
+								onBlur={() => setEmailError(validateEmail(email, emailMsgs))}
 								placeholder="name@company.com"
 								required
 							/>
 							{emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="password">Password</Label>
+							<Label htmlFor="password">{t.auth.password}</Label>
 							<Input
 								type="password"
 								id="password"
 								autoComplete="current-password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								onBlur={() => setPasswordError(validatePassword(password))}
+								onBlur={() => setPasswordError(validatePassword(password, passwordMsgs))}
 								placeholder="••••••••"
 								required
 							/>
@@ -127,7 +132,7 @@ const LoginPage = () => {
 							<div className="flex items-center gap-2">
 								<Checkbox id="remember" />
 								<Label htmlFor="remember" className="font-normal text-muted-foreground">
-									Remember me
+									{t.auth.rememberMe}
 								</Label>
 							</div>
 							{/* Password reset: directs user to email support instead of a self-serve flow */}
@@ -135,11 +140,11 @@ const LoginPage = () => {
 								href="mailto:support@atlasnotebook.com?subject=Password%20Reset%20Request"
 								className="text-sm font-medium text-primary hover:underline"
 							>
-								Forgot password?
+								{t.auth.forgotPassword}
 							</a>
 						</div>
 						<Button type="submit" disabled={loading} className="w-full">
-							{loading ? "Signing in..." : "Sign in"}
+							{loading ? t.auth.signingIn : t.auth.signIn}
 						</Button>
 					</form>
 
@@ -148,7 +153,7 @@ const LoginPage = () => {
 							<span className="w-full border-t" />
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
-							<span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+							<span className="bg-card px-2 text-muted-foreground">{t.auth.orContinueWith}</span>
 						</div>
 					</div>
 
@@ -176,16 +181,16 @@ const LoginPage = () => {
 								fill="#EA4335"
 							/>
 						</svg>
-						Sign in with Google
+						{t.auth.signInWithGoogle}
 					</Button>
 
 					<p className="mt-4 text-center text-sm text-muted-foreground">
-						Don't have an account yet?{" "}
+						{t.auth.noAccount}{" "}
 						<Link
 							to="/signup"
 							className="font-medium text-primary hover:underline"
 						>
-							Sign up
+							{t.auth.signUp}
 						</Link>
 					</p>
 				</CardContent>

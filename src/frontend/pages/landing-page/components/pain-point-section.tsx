@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../../i18n/language-context";
 
 // ─── Math helpers ────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ const PainPointSection = () => {
 	const [progress, setProgress] = useState(0);
 	const rafRef = useRef<number>();
 	const latestP = useRef(0);
+	const { t } = useLanguage();
 
 	useEffect(() => {
 		const wrapper = wrapperRef.current;
@@ -143,10 +145,10 @@ const PainPointSection = () => {
 				<div className="absolute inset-0 flex items-center justify-center px-8" style={slideStyle(0)}>
 					<div className="max-w-xl text-center">
 						<p className="text-4xl md:text-5xl text-foreground font-medium leading-snug">
-							Most of your "note-taking" time
+							{t.pain.card1Line1}
 						</p>
 						<p className="text-4xl md:text-5xl text-muted-foreground font-medium leading-snug mt-3">
-							isn't actually note-taking.
+							{t.pain.card1Line2}
 						</p>
 					</div>
 				</div>
@@ -154,7 +156,7 @@ const PainPointSection = () => {
 				{/* Slide 1: The reality — list items stagger in from below on entry */}
 				<div className="absolute inset-0 flex items-center justify-center px-8" style={slideStyle(1)}>
 					<div className="max-w-xl w-full text-center space-y-5">
-						{["Switching tabs.", "Copy-pasting.", "Retyping formulas.", "Fixing broken formatting."].map(
+						{t.pain.card2Items.map(
 							(line, i) => (
 								<p
 									key={line}
@@ -177,13 +179,13 @@ const PainPointSection = () => {
 				<div className="absolute inset-0 flex items-center justify-center px-8" style={slideStyle(2)}>
 					<div className="max-w-xl text-center">
 						<p className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-							That's not thinking.
+							{t.pain.card3Verdict}
 						</p>
 						<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-8">
-							That's busywork.
+							{t.pain.card3Label}
 						</p>
 						<p className="text-lg text-muted-foreground">
-							Your best ideas deserve better than that.
+							{t.pain.card3Message}
 						</p>
 					</div>
 				</div>
@@ -192,19 +194,19 @@ const PainPointSection = () => {
 				<div className="absolute inset-0 flex items-center justify-center px-8" style={slideStyle(3)}>
 					<div className="max-w-xl text-center">
 						<p className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-							Atlas is built for one thing.
+							{t.pain.card4Title}
 						</p>
 						<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-6">
-							The fastest path from reading to knowing.
+							{t.pain.card4Subtitle}
 						</p>
 						<p className="text-lg text-muted-foreground mb-16">
-							Every unnecessary step — removed.
+							{t.pain.card4Detail}
 						</p>
 						<Link
 							to="/signup"
 							className="inline-block bg-foreground text-background px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity"
 						>
-							Start for free
+							{t.pain.card4Cta}
 						</Link>
 					</div>
 				</div>

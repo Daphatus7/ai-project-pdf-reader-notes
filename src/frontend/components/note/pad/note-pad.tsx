@@ -9,11 +9,13 @@ import { useQuota } from '@/frontend/features/quota/use-quota'
 import { Save, Sidebar, Loader2 } from 'lucide-react'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { Skeleton } from '@/frontend/components/ui/skeleton.tsx'
+import { useLanguage } from '@/frontend/i18n/language-context'
 
 export const NotePad = forwardRef<NotePadHandler>(
 	function NotePad(_, ref) {
 		const pad = useNotePad()
 		const quota = useQuota()
+		const { t } = useLanguage()
 		const [showSidebar, setShowSidebar] = useState(false)
 
 useImperativeHandle(ref, () => ({
@@ -47,8 +49,8 @@ useImperativeHandle(ref, () => ({
 						<div className="p-3 flex items-center border-b h-13 justify-between">
 							<div className="flex items-center gap-2">
 								<TabsList>
-									<TabsTrigger value="markdown">Markdown</TabsTrigger>
-									<TabsTrigger value="editor">Editor</TabsTrigger>
+									<TabsTrigger value="markdown">{t.notes.tabMarkdown}</TabsTrigger>
+									<TabsTrigger value="editor">{t.notes.tabEditor}</TabsTrigger>
 								</TabsList>
 							</div>
 							<div className="flex items-center gap-1">

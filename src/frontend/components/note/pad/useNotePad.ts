@@ -6,6 +6,7 @@ import type { NoteRendererHandle } from './renderer/note-renderer'
 import { notesService } from '@/frontend/api/services/notes.service.ts'
 import { notebooksService } from '@/frontend/api/services/notebooks.service.ts'
 import { isQuotaError } from '@/frontend/features/quota/use-quota'
+import { useLanguage } from '@/frontend/i18n/language-context'
 
 // --- PDF export pipeline (unified + remark/rehype) ---
 import { unified } from 'unified'
@@ -33,6 +34,7 @@ async function markdownToHtml(markdown: string): Promise<string> {
 export type ViewMode = 'markdown' | 'editor'
 
 export function useNotePad() {
+	const { t } = useLanguage()
 	// --- Notes list ---
 	const [notes, setNotes] = useState<Note[]>([])
 	const [selectedNoteId, setSelectedNoteId] = useState('')
@@ -85,7 +87,7 @@ export function useNotePad() {
 			])
 			setNotebooks(fetchedNotebooks)
 			if (fetched.length === 0) {
-				const created = await notesService.createNote({ title: 'Untitled' })
+				const created = await notesService.createNote({ title: t.notes.untitled })
 				setNotes([created])
 				applyNote(created)
 			} else {
@@ -150,10 +152,10 @@ export function useNotePad() {
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
 			lastSavedContent.current = contentRef.current
-			if (!silent) toast.success('Note saved')
+			if (!silent) toast.success(t.notes.noteSaved)
 		} catch (error) {
 			console.error('[useNotePad] Failed to save note:', error)
-			if (!silent) toast.error('Failed to save note')
+			if (!silent) toast.error(t.notes.noteSaveFailed)
 		} finally {
 			setIsSaving(false)
 		}
@@ -166,16 +168,16 @@ export function useNotePad() {
 			if (selectedNoteId && isDirty()) {
 				await saveCurrentNote()
 			}
-			const created = await notesService.createNote({ title: 'Untitled', notebook_id: notebookId })
+			const created = await notesService.createNote({ title: t.notes.untitled, notebook_id: notebookId })
 			setNotes(prev => [created, ...prev])
 			applyNote(created)
-			toast.success('Note created')
+			toast.success(t.notes.noteCreated)
 		} catch (error) {
 			console.error('[useNotePad] Failed to create note:', error)
 			if (isQuotaError(error)) {
-				toast.error('Note limit reached. Upgrade your plan to create more.')
+				toast.error(t.notes.noteLimitReached)
 			} else {
-				toast.error('Failed to create note')
+				toast.error(t.notes.noteCreateFailed)
 			}
 		}
 	}
@@ -196,10 +198,10 @@ export function useNotePad() {
 					lastSavedContent.current = ''
 				}
 			}
-			toast.success('Note deleted')
+			toast.success(t.notes.noteDeleted)
 		} catch (error) {
 			console.error('[useNotePad] Failed to delete note:', error)
-			toast.error('Failed to delete note')
+			toast.error(t.notes.noteDeleteFailed)
 		}
 	}
 
@@ -213,10 +215,10 @@ export function useNotePad() {
 				version: note.version,
 			})
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
-			toast.success('Note renamed')
+			toast.success(t.notes.noteRenamed)
 		} catch (error) {
 			console.error('[useNotePad] Failed to rename note:', error)
-			toast.error('Failed to rename note')
+			toast.error(t.notes.noteRenameFailed)
 		}
 	}
 
@@ -224,12 +226,12 @@ export function useNotePad() {
 
 	async function addNotebook() {
 		try {
-			const created = await notebooksService.createNotebook({ name: 'Untitled Notebook' })
+			const created = await notebooksService.createNotebook({ name: t.notes.untitledNotebook })
 			setNotebooks(prev => [...prev, created])
-			toast.success('Notebook created')
+			toast.success(t.notes.notebookCreated)
 		} catch (error) {
 			console.error('[useNotePad] Failed to create notebook:', error)
-			toast.error('Failed to create notebook')
+			toast.error(t.notes.notebookCreateFailed)
 		}
 	}
 
@@ -239,7 +241,7 @@ export function useNotePad() {
 			setNotebooks(prev => prev.map(nb => nb.id === updated.id ? updated : nb))
 		} catch (error) {
 			console.error('[useNotePad] Failed to rename notebook:', error)
-			toast.error('Failed to rename notebook')
+			toast.error(t.notes.notebookRenameFailed)
 		}
 	}
 
@@ -249,10 +251,10 @@ export function useNotePad() {
 			setNotebooks(prev => prev.filter(nb => nb.id !== id))
 			// Reflect ON DELETE SET NULL — uncategorise notes that were in this notebook
 			setNotes(prev => prev.map(n => n.notebook_id === id ? { ...n, notebook_id: null } : n))
-			toast.success('Notebook deleted')
+			toast.success(t.notes.notebookDeleted)
 		} catch (error) {
 			console.error('[useNotePad] Failed to delete notebook:', error)
-			toast.error('Failed to delete notebook')
+			toast.error(t.notes.notebookDeleteFailed)
 		}
 	}
 
@@ -267,7 +269,7 @@ export function useNotePad() {
 			setNotes(prev => prev.map(n => n.id === updated.id ? updated : n))
 		} catch (error) {
 			console.error('[useNotePad] Failed to move note:', error)
-			toast.error('Failed to move note')
+			toast.error(t.notes.noteMoveFailed)
 		}
 	}
 

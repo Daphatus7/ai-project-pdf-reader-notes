@@ -9,6 +9,7 @@ import { useState, useCallback } from 'react';
 import { llmService } from '../../api/services/llm.service.ts';
 import type {UserMessage} from '../../api/types/chat.ts';
 import type {ChatContent} from "@/frontend/api";
+import { useLanguage } from "@/frontend/i18n/language-context";
 
 // ============ Hook ============
 
@@ -22,6 +23,7 @@ export function useChat(
 	updateThreadTitle: (threadId: string, title: string) => void,
 	sourceIds?: string[] | undefined,
 ) {
+	const { t } = useLanguage();
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -49,10 +51,10 @@ export function useChat(
 				(message) => { setError(message); setIsLoading(false); },
 			);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to send message');
+			setError(err instanceof Error ? err.message : t.chat.errorSendMessage);
 			setIsLoading(false);
 		}
-	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, updateThreadTitle, sourceIds]);
+	}, [activeThreadId, addUserMessage, startStreamingMessage, appendStreamingChunk, finalizeStreamingMessage, updateThreadTitle, sourceIds, t]);
 
 	const selectMessage = useCallback((messageId: string) => {
 		// console.log('Selected message:', messageId);

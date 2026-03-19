@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '@/frontend/components/ui/button';
 import { Progress } from '@/frontend/components/ui/progress';
+import { useLanguage } from '@/frontend/i18n/language-context';
 
 interface DocumentUploadProps {
 	onUpload: (file: File, sourceName?: string) => Promise<void>;
@@ -9,6 +10,7 @@ interface DocumentUploadProps {
 }
 
 export function DocumentUpload({ onUpload, isUploading }: DocumentUploadProps) {
+	const { t } = useLanguage();
 	const [isDragging, setIsDragging] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,19 +52,19 @@ export function DocumentUpload({ onUpload, isUploading }: DocumentUploadProps) {
 		>
 			{isUploading ? (
 				<div className="space-y-2">
-					<p className="text-sm text-center text-muted-foreground">Uploading & processing...</p>
+					<p className="text-sm text-center text-muted-foreground">{t.documentUpload.uploading}</p>
 					<Progress className="h-1" />
 				</div>
 			) : (
 				<div className="text-center">
 					<Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-					<p className="text-sm text-muted-foreground mb-2">Drag & drop PDF here</p>
+					<p className="text-sm text-muted-foreground mb-2">{t.documentUpload.dragDrop}</p>
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={() => fileInputRef.current?.click()}
 					>
-						Browse Files
+						{t.documentUpload.browseFiles}
 					</Button>
 					<input
 						ref={fileInputRef}

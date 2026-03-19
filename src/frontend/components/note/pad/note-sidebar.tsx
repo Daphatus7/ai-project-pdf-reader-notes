@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLanguage } from '@/frontend/i18n/language-context'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { ScrollArea } from '@/frontend/components/ui/scroll-area.tsx'
 import { Input } from '@/frontend/components/ui/input.tsx'
@@ -76,6 +77,7 @@ export function NoteSidebar({
 	onClose,
 }: NoteSidebarProps) {
 	const [pricingOpen, setPricingOpen] = useState(false)
+	const { t } = useLanguage()
 
 	// Drop zone for uncategorised area — dragging a note here removes its notebook
 	const [{ isOver: isOverUncategorized }, uncategorizedDropRef] = useDrop<DragItem, void, { isOver: boolean }>({
@@ -100,7 +102,7 @@ export function NoteSidebar({
 		<div className="w-1/2 border-l flex flex-col h-full bg-panel">
 			{/* Header */}
 			<div className="p-3 border-b flex items-center justify-between h-13">
-				<span className="text-sm font-medium">Notes</span>
+				<span className="text-sm font-medium">{t.notes.sidebarTitle}</span>
 				<Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
 					<LucideSidebar className="h-4 w-4" />
 				</Button>
@@ -113,9 +115,9 @@ export function NoteSidebar({
 						? <Plus className="w-4 h-4 mr-2" />
 						: <Crown className="w-4 h-4 mr-2 text-amber-500" />
 					}
-					{canCreateNote ? 'New Note' : 'Upgrade'}
+					{canCreateNote ? t.notes.newNote : t.notes.upgrade}
 				</Button>
-				<Button variant="outline" size="sm" onClick={onAddNotebook} title="New Notebook">
+				<Button variant="outline" size="sm" onClick={onAddNotebook} title={t.notes.newNotebook}>
 					<BookPlus className="w-4 h-4" />
 				</Button>
 			</div>
@@ -208,6 +210,7 @@ function NotebookSection({
 	onDeleteNotebook,
 	onMoveNoteToNotebook,
 }: NotebookSectionProps) {
+	const { t } = useLanguage()
 	// Persist expanded state per notebook in localStorage so it survives sidebar close/reopen
 	const storageKey = `notebook-expanded-${notebook.id}`
 	const [isExpanded, setIsExpanded] = useState(() => {
@@ -296,7 +299,7 @@ function NotebookSection({
 					variant="ghost"
 					size="icon"
 					className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-					title="New note in this notebook"
+					title={t.notes.newNoteInNotebook}
 					onClick={e => { e.stopPropagation(); onAddNote() }}
 				>
 					<Plus className="h-3 w-3" />
@@ -317,14 +320,14 @@ function NotebookSection({
 					<DropdownMenuContent align="end">
 						<DropdownMenuItem onClick={e => { e.stopPropagation(); setIsEditing(true) }}>
 							<EditIcon className="w-4 h-4 mr-2" />
-							Rename
+							{t.notes.rename}
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							variant="destructive"
 							onClick={e => { e.stopPropagation(); onDeleteNotebook() }}
 						>
 							<Trash2 className="w-4 h-4 mr-2" />
-							Delete
+							{t.notes.delete}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -378,6 +381,7 @@ function NoteItem({
 	onExportPdf,
 	onMoveToNotebook,
 }: NoteItemProps) {
+	const { t } = useLanguage()
 	const [isEditing, setIsEditing] = useState(false)
 	const [editValue, setEditValue] = useState(note.title)
 
@@ -432,7 +436,7 @@ function NoteItem({
 					className="h-6 text-sm px-1 py-0 flex-1"
 				/>
 			) : (
-				<span className="truncate flex-1">{note.title || 'Untitled'}</span>
+				<span className="truncate flex-1">{note.title || t.notes.untitled}</span>
 			)}
 
 			<DropdownMenu>
@@ -449,20 +453,20 @@ function NoteItem({
 				<DropdownMenuContent align="end">
 					<DropdownMenuItem onClick={e => { e.stopPropagation(); handleStartEdit() }}>
 						<EditIcon className="w-4 h-4 mr-2" />
-						Rename
+						{t.notes.rename}
 					</DropdownMenuItem>
 
 					{/* Move to notebook sub-menu */}
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger onClick={e => e.stopPropagation()}>
 							<FolderSymlink className="w-4 h-4 mr-2" />
-							Move to Notebook
+							{t.notes.moveToNotebook}
 						</DropdownMenuSubTrigger>
 						<DropdownMenuSubContent>
 							{note.notebook_id && (
 								<>
 									<DropdownMenuItem onClick={() => onMoveToNotebook(null)}>
-										Remove from Notebook
+										{t.notes.removeFromNotebook}
 									</DropdownMenuItem>
 									<DropdownMenuSeparator />
 								</>
@@ -478,7 +482,7 @@ function NoteItem({
 								</DropdownMenuItem>
 							))}
 							{notebooks.length === 0 && (
-								<DropdownMenuItem disabled>No notebooks yet</DropdownMenuItem>
+								<DropdownMenuItem disabled>{t.notes.noNotebooksYet}</DropdownMenuItem>
 							)}
 						</DropdownMenuSubContent>
 					</DropdownMenuSub>
@@ -488,11 +492,11 @@ function NoteItem({
 					{/* Export actions */}
 					<DropdownMenuItem onClick={e => { e.stopPropagation(); onExportMarkdown() }}>
 						<FileDown className="w-4 h-4 mr-2" />
-						Export as Markdown
+						{t.notes.exportMarkdown}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={e => { e.stopPropagation(); onExportPdf() }}>
 						<Printer className="w-4 h-4 mr-2" />
-						Export as PDF
+						{t.notes.exportPdf}
 					</DropdownMenuItem>
 
 					<DropdownMenuSeparator />
@@ -502,7 +506,7 @@ function NoteItem({
 						onClick={e => { e.stopPropagation(); onDelete() }}
 					>
 						<Trash2 className="w-4 h-4 mr-2" />
-						Delete
+						{t.notes.delete}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
