@@ -222,8 +222,8 @@ const LandingPage = () => {
 					<p className="text-lg text-muted-foreground mb-16">
 						Every unnecessary step — removed.
 					</p>
-					<a href="#product" className="inline-block bg-foreground text-background px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity">
-						See how it works
+					<a href="/signup" className="text-accent inline-block bg-foreground  px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity">
+						Start for free
 					</a>
 				</div>
 			</div>
