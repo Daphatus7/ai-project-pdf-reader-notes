@@ -168,6 +168,28 @@ const LandingPage = () => {
 			</section>
 
 			<DemoSection />
+
+			{/* Pain Point Section */}
+			<section className="w-full px-4 py-20 bg-card">
+				<div className="max-w-2xl mx-auto text-center">
+					<p className="text-2xl md:text-3xl text-foreground leading-relaxed font-medium">
+						You know what's wild?
+					</p>
+					<p className="text-2xl md:text-3xl text-muted-foreground leading-relaxed mt-4">
+						Most of your "note-taking" time isn't actually note-taking.
+					</p>
+					<p className="text-lg text-muted-foreground leading-relaxed mt-8">
+						It's switching tabs. Copy-pasting. Retyping formulas.
+						Fixing broken formatting. Hunting for that screenshot you took 10 minutes ago.
+						<br /><br />
+						That's not thinking. That's busywork.
+						<br /><br />
+						<span className="text-foreground font-medium">
+                Your best ideas deserve better than that.
+            </span>
+					</p>
+				</div>
+			</section>
 			
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
