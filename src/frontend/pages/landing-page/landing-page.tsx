@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
 	ArrowRightIcon,
 	LucideArrowRight,
-	LucideCog,
+	LucideCog, LucideMousePointer, LucideSigma,
 	LucideSparkles,
 	LucideTarget,
 	LucideTrendingUp,
@@ -110,14 +110,16 @@ const LandingPage = () => {
 						WebkitBackgroundClip: "text",
 					}}
 				>
-					<div>Ask any PDF</div>
-					<div>Keep the answers that matter</div>
+					<div>You didn't spend years studying</div>
+					<div>just to copy-paste and fix formatting.</div>
 				</h1>
 
 				{/* Subtitle */}
 				<p className="text-foreground text-xl md:text-2xl text-center max-w-4xl mb-12 leading-relaxed">
-					Screenshot any section, get structured AI answers, verify them, and insert properly
-					formatted tables and formulas directly into your notebook.
+					Screenshot anything. AI answers instantly. Already in your notes —
+					formulas, tables, perfectly formatted.
+					<br />
+					The AI notebook that kills the busywork.
 				</p>
 
 				{/* CTA Buttons */}
@@ -140,26 +142,29 @@ const LandingPage = () => {
 
 				{/* Features Pills */}
 				<div className="flex flex-wrap justify-center gap-8 max-w-4xl">
-					{/* Workflow speed / Focus / Productivity pills */}
-				<div className="flex items-center gap-2">
+
+					<div className="flex items-center gap-2">
 						<LucideZap />
 						<span className="text-sm text-muted-foreground">
-              50% faster Workflow
-            </span>
+            Screenshot to notes in 3 seconds
+			</span>
+						</div>
+	
+						<div className="flex items-center gap-2">
+							<LucideSigma /> {/* or LucideSigma */}
+							<span className="text-sm text-muted-foreground">
+				Formulas & tables, perfectly formatted
+			</span>
+						</div>
+	
+						<div className="flex items-center gap-2">
+							<LucideMousePointer />
+							<span className="text-sm text-muted-foreground">
+				One-click AI macros
+			</span>
+						</div>
+	
 					</div>
-					<div className="flex items-center gap-2">
-						<LucideTarget />
-						<span className="text-sm text-muted-foreground">
-              100% Focus
-            </span>
-					</div>
-					<div className="flex items-center gap-2">
-						<LucideTrendingUp />
-						<span className="text-sm text-muted-foreground">
-              200% productivity
-            </span>
-					</div>
-				</div>
 			</section>
 
 			<DemoSection />
