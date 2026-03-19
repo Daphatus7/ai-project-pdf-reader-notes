@@ -8,6 +8,7 @@ import {
 	LucideZap
 } from "lucide-react";
 import DemoSection from "./components/demo";
+import PainPointSection from "./components/pain-point-section";
 import PricingSection from "./pricing";
 
 const LandingPage = () => {
@@ -36,7 +37,7 @@ const LandingPage = () => {
 
 				<link rel="canonical" href="https://atlasnotebook.com" />
 			</Helmet>
-		<div className="bg-card h-screen overflow-y-auto scroll-smooth w-full" style={{ scrollSnapType: 'y proximity' }}>
+		<div className="bg-card h-screen overflow-y-auto scroll-smooth w-full">
 			{/* Header */}
 			<header className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border">
 				<div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
@@ -167,66 +168,8 @@ const LandingPage = () => {
 
 			<DemoSection />
 
-			{/* Pain Point Section — 3 full-screen cards in normal page flow, main scroll handles navigation */}
-
-			{/* Card 1: The observation */}
-			<div className="h-screen snap-start bg-card flex items-center justify-center px-8">
-				<div className="max-w-xl text-center">
-					<p className="text-4xl md:text-5xl text-foreground font-medium leading-snug">
-						Most of your "note-taking" time
-					</p>
-					<p className="text-4xl md:text-5xl text-muted-foreground font-medium leading-snug mt-3">
-						isn't actually note-taking.
-					</p>
-				</div>
-			</div>
-
-			{/* Card 2: The reality — each line drops alone */}
-			<div className="h-screen snap-start bg-secondary flex items-center justify-center px-8">
-				<div className="max-w-xl text-center space-y-5">
-					{[
-						"Switching tabs.",
-						"Copy-pasting.",
-						"Retyping formulas.",
-						"Fixing broken formatting.",
-					].map((line) => (
-						<p key={line} className="text-2xl md:text-3xl text-muted-foreground">{line}</p>
-					))}
-				</div>
-			</div>
-
-			{/* Card 3: The verdict */}
-			<div className="h-screen snap-start bg-card flex items-center justify-center px-8">
-				<div className="max-w-xl text-center">
-					<p className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-						That's not thinking.
-					</p>
-					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-12">
-						That's busywork.
-					</p>
-					<p className="text-lg text-muted-foreground">
-						Your best ideas deserve better than that.
-					</p>
-				</div>
-			</div>
-
-			{/* Card 4: The payoff */}
-			<div className="h-screen snap-start bg-secondary flex items-center justify-center px-8">
-				<div className="max-w-xl text-center">
-					<p className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-						Atlas is built for one thing.
-					</p>
-					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-6">
-						The fastest path from reading to knowing.
-					</p>
-					<p className="text-lg text-muted-foreground mb-16">
-						Every unnecessary step — removed.
-					</p>
-					<a href="/signup" className="text-accent inline-block bg-foreground  px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity">
-						Start for free
-					</a>
-				</div>
-			</div>
+			{/* Pain Point Section — Apple-style sticky scroll reveal */}
+			<PainPointSection />
 			
 			{/* Features Section */}
 			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
