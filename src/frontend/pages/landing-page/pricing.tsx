@@ -36,10 +36,6 @@ export default function PricingSection() {
 					onSelectYearly={() => startCheckout('year')}
 					freeAction={freeAction}
 				/>
-
-				<p className="text-sm text-muted-foreground text-center mt-10">
-					All plans include end-to-end encryption, automatic backups.
-				</p>
 			</div>
 		</section>
 	);

@@ -56,7 +56,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						<span className="text-5xl font-bold text-foreground">$15</span>
 						<span className="text-muted-foreground pb-1.5 ml-1">/ month</span>
 					</div>
-					<p className="text-sm text-muted-foreground mt-1">Billed monthly · Cancel anytime</p>
+					<p className="text-sm text-muted-foreground mt-1">Billed monthly</p>
 				</div>
 
 				<Button
@@ -86,7 +86,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 			>
 				<div className="absolute -top-4 left-1/2 -translate-x-1/2">
 					<span className="bg-yellow-400 text-yellow-900 text-xs font-semibold px-4 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1">
-						<Zap className="size-3" /> Best Value · Save $31
+						<Zap className="size-3" /> Best Value
 					</span>
 				</div>
 				
@@ -96,7 +96,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						<span className="text-5xl font-bold text-white">$12.42</span>
 						<span className="text-white/50 pb-1.5 ml-1">/ month</span>
 					</div>
-					<p className="text-sm text-white/60 mt-1">$149 / year · billed annually</p>
+					<p className="text-sm text-white/60 mt-1">Billed annually</p>
 				</div>
 
 				<Button
