@@ -7,7 +7,6 @@ import {
 	LucideSparkles,
 	LucideZap
 } from "lucide-react";
-import DemoSection from "./components/demo";
 import PainPointSection from "./components/pain-point-section";
 import PricingSection from "./pricing";
 import { useLanguage } from "../../i18n/language-context";
@@ -176,7 +175,6 @@ const LandingPage = () => {
 					</div>
 			</section>
 
-			<DemoSection />
 
 			{/* Pain Point Section — Apple-style sticky scroll reveal */}
 			<PainPointSection />
