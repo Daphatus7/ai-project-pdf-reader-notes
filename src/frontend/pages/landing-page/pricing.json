@@ -3,16 +3,15 @@
   "subheading": "Start free. Upgrade when the busywork gets old.",
   "free": [
     { "included": true, "label": "AI-native notebook experience" },
-    { "included": true, "label": "Limited AI usage" },
+    { "included": true, "label": "State of the Art Document Q&A" },
     { "included": true, "label": "Basic project folder limits" },
     { "included": true, "label": "Basic note limits" },
-    { "included": true, "label": "Basic document analysis" }
+    { "included": true, "label": "Limited AI usage" }
   ],
 
   "monthly": [
     { "included": true, "label": "Everything in free" },
     { "included": true, "label": "High AI usage & Reasoning Model" },
-    { "included": true, "label": "State of the Art Document Q&A" },
     { "included": true, "label": "Unlimited Projects" },
     { "included": true, "label": "Unlimited Notes" },
     { "included": true, "label": "High-volume document uploads" },

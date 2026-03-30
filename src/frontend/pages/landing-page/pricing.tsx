@@ -14,20 +14,24 @@ export default function PricingSection() {
 	const freeAction = (
 		<Link
 			to="/signup"
-			className="flex items-center justify-center h-9 w-full px-4 rounded-md border border-input bg-panel text-sm font-medium text-foreground hover:border-[#006aff] hover:text-[#006aff] transition-colors mb-8"
+			className="flex items-center justify-center h-9 w-full px-4 rounded-lg border border-border bg-transparent text-sm font-medium text-foreground hover:border-[#006aff] hover:text-[#006aff] transition-colors"
 		>
 			{t.pricing.getStartedFree}
 		</Link>
 	);
 
 	return (
-		<section id="pricing" className="w-full px-4 py-20">
+		<section id="pricing" className="w-full px-4 py-24">
 			<div className="max-w-7xl mx-auto">
-				<div className="text-center mb-16">
-					<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
+				<div className="text-center mb-14">
+					{/* Eyebrow label */}
+					<p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-4">
+						Pricing
+					</p>
+					<h2 className="font-semibold text-3xl md:text-4xl text-foreground mb-3">
 						{t.pricing.heading}
 					</h2>
-					<p className="text-lg text-muted-foreground">
+					<p className="text-base text-muted-foreground max-w-sm mx-auto">
 						{t.pricing.subheading}
 					</p>
 				</div>
