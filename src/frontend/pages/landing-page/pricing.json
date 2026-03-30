@@ -11,7 +11,7 @@
 
   "monthly": [
     { "included": true, "label": "Everything in free" },
-    { "included": true, "label": "High AI usage & Reasoning Model" },
+    { "included": true, "label": "High AI usage & Grok Reasoning Model" },
     { "included": true, "label": "Unlimited Projects" },
     { "included": true, "label": "Unlimited Notes" },
     { "included": true, "label": "High-volume document uploads" },
