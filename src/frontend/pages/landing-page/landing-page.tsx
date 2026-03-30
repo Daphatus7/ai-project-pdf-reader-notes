@@ -270,7 +270,7 @@ const LandingPage = () => {
 								Reading PDFs made easy
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								Select any passage in your document and get instant, precise answers — powered by state-of-the-art AI. No hallucinations, no fluff.
+								Select any passage in your document and get instant, precise answers — powered by XAI Collection — State of Art Q&A — Most reliable answers you can get.
 							</p>
 						</div>
 					</div>
@@ -295,7 +295,7 @@ const LandingPage = () => {
 								Formulas, tables, any LLM output
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								One-click insert into your notebook — LaTeX, tables, code blocks all perfectly formatted. What you see is exactly what you get.
+								Perfectly matches AI outputs to your notebook — Tables Latex formulas,. What you see is exactly what you get.
 							</p>
 						</div>
 					</div>
