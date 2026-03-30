@@ -249,42 +249,57 @@ const LandingPage = () => {
 				</div>
 			</section>
 
-			{/* How it Works — product screenshot */}
+			{/* How it Works — alternating media + text rows */}
 			<section className="w-full px-4 py-24">
-				<div className="max-w-5xl mx-auto">
-					<div className="text-center mb-12">
-						<p className="text-sm font-semibold tracking-[0.12em] text-muted-foreground mb-4">
-							Reading PDFs made Easy
-							- Select source to AI document, and XAI State of Art Document Q&A
-						</p>
+				<div className="max-w-5xl mx-auto space-y-24">
+
+					{/* Row 1 — left: screenshot, right: text */}
+					<div className="flex flex-col md:flex-row items-center gap-12">
+						<div className="w-full md:w-3/5 rounded-xl border border-border overflow-hidden shrink-0">
+							<img
+								src="/demo.png"
+								alt="Atlas Notebook — AI-native notebook interface"
+								className="w-full block"
+							/>
+						</div>
+						<div className="flex flex-col gap-4">
+							<p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+								Document Q&A
+							</p>
+							<h3 className="font-semibold text-2xl text-foreground leading-snug">
+								Reading PDFs made easy
+							</h3>
+							<p className="text-base text-muted-foreground leading-relaxed">
+								Select any passage in your document and get instant, precise answers — powered by state-of-the-art AI. No hallucinations, no fluff.
+							</p>
+						</div>
 					</div>
 
-					{/* Screenshot frame */}
-
-					<div className="rounded-xl border border-border overflow-hidden shadow-2xl">
-						<img
-							src="/demo.png"
-							alt="Atlas Notebook — AI-native notebook interface"
-							className="w-full block"
-						/>
+					{/* Row 2 — left: text, right: video */}
+					<div className="flex flex-col md:flex-row-reverse items-center gap-12">
+						<div className="w-full md:w-3/5 rounded-xl border border-border overflow-hidden shrink-0">
+							<video
+								src="/an.mp4"
+								autoPlay
+								loop
+								muted
+								playsInline
+								className="w-full block"
+							/>
+						</div>
+						<div className="flex flex-col gap-4">
+							<p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+								Rich Output
+							</p>
+							<h3 className="font-semibold text-2xl text-foreground leading-snug">
+								Formulas, tables, any LLM output
+							</h3>
+							<p className="text-base text-muted-foreground leading-relaxed">
+								One-click insert into your notebook — LaTeX, tables, code blocks all perfectly formatted. What you see is exactly what you get.
+							</p>
+						</div>
 					</div>
 
-					{/* Video demo */}
-					<div className="text-center mb-12">
-						<p className="text-sm font-semibold tracking-[0.12em] text-muted-foreground mb-4">
-							Formulas and Tables, support any LLM outputs
-						</p>
-					</div>
-					<div className="rounded-xl border border-border overflow-hidden shadow-2xl mt-6">
-						<video
-							src="/an.mp4"
-							autoPlay
-							loop
-							muted
-							playsInline
-							className="w-full block"
-						/>
-					</div>
 				</div>
 			</section>
 
