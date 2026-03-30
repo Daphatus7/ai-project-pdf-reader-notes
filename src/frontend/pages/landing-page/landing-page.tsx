@@ -249,6 +249,45 @@ const LandingPage = () => {
 				</div>
 			</section>
 
+			{/* How it Works — product screenshot */}
+			<section className="w-full px-4 py-24">
+				<div className="max-w-5xl mx-auto">
+					<div className="text-center mb-12">
+						<p className="text-sm font-semibold tracking-[0.12em] text-muted-foreground mb-4">
+							Reading PDFs made Easy
+							- Select source to AI document, and XAI State of Art Document Q&A
+						</p>
+					</div>
+
+					{/* Screenshot frame */}
+
+					<div className="rounded-xl border border-border overflow-hidden shadow-2xl">
+						<img
+							src="/demo.png"
+							alt="Atlas Notebook — AI-native notebook interface"
+							className="w-full block"
+						/>
+					</div>
+
+					{/* Video demo */}
+					<div className="text-center mb-12">
+						<p className="text-sm font-semibold tracking-[0.12em] text-muted-foreground mb-4">
+							Formulas and Tables, support any LLM outputs
+						</p>
+					</div>
+					<div className="rounded-xl border border-border overflow-hidden shadow-2xl mt-6">
+						<video
+							src="/an.mp4"
+							autoPlay
+							loop
+							muted
+							playsInline
+							className="w-full block"
+						/>
+					</div>
+				</div>
+			</section>
+
 			<PricingSection />
 
 			{/* CTA Section */}
