@@ -56,19 +56,13 @@ const LandingPage = () => {
             </span>
 					</a>
 
-					{/* Navigation */}
+					{/* Navigation — only links to sections that actually exist on the page */}
 					<nav className="hidden md:flex items-center gap-1">
 						<a href="#product" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							{t.nav.product}
 						</a>
-						<a href="#solutions" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							{t.nav.solutions}
-						</a>
 						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							{t.nav.pricing}
-						</a>
-						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							{t.nav.resources}
 						</a>
 					</nav>
 
