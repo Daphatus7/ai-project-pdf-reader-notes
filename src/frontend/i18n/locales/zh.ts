@@ -14,9 +14,8 @@ export const zh: Translations = {
 		badge: "AI 驱动",
 		heading1: "你花了多年苦读，",
 		heading2: "不是为了复制粘贴和改格式的。",
-		subtitle1: "截图任意内容，AI 立即解答，公式和表格完美排版，",
-		subtitle2: "直接存入你的笔记。",
-		subtitle3: "终结繁琐操作的 AI 笔记本。",
+		subtitle1: "截图任意 PDF，AI 立即解答。",
+		subtitle2: "公式、表格和代码完美排版，直接存入你的笔记。",
 		cta: "免费试用",
 		features: {
 			screenshot: "截图到笔记仅需 3 秒",
