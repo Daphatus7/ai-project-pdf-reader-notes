@@ -327,7 +327,7 @@ const LandingPage = () => {
 			{/* Footer */}
 			<footer className="w-full bg-secondary border-t border-border px-4 py-12">
 				<div className="max-w-7xl mx-auto">
-					<div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
 						{/* Company Info */}
 						<div className="space-y-4">
 							<div className="flex items-center gap-3">
