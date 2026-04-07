@@ -152,9 +152,12 @@ const LandingPage = () => {
 
 				{/* Product screenshot — shows the actual UI before visitors scroll */}
 				<div className="w-full max-w-4xl rounded-xl border border-border overflow-hidden shadow-sm">
-					<img
-						src="/demo.png"
-						alt="Atlas Notebook interface — PDF on the left, AI chat and notes on the right"
+					<video
+						src="/demo-full.mp4"
+						autoPlay
+						loop
+						muted
+						playsInline
 						className="w-full block"
 					/>
 				</div>
@@ -230,7 +233,7 @@ const LandingPage = () => {
 					<div className="flex flex-col md:flex-row-reverse items-center gap-12">
 						<div className="w-full md:w-3/5 rounded-xl border border-border overflow-hidden shrink-0">
 							<video
-								src="/an.mp4"
+								src="/demo-table.mp4"
 								autoPlay
 								loop
 								muted
