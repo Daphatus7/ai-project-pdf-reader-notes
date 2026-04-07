@@ -281,7 +281,7 @@ const LandingPage = () => {
 								Formulas, tables, any LLM output
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								Perfectly matches AI outputs to your notebook — Tables Latex formulas,. What you see is exactly what you get.
+								Perfectly matches AI outputs to your notebook — tables, LaTeX formulas, code blocks. What you see is exactly what you get.
 							</p>
 						</div>
 					</div>
