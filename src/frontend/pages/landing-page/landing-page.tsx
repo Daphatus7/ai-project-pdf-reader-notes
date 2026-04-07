@@ -100,14 +100,6 @@ const LandingPage = () => {
 
 			{/* Hero Section */}
 			<section className="w-full px-4 py-16 flex flex-col items-center">
-				{/* Powered by AI Badge */}
-				<div className="bg-secondary border border-border rounded-full px-6 py-2 mb-8 flex items-center gap-3">
-					<LucideSparkles />
-					<span className="font-medium text-xs text-foreground">
-            {t.hero.badge}
-          </span>
-				</div>
-
 				{/* Main Heading */}
 				<h1
 					className="font-bold text-5xl md:text-6xl text-center mb-6 bg-clip-text text-transparent"
