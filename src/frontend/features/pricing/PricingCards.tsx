@@ -82,7 +82,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						</span>
 					</div>
 					<div className="flex items-baseline gap-1 mb-1.5">
-						<span className="text-[2.5rem] font-semibold tracking-tight text-gray-900 leading-none">$15</span>
+						<span className="text-[2.5rem] font-semibold tracking-tight text-gray-900 leading-none">$20</span>
 						<span className="text-gray-400 text-sm ml-1.5">/ mo</span>
 					</div>
 					<p className="text-xs text-gray-400 mt-2">{t.pricing.billedMonthly}</p>
@@ -120,11 +120,11 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 							Pro Yearly
 						</p>
 						<span className="text-[11px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400 px-2.5 py-1 rounded-md flex items-center gap-1">
-							<Zap className="size-2.5" /> Save 17%
+							<Zap className="size-2.5" /> Save 20%
 						</span>
 					</div>
 					<div className="flex items-baseline gap-1 mb-1.5">
-						<span className="text-[2.5rem] font-semibold tracking-tight text-foreground leading-none">$12.42</span>
+						<span className="text-[2.5rem] font-semibold tracking-tight text-foreground leading-none">$16</span>
 						<span className="text-muted-foreground text-sm ml-1.5">/ mo</span>
 					</div>
 					<p className="text-xs text-muted-foreground mt-2">{t.pricing.billedYearly}</p>
