@@ -12,9 +12,8 @@ export const en = {
 		badge: "Powered by AI",
 		heading1: "You didn't spend years studying",
 		heading2: "just to copy-paste and fix formatting.",
-		subtitle1: "Screenshot anything. AI answers instantly. Already in your notes —",
-		subtitle2: "formulas, tables, perfectly formatted.",
-		subtitle3: "The AI notebook that kills the busywork.",
+		subtitle1: "Screenshot any PDF. AI answers instantly.",
+		subtitle2: "Formulas, tables, and code land perfectly in your notes.",
 		cta: "Try for free",
 		features: {
 			screenshot: "Screenshot to notes in 3 seconds",

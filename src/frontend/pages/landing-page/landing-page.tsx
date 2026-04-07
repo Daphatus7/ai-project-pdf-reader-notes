@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
 	ArrowRightIcon,
 	LucideArrowRight,
-	LucideCog, LucideMousePointer, LucideSigma,
+	LucideMousePointer, LucideSigma,
 	LucideSparkles,
 	LucideZap
 } from "lucide-react";
@@ -40,6 +40,7 @@ const LandingPage = () => {
 				<link rel="canonical" href="https://atlasnotebook.com" />
 			</Helmet>
 		<div className="bg-card h-screen overflow-y-auto scroll-smooth w-full">
+			<main>
 			{/* Header */}
 			<header className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border">
 				<div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
@@ -56,19 +57,13 @@ const LandingPage = () => {
             </span>
 					</a>
 
-					{/* Navigation */}
-					<nav className="hidden md:flex items-center gap-1">
+					{/* Navigation — only links to sections that actually exist on the page */}
+					<nav aria-label="Main navigation" className="hidden md:flex items-center gap-1">
 						<a href="#product" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							{t.nav.product}
 						</a>
-						<a href="#solutions" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							{t.nav.solutions}
-						</a>
 						<a href="#pricing" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							{t.nav.pricing}
-						</a>
-						<a href="#resources" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-							{t.nav.resources}
 						</a>
 					</nav>
 
@@ -80,7 +75,7 @@ const LandingPage = () => {
 							className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-md transition-colors"
 							aria-label="Switch language"
 						>
-							{lang === "en" ? "中文" : "EN"}
+							{lang === "en" ? "中" : "EN"}
 						</button>
 						<Link
 							to="/login"
@@ -100,20 +95,12 @@ const LandingPage = () => {
 
 			{/* Hero Section */}
 			<section className="w-full px-4 py-16 flex flex-col items-center">
-				{/* Powered by AI Badge */}
-				<div className="bg-secondary border border-border rounded-full px-6 py-2 mb-8 flex items-center gap-3">
-					<LucideSparkles />
-					<span className="font-medium text-xs text-foreground">
-            {t.hero.badge}
-          </span>
-				</div>
-
-				{/* Main Heading */}
+				{/* Main Heading — gradient from near-black to brand blue (#006aff) */}
 				<h1
-					className="font-bold text-5xl md:text-6xl text-center mb-6 bg-clip-text text-transparent"
+					className="font-bold text-4xl sm:text-5xl md:text-6xl text-center mb-6 bg-clip-text text-transparent"
 					style={{
 						backgroundImage:
-							"linear-gradient(90deg, rgb(15, 23, 43) 0%, rgb(49, 44, 133) 100%)",
+							"linear-gradient(90deg, rgb(15, 23, 43) 0%, #006aff 100%)",
 						WebkitTextFillColor: "transparent",
 						WebkitBackgroundClip: "text",
 					}}
@@ -122,16 +109,15 @@ const LandingPage = () => {
 					<div>{t.hero.heading2}</div>
 				</h1>
 
-				{/* Subtitle */}
-				<p className="text-foreground text-xl md:text-2xl text-center max-w-4xl mb-12 leading-relaxed">
+				{/* Subtitle — two clean sentences */}
+				<p className="text-muted-foreground text-xl md:text-2xl text-center max-w-2xl mb-12 leading-relaxed">
 					{t.hero.subtitle1}
-					{t.hero.subtitle2}
 					<br />
-					{t.hero.subtitle3}
+					{t.hero.subtitle2}
 				</p>
 
 				{/* CTA Buttons */}
-				<div className="flex flex-col sm:flex-row gap-4 mb-12">
+				<div className="flex flex-col sm:flex-row gap-4 mb-8">
 					<Link
 						to="/signup"
 						className="px-8 py-4 rounded-xl text-primary-foreground font-medium text-base flex items-center gap-3 hover:opacity-90 transition-opacity"
@@ -148,106 +134,74 @@ const LandingPage = () => {
 					{/*</button>*/}
 				</div>
 
-				{/* Features Pills */}
-				<div className="flex flex-wrap justify-center gap-8 max-w-4xl">
-
+				{/* Feature pills — concise capability signals */}
+				<div className="flex flex-wrap justify-center gap-8 max-w-4xl mb-16">
 					<div className="flex items-center gap-2">
-						<LucideZap />
-						<span className="text-sm text-muted-foreground">
-            {t.hero.features.screenshot}
-			</span>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<LucideSigma />
-							<span className="text-sm text-muted-foreground">
-				{t.hero.features.formulas}
-			</span>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<LucideMousePointer />
-							<span className="text-sm text-muted-foreground">
-				{t.hero.features.macros}
-			</span>
-						</div>
-
+						<LucideZap className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.screenshot}</span>
 					</div>
+					<div className="flex items-center gap-2">
+						<LucideSigma className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.formulas}</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<LucideMousePointer className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.macros}</span>
+					</div>
+				</div>
+
+				{/* Product screenshot — shows the actual UI before visitors scroll */}
+				<div className="w-full max-w-4xl rounded-xl border border-border overflow-hidden shadow-sm">
+					<video
+						src="/demo-full.mp4"
+						autoPlay
+						loop
+						muted
+						playsInline
+						className="w-full block"
+					/>
+				</div>
 			</section>
 
+			{/* Features Section — numbered rows, no icon-in-circle AI slop */}
+			<section id="product" className="w-full px-4 py-20 bg-secondary/30">
+				<div className="max-w-4xl mx-auto">
+					<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
+						{t.features.heading}
+					</h2>
+					<p className="text-lg text-muted-foreground mb-16 max-w-xl">
+						{t.features.subheading}
+					</p>
 
-			{/* Pain Point Section — Apple-style sticky scroll reveal */}
-			<PainPointSection />
-
-			{/* Features Section */}
-			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
-				<div className="max-w-7xl mx-auto">
-					<div className="text-center mb-16">
-						<div className="flex justify-center mb-6">
-							<div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
-								<LucideCog />
-								<span className="font-medium text-xs text-foreground">
-                  {t.features.badge}
-                </span>
+					{/* Step rows — left-aligned number + title + description */}
+					<div className="space-y-0 divide-y divide-border">
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">01</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step1Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step1Desc}</p>
 							</div>
 						</div>
-						<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
-							{t.features.heading}
-						</h2>
-						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-							{t.features.subheading}
-						</p>
-					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-						{/* Feature 1 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#006aff]/10 to-[#006aff]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#006aff" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-									<path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-								</svg>
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">02</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step2Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step2Desc}</p>
 							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step1Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step1Desc}
-							</p>
 						</div>
-
-						{/* Feature 2 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4F39F6]/10 to-[#4F39F6]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#4F39F6" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-								</svg>
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">03</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step3Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step3Desc}</p>
 							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step2Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step2Desc}
-							</p>
-						</div>
-
-						{/* Feature 3 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009966]/10 to-[#009966]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#009966" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-								</svg>
-							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step3Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step3Desc}
-							</p>
 						</div>
 					</div>
 				</div>
 			</section>
+
+			{/* Pain Point Section — moved after features so visitors see the product first */}
+			<PainPointSection />
 
 			{/* How it Works — alternating media + text rows */}
 			<section className="w-full px-4 py-24">
@@ -270,7 +224,7 @@ const LandingPage = () => {
 								Reading PDFs made easy
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								Select any passage in your document and get instant, precise answers — powered by XAI Collection — State of Art Q&A — Most reliable answers you can get.
+								Select any passage. Ask anything. Atlas uses Grok — XAI's frontier model — for answers grounded in your document.
 							</p>
 						</div>
 					</div>
@@ -279,7 +233,7 @@ const LandingPage = () => {
 					<div className="flex flex-col md:flex-row-reverse items-center gap-12">
 						<div className="w-full md:w-3/5 rounded-xl border border-border overflow-hidden shrink-0">
 							<video
-								src="/an.mp4"
+								src="/demo-table.mp4"
 								autoPlay
 								loop
 								muted
@@ -295,7 +249,7 @@ const LandingPage = () => {
 								Formulas, tables, any LLM output
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								Perfectly matches AI outputs to your notebook — Tables Latex formulas,. What you see is exactly what you get.
+								Perfectly matches AI outputs to your notebook — tables, LaTeX formulas, code blocks. What you see is exactly what you get.
 							</p>
 						</div>
 					</div>
@@ -305,32 +259,30 @@ const LandingPage = () => {
 
 			<PricingSection />
 
-			{/* CTA Section */}
-			<section
-				className="w-full px-4 py-20"
-				style={{
-					backgroundImage:
-						"linear-gradient(163.293deg, rgb(15, 23, 43) 0%, rgb(29, 41, 61) 50%, rgb(49, 44, 133) 100%)",
-				}}
-			>
+			{/* CTA Section — clean bordered, no dark gradient template */}
+			<section className="w-full px-4 py-20 border-t border-border">
 				<div className="max-w-4xl mx-auto text-center">
-					<h2 className="font-bold text-4xl md:text-5xl text-primary-foreground mb-6">
+					<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-6">
 						{t.cta.heading}
 					</h2>
-					<p className="text-lg text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
 						{t.cta.subheading}
 					</p>
 					<div className="flex flex-col items-center gap-4">
 						<Link
 							to="/signup"
-							className="px-8 py-4 rounded-xl text-foreground font-medium text-base bg-card hover:bg-card/90 transition-colors inline-flex items-center justify-center gap-3"
+							className="px-8 py-4 rounded-xl text-primary-foreground font-medium text-base hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-3"
+							style={{
+								backgroundImage:
+									"linear-gradient(74.7176deg, rgb(0, 106, 255) 0.60002%, rgb(0, 64, 153) 103.57%)",
+							}}
 						>
 							{t.cta.button}
 							<LucideArrowRight/>
 						</Link>
-						<p className="text-sm text-primary-foreground/40">
+						<p className="text-sm text-muted-foreground">
 							{t.cta.questions}{" "}
-							<a href="mailto:support@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
+							<a href="mailto:support@atlasnotebook.com" className="text-[#006aff] hover:opacity-80 underline underline-offset-2 transition-opacity duration-200">
 								{t.cta.talkToUs}
 							</a>
 						</p>
@@ -338,10 +290,10 @@ const LandingPage = () => {
 				</div>
 			</section>
 
-			{/* Footer */}
+			{/* Footer — two columns until roadmap/docs/blog pages exist */}
 			<footer className="w-full bg-secondary border-t border-border px-4 py-12">
 				<div className="max-w-7xl mx-auto">
-					<div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 						{/* Company Info */}
 						<div className="space-y-4">
 							<div className="flex items-center gap-3">
@@ -363,7 +315,7 @@ const LandingPage = () => {
 							</p>
 						</div>
 
-						{/* Product */}
+						{/* Product — only links to sections that exist */}
 						<div>
 							<h4 className="font-medium text-sm text-foreground mb-3">
 								{t.footer.product}
@@ -379,38 +331,8 @@ const LandingPage = () => {
 										{t.footer.pricing}
 									</a>
 								</li>
-								<li>
-									<a href="#roadmap" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.roadmap}
-									</a>
-								</li>
 							</ul>
 						</div>
-
-						{/* Resources */}
-						<div>
-							<h4 className="font-medium text-sm text-foreground mb-3">
-								{t.footer.resources}
-							</h4>
-							<ul className="space-y-2">
-								<li>
-									<a href="#docs" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.docs}
-									</a>
-								</li>
-								<li>
-									<a href="#api" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.api}
-									</a>
-								</li>
-								<li>
-									<a href="#blog" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.blog}
-									</a>
-								</li>
-							</ul>
-						</div>
-
 					</div>
 
 					{/* Footer Bottom */}
@@ -418,20 +340,13 @@ const LandingPage = () => {
 						<p className="text-sm text-muted-foreground">
 							{t.footer.copyright}
 						</p>
-						<div className="flex gap-6">
-							<a href="#status" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.status}
-							</a>
-							<a href="#security" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.security}
-							</a>
-							<a href="#contact" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.contact}
-							</a>
-						</div>
+						<a href="mailto:support@atlasnotebook.com" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
+							{t.footer.contact}
+						</a>
 					</div>
 				</div>
 			</footer>
+			</main>
 		</div>
 		</>
 	);
