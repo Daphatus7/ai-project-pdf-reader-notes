@@ -258,32 +258,30 @@ const LandingPage = () => {
 
 			<PricingSection />
 
-			{/* CTA Section */}
-			<section
-				className="w-full px-4 py-20"
-				style={{
-					backgroundImage:
-						"linear-gradient(163.293deg, rgb(15, 23, 43) 0%, rgb(29, 41, 61) 50%, rgb(49, 44, 133) 100%)",
-				}}
-			>
+			{/* CTA Section — clean bordered, no dark gradient template */}
+			<section className="w-full px-4 py-20 border-t border-border">
 				<div className="max-w-4xl mx-auto text-center">
-					<h2 className="font-bold text-4xl md:text-5xl text-primary-foreground mb-6">
+					<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-6">
 						{t.cta.heading}
 					</h2>
-					<p className="text-lg text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
+					<p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
 						{t.cta.subheading}
 					</p>
 					<div className="flex flex-col items-center gap-4">
 						<Link
 							to="/signup"
-							className="px-8 py-4 rounded-xl text-foreground font-medium text-base bg-card hover:bg-card/90 transition-colors inline-flex items-center justify-center gap-3"
+							className="px-8 py-4 rounded-xl text-primary-foreground font-medium text-base hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-3"
+							style={{
+								backgroundImage:
+									"linear-gradient(74.7176deg, rgb(0, 106, 255) 0.60002%, rgb(0, 64, 153) 103.57%)",
+							}}
 						>
 							{t.cta.button}
 							<LucideArrowRight/>
 						</Link>
-						<p className="text-sm text-primary-foreground/40">
+						<p className="text-sm text-muted-foreground">
 							{t.cta.questions}{" "}
-							<a href="mailto:support@atlasnotebook.com" className="text-primary-foreground/60 hover:text-primary-foreground/90 underline underline-offset-2 transition-colors duration-200">
+							<a href="mailto:support@atlasnotebook.com" className="text-[#006aff] hover:opacity-80 underline underline-offset-2 transition-opacity duration-200">
 								{t.cta.talkToUs}
 							</a>
 						</p>
