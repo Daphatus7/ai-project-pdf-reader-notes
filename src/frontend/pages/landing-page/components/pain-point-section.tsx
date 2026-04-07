@@ -67,6 +67,11 @@ const PainPointSection = () => {
 	const latestP = useRef(0);
 	const { t } = useLanguage();
 
+	// Respect user's reduced-motion preference — skip animation, show all slides statically
+	const prefersReducedMotion =
+		typeof window !== "undefined" &&
+		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 	useEffect(() => {
 		const wrapper = wrapperRef.current;
 		if (!wrapper) return;
@@ -118,13 +123,43 @@ const PainPointSection = () => {
 	const s1Opacity = slideOpacity(1, progress);
 	const s1Entering = progress < 0.375; // center of slide 1's zone
 
+	// Static fallback for users who prefer reduced motion — all slides visible, no scroll animation
+	if (prefersReducedMotion) {
+		return (
+			<div className="w-full bg-card py-24 px-8 space-y-16">
+				<div className="max-w-xl mx-auto text-center">
+					<p className="text-4xl md:text-5xl text-foreground font-medium leading-snug">{t.pain.card1Line1}</p>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium leading-snug mt-3">{t.pain.card1Line2}</p>
+				</div>
+				<div className="max-w-xl mx-auto text-center space-y-4">
+					{t.pain.card2Items.map((line) => (
+						<p key={line} className="text-2xl md:text-3xl text-muted-foreground">{line}</p>
+					))}
+				</div>
+				<div className="max-w-xl mx-auto text-center">
+					<p className="text-4xl md:text-5xl font-bold text-foreground mb-4">{t.pain.card3Verdict}</p>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-8">{t.pain.card3Label}</p>
+					<p className="text-lg text-muted-foreground">{t.pain.card3Message}</p>
+				</div>
+				<div className="max-w-xl mx-auto text-center">
+					<p className="text-4xl md:text-5xl font-bold text-foreground mb-6">{t.pain.card4Title}</p>
+					<p className="text-4xl md:text-5xl text-muted-foreground font-medium mb-6">{t.pain.card4Subtitle}</p>
+					<p className="text-lg text-muted-foreground mb-16">{t.pain.card4Detail}</p>
+					<Link to="/signup" className="inline-block bg-foreground text-background px-8 py-4 rounded-full text-lg font-medium hover:opacity-80 transition-opacity">
+						{t.pain.card4Cta}
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div ref={wrapperRef} className="relative h-[700vh]">
 			{/* Sticky viewport — stays pinned while user scrolls through the tall wrapper */}
 			<div className={`sticky top-0 h-screen overflow-hidden transition-colors duration-500 ${bgClass}`}>
 
-				{/* Progress dots — size and opacity reflect scroll position */}
-				<div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
+				{/* Progress dots — decorative scroll indicator, not interactive */}
+				<div aria-hidden="true" className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
 					{[0, 1, 2, 3].map((i) => {
 						const op = slideOpacity(i, progress);
 						return (

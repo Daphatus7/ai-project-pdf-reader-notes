@@ -40,6 +40,7 @@ const LandingPage = () => {
 				<link rel="canonical" href="https://atlasnotebook.com" />
 			</Helmet>
 		<div className="bg-card h-screen overflow-y-auto scroll-smooth w-full">
+			<main>
 			{/* Header */}
 			<header className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border">
 				<div className="max-w-[1200px] mx-auto flex items-center justify-between h-16 px-6">
@@ -57,7 +58,7 @@ const LandingPage = () => {
 					</a>
 
 					{/* Navigation — only links to sections that actually exist on the page */}
-					<nav className="hidden md:flex items-center gap-1">
+					<nav aria-label="Main navigation" className="hidden md:flex items-center gap-1">
 						<a href="#product" className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
 							{t.nav.product}
 						</a>
@@ -74,7 +75,7 @@ const LandingPage = () => {
 							className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-md transition-colors"
 							aria-label="Switch language"
 						>
-							{lang === "en" ? "中文" : "EN"}
+							{lang === "en" ? "中" : "EN"}
 						</button>
 						<Link
 							to="/login"
@@ -94,12 +95,12 @@ const LandingPage = () => {
 
 			{/* Hero Section */}
 			<section className="w-full px-4 py-16 flex flex-col items-center">
-				{/* Main Heading */}
+				{/* Main Heading — gradient from near-black to brand blue (#006aff) */}
 				<h1
-					className="font-bold text-5xl md:text-6xl text-center mb-6 bg-clip-text text-transparent"
+					className="font-bold text-4xl sm:text-5xl md:text-6xl text-center mb-6 bg-clip-text text-transparent"
 					style={{
 						backgroundImage:
-							"linear-gradient(90deg, rgb(15, 23, 43) 0%, rgb(49, 44, 133) 100%)",
+							"linear-gradient(90deg, rgb(15, 23, 43) 0%, #006aff 100%)",
 						WebkitTextFillColor: "transparent",
 						WebkitBackgroundClip: "text",
 					}}
@@ -108,16 +109,15 @@ const LandingPage = () => {
 					<div>{t.hero.heading2}</div>
 				</h1>
 
-				{/* Subtitle */}
-				<p className="text-foreground text-xl md:text-2xl text-center max-w-4xl mb-12 leading-relaxed">
+				{/* Subtitle — two clean sentences */}
+				<p className="text-muted-foreground text-xl md:text-2xl text-center max-w-2xl mb-12 leading-relaxed">
 					{t.hero.subtitle1}
-					{t.hero.subtitle2}
 					<br />
-					{t.hero.subtitle3}
+					{t.hero.subtitle2}
 				</p>
 
 				{/* CTA Buttons */}
-				<div className="flex flex-col sm:flex-row gap-4 mb-12">
+				<div className="flex flex-col sm:flex-row gap-4 mb-8">
 					<Link
 						to="/signup"
 						className="px-8 py-4 rounded-xl text-primary-foreground font-medium text-base flex items-center gap-3 hover:opacity-90 transition-opacity"
@@ -134,36 +134,31 @@ const LandingPage = () => {
 					{/*</button>*/}
 				</div>
 
-				{/* Features Pills */}
-				<div className="flex flex-wrap justify-center gap-8 max-w-4xl">
-
+				{/* Feature pills — concise capability signals */}
+				<div className="flex flex-wrap justify-center gap-8 max-w-4xl mb-16">
 					<div className="flex items-center gap-2">
-						<LucideZap />
-						<span className="text-sm text-muted-foreground">
-            {t.hero.features.screenshot}
-			</span>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<LucideSigma />
-							<span className="text-sm text-muted-foreground">
-				{t.hero.features.formulas}
-			</span>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<LucideMousePointer />
-							<span className="text-sm text-muted-foreground">
-				{t.hero.features.macros}
-			</span>
-						</div>
-
+						<LucideZap className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.screenshot}</span>
 					</div>
+					<div className="flex items-center gap-2">
+						<LucideSigma className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.formulas}</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<LucideMousePointer className="size-4 text-muted-foreground" />
+						<span className="text-sm text-muted-foreground">{t.hero.features.macros}</span>
+					</div>
+				</div>
+
+				{/* Product screenshot — shows the actual UI before visitors scroll */}
+				<div className="w-full max-w-4xl rounded-xl border border-border overflow-hidden shadow-sm">
+					<img
+						src="/demo.png"
+						alt="Atlas Notebook interface — PDF on the left, AI chat and notes on the right"
+						className="w-full block"
+					/>
+				</div>
 			</section>
-
-
-			{/* Pain Point Section — Apple-style sticky scroll reveal */}
-			<PainPointSection />
 
 			{/* Features Section — numbered rows, no icon-in-circle AI slop */}
 			<section id="product" className="w-full px-4 py-20 bg-secondary/30">
@@ -202,6 +197,9 @@ const LandingPage = () => {
 				</div>
 			</section>
 
+			{/* Pain Point Section — moved after features so visitors see the product first */}
+			<PainPointSection />
+
 			{/* How it Works — alternating media + text rows */}
 			<section className="w-full px-4 py-24">
 				<div className="max-w-5xl mx-auto space-y-24">
@@ -223,7 +221,7 @@ const LandingPage = () => {
 								Reading PDFs made easy
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">
-								Select any passage in your document and get instant, precise answers — powered by XAI Collection — State of Art Q&A — Most reliable answers you can get.
+								Select any passage. Ask anything. Atlas uses Grok — XAI's frontier model — for answers grounded in your document.
 							</p>
 						</div>
 					</div>
@@ -289,10 +287,10 @@ const LandingPage = () => {
 				</div>
 			</section>
 
-			{/* Footer */}
+			{/* Footer — two columns until roadmap/docs/blog pages exist */}
 			<footer className="w-full bg-secondary border-t border-border px-4 py-12">
 				<div className="max-w-7xl mx-auto">
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 						{/* Company Info */}
 						<div className="space-y-4">
 							<div className="flex items-center gap-3">
@@ -314,7 +312,7 @@ const LandingPage = () => {
 							</p>
 						</div>
 
-						{/* Product */}
+						{/* Product — only links to sections that exist */}
 						<div>
 							<h4 className="font-medium text-sm text-foreground mb-3">
 								{t.footer.product}
@@ -330,38 +328,8 @@ const LandingPage = () => {
 										{t.footer.pricing}
 									</a>
 								</li>
-								<li>
-									<a href="#roadmap" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.roadmap}
-									</a>
-								</li>
 							</ul>
 						</div>
-
-						{/* Resources */}
-						<div>
-							<h4 className="font-medium text-sm text-foreground mb-3">
-								{t.footer.resources}
-							</h4>
-							<ul className="space-y-2">
-								<li>
-									<a href="#docs" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.docs}
-									</a>
-								</li>
-								<li>
-									<a href="#api" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.api}
-									</a>
-								</li>
-								<li>
-									<a href="#blog" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-										{t.footer.blog}
-									</a>
-								</li>
-							</ul>
-						</div>
-
 					</div>
 
 					{/* Footer Bottom */}
@@ -369,20 +337,13 @@ const LandingPage = () => {
 						<p className="text-sm text-muted-foreground">
 							{t.footer.copyright}
 						</p>
-						<div className="flex gap-6">
-							<a href="#status" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.status}
-							</a>
-							<a href="#security" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.security}
-							</a>
-							<a href="#contact" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
-								{t.footer.contact}
-							</a>
-						</div>
+						<a href="mailto:support@atlasnotebook.com" className="text-sm text-muted-foreground hover:text-[#006aff] transition-colors">
+							{t.footer.contact}
+						</a>
 					</div>
 				</div>
 			</footer>
+			</main>
 		</div>
 		</>
 	);
