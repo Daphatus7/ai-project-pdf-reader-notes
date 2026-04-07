@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
 	ArrowRightIcon,
 	LucideArrowRight,
-	LucideCog, LucideMousePointer, LucideSigma,
+	LucideMousePointer, LucideSigma,
 	LucideSparkles,
 	LucideZap
 } from "lucide-react";
@@ -165,71 +165,38 @@ const LandingPage = () => {
 			{/* Pain Point Section — Apple-style sticky scroll reveal */}
 			<PainPointSection />
 
-			{/* Features Section */}
-			<section id="product" className="w-full px-4 py-20 bg-gradient-to-b from-card to-secondary/50">
-				<div className="max-w-7xl mx-auto">
-					<div className="text-center mb-16">
-						<div className="flex justify-center mb-6">
-							<div className="bg-secondary border border-border rounded-full px-6 py-2 flex items-center gap-3">
-								<LucideCog />
-								<span className="font-medium text-xs text-foreground">
-                  {t.features.badge}
-                </span>
+			{/* Features Section — numbered rows, no icon-in-circle AI slop */}
+			<section id="product" className="w-full px-4 py-20 bg-secondary/30">
+				<div className="max-w-4xl mx-auto">
+					<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
+						{t.features.heading}
+					</h2>
+					<p className="text-lg text-muted-foreground mb-16 max-w-xl">
+						{t.features.subheading}
+					</p>
+
+					{/* Step rows — left-aligned number + title + description */}
+					<div className="space-y-0 divide-y divide-border">
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">01</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step1Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step1Desc}</p>
 							</div>
 						</div>
-						<h2 className="font-bold text-4xl md:text-5xl text-foreground mb-4">
-							{t.features.heading}
-						</h2>
-						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-							{t.features.subheading}
-						</p>
-					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-						{/* Feature 1 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#006aff]/10 to-[#006aff]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#006aff" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-									<path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-								</svg>
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">02</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step2Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step2Desc}</p>
 							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step1Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step1Desc}
-							</p>
 						</div>
-
-						{/* Feature 2 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4F39F6]/10 to-[#4F39F6]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#4F39F6" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-								</svg>
+						<div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-16">
+							<span className="text-5xl font-bold text-muted-foreground/25 leading-none shrink-0 w-16">03</span>
+							<div>
+								<h3 className="font-semibold text-xl text-foreground mb-2">{t.features.step3Title}</h3>
+								<p className="text-muted-foreground leading-relaxed max-w-lg">{t.features.step3Desc}</p>
 							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step2Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step2Desc}
-							</p>
-						</div>
-
-						{/* Feature 3 */}
-						<div className="bg-card rounded-2xl p-8 border border-border hover:shadow-lg transition-shadow">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009966]/10 to-[#009966]/5 flex items-center justify-center mb-6">
-								<svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="#009966" strokeWidth="1.5">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-								</svg>
-							</div>
-							<h3 className="font-bold text-xl text-foreground mb-3">
-								{t.features.step3Title}
-							</h3>
-							<p className="text-muted-foreground leading-relaxed">
-								{t.features.step3Desc}
-							</p>
 						</div>
 					</div>
 				</div>
