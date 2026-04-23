@@ -1,8 +1,5 @@
 Explain the purpose of changes everytime, compare pros and cons.
 
-Make sure include brief comments for the purpose of a group of code.
-When adding new features, include a document <feature_name>_<date>.md
-
 ## gstack
 
 - Use the `/browse` skill from gstack for all web browsing — never use `mcp__claude-in-chrome__*` tools directly.
