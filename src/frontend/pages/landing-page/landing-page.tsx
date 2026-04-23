@@ -265,7 +265,7 @@ const LandingPage = () => {
 						<div className="text-center mb-16">
 							<p className="text-[#0fa478] text-xs font-medium tracking-widest uppercase mb-6">The Workflow</p>
 							<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] mb-4 tracking-tight">
-								From source to knowledge in<br />seconds.
+								From source to knowledge in seconds.
 							</h2>
 							<p className="text-[#6b7280] text-lg max-w-3xl mx-auto">
 								A three-step flow built for documents that fight back — dense PDFs, nested tables, and equations that other tools choke on.
@@ -275,61 +275,96 @@ const LandingPage = () => {
 						<div className="grid md:grid-cols-3 gap-8">
 							{/* Step 1 */}
 							<div className="bg-white border border-[#ececec] rounded-2xl p-8">
-								<div className="bg-gradient-to-br from-[#f6faf8] to-[#eef7f2] rounded-xl h-48 mb-6 flex items-center justify-center">
-									<svg className="w-full h-full p-8" viewBox="0 0 374.664 195.914" fill="none">
-										{/* PDF viewer mockup */}
-										<rect x="30" y="10" width="314.664" height="175.914" rx="6" fill="white" stroke="#E2E8F0" strokeWidth="0.983325" opacity="0.5" />
-										{/* Sidebar lines (simulated text) */}
-										<rect x="39.74" y="35" width="60" height="6" fill="#CBD5E1" opacity="0.6" rx="2" />
-										<rect x="39.74" y="46.8" width="80" height="5" fill="#E2E8F0" opacity="0.6" rx="2" />
-										<rect x="39.74" y="58.6" width="70" height="5" fill="#E2E8F0" opacity="0.6" rx="2" />
-										{/* Action popup */}
-										<rect x="79.5" y="76.3" width="181" height="90.5" fill="white" stroke="#E2E8F0" strokeWidth="0.983325" rx="2" />
-										<rect x="79.5" y="76.3" width="181" height="27.5" fill="#F9FAFB" rx="2" />
-										<circle cx="92.5" cy="90" r="3.93" fill="#15CC91" />
-										<rect x="106" y="86" width="68" height="4.92" fill="#0F172A" rx="2" />
-										{/* Action buttons */}
-										<rect x="93.5" y="114" width="67" height="21.6" fill="#E6FAF3" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="0.98" rx="2" />
-										<text x="127" y="129" fontFamily="Inter" fontWeight="bold" fontSize="9.83" fill="#0fa478" textAnchor="middle">Explain</text>
-										<rect x="182.5" y="114" width="67" height="21.6" fill="#F1F5F9" rx="2" />
-										<text x="216" y="129" fontFamily="Inter" fontSize="9.83" fill="#475569" textAnchor="middle">Extract</text>
-										<rect x="93.5" y="139" width="67" height="21.6" fill="#F1F5F9" rx="2" />
-										<text x="127" y="154" fontFamily="Inter" fontSize="9.83" fill="#475569" textAnchor="middle">Summarize</text>
-										<rect x="182.5" y="139" width="67" height="21.6" fill="#F1F5F9" rx="2" />
-										<text x="216" y="154" fontFamily="Inter" fontSize="9.83" fill="#475569" textAnchor="middle">Translate</text>
+								<div className="rounded-xl h-48 mb-6 overflow-hidden bg-gradient-to-br from-[#f6faf8] to-[#eef7f2]">
+									<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+										<rect x="40" y="20" width="240" height="170" rx="6" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+										<rect x="54" y="36" width="180" height="5" rx="1.5" fill="#cbd5e1"/>
+										<rect x="54" y="48" width="210" height="5" rx="1.5" fill="#e2e8f0"/>
+										<rect x="54" y="60" width="160" height="5" rx="1.5" fill="#e2e8f0"/>
+										<rect x="52" y="76" width="216" height="22" rx="3" fill="#15cc91" fillOpacity="0.18" stroke="#15cc91" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="3 2"/>
+										<rect x="60" y="82" width="180" height="5" rx="1.5" fill="#15cc91" fillOpacity="0.7"/>
+										<rect x="60" y="91" width="140" height="5" rx="1.5" fill="#15cc91" fillOpacity="0.5"/>
+										<rect x="54" y="110" width="200" height="5" rx="1.5" fill="#e2e8f0"/>
+										<rect x="54" y="122" width="220" height="5" rx="1.5" fill="#e2e8f0"/>
+										<rect x="54" y="134" width="170" height="5" rx="1.5" fill="#e2e8f0"/>
+										<rect x="54" y="146" width="200" height="5" rx="1.5" fill="#e2e8f0"/>
+										<path d="M250 95 L 260 102 L 255 103 L 258 109 L 254 110 L 251 104 L 246 108 Z" fill="#0f172a"/>
 									</svg>
 								</div>
+								<div className="flex items-center gap-2 mb-3">
+									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">1</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Highlight</span>
+								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									One-click capture from any source.
+									Select any text, equation, or table.
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Select text on any page — your AI-enhanced note appears instantly. No context switching, no copy-paste.
+									Works directly inside your PDF. No preprocessing, no conversion, no upload.
 								</p>
 							</div>
 
 							{/* Step 2 */}
 							<div className="bg-white border border-[#ececec] rounded-2xl p-8">
-								<div className="bg-gradient-to-br from-[#f6faf8] to-[#eef7f2] rounded-xl h-48 mb-6 flex items-center justify-center">
-									<div className="text-6xl">🔍</div>
+								<div className="rounded-xl h-48 mb-6 overflow-hidden bg-gradient-to-br from-[#f6faf8] to-[#eef7f2]">
+									<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+										<rect x="20" y="20" width="280" height="160" rx="6" fill="#fff" stroke="#e2e8f0" strokeWidth="1" opacity="0.5"/>
+										<rect x="34" y="36" width="180" height="4" rx="1.5" fill="#cbd5e1" opacity="0.6"/>
+										<rect x="34" y="48" width="210" height="4" rx="1.5" fill="#e2e8f0" opacity="0.6"/>
+										<rect x="34" y="60" width="160" height="4" rx="1.5" fill="#e2e8f0" opacity="0.6"/>
+										<rect x="68" y="78" width="184" height="92" rx="12" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+										<path d="M68 90 L 68 78 Q 68 78 80 78 L 240 78 Q 252 78 252 90 L 252 106 L 68 106 Z" fill="#f9fafb"/>
+										<circle cx="82" cy="92" r="4" fill="#15cc91"/>
+										<rect x="92" y="89" width="70" height="5" rx="1.5" fill="#0f172a"/>
+										<rect x="80" y="116" width="68" height="22" rx="6" fill="#e6faf3" stroke="#15cc91" strokeOpacity="0.3"/>
+										<text x="114" y="131" fill="#0fa478" fontSize="10" fontWeight="600" textAnchor="middle" fontFamily="Inter">Explain</text>
+										<rect x="156" y="116" width="68" height="22" rx="6" fill="#f1f5f9"/>
+										<text x="190" y="131" fill="#475569" fontSize="10" fontWeight="500" textAnchor="middle" fontFamily="Inter">Extract</text>
+										<rect x="80" y="142" width="68" height="22" rx="6" fill="#f1f5f9"/>
+										<text x="114" y="157" fill="#475569" fontSize="10" fontWeight="500" textAnchor="middle" fontFamily="Inter">Summarize</text>
+										<rect x="156" y="142" width="68" height="22" rx="6" fill="#f1f5f9"/>
+										<text x="190" y="157" fill="#475569" fontSize="10" fontWeight="500" textAnchor="middle" fontFamily="Inter">Translate</text>
+									</svg>
+								</div>
+								<div className="flex items-center gap-2 mb-3">
+									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">2</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Process</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									AI reads, extracts, explains — inline.
+									Extract, explain, summarize, or translate.
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Grok AI processes your selection in context. Tables become tables. Equations render perfectly. Citations link back.
+									One click on the floating widget. The AI already knows what you selected and what page you're on.
 								</p>
 							</div>
 
 							{/* Step 3 */}
 							<div className="bg-white border border-[#ececec] rounded-2xl p-8">
-								<div className="bg-gradient-to-br from-[#f6faf8] to-[#eef7f2] rounded-xl h-48 mb-6 flex items-center justify-center">
-									<div className="text-6xl">📝</div>
+								<div className="rounded-xl h-48 mb-6 overflow-hidden bg-gradient-to-br from-[#f6faf8] to-[#eef7f2]">
+									<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style={{width:'100%',height:'100%'}}>
+										<rect x="30" y="20" width="260" height="170" rx="6" fill="#fff" stroke="#e2e8f0" strokeWidth="1"/>
+										<rect x="44" y="34" width="110" height="8" rx="2" fill="#0f172a"/>
+										<rect x="44" y="50" width="200" height="4" rx="1.5" fill="#cbd5e1"/>
+										<rect x="42" y="66" width="236" height="62" rx="5" fill="#f0fdf4" stroke="#15cc91" strokeOpacity="0.35" strokeWidth="1"/>
+										<text x="54" y="86" fill="#0f172a" fontSize="12" fontStyle="italic" fontFamily="Georgia, serif">∫₀^∞ e^(-x²) dx = √π / 2</text>
+										<rect x="54" y="96" width="200" height="3" rx="1.5" fill="#cbd5e1"/>
+										<rect x="54" y="104" width="180" height="3" rx="1.5" fill="#cbd5e1"/>
+										<rect x="54" y="112" width="150" height="3" rx="1.5" fill="#cbd5e1"/>
+										<circle cx="264" cy="76" r="8" fill="#15cc91"/>
+										<path d="M260 76 L 263 79 L 268 73" stroke="#fff" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+										<rect x="44" y="142" width="180" height="4" rx="1.5" fill="#e2e8f0"/>
+										<rect x="44" y="154" width="220" height="4" rx="1.5" fill="#e2e8f0"/>
+										<rect x="44" y="166" width="160" height="4" rx="1.5" fill="#e2e8f0"/>
+									</svg>
+								</div>
+								<div className="flex items-center gap-2 mb-3">
+									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">3</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Snap</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									Your note builds itself, formatted and linked.
+									One click. Straight into your notes.
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Zero manual work. The note appears in your graph, connected to related ideas, ready to search and reference.
+									Formatting preserved — pixel-perfect. No copy-paste, no cleanup, no tab-switching.
 								</p>
 							</div>
 						</div>
