@@ -120,9 +120,9 @@ const LandingPage = () => {
 				{/* ── Problems ────────────────────────────────────────────────── */}
 				<section id="problems" className="bg-[#fafaf7] py-[140px] px-6 text-[#0f172a]">
 					<div className="max-w-[1100px] mx-auto">
-						<h2 className="text-[clamp(32px,4.5vw,56px)] font-semibold tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto mb-[60px]">
-							You read to understand.<br />
-							<span className="text-[#9ca3af]">But the process keeps getting in the way.</span>
+						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto mb-[60px]">
+							<span className="font-semibold">You read to understand.</span><br />
+							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">But the process keeps getting in the way.</span>
 						</h2>
 
 						{/* Problem 01 */}
