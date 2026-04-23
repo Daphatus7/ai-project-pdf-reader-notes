@@ -410,59 +410,6 @@ const LandingPage = () => {
 										Say goodbye to broken formulas and misaligned grids. LaTeX, complex tables — rendered perfectly, every time.
 									</p>
 								</div>
-								{/* SVG product mockup */}
-								<div className="absolute right-0 bottom-0 w-[58%] translate-y-4 translate-x-4
-										group-hover:translate-y-2 group-hover:translate-x-2 transition-transform duration-500">
-									<svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" className="w-full drop-shadow-2xl">
-										<rect x="8" y="8" width="264" height="264" rx="12" fill="#1e293b" stroke="#334155" strokeWidth="1"/>
-										{/* window chrome */}
-										<circle cx="24" cy="26" r="4" fill="#ef4444" opacity="0.6"/>
-										<circle cx="36" cy="26" r="4" fill="#f59e0b" opacity="0.6"/>
-										<circle cx="48" cy="26" r="4" fill="#22c55e" opacity="0.6"/>
-										{/* divider */}
-										<line x1="8" y1="40" x2="272" y2="40" stroke="#334155" strokeWidth="1"/>
-										{/* note title */}
-										<rect x="20" y="52" width="90" height="7" rx="2.5" fill="#334155"/>
-										{/* body text lines */}
-										<rect x="20" y="66" width="220" height="4" rx="1.5" fill="#1e293b"/>
-										<rect x="20" y="73" width="180" height="4" rx="1.5" fill="#1e293b"/>
-										{/* LaTeX block */}
-										<rect x="20" y="84" width="240" height="52" rx="6" fill="#0d2a1a" stroke="#0fa478" strokeWidth="1" strokeOpacity="0.45"/>
-										<rect x="20" y="84" width="42" height="14" rx="6" fill="#0fa478" opacity="0.15"/>
-										<text x="27" y="95" fill="#0fa478" fontSize="8" fontFamily="monospace" fontWeight="600">LaTeX</text>
-										<text x="30" y="112" fill="#d1fae5" fontSize="10" fontFamily="monospace">∫₀^∞ e^(-x²) dx = √π / 2</text>
-										<text x="30" y="126" fill="#6ee7b7" fontSize="8" fontFamily="monospace" opacity="0.7">Gaussian integral — converges absolutely</text>
-										{/* check badge */}
-										<circle cx="250" cy="106" r="9" fill="#0fa478"/>
-										<path d="M245 106 L248 109 L255 102" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-										{/* table header */}
-										<rect x="20" y="145" width="240" height="10" rx="3" fill="#0fa478" opacity="0.12"/>
-										<rect x="20" y="157" width="240" height="8" rx="2" fill="#1e293b"/>
-										<rect x="20" y="167" width="240" height="8" rx="2" fill="#172032"/>
-										<rect x="20" y="177" width="240" height="8" rx="2" fill="#1e293b"/>
-										{/* col dividers */}
-										<line x1="100" y1="145" x2="100" y2="185" stroke="#334155" strokeWidth="0.5"/>
-										<line x1="180" y1="145" x2="180" y2="185" stroke="#334155" strokeWidth="0.5"/>
-										{/* header text */}
-										<rect x="28" y="149" width="44" height="3" rx="1" fill="#94a3b8"/>
-										<rect x="108" y="149" width="36" height="3" rx="1" fill="#94a3b8"/>
-										<rect x="188" y="149" width="40" height="3" rx="1" fill="#94a3b8"/>
-										{/* row data */}
-										<rect x="28" y="161" width="52" height="2.5" rx="1" fill="#475569"/>
-										<rect x="108" y="161" width="40" height="2.5" rx="1" fill="#475569"/>
-										<rect x="188" y="161" width="38" height="2.5" rx="1" fill="#475569"/>
-										<rect x="28" y="171" width="44" height="2.5" rx="1" fill="#475569"/>
-										<rect x="108" y="171" width="48" height="2.5" rx="1" fill="#475569"/>
-										<rect x="188" y="171" width="32" height="2.5" rx="1" fill="#475569"/>
-										<rect x="28" y="181" width="58" height="2.5" rx="1" fill="#475569"/>
-										<rect x="108" y="181" width="30" height="2.5" rx="1" fill="#475569"/>
-										<rect x="188" y="181" width="46" height="2.5" rx="1" fill="#475569"/>
-										{/* bottom text */}
-										<rect x="20" y="198" width="160" height="3.5" rx="1.5" fill="#1e293b"/>
-										<rect x="20" y="205" width="200" height="3.5" rx="1.5" fill="#1e293b"/>
-										<rect x="20" y="212" width="130" height="3.5" rx="1.5" fill="#1e293b"/>
-									</svg>
-								</div>
 								{/* bottom gradient fade */}
 								<div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none z-10"/>
 							</div>
