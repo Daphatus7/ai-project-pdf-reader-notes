@@ -118,132 +118,147 @@ const LandingPage = () => {
 				</section>
 
 				{/* ── Problems ────────────────────────────────────────────────── */}
-				<section id="problems" className="bg-[#fafaf7] py-20 lg:py-32">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="text-center mb-20">
-							<h2 className="text-4xl sm:text-5xl lg:text-[56px] font-semibold tracking-[-1.4px] mb-2">
-								<span className="text-[#0f172a]">You read to understand.</span>
-							</h2>
-							<p className="text-4xl sm:text-5xl lg:text-[56px] font-semibold tracking-[-1.4px] text-[#9ca3af]">
-								But the process keeps getting in the way.
-							</p>
-						</div>
+				<section id="problems" className="bg-[#fafaf7] py-[140px] px-6 text-[#0f172a]">
+					<div className="max-w-[1100px] mx-auto">
+						<h2 className="text-[clamp(32px,4.5vw,56px)] font-semibold tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto mb-[60px]">
+							You read to understand.<br />
+							<span className="text-[#9ca3af]">But the process keeps getting in the way.</span>
+						</h2>
 
 						{/* Problem 01 */}
-						<div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-32">
-							<div className="order-2 md:order-1">
-								<div className="flex items-center gap-3 mb-6">
-									<div className="w-6 h-px bg-[#0fa478]"></div>
-									<span className="text-[#0fa478] text-sm font-medium tracking-widest uppercase">Problem 01</span>
+						<div className="grid md:grid-cols-2 gap-20 items-center mb-[60px]">
+							<div>
+								<div className="flex items-center gap-3 mb-[18px]">
+									<div className="w-6 h-px bg-[#0fa478]" />
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 01</span>
 								</div>
-								<h3 className="text-3xl lg:text-[38px] font-semibold text-[#0f172a] mb-6 leading-tight tracking-tight">
+								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
 									AI explains better — but getting there kills your focus.
 								</h3>
-								<p className="text-[#52525b] text-lg leading-relaxed">
+								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
 									You want AI to explain exactly where you're stuck, but the prompting, screenshotting, and app-switching kills your focus.
 								</p>
 							</div>
-							{/* 3 document cards connected by dashed arrows */}
-							<div className="order-1 md:order-2 bg-gradient-to-br from-[#eef9f4] to-[#dff2e8] rounded-2xl p-12 flex items-center justify-center min-h-[400px]" style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 0.26144%,rgba(0,0,0,0) 0.26144%),linear-gradient(90deg,rgba(21,204,145,0.06) 0.19608%,rgba(0,0,0,0) 0.19608%),linear-gradient(143.13deg,rgb(238,249,244) 0%,rgb(223,242,232) 100%)" }}>
-								<svg className="w-full max-w-sm opacity-85" viewBox="0 0 280.5 205.695" fill="none">
-									<g opacity="0.85">
-										{/* Card 1 */}
-										<rect x="14.5" y="2" width="112" height="92" rx="5.6" stroke="#15CC91" strokeOpacity="0.7" strokeWidth="1.40247" />
-										<path d="M18.703 44.8789H121.55" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<circle cx="29.9227" cy="36.4641" r="2.33748" fill="#15CC91" />
-										<path d="M29.9227 56.0986H107.526" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<path d="M29.9227 67.3184H93.5011" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<path d="M29.9227 78.5381H102.851" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										{/* Card 2 */}
-										<rect x="145.5" y="25" width="120" height="92" rx="5.6" stroke="#15CC91" strokeOpacity="0.7" strokeWidth="1.40247" />
-										<path d="M149.6 68.2533H261.797" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<circle cx="160.82" cy="59.8385" r="2.33748" fill="#15CC91" />
-										<path d="M160.82 81.343H243.098" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<path d="M160.82 93.4977H224.398" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<path d="M160.82 105.652H238.423" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										{/* Card 3 */}
-										<rect x="51.5" y="89" width="131.5" height="92" rx="5.6" stroke="#15CC91" strokeOpacity="0.7" strokeWidth="1.40247" />
-										<path d="M56.102 133.702H177.649" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<circle cx="67.3218" cy="125.287" r="2.33748" fill="#15CC91" />
-										<path d="M67.3218 146.791H163.624" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<path d="M67.3218 158.946H149.6" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										{/* Dashed connectors between cards */}
-										<path d="M126.5 48 Q 136 54 145.5 70" stroke="#15CC91" strokeDasharray="2.8 2.8" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<path d="M205.5 117 Q 190 122 183 119" stroke="#15CC91" strokeDasharray="2.8 2.8" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<path d="M51.5 110 Q 42 100 70 94" stroke="#15CC91" strokeDasharray="2.8 2.8" strokeOpacity="0.5" strokeWidth="1.40247" />
-									</g>
+							<div
+								className="aspect-[4/3] rounded-2xl flex items-center justify-center overflow-hidden"
+								style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(135deg, #eef9f4 0%, #dff2e8 100%)", backgroundSize: "24px 24px, 24px 24px, 100% 100%" }}
+							>
+								<svg className="w-[55%]" viewBox="0 0 300 220" fill="none" stroke="#15cc91" strokeWidth="1.5">
+									<rect x="20" y="30" width="110" height="75" rx="6" strokeOpacity="0.7" />
+									<line x1="20" y1="48" x2="130" y2="48" strokeOpacity="0.5" />
+									<circle cx="32" cy="39" r="2.5" fill="#15cc91" stroke="none" />
+									<line x1="32" y1="60" x2="115" y2="60" strokeOpacity="0.3" />
+									<line x1="32" y1="72" x2="100" y2="72" strokeOpacity="0.3" />
+									<line x1="32" y1="84" x2="110" y2="84" strokeOpacity="0.3" />
+									<rect x="160" y="55" width="120" height="80" rx="6" strokeOpacity="0.7" />
+									<line x1="160" y1="73" x2="280" y2="73" strokeOpacity="0.5" />
+									<circle cx="172" cy="64" r="2.5" fill="#15cc91" stroke="none" />
+									<line x1="172" y1="87" x2="260" y2="87" strokeOpacity="0.3" />
+									<line x1="172" y1="100" x2="240" y2="100" strokeOpacity="0.3" />
+									<line x1="172" y1="113" x2="255" y2="113" strokeOpacity="0.3" />
+									<rect x="60" y="125" width="130" height="70" rx="6" strokeOpacity="0.7" />
+									<line x1="60" y1="143" x2="190" y2="143" strokeOpacity="0.5" />
+									<circle cx="72" cy="134" r="2.5" fill="#15cc91" stroke="none" />
+									<line x1="72" y1="157" x2="175" y2="157" strokeOpacity="0.3" />
+									<line x1="72" y1="170" x2="160" y2="170" strokeOpacity="0.3" />
+									<path d="M130 70 Q 145 50 160 75" strokeOpacity="0.5" strokeDasharray="3 3" />
+									<path d="M190 135 Q 160 150 125 145" strokeOpacity="0.5" strokeDasharray="3 3" />
+									<path d="M95 105 Q 75 115 85 125" strokeOpacity="0.5" strokeDasharray="3 3" />
 								</svg>
 							</div>
 						</div>
 
 						{/* Problem 02 */}
-						<div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-32">
-							<div className="bg-gradient-to-br from-[#eef9f4] to-[#dff2e8] rounded-2xl p-12 flex items-center justify-center min-h-[400px]" style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 0.26144%,rgba(0,0,0,0) 0.26144%),linear-gradient(90deg,rgba(21,204,145,0.06) 0.19608%,rgba(0,0,0,0) 0.19608%),linear-gradient(143.13deg,rgb(238,249,244) 0%,rgb(223,242,232) 100%)" }}>
-								<svg className="w-full max-w-sm opacity-85" viewBox="0 0 280.5 205.695" fill="none">
-									<g opacity="0.85">
-										{/* Document outline */}
-										<rect x="60" y="20" width="160" height="165" rx="5.6" stroke="#15CC91" strokeOpacity="0.8" strokeWidth="1.40247" />
-										{/* Header line */}
-										<path d="M88.83 52.12H191.678" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										{/* Question mark circles */}
-										<circle cx="89.79" cy="65.79" r="13.79" stroke="#15CC91" strokeOpacity="0.6" strokeWidth="1.40247" />
-										<text x="89.79" y="71" fontFamily="Inter" fontWeight="bold" fontSize="14.96" fill="#15cc91" textAnchor="middle">?</text>
-										<circle cx="234.5" cy="122.29" r="13.79" stroke="#15CC91" strokeOpacity="0.6" strokeWidth="1.40247" />
-										<text x="234.5" y="128.2" fontFamily="Inter" fontWeight="bold" fontSize="14.96" fill="#15cc91" textAnchor="middle">?</text>
-										{/* Exclamation circle */}
-										<circle cx="224.85" cy="47.42" r="10.051" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<text x="224.85" y="52.5" fontFamily="Inter" fontWeight="bold" fontSize="11.22" fill="#15cc91" textAnchor="middle">!</text>
-									</g>
+						<div className="grid md:grid-cols-2 gap-20 items-center mb-[60px]">
+							<div
+								className="order-2 md:order-1 aspect-[4/3] rounded-2xl flex items-center justify-center overflow-hidden"
+								style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(135deg, #eef9f4 0%, #dff2e8 100%)", backgroundSize: "24px 24px, 24px 24px, 100% 100%" }}
+							>
+								<svg className="w-[55%]" viewBox="0 0 300 220" fill="none" stroke="#15cc91" strokeWidth="1.5">
+									<rect x="80" y="30" width="140" height="170" rx="6" strokeOpacity="0.8" />
+									<line x1="95" y1="55" x2="205" y2="55" strokeOpacity="0.5" />
+									<line x1="95" y1="68" x2="190" y2="68" strokeOpacity="0.3" />
+									<line x1="95" y1="80" x2="200" y2="80" strokeOpacity="0.3" />
+									<rect x="92" y="95" width="116" height="28" rx="3" fill="#15cc91" fillOpacity="0.12" stroke="#15cc91" strokeOpacity="0.5" strokeDasharray="3 2" />
+									<line x1="100" y1="105" x2="190" y2="105" strokeOpacity="0.4" />
+									<line x1="100" y1="115" x2="175" y2="115" strokeOpacity="0.4" />
+									<line x1="95" y1="138" x2="200" y2="138" strokeOpacity="0.3" />
+									<line x1="95" y1="150" x2="180" y2="150" strokeOpacity="0.3" />
+									<line x1="95" y1="162" x2="195" y2="162" strokeOpacity="0.3" />
+									<line x1="95" y1="174" x2="170" y2="174" strokeOpacity="0.3" />
+									<circle cx="50" cy="70" r="14" strokeOpacity="0.6" />
+									<text x="50" y="76" fill="#15cc91" stroke="none" fontSize="16" fontWeight="600" textAnchor="middle" fontFamily="Inter">?</text>
+									<circle cx="250" cy="130" r="14" strokeOpacity="0.6" />
+									<text x="250" y="136" fill="#15cc91" stroke="none" fontSize="16" fontWeight="600" textAnchor="middle" fontFamily="Inter">?</text>
+									<circle cx="240" cy="50" r="10" strokeOpacity="0.5" />
+									<text x="240" y="55" fill="#15cc91" stroke="none" fontSize="12" fontWeight="600" textAnchor="middle" fontFamily="Inter">!</text>
 								</svg>
 							</div>
-							<div>
-								<div className="flex items-center gap-3 mb-6">
-									<div className="w-6 h-px bg-[#0fa478]"></div>
-									<span className="text-[#0fa478] text-sm font-medium tracking-widest uppercase">Problem 02</span>
+							<div className="order-1 md:order-2">
+								<div className="flex items-center gap-3 mb-[18px]">
+									<div className="w-6 h-px bg-[#0fa478]" />
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 02</span>
 								</div>
-								<h3 className="text-3xl lg:text-[38px] font-semibold text-[#0f172a] mb-6 leading-tight tracking-tight">
+								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
 									You fed AI the full PDF — but you can't trust the output.
 								</h3>
-								<p className="text-[#52525b] text-lg leading-relaxed">
+								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
 									Answers come with hallucinations, omissions, and no way to verify. You end up fact-checking the thing that was supposed to save you time.
 								</p>
 							</div>
 						</div>
 
 						{/* Problem 03 */}
-						<div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
-							<div className="order-2 md:order-1">
-								<div className="flex items-center gap-3 mb-6">
-									<div className="w-6 h-px bg-[#0fa478]"></div>
-									<span className="text-[#0fa478] text-sm font-medium tracking-widest uppercase">Problem 03</span>
+						<div className="grid md:grid-cols-2 gap-20 items-center">
+							<div>
+								<div className="flex items-center gap-3 mb-[18px]">
+									<div className="w-6 h-px bg-[#0fa478]" />
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 03</span>
 								</div>
-								<h3 className="text-3xl lg:text-[38px] font-semibold text-[#0f172a] mb-6 leading-tight tracking-tight">
+								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
 									The answers are good. Your notebook can't handle them.
 								</h3>
-								<p className="text-[#52525b] text-lg leading-relaxed">
+								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
 									Tables, equations, formatted content — AI finally gives you what you need, but you're stuck copying, pasting, and fixing. No notebook supports AI output natively.
 								</p>
 							</div>
-							<div className="order-1 md:order-2 bg-gradient-to-br from-[#eef9f4] to-[#dff2e8] rounded-2xl p-12 flex items-center justify-center min-h-[400px]" style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 0.26144%,rgba(0,0,0,0) 0.26144%),linear-gradient(90deg,rgba(21,204,145,0.06) 0.19608%,rgba(0,0,0,0) 0.19608%),linear-gradient(143.13deg,rgb(238,249,244) 0%,rgb(223,242,232) 100%)" }}>
-								<svg className="w-full max-w-sm opacity-85" viewBox="0 0 280.5 205.695" fill="none">
-									<g opacity="0.85">
-										{/* Document outline */}
-										<rect x="14.5" y="2" width="252" height="201" rx="5.6" stroke="#15CC91" strokeOpacity="0.7" strokeWidth="1.40247" />
-										{/* Formula */}
-										<text x="30" y="45" fontFamily="Inter" fontStyle="italic" fontSize="12.16" fill="#15cc91">∫ f(x)dx</text>
-										{/* Table */}
-										<rect x="30" y="67.3" width="83.15" height="36.4" stroke="#15CC91" strokeOpacity="0.6" strokeWidth="1.40247" rx="2" />
-										<line x1="30" y1="80.3" x2="113.15" y2="80.3" stroke="#15CC91" strokeOpacity="0.5" strokeWidth="1.40247" />
-										<line x1="30" y1="92.8" x2="113.15" y2="92.8" stroke="#15CC91" strokeOpacity="0.3" strokeWidth="1.40247" />
-										<line x1="58" y1="67.3" x2="58" y2="103.7" stroke="#15CC91" strokeOpacity="0.4" strokeWidth="1.40247" />
-										<line x1="86" y1="67.3" x2="86" y2="103.7" stroke="#15CC91" strokeOpacity="0.4" strokeWidth="1.40247" />
-									</g>
+							<div
+								className="aspect-[4/3] rounded-2xl flex items-center justify-center overflow-hidden"
+								style={{ backgroundImage: "linear-gradient(rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(21,204,145,0.06) 1px, transparent 1px), linear-gradient(135deg, #eef9f4 0%, #dff2e8 100%)", backgroundSize: "24px 24px, 24px 24px, 100% 100%" }}
+							>
+								<svg className="w-[55%]" viewBox="0 0 300 220" fill="none" stroke="#15cc91" strokeWidth="1.5">
+									<rect x="20" y="30" width="115" height="160" rx="6" strokeOpacity="0.7" />
+									<text x="32" y="58" fill="#15cc91" stroke="none" fontSize="13" fontFamily="Georgia, serif" fontStyle="italic">∫ f(x)dx</text>
+									<rect x="32" y="72" width="90" height="40" rx="2" strokeOpacity="0.6" />
+									<line x1="32" y1="86" x2="122" y2="86" strokeOpacity="0.5" />
+									<line x1="32" y1="99" x2="122" y2="99" strokeOpacity="0.3" />
+									<line x1="62" y1="72" x2="62" y2="112" strokeOpacity="0.4" />
+									<line x1="92" y1="72" x2="92" y2="112" strokeOpacity="0.4" />
+									<rect x="32" y="122" width="60" height="6" rx="2" fill="#15cc91" fillOpacity="0.25" stroke="none" />
+									<line x1="32" y1="138" x2="120" y2="138" strokeOpacity="0.3" />
+									<line x1="32" y1="150" x2="110" y2="150" strokeOpacity="0.3" />
+									<line x1="32" y1="162" x2="115" y2="162" strokeOpacity="0.3" />
+									<line x1="32" y1="174" x2="95" y2="174" strokeOpacity="0.3" />
+									<path d="M145 110 L 170 110" strokeOpacity="0.6" />
+									<path d="M155 105 L 160 110 L 155 115" strokeOpacity="0.6" />
+									<path d="M150 118 L 165 102" stroke="#e65454" strokeOpacity="0.6" strokeWidth="2" />
+									<rect x="180" y="30" width="100" height="160" rx="6" strokeOpacity="0.7" strokeDasharray="4 3" />
+									<line x1="192" y1="55" x2="265" y2="55" strokeOpacity="0.3" />
+									<line x1="192" y1="68" x2="255" y2="68" strokeOpacity="0.3" />
+									<line x1="192" y1="81" x2="260" y2="81" strokeOpacity="0.3" />
+									<line x1="192" y1="94" x2="245" y2="94" strokeOpacity="0.3" />
+									<line x1="192" y1="107" x2="258" y2="107" strokeOpacity="0.3" />
+									<line x1="192" y1="120" x2="250" y2="120" strokeOpacity="0.3" />
+									<line x1="192" y1="133" x2="255" y2="133" strokeOpacity="0.3" />
+									<line x1="192" y1="146" x2="240" y2="146" strokeOpacity="0.3" />
+									<line x1="192" y1="159" x2="260" y2="159" strokeOpacity="0.3" />
+									<line x1="192" y1="172" x2="245" y2="172" strokeOpacity="0.3" />
 								</svg>
 							</div>
 						</div>
 					</div>
 				</section>
-
+				
 				{/* ── Workflow ─────────────────────────────────────────────────── */}
 				<section id="workflow" className="bg-white py-20 lg:py-32">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
