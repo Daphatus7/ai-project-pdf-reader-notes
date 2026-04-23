@@ -392,7 +392,7 @@ const LandingPage = () => {
 						</h2>
 						<p className="text-[#52525b] text-center mb-12">Everything you need to know before you start.</p>
 
-						<div className="space-y-4">
+						<div className="space-y-2">
 							{[
 								{
 									q: "What is the main benefit of using Atlas Notebook?",
@@ -419,7 +419,7 @@ const LandingPage = () => {
 									a: "Yes, they share the exact same powerful features. However, because we run expensive, high-tier reasoning models (Grok) to ensure maximum accuracy, the free version has a limited monthly token usage.",
 								},
 							].map(({ q, a }) => (
-								<details key={q} className="group border-b border-[#ececec] pb-6">
+								<details key={q} className="group border-b border-[#ececec] pb-2">
 									<summary className="flex items-center justify-between cursor-pointer list-none font-semibold text-[#0f172a] text-lg py-4">
 										{q}
 										<svg className="w-5 h-5 transition-transform group-open:rotate-180 shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
