@@ -395,28 +395,28 @@ const LandingPage = () => {
 						<div className="space-y-4">
 							{[
 								{
-									q: "How is this different from Notion AI or Obsidian?",
-									a: "Notion AI bolts AI onto an existing product. Obsidian requires manual linking and doesn't support rich AI output. Atlas was designed AI-first: formatting, search, and capture all assume you're working with AI-generated content, not fighting it.",
+									q: "What is the main benefit of using Atlas Notebook?",
+									a: "Time and sanity. You save hours previously wasted on copying, pasting, and manually fixing broken formatting. Atlas is uniquely optimized to handle and render complex data (like LaTeX and multi-level tables) natively.",
 								},
 								{
-									q: "Does it work offline?",
-									a: "Yes. All your notes are stored locally and sync when you reconnect. AI features require internet, but reading, editing, and searching work offline.",
+									q: "How is this different from ChatGPT or Claude?",
+									a: "Standard AI chatbots force you into a broken loop: screenshot → upload → prompt → copy broken text → paste → manually fix formatting in Notion/Word. Atlas Notebook unifies the PDF, the AI reasoning, and the final note-taking environment into one seamless interface. You keep the context, and you keep the exact formatting.",
 								},
 								{
-									q: "Can I export my data?",
-									a: "Always. Export to Markdown, PDF, or HTML with one click. Your data belongs to you — no lock-in, no vendor dependency.",
+									q: "What AI models power Atlas Notebook?",
+									a: "We use the latest xAI Grok reasoning model. It delivers incredibly fast, objective, and unfiltered extractions with industry-low hallucination rates, specifically optimized for complex document layouts.",
 								},
 								{
-									q: "What AI model powers this?",
-									a: "We use Grok AI for all reasoning tasks. You can switch between models (GPT-4, Claude, Llama) in settings if you prefer, but Grok delivers the best balance of speed and accuracy for note-taking.",
+									q: "I prefer handwritten notes, is this for me?",
+									a: "Probably not. Atlas Notebook is heavily optimized for laptop/PC users who need to rapidly extract and structure complex digital information. However, we'd love to hear your use case! Drop us a line at support@atlasnotebook.com.",
 								},
 								{
-									q: "How much does it cost?",
-									a: "Free tier includes 100 AI queries per month. Pro is $12/month for unlimited queries, priority support, and early access to new features. Students get 50% off with a .edu email.",
+									q: "Can Atlas Notebook read formats other than PDF?",
+									a: "Currently, we are 100% focused on perfecting the PDF experience. Support for more formats is on our roadmap.",
 								},
 								{
-									q: "Is the free tier truly free, or will quality be degraded?",
-									a: "Yes — same features, same quality. But because we run premium reasoning models (Grok) to guarantee accuracy, the free tier has a monthly token cap.",
+									q: "Is the free version as good as the paid version?",
+									a: "Yes, they share the exact same powerful features. However, because we run expensive, high-tier reasoning models (Grok) to ensure maximum accuracy, the free version has a limited monthly token usage.",
 								},
 							].map(({ q, a }) => (
 								<details key={q} className="group border-b border-[#ececec] pb-6">
