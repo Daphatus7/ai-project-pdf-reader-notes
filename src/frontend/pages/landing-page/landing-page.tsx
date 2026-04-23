@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import PricingSection from "@/frontend/pages/landing-page/pricing.tsx";
 
 /* ─── Landing Page ────────────────────────────────────────────────────────────
    New design: teal hero + problems / workflow / features / FAQ sections.
@@ -458,6 +459,12 @@ const LandingPage = () => {
 					</div>
 				</section>
 			</div>
+			
+			<section>
+				<PricingSection>
+					
+				</PricingSection>
+			</section>
 		</>
 	);
 };
