@@ -39,6 +39,8 @@ const LandingPage = () => {
 								<a href="#workflow" className="text-white/95 text-sm font-medium hover:text-white transition">How it works</a>
 								<a href="#features" className="text-white/95 text-sm font-medium hover:text-white transition">Features</a>
 								<a href="#faq" className="text-white/95 text-sm font-medium hover:text-white transition">FAQ</a>
+								<a href="#pricing" className="text-white/95 text-sm font-medium hover:text-white transition">Pricing</a>
+								<a className="text-white/95 text-sm font-medium hover:text-white transition">Blog</a>
 							</nav>
 
 							{/* CTA Buttons */}
@@ -67,10 +69,8 @@ const LandingPage = () => {
 							{/* Powered-by badge */}
 							<div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-6 py-2.5 mb-8">
 								{/* Grok AI star icon — simplified inline SVG */}
-								<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-									<path d="M12 2 L13.8 9 L21 12 L13.8 15 L12 22 L10.2 15 L3 12 L10.2 9 Z" fill="white" />
-								</svg>
-								<span className="text-white font-bold text-sm">Powered by Grok AI</span>
+								<img src="/public/xAI-logo.svg" alt="xAI Grok" className="w-6 h-6" />
+								<span className="text-white font-bold text-md">Powered by xAI Grok</span>
 							</div>
 
 							{/* Main headline */}
