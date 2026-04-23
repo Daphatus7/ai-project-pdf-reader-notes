@@ -410,8 +410,15 @@ const LandingPage = () => {
 										Say goodbye to broken formulas and misaligned grids. LaTeX, complex tables — rendered perfectly, every time.
 									</p>
 								</div>
-								{/* bottom gradient fade */}
-								<div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none z-10"/>
+								{/* Screenshots pinned to bottom, clipped by overflow-hidden */}
+								<div className="absolute inset-x-6 top-[44%] bottom-0 flex items-start gap-3">
+									<div className="flex-[3] min-w-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+										<img src="/chat-image.png" alt="AI chat output" className="w-full block"/>
+									</div>
+									<div className="flex-[2] min-w-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+										<img src="/editor-image.png" alt="Editor output" className="w-full block"/>
+									</div>
+								</div>
 							</div>
 
 							{/* F2 — Dual Editors */}
