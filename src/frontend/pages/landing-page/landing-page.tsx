@@ -259,10 +259,19 @@ const LandingPage = () => {
 					</div>
 				</section>
 
-				{/* Solution }
+				{/* ── Solution ─────────────────────────────────────────────────── */}
+
+				<section id="solutions" className="bg-[#FFFFFF] py-[140px] px-6 text-[#0f172a]">
+					<div className="max-w-[1100px] mx-auto">
+						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto">
+							<span className="font-semibold">Atlas Notebook is built </span><br/>
+							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">to eliminate the friction, from source to structured notes</span>
+						</h2>
+					</div>
+				</section>
 				
 				{/* ── Workflow ─────────────────────────────────────────────────── */}
-				<section id="workflow" className="bg-white py-20 lg:py-32">
+				<section id="workflow" className="bg-[#fafaf7] py-20 lg:py-32">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="text-center mb-16">
 							<p className="text-[#0fa478] text-xs font-medium tracking-widest uppercase mb-6">The Workflow</p>
@@ -295,13 +304,13 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">1</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Highlight</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Select</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									Select any text, equation, or table.
+									Select any section on the PDF
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Works directly inside your PDF. No preprocessing, no conversion, no upload.
+									Capture any part of your PDF — tables, equations, diagrams, or text blocks — with a simple screenshot tool.
 								</p>
 							</div>
 
@@ -329,13 +338,13 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">2</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Process</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Ask</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									Extract, explain, summarize, or translate.
+									Ask AI to explain, extract, summarize, or translate
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									One click on the floating widget. The AI already knows what you selected and what page you're on.
+									Get the same AI experience you're used to, but with higher precision and interactable output.
 								</p>
 							</div>
 
@@ -360,20 +369,18 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">3</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Snap</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Insert</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									One click. Straight into your notes.
+									One click. Straight into your notes
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Formatting preserved — pixel-perfect. No copy-paste, no cleanup, no tab-switching.
+									Pixel-perfect tables, LaTeX, and Math/Chemical formulas. No copy-paste, no cleanup, no tab-switching. All in one screen.
 								</p>
 							</div>
 						</div>
 					</div>
 				</section>
-
-				
 				
 
 				{/* ── FAQ ──────────────────────────────────────────────────────── */}
