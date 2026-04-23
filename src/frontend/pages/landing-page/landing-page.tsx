@@ -22,7 +22,7 @@ const LandingPage = () => {
 
 			<div className="min-h-screen bg-[#0d5a6b]">
 				{/* ── Header ──────────────────────────────────────────────────── */}
-				<header className="sticky top-0 z-50 backdrop-blur-sm">
+				<header className="sticky top-2 z-50 backdrop-blur-sm">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="flex items-center justify-between h-20 bg-[rgba(21,204,145,0.1)] border border-[rgba(220,220,219,0.14)] rounded-2xl px-6 mb-4">
 							{/* Logo */}
