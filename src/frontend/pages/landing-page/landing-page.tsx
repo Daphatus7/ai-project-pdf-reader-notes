@@ -462,10 +462,9 @@ const LandingPage = () => {
 								Start for free
 							</Link>
 						</div>
-						<p className="text-white/60 text-sm mt-6">S</p>
+						<p className="text-white/60 text-sm mt-6">Experience the performance Upgrade for free</p>
 					</div>
 				</section>
-				
 				
 			</div>
 			
