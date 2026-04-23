@@ -258,6 +258,8 @@ const LandingPage = () => {
 						</div>
 					</div>
 				</section>
+
+				{/* Solution }
 				
 				{/* ── Workflow ─────────────────────────────────────────────────── */}
 				<section id="workflow" className="bg-white py-20 lg:py-32">
@@ -371,68 +373,8 @@ const LandingPage = () => {
 					</div>
 				</section>
 
-				{/* ── Features ─────────────────────────────────────────────────── */}
-				<section id="features" className="bg-[#0a1628] py-20 lg:py-32">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="text-center mb-16">
-							<h2 className="text-3xl lg:text-5xl font-semibold text-white mb-4">
-								Built for maximum AI compatibility.
-							</h2>
-							<p className="text-white/70 text-lg max-w-2xl mx-auto">
-								The first notebook designed from the ground up for AI-assisted learning.
-							</p>
-						</div>
-
-						<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-							{[
-								{ num: "01", tag: "Formatting", title: "100% lossless formatting.", icon: "📄", desc: "LaTeX, nested tables, code blocks — rendered pixel-perfect. The only notebook that treats AI output as a first-class citizen, not plain text." },
-								{ num: "02", tag: "Search", title: "Find anything, instantly.", icon: "🔍", desc: "Semantic search across all your notes. Ask in plain language, get the exact answer — even if you never used those words." },
-								{ num: "03", tag: "Speed", title: "Native PDF support.", icon: "⚡", desc: "Works directly inside your PDF. No preprocessing, no conversion, no upload." },
-								{ num: "04", tag: "AI", title: "Context-aware responses.", icon: "🤖", desc: "AI sees your entire knowledge base. Answers connect to what you already know, building on previous notes automatically." },
-								{ num: "05", tag: "Linking", title: "Bi-directional linking, automatic.", icon: "🔗", desc: "Your knowledge graph builds itself. Connections surface organically — no manual tagging required." },
-								{ num: "06", tag: "Citations", title: "Inline citations always.", icon: "✨", desc: "Every AI-generated claim links back to source material. Verify, cross-reference, and learn with confidence." },
-							].map(({ num, tag, title, icon, desc }) => (
-								<div key={num} className="bg-[#111c2f] border border-white/8 rounded-2xl p-8">
-									<div className="bg-gradient-to-br from-[#f6faf8] to-[#eef7f2] rounded-xl h-56 mb-6 flex items-center justify-center">
-										<div className="text-6xl">{icon}</div>
-									</div>
-									<div className="text-[#4ade80] text-xs font-semibold tracking-widest uppercase mb-3">{num} / {tag}</div>
-									<h3 className="text-xl font-semibold text-white mb-3 tracking-tight">{title}</h3>
-									<p className="text-[#94a3b8] text-sm leading-relaxed">{desc}</p>
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
-
-				{/* ── Everything Else ──────────────────────────────────────────── */}
-				<section className="bg-white py-20 lg:py-32">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="text-center mb-16">
-							<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] mb-4">
-								Everything else, already<br />handled.
-							</h2>
-							<p className="text-[#52525b] text-lg max-w-2xl mx-auto">
-								All the table stakes you expect, plus details you didn't know you needed.
-							</p>
-						</div>
-
-						<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-							{[
-								{ icon: "🔒", title: "End-to-end encryption.", desc: "Your notes stay private. Always." },
-								{ icon: "☁️", title: "Real-time sync.", desc: "Seamless across all devices." },
-								{ icon: "📱", title: "Mobile-first design.", desc: "Full power, pocket-sized." },
-								{ icon: "⌨️", title: "Keyboard shortcuts.", desc: "Never touch the mouse." },
-							].map(({ icon, title, desc }) => (
-								<div key={title} className="text-center">
-									<div className="text-4xl mb-4">{icon}</div>
-									<h3 className="text-lg font-semibold text-[#0f172a] mb-2">{title}</h3>
-									<p className="text-[#71717a] text-sm">{desc}</p>
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
+				
+				
 
 				{/* ── FAQ ──────────────────────────────────────────────────────── */}
 				<section id="faq" className="bg-white py-20 lg:py-32 border-t border-[#ececec]">
