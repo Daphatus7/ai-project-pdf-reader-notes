@@ -433,14 +433,21 @@ const LandingPage = () => {
 					</div>
 				</section>
 
+
+				<section>
+					<PricingSection>
+					</PricingSection>
+				</section>
+				
+
 				{/* ── Final CTA ────────────────────────────────────────────────── */}
 				<section className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32">
 					<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6">
-							Stop fighting your tools.<br />Start learning.
+							Start reading smarter today
 						</h2>
 						<p className="text-white/90 text-lg mb-10 max-w-2xl mx-auto">
-							Join thousands of students and researchers who've already made the switch.
+							Join now. Get 1 hour of work done in 20 minutes.
 						</p>
 						<div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
 							<input
@@ -452,19 +459,17 @@ const LandingPage = () => {
 								to="/signup"
 								className="w-full sm:w-auto bg-white text-[#0f172a] px-8 py-3.5 rounded-full font-semibold hover:bg-white/90 transition text-center"
 							>
-								Get started free
+								Start for free
 							</Link>
 						</div>
-						<p className="text-white/60 text-sm mt-6">No credit card required • 100 free queries per month</p>
+						<p className="text-white/60 text-sm mt-6">S</p>
 					</div>
 				</section>
+				
+				
 			</div>
 			
-			<section>
-				<PricingSection>
-					
-				</PricingSection>
-			</section>
+
 		</>
 	);
 };
