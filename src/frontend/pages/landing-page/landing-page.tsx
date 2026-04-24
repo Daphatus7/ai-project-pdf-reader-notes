@@ -128,7 +128,7 @@ const LandingPage = () => {
 							</div>
 
 							{/* Main headline */}
-							<h2 className="text-4xl sm:text-5xl lg:text-[68px] font-semibold text-white leading-tight tracking-[-1.7px] mb-6 max-w-5xl mx-auto">
+							<h2 className="text-4xl sm:text-5xl lg:text-[54px] font-semibold text-white leading-tight tracking-[-1.7px] mb-6 max-w-5xl mx-auto">
 								{lp.hero.heading1}<br />
 								{lp.hero.heading2}
 							</h2>
