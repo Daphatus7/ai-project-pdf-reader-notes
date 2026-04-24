@@ -4,6 +4,153 @@ import { Link } from "react-router-dom";
 import PricingSection from "@/frontend/pages/landing-page/pricing.tsx";
 import { useLanguage } from "@/frontend/i18n/language-context.tsx";
 
+// Particle nebula — pure Canvas, no deps, ~1% CPU on modern hardware
+const ParticleNebula = () => {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		let W = 0, H = 0, animId = 0;
+		const mouse = { x: -9999, y: -9999 };
+
+		type Pt = {
+			x: number; y: number;
+			vx: number; vy: number;
+			phase: number; drift: number;
+			r: number; baseAlpha: number;
+			cr: number; cg: number; cb: number;
+			bright: boolean;
+		};
+		let pts: Pt[] = [];
+
+		const init = () => {
+			W = canvas.offsetWidth;
+			H = canvas.offsetHeight;
+			canvas.width = W;
+			canvas.height = H;
+
+			const N = Math.min(240, Math.floor((W * H) / 4800));
+			pts = Array.from({ length: N }, () => {
+				const rnd = Math.random();
+				const bright = Math.random() < 0.07;
+				// Colors: mostly cool-white, some brand teal, some brand blue
+				const [cr, cg, cb] = rnd < 0.11
+					? [15, 164, 120]   // teal
+					: rnd < 0.19
+					? [0, 106, 255]    // blue
+					: [215, 235, 255]; // cool-white
+				return {
+					x: Math.random() * W,
+					y: Math.random() * H,
+					vx: 0, vy: 0,
+					phase: Math.random() * Math.PI * 2,
+					drift: Math.random() * 0.5 + 0.15,
+					r: bright ? Math.random() * 1.8 + 2.2 : Math.random() * 1.1 + 0.3,
+					baseAlpha: bright ? Math.random() * 0.35 + 0.65 : Math.random() * 0.45 + 0.1,
+					cr, cg, cb, bright,
+				};
+			});
+		};
+
+		let t = 0;
+		const CONN_D = 90, CONN_D2 = 90 * 90;
+		const MOUSE_R = 130, MOUSE_R2 = 130 * 130;
+
+		const tick = () => {
+			ctx.clearRect(0, 0, W, H);
+			t += 0.018;
+
+			// Update positions
+			for (const p of pts) {
+				p.vx += Math.cos(t * 0.7 + p.phase) * p.drift * 0.03;
+				p.vy += Math.sin(t * 0.5 + p.phase * 1.3) * p.drift * 0.03;
+
+				const dx = p.x - mouse.x, dy = p.y - mouse.y;
+				const d2 = dx * dx + dy * dy;
+				if (d2 < MOUSE_R2 && d2 > 0) {
+					const d = Math.sqrt(d2);
+					const f = ((MOUSE_R - d) / MOUSE_R) * 1.5;
+					p.vx += (dx / d) * f;
+					p.vy += (dy / d) * f;
+				}
+
+				p.vx *= 0.93; p.vy *= 0.93;
+				p.x += p.vx; p.y += p.vy;
+
+				if (p.x < -5) p.x = W + 5;
+				else if (p.x > W + 5) p.x = -5;
+				if (p.y < -5) p.y = H + 5;
+				else if (p.y > H + 5) p.y = -5;
+			}
+
+			// Connection lines
+			ctx.lineWidth = 0.5;
+			for (let i = 0; i < pts.length; i++) {
+				for (let j = i + 1; j < pts.length; j++) {
+					const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+					const d2 = dx * dx + dy * dy;
+					if (d2 < CONN_D2) {
+						const a = (1 - Math.sqrt(d2) / CONN_D) * 0.2;
+						ctx.beginPath();
+						ctx.strokeStyle = `rgba(200,225,255,${a.toFixed(3)})`;
+						ctx.moveTo(pts[i].x, pts[i].y);
+						ctx.lineTo(pts[j].x, pts[j].y);
+						ctx.stroke();
+					}
+				}
+			}
+
+			// Particles
+			for (const p of pts) {
+				const a = p.baseAlpha * (0.65 + 0.35 * Math.sin(t * (p.drift * 2 + 0.5) + p.phase));
+				if (p.bright) { ctx.shadowColor = `rgb(${p.cr},${p.cg},${p.cb})`; ctx.shadowBlur = 12; }
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+				ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${a.toFixed(3)})`;
+				ctx.fill();
+				if (p.bright) ctx.shadowBlur = 0;
+			}
+
+			animId = requestAnimationFrame(tick);
+		};
+
+		init();
+		tick();
+
+		const onMove = (e: MouseEvent) => {
+			const r = canvas.getBoundingClientRect();
+			mouse.x = e.clientX - r.left;
+			mouse.y = e.clientY - r.top;
+		};
+		const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
+		const onResize = () => { cancelAnimationFrame(animId); init(); tick(); };
+
+		const sec = canvas.closest('section');
+		sec?.addEventListener('mousemove', onMove);
+		sec?.addEventListener('mouseleave', onLeave);
+		window.addEventListener('resize', onResize);
+
+		return () => {
+			cancelAnimationFrame(animId);
+			sec?.removeEventListener('mousemove', onMove);
+			sec?.removeEventListener('mouseleave', onLeave);
+			window.removeEventListener('resize', onResize);
+		};
+	}, []);
+
+	return (
+		<canvas
+			ref={canvasRef}
+			className="absolute inset-0 w-full h-full pointer-events-none"
+			aria-hidden="true"
+		/>
+	);
+};
+
 const LandingPage = () => {
 	const f1Ref = useRef<HTMLDivElement>(null);
 	const [f1Visible, setF1Visible] = useState(false);
@@ -118,8 +265,9 @@ const LandingPage = () => {
 				</header>
 
 				{/* ── Hero ────────────────────────────────────────────────────── */}
-				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] via-[#1a7a8a] to-[#3ba89a] relative">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] via-[#1a7a8a] to-[#3ba89a] relative overflow-hidden">
+					<ParticleNebula />
+					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 relative z-10">
 						<div className="text-center mb-12">
 							{/* Powered-by badge */}
 							<div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-6 py-2.5 mb-8">
@@ -612,8 +760,9 @@ const LandingPage = () => {
 
 
 				{/* ── Final CTA ────────────────────────────────────────────────── */}
-				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32">
-					<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32 relative overflow-hidden">
+					<ParticleNebula />
+					<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6">
 							{lp.cta.heading}
 						</h2>
