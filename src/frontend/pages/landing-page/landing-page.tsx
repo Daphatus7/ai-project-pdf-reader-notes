@@ -117,7 +117,7 @@ const LandingPage = () => {
 							{/* Powered-by badge */}
 							<div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-6 py-2.5 mb-8">
 								{/* Grok AI star icon — simplified inline SVG */}
-								<img src="/public/xAI-logo.svg" alt="xAI Grok" className="w-6 h-6" />
+								<img src="/xAI-logo.svg" alt="xAI Grok" className="w-6 h-6" />
 								<span className="text-white font-bold text-md">Powered by xAI Grok</span>
 							</div>
 
