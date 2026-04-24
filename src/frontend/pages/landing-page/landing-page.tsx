@@ -500,9 +500,9 @@ const LandingPage = () => {
 							<div className="bg-[#070f0b] border border-[#0fa478]/20 rounded-2xl p-7 overflow-hidden min-h-[260px] relative group
 									transition-all duration-300 hover:border-[#0fa478]/50 hover:shadow-[0_8px_32px_-8px_rgba(15,164,120,0.2)] cursor-default">
 								<p className="text-[#0fa478] text-xs font-semibold tracking-widest mb-4">03</p>
-								<h3 className="text-lg font-semibold text-white mb-2 leading-snug">Context-Aware AI Widget</h3>
+								<h3 className="text-lg font-semibold text-white mb-2 leading-snug">AI Widget</h3>
 								<p className="text-white/40 text-xs leading-relaxed mb-6">
-									Floating widget. Knows what you're reading. No tab-switching.
+									Save your recent prompts, no more reprompting, big time saver for repetitive tasks and follow-up questions.
 								</p>
 								{/* Floating widget mockup */}
 								<div className="bg-[#0d1f16] rounded-xl border border-[#0fa478]/25 p-4 shadow-xl
