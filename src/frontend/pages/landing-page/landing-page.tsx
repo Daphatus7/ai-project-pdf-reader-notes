@@ -425,7 +425,7 @@ const LandingPage = () => {
 
 							{/* F1 — Lossless Formatting, dark, large */}
 							<div ref={f1Ref} className="md:col-span-2 md:row-span-2 bg-[#0f172a] rounded-2xl p-8 overflow-hidden relative min-h-[340px] group
-									transition-shadow duration-500 hover:shadow-[0_24px_60px_-12px_rgba(15,164,120,0.18)] cursor-default">
+									transition-shadow duration-500 hover:shadow cursor-default">
 								<div className="relative z-10 max-w-sm">
 									<p className="text-[#0fa478] text-xs font-semibold tracking-widest mb-4">01</p>
 									<h3 className="text-2xl lg:text-3xl font-semibold text-white mb-3 leading-snug">
