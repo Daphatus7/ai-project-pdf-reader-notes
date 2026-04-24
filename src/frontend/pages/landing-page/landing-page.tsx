@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import PricingSection from "@/frontend/pages/landing-page/pricing.tsx";
@@ -9,6 +10,30 @@ import PricingSection from "@/frontend/pages/landing-page/pricing.tsx";
 ───────────────────────────────────────────────────────────────────────────── */
 
 const LandingPage = () => {
+	const f1Ref = useRef<HTMLDivElement>(null);
+	const [f1Visible, setF1Visible] = useState(false);
+	const [showEditor, setShowEditor] = useState(false);
+
+	useEffect(() => {
+		const el = f1Ref.current;
+		if (!el) return;
+		const obs = new IntersectionObserver(
+			([entry]) => { if (entry.isIntersecting) setF1Visible(true); },
+			{ threshold: 0.35 }
+		);
+		obs.observe(el);
+		return () => obs.disconnect();
+	}, []);
+
+	useEffect(() => {
+		if (!f1Visible) return;
+		let intervalId: ReturnType<typeof setInterval>;
+		const delayId = setTimeout(() => {
+			intervalId = setInterval(() => setShowEditor(v => !v), 2800);
+		}, 800);
+		return () => { clearTimeout(delayId); clearInterval(intervalId); };
+	}, [f1Visible]);
+
 	return (
 		<>
 			<Helmet>
@@ -399,7 +424,7 @@ const LandingPage = () => {
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
 							{/* F1 — Lossless Formatting, dark, large */}
-							<div className="md:col-span-2 md:row-span-2 bg-[#0f172a] rounded-2xl p-8 overflow-hidden relative min-h-[340px] group
+							<div ref={f1Ref} className="md:col-span-2 md:row-span-2 bg-[#0f172a] rounded-2xl p-8 overflow-hidden relative min-h-[340px] group
 									transition-shadow duration-500 hover:shadow-[0_24px_60px_-12px_rgba(15,164,120,0.18)] cursor-default">
 								<div className="relative z-10 max-w-sm">
 									<p className="text-[#0fa478] text-xs font-semibold tracking-widest mb-4">01</p>
@@ -410,12 +435,31 @@ const LandingPage = () => {
 										Say goodbye to broken formulas and misaligned grids. LaTeX, complex tables — rendered perfectly, every time.
 									</p>
 								</div>
-								{/* Screenshots pinned to bottom, clipped by overflow-hidden */}
-								<div className="absolute inset-x-6 top-[44%] bottom-0 flex items-start gap-3">
-									<div className="flex-[3] min-w-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+								{/* Screenshots — scroll-triggered chat→editor swap animation */}
+								<div className="absolute inset-x-6 top-[44%] bottom-0 overflow-hidden">
+									{/* Chat image — accelerates out (ease-in quick exit) / whoosh return */}
+									<div className="absolute inset-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
+										style={{
+											transform: showEditor ? 'translateX(-108%)' : 'translateX(0)',
+											opacity: showEditor ? 0 : 1,
+											transition: showEditor
+												? 'transform 0.34s cubic-bezier(0.4, 0, 1, 0.9), opacity 0.22s ease-in'
+												: 'transform 0.58s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out',
+											willChange: 'transform, opacity',
+										}}>
 										<img src="/chat-image.png" alt="AI chat output" className="w-full block"/>
 									</div>
-									<div className="flex-[2] min-w-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+
+									{/* Editor image — whoosh entry (fast-in slow-out) / accelerates out */}
+									<div className="absolute inset-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
+										style={{
+											transform: showEditor ? 'translateX(0)' : 'translateX(108%)',
+											opacity: showEditor ? 1 : 0,
+											transition: showEditor
+												? 'transform 0.58s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out'
+												: 'transform 0.34s cubic-bezier(0.4, 0, 1, 0.9), opacity 0.22s ease-in',
+											willChange: 'transform, opacity',
+										}}>
 										<img src="/editor-image.png" alt="Editor output" className="w-full block"/>
 									</div>
 								</div>
