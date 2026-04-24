@@ -676,7 +676,7 @@ const LandingPage = () => {
 				</section>
 
 				{/* ── Footer ───────────────────────────────────────────────────── */}
-				<footer data-navbar-theme="dark" className="bg-[#070d14] text-white">
+				<footer data-navbar-theme="dark" className="bg-[#071c24] text-white">
 					{/* Top strip — teal accent line */}
 					<div className="h-px bg-gradient-to-r from-transparent via-[#0fa478]/60 to-transparent" />
 
@@ -771,15 +771,15 @@ const LandingPage = () => {
 					</div>
 
 					{/* Bottom bar */}
-					<div className="border-t border-white/[0.06]">
+					<div className="border-t border-white/10">
 						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-							<p className="text-[#4a5568] text-xs">
+							<p className="text-white/30 text-xs">
 								© {new Date().getFullYear()} Atlas Notebook. All rights reserved.
 							</p>
-							<p className="text-[#4a5568] text-xs flex items-center gap-1.5">
-								Powered by
-								<img src="/xAI-logo.svg" alt="xAI" className="w-4 h-4 opacity-40" />
-								<span>xAI Grok</span>
+							<p className="text-white/30 text-xs flex items-center gap-1.5">
+								{/*Powered by*/}
+								{/*<img src="/xAI-logo.svg" alt="xAI" className="w-4 h-4 opacity-40" />*/}
+								{/*<span>xAI Grok</span>*/}
 							</p>
 						</div>
 					</div>
