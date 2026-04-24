@@ -471,7 +471,7 @@ const LandingPage = () => {
 								<p className="text-[#94a3b8] text-xs font-semibold tracking-widest mb-4">02</p>
 								<h3 className="text-lg font-semibold text-[#0f172a] mb-2 leading-snug">Dual Interchangeable Editors</h3>
 								<p className="text-[#64748b] text-xs leading-relaxed mb-6">
-									Block editor or raw Markdown — switch with one click, no syntax to learn. And Easy export to others: Obsidian, Notion, Logseq, and more.
+									Perfectly support Markdown and Block Editor. Easy to export to your existing notes or just copying Markdown to atlas.
 								</p>
 								{/* Toggle UI mockup */}
 								<div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm overflow-hidden
