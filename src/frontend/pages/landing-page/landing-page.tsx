@@ -471,14 +471,14 @@ const LandingPage = () => {
 								<p className="text-[#94a3b8] text-xs font-semibold tracking-widest mb-4">02</p>
 								<h3 className="text-lg font-semibold text-[#0f172a] mb-2 leading-snug">Dual Interchangeable Editors</h3>
 								<p className="text-[#64748b] text-xs leading-relaxed mb-6">
-									Block editor or raw Markdown — switch with one click, no syntax to learn.
+									Block editor or raw Markdown — switch with one click, no syntax to learn. And Easy export to others: Obsidian, Notion, Logseq, and more.
 								</p>
 								{/* Toggle UI mockup */}
 								<div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm overflow-hidden
 										group-hover:shadow-md group-hover:border-[#0fa478]/25 transition-all duration-300">
 									<div className="flex">
-										<div className="flex-1 py-2 text-center text-xs font-semibold text-[#0f172a] border-b-2 border-[#0fa478]">Block</div>
 										<div className="flex-1 py-2 text-center text-xs text-[#94a3b8] border-b border-[#e2e8f0]">Markdown</div>
+										<div className="flex-1 py-2 text-center text-xs font-semibold text-[#0f172a] border-b-2 border-[#0fa478]">Block Editor</div>
 									</div>
 									<div className="p-4 space-y-2.5">
 										<div className="flex items-center gap-2.5">
