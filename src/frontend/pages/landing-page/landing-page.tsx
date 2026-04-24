@@ -13,6 +13,7 @@ const LandingPage = () => {
 	const f1Ref = useRef<HTMLDivElement>(null);
 	const [f1Visible, setF1Visible] = useState(false);
 	const [showEditor, setShowEditor] = useState(false);
+	const [navbarTheme, setNavbarTheme] = useState<'dark' | 'light'>('dark');
 
 	useEffect(() => {
 		const el = f1Ref.current;
@@ -34,6 +35,23 @@ const LandingPage = () => {
 		return () => { clearTimeout(delayId); clearInterval(intervalId); };
 	}, [f1Visible]);
 
+	// Navbar theme: the topmost section inside the viewport's top 40% wins
+	useEffect(() => {
+		const sections = document.querySelectorAll('[data-navbar-theme]');
+		const intersecting = new Map<Element, boolean>();
+
+		const obs = new IntersectionObserver((entries) => {
+			entries.forEach(entry => intersecting.set(entry.target, entry.isIntersecting));
+			const topmost = Array.from(sections).find(s => intersecting.get(s));
+			if (topmost) {
+				setNavbarTheme(topmost.getAttribute('data-navbar-theme') as 'dark' | 'light');
+			}
+		}, { rootMargin: '0px 0px -60% 0px', threshold: 0 });
+
+		sections.forEach(s => obs.observe(s));
+		return () => obs.disconnect();
+	}, []);
+
 	return (
 		<>
 			<Helmet>
@@ -50,36 +68,40 @@ const LandingPage = () => {
 				{/* ── Header ──────────────────────────────────────────────────── */}
 				<header className="sticky top-2 z-50">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="flex items-center justify-between h-20 backdrop-blur-md backdrop-saturate-120 bg-white/10 border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.15)] rounded-2xl px-6 mb-4">
+						<div className={`flex items-center justify-between h-20 backdrop-blur-md backdrop-saturate-120 rounded-2xl px-6 mb-4 transition-all duration-300 ${
+								navbarTheme === 'dark'
+									? 'bg-white/10 border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.15)]'
+									: 'bg-white/85 border border-[#0f172a]/10 shadow-[0_4px_16px_rgba(0,0,0,0.08)]'
+							}`}>
 							{/* Logo */}
 							<div className="flex items-baseline gap-1">
-								<h1 className="text-3xl font-['Crimson_Text'] text-white">
+								<h1 className={`text-3xl font-['Crimson_Text'] transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>
 									<span className="text-[#006aff]">A</span>tlas
 								</h1>
-								<span className="text-lg text-white">notebook</span>
+								<span className={`text-lg transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>notebook</span>
 							</div>
 
 							{/* Navigation */}
 							<nav className="hidden md:flex items-center gap-10">
-								<a href="#problems" className="text-white/95 text-sm font-medium hover:text-white transition">Problems</a>
-								<a href="#workflow" className="text-white/95 text-sm font-medium hover:text-white transition">How it works</a>
-								<a href="#features" className="text-white/95 text-sm font-medium hover:text-white transition">Features</a>
-								<a href="#faq" className="text-white/95 text-sm font-medium hover:text-white transition">FAQ</a>
-								<a href="#pricing" className="text-white/95 text-sm font-medium hover:text-white transition">Pricing</a>
-								<a className="text-white/95 text-sm font-medium hover:text-white transition">Blog</a>
+								{['#problems', '#workflow', '#features', '#faq', '#pricing'].map((href, i) => (
+									<a key={href} href={href} className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>
+										{['Problems', 'How it works', 'Features', 'FAQ', 'Pricing'][i]}
+									</a>
+								))}
+								<a className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>Blog</a>
 							</nav>
 
 							{/* CTA Buttons */}
 							<div className="flex items-center gap-4">
 								<Link
 									to="/login"
-									className="hidden sm:block text-white text-sm font-medium hover:opacity-80 transition"
+									className={`hidden sm:block text-sm font-medium hover:opacity-80 transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}
 								>
 									Log in
 								</Link>
 								<Link
 									to="/signup"
-									className="bg-white text-[#0f172a] px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-white/90 transition"
+									className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${navbarTheme === 'dark' ? 'bg-white text-[#0f172a] hover:bg-white/90' : 'bg-[#0f172a] text-white hover:bg-[#0f172a]/90'}`}
 								>
 									Start for free
 								</Link>
@@ -89,7 +111,7 @@ const LandingPage = () => {
 				</header>
 
 				{/* ── Hero ────────────────────────────────────────────────────── */}
-				<section className="bg-gradient-to-b from-[#0d5a6b] via-[#1a7a8a] to-[#3ba89a] relative">
+				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] via-[#1a7a8a] to-[#3ba89a] relative">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
 						<div className="text-center mb-12">
 							{/* Powered-by badge */}
@@ -144,7 +166,7 @@ const LandingPage = () => {
 				</section>
 
 				{/* ── Problems ────────────────────────────────────────────────── */}
-				<section id="problems" className="bg-[#fafaf7] py-[140px] px-6 text-[#0f172a]">
+				<section id="problems" data-navbar-theme="light" className="bg-[#fafaf7] py-[140px] px-6 text-[#0f172a]">
 					<div className="max-w-[1100px] mx-auto">
 						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto mb-[60px]">
 							<span className="font-semibold">You read to understand.</span><br />
@@ -287,7 +309,7 @@ const LandingPage = () => {
 
 				{/* ── Solution ─────────────────────────────────────────────────── */}
 
-				<section id="solutions" className="bg-[#FFFFFF] py-[140px] px-6 text-[#0f172a]">
+				<section id="solutions" data-navbar-theme="light" className="bg-[#FFFFFF] py-[140px] px-6 text-[#0f172a]">
 					<div className="max-w-[1100px] mx-auto">
 						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto">
 							<span className="font-semibold">Atlas Notebook is built </span><br/>
@@ -297,7 +319,7 @@ const LandingPage = () => {
 				</section>
 				
 				{/* ── Workflow ─────────────────────────────────────────────────── */}
-				<section id="workflow" className="bg-[#fafaf7] py-20 lg:py-32">
+				<section id="workflow" data-navbar-theme="light" className="bg-[#fafaf7] py-20 lg:py-32">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="text-center mb-16">
 							<p className="text-[#0fa478] text-xs font-medium tracking-widest uppercase mb-6">The Workflow</p>
@@ -410,7 +432,7 @@ const LandingPage = () => {
 				
 
 				{/* ── Features ───────────────────────────────────────────────── */}
-				<section id="features" className="bg-white py-20 lg:py-28 border-t border-[#ececec]">
+				<section id="features" data-navbar-theme="light" className="bg-white py-20 lg:py-28 border-t border-[#ececec]">
 					<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
 						<div className="mb-12">
@@ -573,7 +595,7 @@ const LandingPage = () => {
 
 
 				{/* ── FAQ ──────────────────────────────────────────────────────── */}
-				<section id="faq" className="bg-white py-20 lg:py-32 border-t border-[#ececec]">
+				<section id="faq" data-navbar-theme="light" className="bg-white py-20 lg:py-32 border-t border-[#ececec]">
 					<div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] text-center mb-4">
 							Questions, answered.
@@ -622,14 +644,13 @@ const LandingPage = () => {
 				</section>
 				
 
-				<section>
-					<PricingSection>
-					</PricingSection>
-				</section>
+				<div data-navbar-theme="light">
+					<PricingSection />
+				</div>
 				
 
 				{/* ── Final CTA ────────────────────────────────────────────────── */}
-				<section className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32">
+				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32">
 					<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6">
 							Start reading smarter today
