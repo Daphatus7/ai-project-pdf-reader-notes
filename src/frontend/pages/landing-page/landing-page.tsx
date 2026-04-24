@@ -2,18 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import PricingSection from "@/frontend/pages/landing-page/pricing.tsx";
-
-/* ─── Landing Page ────────────────────────────────────────────────────────────
-   New design: teal hero + problems / workflow / features / FAQ sections.
-   Replaced old card-based design; drops i18n, PainPointSection, PricingSection.
-   SVG illustrations are inlined (source file svg-gw25jj2mok not in repo).
-───────────────────────────────────────────────────────────────────────────── */
+import { useLanguage } from "@/frontend/i18n/language-context.tsx";
 
 const LandingPage = () => {
 	const f1Ref = useRef<HTMLDivElement>(null);
 	const [f1Visible, setF1Visible] = useState(false);
 	const [showEditor, setShowEditor] = useState(false);
 	const [navbarTheme, setNavbarTheme] = useState<'dark' | 'light'>('dark');
+	const { t, toggle } = useLanguage();
+	const lp = t.landing;
 
 	useEffect(() => {
 		const el = f1Ref.current;
@@ -83,27 +80,37 @@ const LandingPage = () => {
 
 							{/* Navigation */}
 							<nav className="hidden md:flex items-center gap-10">
-								{['#problems', '#workflow', '#features', '#faq', '#pricing'].map((href, i) => (
+								{(['#problems', '#workflow', '#features', '#faq', '#pricing'] as const).map((href, i) => (
 									<a key={href} href={href} className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>
-										{['Problems', 'How it works', 'Features', 'FAQ', 'Pricing'][i]}
+										{[lp.nav.problems, lp.nav.howItWorks, lp.nav.features, lp.nav.faq, lp.nav.pricing][i]}
 									</a>
 								))}
-								<a className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>Blog</a>
+								<a className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>{lp.nav.blog}</a>
 							</nav>
 
 							{/* CTA Buttons */}
 							<div className="flex items-center gap-4">
+								<button
+									onClick={toggle}
+									aria-label="Switch language"
+									className={`hidden sm:flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-[#0f172a]/40 hover:text-[#0f172a] hover:bg-[#0f172a]/8'}`}
+								>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+										<circle cx="12" cy="12" r="10"/>
+										<path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20M2 12h20"/>
+									</svg>
+								</button>
 								<Link
 									to="/login"
 									className={`hidden sm:block text-sm font-medium hover:opacity-80 transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}
 								>
-									Log in
+									{lp.nav.login}
 								</Link>
 								<Link
 									to="/signup"
 									className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${navbarTheme === 'dark' ? 'bg-white text-[#0f172a] hover:bg-white/90' : 'bg-[#0f172a] text-white hover:bg-[#0f172a]/90'}`}
 								>
-									Start for free
+									{lp.nav.startFree}
 								</Link>
 							</div>
 						</div>
@@ -116,33 +123,32 @@ const LandingPage = () => {
 						<div className="text-center mb-12">
 							{/* Powered-by badge */}
 							<div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-6 py-2.5 mb-8">
-								{/* Grok AI star icon — simplified inline SVG */}
 								<img src="/xAI-logo.svg" alt="xAI Grok" className="w-6 h-6" />
-								<span className="text-white font-bold text-md">Powered by xAI Grok</span>
+								<span className="text-white font-bold text-md">{lp.hero.badge}</span>
 							</div>
 
 							{/* Main headline */}
 							<h2 className="text-4xl sm:text-5xl lg:text-[68px] font-semibold text-white leading-tight tracking-[-1.7px] mb-6 max-w-5xl mx-auto">
-								You didn't spend years studying<br />
-								just to copy-paste and fix formatting
+								{lp.hero.heading1}<br />
+								{lp.hero.heading2}
 							</h2>
 
 							<p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto mb-10 leading-relaxed">
-								No copy-paste. No reformatting. No tab-switching. Just select what matters — your notes build themselves on the same screen.
+								{lp.hero.subtitle}
 							</p>
 
 							{/* Email capture */}
 							<div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
 								<input
 									type="email"
-									placeholder="Email address"
+									placeholder={lp.hero.emailPlaceholder}
 									className="w-full sm:flex-1 bg-white/12 border border-white/25 rounded-full px-6 py-3.5 text-white placeholder:text-white/75 focus:outline-none focus:ring-2 focus:ring-white/50"
 								/>
 								<Link
 									to="/signup"
 									className="w-full sm:w-auto bg-white text-[#0f172a] px-8 py-3.5 rounded-full font-semibold hover:bg-white/90 transition text-center"
 								>
-									Start now
+									{lp.hero.cta}
 								</Link>
 							</div>
 						</div>
@@ -169,8 +175,8 @@ const LandingPage = () => {
 				<section id="problems" data-navbar-theme="light" className="bg-[#fafaf7] py-[140px] px-6 text-[#0f172a]">
 					<div className="max-w-[1100px] mx-auto">
 						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto mb-[60px]">
-							<span className="font-semibold">You read to understand.</span><br />
-							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">But the process keeps getting in the way.</span>
+							<span className="font-semibold">{lp.problems.sectionHeading1}</span><br />
+							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">{lp.problems.sectionHeading2}</span>
 						</h2>
 
 						{/* Problem 01 */}
@@ -178,13 +184,13 @@ const LandingPage = () => {
 							<div>
 								<div className="flex items-center gap-3 mb-[18px]">
 									<div className="w-6 h-px bg-[#0fa478]" />
-									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 01</span>
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">{lp.problems.p1label}</span>
 								</div>
 								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
-									AI explains better — but getting there kills your focus.
+									{lp.problems.p1heading}
 								</h3>
 								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
-									You want AI to explain exactly where you're stuck, but the prompting, screenshotting, and app-switching kills your focus.
+									{lp.problems.p1desc}
 								</p>
 							</div>
 							<div
@@ -245,13 +251,13 @@ const LandingPage = () => {
 							<div className="order-1 md:order-2">
 								<div className="flex items-center gap-3 mb-[18px]">
 									<div className="w-6 h-px bg-[#0fa478]" />
-									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 02</span>
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">{lp.problems.p2label}</span>
 								</div>
 								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
-									You fed AI the full PDF — but you can't trust the output.
+									{lp.problems.p2heading}
 								</h3>
 								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
-									Answers come with hallucinations, omissions, and no way to verify. You end up fact-checking the thing that was supposed to save you time.
+									{lp.problems.p2desc}
 								</p>
 							</div>
 						</div>
@@ -261,13 +267,13 @@ const LandingPage = () => {
 							<div>
 								<div className="flex items-center gap-3 mb-[18px]">
 									<div className="w-6 h-px bg-[#0fa478]" />
-									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">Problem 03</span>
+									<span className="text-[#0fa478] text-sm font-medium tracking-[0.08em] uppercase">{lp.problems.p3label}</span>
 								</div>
 								<h3 className="text-[clamp(26px,3vw,38px)] font-semibold tracking-[-0.02em] leading-[1.2] mb-5 text-[#0f172a]">
-									The answers are good. Your notebook can't handle them.
+									{lp.problems.p3heading}
 								</h3>
 								<p className="text-[17px] leading-[1.6] text-[#52525b] max-w-[460px]">
-									Tables, equations, formatted content — AI finally gives you what you need, but you're stuck copying, pasting, and fixing. No notebook supports AI output natively.
+									{lp.problems.p3desc}
 								</p>
 							</div>
 							<div
@@ -308,26 +314,25 @@ const LandingPage = () => {
 				</section>
 
 				{/* ── Solution ─────────────────────────────────────────────────── */}
-
 				<section id="solutions" data-navbar-theme="light" className="bg-[#FFFFFF] py-[140px] px-6 text-[#0f172a]">
 					<div className="max-w-[1100px] mx-auto">
 						<h2 className="text-[clamp(32px,4.5vw,56px)] tracking-[-0.025em] leading-[1.15] text-center max-w-[900px] mx-auto">
-							<span className="font-semibold">Atlas Notebook is built </span><br/>
-							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">to eliminate the friction, from source to structured notes</span>
+							<span className="font-semibold">{lp.solutions.heading1} </span><br/>
+							<span className="font-semibold italic font-['Crimson_Text'] text-[#0fa478]">{lp.solutions.heading2}</span>
 						</h2>
 					</div>
 				</section>
-				
+
 				{/* ── Workflow ─────────────────────────────────────────────────── */}
 				<section id="workflow" data-navbar-theme="light" className="bg-[#fafaf7] py-20 lg:py-32">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="text-center mb-16">
-							<p className="text-[#0fa478] text-xs font-medium tracking-widest uppercase mb-6">The Workflow</p>
+							<p className="text-[#0fa478] text-xs font-medium tracking-widest uppercase mb-6">{lp.workflow.tag}</p>
 							<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] mb-4 tracking-tight">
-								From source to knowledge in seconds.
+								{lp.workflow.heading}
 							</h2>
 							<p className="text-[#6b7280] text-lg max-w-3xl mx-auto">
-								A three-step flow built for documents that fight back — dense PDFs, nested tables, and equations that other tools choke on.
+								{lp.workflow.subtitle}
 							</p>
 						</div>
 
@@ -352,13 +357,13 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">1</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Select</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">{lp.workflow.step1tag}</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									Select any section on the PDF
+									{lp.workflow.step1heading}
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Capture any part of your PDF — tables, equations, diagrams, or text blocks — with a simple screenshot tool.
+									{lp.workflow.step1desc}
 								</p>
 							</div>
 
@@ -386,13 +391,13 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">2</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Ask</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">{lp.workflow.step2tag}</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									Ask AI to explain, extract, summarize, or translate
+									{lp.workflow.step2heading}
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Get the same AI experience you're used to, but with higher precision and interactable output.
+									{lp.workflow.step2desc}
 								</p>
 							</div>
 
@@ -417,28 +422,28 @@ const LandingPage = () => {
 								</div>
 								<div className="flex items-center gap-2 mb-3">
 									<span className="w-6 h-6 rounded-full bg-[#0fa478] text-white text-xs flex items-center justify-center font-bold">3</span>
-									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">Insert</span>
+									<span className="text-[#0f172a] text-xs font-semibold uppercase tracking-widest">{lp.workflow.step3tag}</span>
 								</div>
 								<h3 className="text-xl font-semibold text-[#0f172a] mb-3 tracking-tight">
-									One click. Straight into your notes
+									{lp.workflow.step3heading}
 								</h3>
 								<p className="text-[#6b7280] text-sm leading-relaxed">
-									Pixel-perfect tables, LaTeX, and Math/Chemical formulas. No copy-paste, no cleanup, no tab-switching. All in one screen.
+									{lp.workflow.step3desc}
 								</p>
 							</div>
 						</div>
 					</div>
 				</section>
-				
+
 
 				{/* ── Features ───────────────────────────────────────────────── */}
 				<section id="features" data-navbar-theme="light" className="bg-white py-20 lg:py-28 border-t border-[#ececec]">
 					<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
 						<div className="mb-12">
-							<p className="text-xs font-semibold uppercase tracking-widest text-[#0fa478] mb-3">Features</p>
+							<p className="text-xs font-semibold uppercase tracking-widest text-[#0fa478] mb-3">{lp.features.tag}</p>
 							<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] max-w-2xl leading-tight">
-								Built for the output AI actually gives you.
+								{lp.features.heading}
 							</h2>
 						</div>
 
@@ -451,15 +456,14 @@ const LandingPage = () => {
 								<div className="relative z-10 max-w-sm">
 									<p className="text-[#0fa478] text-xs font-semibold tracking-widest mb-4">01</p>
 									<h3 className="text-2xl lg:text-3xl font-semibold text-white mb-3 leading-snug">
-										100% Lossless Formatting
+										{lp.features.f1heading}
 									</h3>
 									<p className="text-white/50 text-sm leading-relaxed">
-										Say goodbye to broken formulas and misaligned grids. LaTeX, complex tables — rendered perfectly, every time.
+										{lp.features.f1desc}
 									</p>
 								</div>
 								{/* Screenshots — scroll-triggered chat→editor swap animation */}
 								<div className="absolute inset-x-6 top-[44%] bottom-0 overflow-hidden">
-									{/* Chat image — accelerates out (ease-in quick exit) / whoosh return */}
 									<div className="absolute inset-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
 										style={{
 											transform: showEditor ? 'translateX(-108%)' : 'translateX(0)',
@@ -472,7 +476,6 @@ const LandingPage = () => {
 										<img src="/chat-image.png" alt="AI chat output" className="w-full block"/>
 									</div>
 
-									{/* Editor image — whoosh entry (fast-in slow-out) / accelerates out */}
 									<div className="absolute inset-0 rounded-t-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
 										style={{
 											transform: showEditor ? 'translateX(0)' : 'translateX(108%)',
@@ -491,16 +494,16 @@ const LandingPage = () => {
 							<div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-7 overflow-hidden min-h-[260px] relative group
 									transition-all duration-300 hover:border-[#0fa478]/35 hover:shadow-lg cursor-default">
 								<p className="text-[#94a3b8] text-xs font-semibold tracking-widest mb-4">02</p>
-								<h3 className="text-lg font-semibold text-[#0f172a] mb-2 leading-snug">Dual Interchangeable Editors</h3>
+								<h3 className="text-lg font-semibold text-[#0f172a] mb-2 leading-snug">{lp.features.f2heading}</h3>
 								<p className="text-[#64748b] text-xs leading-relaxed mb-6">
-									Perfectly support Markdown and Block Editor. Easy to export to your existing notes or just copying Markdown to atlas.
+									{lp.features.f2desc}
 								</p>
 								{/* Toggle UI mockup */}
 								<div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm overflow-hidden
 										group-hover:shadow-md group-hover:border-[#0fa478]/25 transition-all duration-300">
 									<div className="flex">
-										<div className="flex-1 py-2 text-center text-xs text-[#94a3b8] border-b border-[#e2e8f0]">Markdown</div>
-										<div className="flex-1 py-2 text-center text-xs font-semibold text-[#0f172a] border-b-2 border-[#0fa478]">Block Editor</div>
+										<div className="flex-1 py-2 text-center text-xs text-[#94a3b8] border-b border-[#e2e8f0]">{lp.features.f2tab1}</div>
+										<div className="flex-1 py-2 text-center text-xs font-semibold text-[#0f172a] border-b-2 border-[#0fa478]">{lp.features.f2tab2}</div>
 									</div>
 									<div className="p-4 space-y-2.5">
 										<div className="flex items-center gap-2.5">
@@ -522,16 +525,16 @@ const LandingPage = () => {
 							<div className="bg-[#070f0b] border border-[#0fa478]/20 rounded-2xl p-7 overflow-hidden min-h-[260px] relative group
 									transition-all duration-300 hover:border-[#0fa478]/50 hover:shadow-[0_8px_32px_-8px_rgba(15,164,120,0.2)] cursor-default">
 								<p className="text-[#0fa478] text-xs font-semibold tracking-widest mb-4">03</p>
-								<h3 className="text-lg font-semibold text-white mb-2 leading-snug">AI Widget</h3>
+								<h3 className="text-lg font-semibold text-white mb-2 leading-snug">{lp.features.f3heading}</h3>
 								<p className="text-white/40 text-xs leading-relaxed mb-6">
-									Save your recent prompts, no more reprompting, big time saver for repetitive tasks and follow-up questions.
+									{lp.features.f3desc}
 								</p>
 								{/* Floating widget mockup */}
 								<div className="bg-[#0d1f16] rounded-xl border border-[#0fa478]/25 p-4 shadow-xl
 										group-hover:border-[#0fa478]/45 group-hover:-translate-y-0.5 transition-all duration-300">
 									<div className="flex items-center gap-2 mb-3">
 										<div className="w-1.5 h-1.5 rounded-full bg-[#0fa478]"/>
-										<span className="text-[9px] text-[#0fa478] font-semibold uppercase tracking-widest">Atlas AI</span>
+										<span className="text-[9px] text-[#0fa478] font-semibold uppercase tracking-widest">{lp.features.f3widgetLabel}</span>
 									</div>
 									<div className="space-y-1.5 mb-3">
 										<div className="h-2 rounded bg-[#1a3326] w-full"/>
@@ -555,36 +558,20 @@ const LandingPage = () => {
 
 						{/* ── The Foundation ─────────────────────────────────────────── */}
 						<div className="mt-16 pt-12 border-t border-[#ececec]">
-							<p className="text-xs font-semibold uppercase tracking-widest text-[#94a3b8] mb-8">Also included</p>
+							<p className="text-xs font-semibold uppercase tracking-widest text-[#94a3b8] mb-8">{lp.features.alsoIncluded}</p>
 							<div className="grid grid-cols-2 md:grid-cols-4 gap-y-8">
-								{[
-									{
-										icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
-										title: "Project & Note Folders",
-									desc: "Keep your research isolated and structured."
-									},
-									{
-										icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
-										title: "Project-Level Q&A",
-									desc: "Chat across multiple sources simultaneously."
-									},
-									{
-										icon: "M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z",
-										title: "Cloud Sync",
-									desc: "Notes automatically saved and synced."
-									},
-									{
-										icon: "M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z",
-										title: "Persistent AI Chat",
-									desc: "Full chat history, natively embedded."
-									},
-								].map(({ icon, title, desc }) => (
-									<div key={title} className="flex flex-col gap-2.5">
+								{([
+									{ icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" },
+									{ icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+									{ icon: "M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" },
+									{ icon: "M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" },
+								] as const).map(({ icon }, i) => (
+									<div key={i} className="flex flex-col gap-2.5">
 										<svg className="w-4 h-4 text-[#94a3b8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon}/>
 										</svg>
-										<p className="text-sm font-semibold text-[#0f172a]">{title}</p>
-										<p className="text-xs text-[#94a3b8] leading-relaxed">{desc}</p>
+										<p className="text-sm font-semibold text-[#0f172a]">{lp.features.foundation[i].title}</p>
+										<p className="text-xs text-[#94a3b8] leading-relaxed">{lp.features.foundation[i].desc}</p>
 									</div>
 								))}
 							</div>
@@ -598,37 +585,12 @@ const LandingPage = () => {
 				<section id="faq" data-navbar-theme="light" className="bg-white py-20 lg:py-32 border-t border-[#ececec]">
 					<div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-[#0f172a] text-center mb-4">
-							Questions, answered.
+							{lp.faq.heading}
 						</h2>
-						<p className="text-[#52525b] text-center mb-12">Everything you need to know before you start.</p>
+						<p className="text-[#52525b] text-center mb-12">{lp.faq.subtitle}</p>
 
 						<div className="space-y-2">
-							{[
-								{
-									q: "What is the main benefit of using Atlas Notebook?",
-									a: "Time and sanity. You save hours previously wasted on copying, pasting, and manually fixing broken formatting. Atlas is uniquely optimized to handle and render complex data (like LaTeX and multi-level tables) natively.",
-								},
-								{
-									q: "How is this different from ChatGPT or Claude?",
-									a: "Standard AI chatbots force you into a broken loop: screenshot → upload → prompt → copy broken text → paste → manually fix formatting in Notion/Word. Atlas Notebook unifies the PDF, the AI reasoning, and the final note-taking environment into one seamless interface. You keep the context, and you keep the exact formatting.",
-								},
-								{
-									q: "What AI models power Atlas Notebook?",
-									a: "We use the latest xAI Grok reasoning model. It delivers incredibly fast, objective, and unfiltered extractions with industry-low hallucination rates, specifically optimized for complex document layouts.",
-								},
-								{
-									q: "I prefer handwritten notes, is this for me?",
-									a: "Probably not. Atlas Notebook is heavily optimized for laptop/PC users who need to rapidly extract and structure complex digital information. However, we'd love to hear your use case! Drop us a line at support@atlasnotebook.com.",
-								},
-								{
-									q: "Can Atlas Notebook read formats other than PDF?",
-									a: "Currently, we are 100% focused on perfecting the PDF experience. Support for more formats is on our roadmap.",
-								},
-								{
-									q: "Is the free version as good as the paid version?",
-									a: "Yes, they share the exact same powerful features. However, because we run expensive, high-tier reasoning models (Grok) to ensure maximum accuracy, the free version has a limited monthly token usage.",
-								},
-							].map(({ q, a }) => (
+							{lp.faq.items.map(({ q, a }) => (
 								<details key={q} className="group border-b border-[#ececec] pb-2">
 									<summary className="flex items-center justify-between cursor-pointer list-none font-semibold text-[#0f172a] text-lg py-4">
 										{q}
@@ -642,36 +604,36 @@ const LandingPage = () => {
 						</div>
 					</div>
 				</section>
-				
+
 
 				<div data-navbar-theme="light">
 					<PricingSection />
 				</div>
-				
+
 
 				{/* ── Final CTA ────────────────────────────────────────────────── */}
 				<section data-navbar-theme="dark" className="bg-gradient-to-b from-[#0d5a6b] to-[#1a7a8a] py-20 lg:py-32">
 					<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 						<h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6">
-							Start reading smarter today
+							{lp.cta.heading}
 						</h2>
 						<p className="text-white/90 text-lg mb-10 max-w-2xl mx-auto">
-							Join now. Get 1 hour of work done in 20 minutes.
+							{lp.cta.subtitle}
 						</p>
 						<div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
 							<input
 								type="email"
-								placeholder="Email address"
+								placeholder={lp.cta.emailPlaceholder}
 								className="w-full sm:flex-1 bg-white/12 border border-white/25 rounded-full px-6 py-3.5 text-white placeholder:text-white/75 focus:outline-none focus:ring-2 focus:ring-white/50"
 							/>
 							<Link
 								to="/signup"
 								className="w-full sm:w-auto bg-white text-[#0f172a] px-8 py-3.5 rounded-full font-semibold hover:bg-white/90 transition text-center"
 							>
-								Start for free
+								{lp.cta.button}
 							</Link>
 						</div>
-						<p className="text-white/60 text-sm mt-6">Experience the performance Upgrade for free</p>
+						<p className="text-white/60 text-sm mt-6">{lp.cta.footnote}</p>
 					</div>
 				</section>
 
@@ -693,7 +655,7 @@ const LandingPage = () => {
 									<span className="text-lg text-white/80">notebook</span>
 								</div>
 								<p className="text-[#8899aa] text-sm leading-relaxed">
-									The AI-native notebook built for serious learners. Select, ask, insert — no tab-switching, no broken formatting.
+									{lp.footer.brandDesc}
 								</p>
 								{/* Social icons */}
 								<div className="flex items-center gap-3 pt-1">
@@ -726,40 +688,17 @@ const LandingPage = () => {
 							</div>
 
 							{/* Link columns */}
-							{[
-								{
-									heading: 'Product',
-									links: [
-										{ label: 'Features', href: '#features' },
-										{ label: 'Pricing', href: '#pricing' },
-										{ label: 'How it works', href: '#workflow' },
-										{ label: 'Changelog', href: '#' },
-									],
-								},
-								{
-									heading: 'Resources',
-									links: [
-										{ label: 'Blog', href: '#' },
-										{ label: 'Documentation', href: '#' },
-										{ label: 'FAQ', href: '#faq' },
-										{ label: 'Support', href: 'mailto:support@atlasnotebook.com' },
-									],
-								},
-								{
-									heading: 'Legal',
-									links: [
-										{ label: 'Privacy Policy', href: '#' },
-										{ label: 'Terms of Service', href: '#' },
-										{ label: 'Cookie Policy', href: '#' },
-									],
-								},
-							].map(({ heading, links }) => (
+							{([
+								{ heading: lp.footer.col1heading, links: lp.footer.col1links, hrefs: ['#features', '#pricing', '#workflow', '#'] },
+								{ heading: lp.footer.col2heading, links: lp.footer.col2links, hrefs: ['#', '#', '#faq', 'mailto:support@atlasnotebook.com'] },
+								{ heading: lp.footer.col3heading, links: lp.footer.col3links, hrefs: ['#', '#', '#'] },
+							] as const).map(({ heading, links, hrefs }) => (
 								<div key={heading} className="flex flex-col gap-4">
 									<p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0fa478]">{heading}</p>
 									<ul className="flex flex-col gap-3">
-										{links.map(({ label, href }) => (
+										{(links as readonly string[]).map((label, i) => (
 											<li key={label}>
-												<a href={href} className="text-sm text-[#8899aa] hover:text-white transition-colors duration-200">
+												<a href={hrefs[i]} className="text-sm text-[#8899aa] hover:text-white transition-colors duration-200">
 													{label}
 												</a>
 											</li>
@@ -774,19 +713,24 @@ const LandingPage = () => {
 					<div className="border-t border-white/10">
 						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
 							<p className="text-white/30 text-xs">
-								© {new Date().getFullYear()} Atlas Notebook. All rights reserved.
+								{lp.footer.copyright}
 							</p>
-							<p className="text-white/30 text-xs flex items-center gap-1.5">
-								{/*Powered by*/}
-								{/*<img src="/xAI-logo.svg" alt="xAI" className="w-4 h-4 opacity-40" />*/}
-								{/*<span>xAI Grok</span>*/}
-							</p>
+							<button
+								onClick={toggle}
+								aria-label="Switch language"
+								className="flex items-center justify-center w-7 h-7 rounded-full text-white/35 hover:text-white/70 border border-white/10 hover:border-white/25 transition-all duration-200"
+							>
+								<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+									<circle cx="12" cy="12" r="10"/>
+									<path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20M2 12h20"/>
+								</svg>
+							</button>
 						</div>
 					</div>
 				</footer>
 
 			</div>
-			
+
 
 		</>
 	);
