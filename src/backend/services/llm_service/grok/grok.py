@@ -1,11 +1,23 @@
+import base64
 import json
 import logging
 import os
+from dataclasses import dataclass
 from typing import AsyncIterator
 
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.capabilities import WebSearch
+from pydantic_ai.messages import (
+    BinaryContent,
+    ModelMessage,
+    ModelRequest,
+    ModelResponse,
+    TextPart,
+    UserPromptPart,
+)
+from pydantic_ai.models.xai import XaiModel
+from pydantic_ai.providers.xai import XaiProvider
 from xai_sdk import AsyncClient
-from xai_sdk.chat import user, system, assistant, image as xai_image, tool_result, tool
-from xai_sdk.tools import web_search
 
 from src.backend.schemas.chat.llm import ChatRequest, ChatResponse
 from src.backend.services.llm_service.grok.grok_collection import search_collection
@@ -14,37 +26,12 @@ from src.backend.services.storage.supabase_storage import SupabaseStorage
 
 logger = logging.getLogger(__name__)
 
-# Stage 1: fast non-reasoning model — tool routing only (no history, query only)
-MODEL_ROUTER = "grok-4-1-fast-non-reasoning"
-# Stage 2: reasoning model — final answer (full history + injected tool context)
+# Single reasoning model — it decides on its own whether to call search_document / web search
 MODEL_REASONING = "grok-4.3"
+# Fast non-reasoning model — only used for cheap thread-title generation
+MODEL_TITLE = "grok-4-1-fast-non-reasoning"
 
 MAX_MESSAGES = 20
-
-# Custom tool definition — executed locally, result returned via tool_result()
-SEARCH_DOCUMENT_TOOL = tool(
-    name="search_document",
-    description=(
-        "Search the user's selected documents (PDFs) for content relevant to the query. "
-        "Use this whenever the user asks a question about their documents."
-        "文档.文档内容. 报告"
-    ),
-    parameters={
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "The search query to find relevant content in the documents",
-            }
-        },
-        "required": ["query"],
-    },
-)
-
-# Stage 1: custom tools only — results can be captured locally and injected into stage 2
-ROUTER_TOOLS = [SEARCH_DOCUMENT_TOOL]
-# Stage 2: built-in tools only — xAI handles them transparently during the final stream/sample
-REASONING_TOOLS = [web_search()]
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant. "
@@ -53,15 +40,66 @@ SYSTEM_PROMPT = (
 )
 
 
+@dataclass
+class ChatDeps:
+    """Per-request data made available to the agent's tools via RunContext."""
+    project_id: str | None
+    source_ids: list | None
+
+
 class LlmGrok:
 
     def __init__(self, supabase_storage: SupabaseStorage):
-        # timeout=600 required for reasoning models to avoid premature connection closure during streaming
+        self._supabase = supabase_storage
+
+        # timeout=600 required for reasoning models to avoid premature connection closure during streaming.
+        # The gRPC channel inside AsyncClient binds to the event loop on first RPC — which happens during
+        # request handling (run / run_stream), i.e. the serving loop — so no cross-loop issues here.
         self._client = AsyncClient(
             api_key=os.getenv("XAI_API_KEY"),
             management_api_key=os.getenv("XAI_MANAGEMENT_API_KEY"),
-            timeout=600)
-        self._supabase = supabase_storage
+            timeout=600,
+        )
+        provider = XaiProvider(xai_client=self._client)
+
+        # Main agent: reasoning model + native web search + a document-search tool.
+        # The model itself decides whether to retrieve (replaces the old two-stage router).
+        self._agent = Agent(
+            XaiModel(MODEL_REASONING, provider=provider),
+            deps_type=ChatDeps,
+            instructions=SYSTEM_PROMPT,
+            capabilities=[WebSearch()],
+        )
+
+        # Lightweight agent for thread-title generation (no tools, plain string output).
+        self._title_agent = Agent(
+            XaiModel(MODEL_TITLE, provider=provider),
+            instructions=(
+                "Generate a short title (5-8 words) for a conversation based on the exchange below. "
+                "Reply with ONLY the title — no punctuation, no quotes, no extra text."
+            ),
+        )
+
+        # Dynamic instruction: bias the model toward retrieval when the user selected documents.
+        @self._agent.instructions
+        def _doc_hint(ctx: RunContext[ChatDeps]) -> str:
+            if ctx.deps.source_ids and ctx.deps.project_id:
+                return (
+                    "The user has selected one or more documents. For any question about their "
+                    "content, call the search_document tool before answering."
+                )
+            return ""
+
+        # Custom tool — the model calls this when it wants document context (RAG).
+        @self._agent.tool
+        async def search_document(ctx: RunContext[ChatDeps], query: str) -> str:
+            """Search the user's selected documents (PDFs) for content relevant to the query.
+
+            Use this whenever the user asks a question about their documents (文档, 文档内容, 报告).
+            """
+            logger.info("search_document tool called with query: %s", query)
+            context = await self._get_context(query, ctx.deps.project_id, ctx.deps.source_ids)
+            return context if context else "No relevant content found in the selected documents."
 
     # ── History (loaded from Supabase on every request) ───────────────────────
 
@@ -87,117 +125,43 @@ class LlmGrok:
         image_items = [item for item in request.content if item.get("type") == "image"]
         return history, user_text, image_items
 
-    # ── Stage 1: tool routing (non-reasoning, user query only) ────────────────
-
-    async def _route_tools(self, user_text: str, request: ChatRequest) -> list:
-        """Stage 1: non-reasoning model receives only user query, decides and executes tool calls.
-
-        Follows the source-of-truth pattern (single round):
-          response = sample()
-          if tool_calls → append response → dispatch each custom tool → append results
-
-        Returns list of (assistant tool-call msg + tool_result msgs) to inject into stage 2.
-        Built-in tools (web_search) are handled transparently by xAI servers within sample().
-        """
-        router = self._client.chat.create(model=MODEL_ROUTER, tools=ROUTER_TOOLS)
-        router.append(system(SYSTEM_PROMPT))
-        router.append(user(user_text))
-
-        response = await router.sample()
-
-        if not response.tool_calls:
-            return []
-
-        # Collect messages to inject into the reasoning chat
-        extra = []
-        router.append(response)
-        extra.append(response)
-
-        for tc in response.tool_calls:
-            result = await self._dispatch_tool(tc, request)
-            tr = tool_result(result)
-            router.append(tr)
-            extra.append(tr)
-
-        return extra
-
-    # ── Stage 2: reasoning chat (full history + injected tool context) ────────
-
-    def _build_reasoning_chat(self, history: list[dict], user_text: str,
-                               image_items: list[dict] | None, extra_messages: list,
-                               doc_context: str | None = None):
-        """Build reasoning model chat: system + history + user message + injected tool results.
-
-        doc_context: pre-fetched document chunks injected directly into system prompt (MVP fast path).
-        web_search passed as built-in tool — xAI handles it transparently in the final call.
-        """
-        chat = self._client.chat.create(model=MODEL_REASONING, tools=REASONING_TOOLS)
-
-        # Inject document context into system prompt when available (bypasses LLM tool routing)
-        system_content = SYSTEM_PROMPT
-        if doc_context:
-            system_content += f"\n\nRelevant document content for this query:\n{doc_context}"
-        chat.append(system(system_content))
-
+    @staticmethod
+    def _to_message_history(history: list[dict]) -> list[ModelMessage]:
+        """Convert Supabase {role, content} rows into Pydantic AI message history."""
+        messages: list[ModelMessage] = []
         for msg in history:
             if msg["role"] == "user":
-                chat.append(user(msg["content"]))
+                messages.append(ModelRequest(parts=[UserPromptPart(content=msg["content"])]))
             elif msg["role"] == "assistant":
-                chat.append(assistant(msg["content"]))
+                messages.append(ModelResponse(parts=[TextPart(content=msg["content"])]))
+        return messages
 
-        # User message with optional multimodal images (data URI format required by xAI)
-        if image_items:
-            contents = [user_text] + [
-                xai_image(image_url=f"data:{img['mime_type']};base64,{img['data']}", detail="high")
-                for img in image_items
-            ]
-            chat.append(user(*contents))
-        else:
-            chat.append(user(user_text))
-
-        # Inject tool call + results from routing stage into reasoning context
-        for msg in extra_messages:
-            chat.append(msg)
-
-        return chat
-
-    # ── Custom tool dispatch ───────────────────────────────────────────────────
-
-    async def _dispatch_tool(self, tool_call, request: ChatRequest) -> str:
-        """Execute a local (custom) tool call and return a JSON result string."""
-        name = tool_call.function.name
-        args = json.loads(tool_call.function.arguments)
-
-        if name == "search_document":
-            query = args.get("query", "")
-            logger.info("search_document tool called with query: %s", query)
-            context = await self._get_context(query, request.project_id, request.source_ids)
-            result = context if context else "No relevant content found in the selected documents."
-            return json.dumps({"result": result})
-
-        return json.dumps({"error": f"Unknown tool: {name}"})
+    @staticmethod
+    def _build_user_prompt(user_text: str, image_items: list[dict]):
+        """Build the current-turn prompt: plain text, or text + images for multimodal input."""
+        if not image_items:
+            return user_text
+        parts: list = [user_text]
+        for img in image_items:
+            parts.append(BinaryContent(data=base64.b64decode(img["data"]), media_type=img["mime_type"]))
+        return parts
 
     # ── Chat (non-streaming) ──────────────────────────────────────────────────
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
         history, user_text, image_items = await self._prepare_request(request)
+        deps = ChatDeps(project_id=request.project_id, source_ids=request.source_ids)
 
-        # MVP fast path: documents selected → always search, skip LLM routing entirely
-        if request.source_ids and request.project_id:
-            doc_context = await self._get_context(user_text, request.project_id, request.source_ids)
-            extra_messages = []
-        else:
-            doc_context = None
-            extra_messages = await self._route_tools(user_text, request)
+        result = await self._agent.run(
+            self._build_user_prompt(user_text, image_items),
+            deps=deps,
+            message_history=self._to_message_history(history),
+        )
 
-        # Stage 2: single sample — reasoning model with full history + document context
-        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages, doc_context)
-        response = await chat_obj.sample()
-
-        ai_text = response.content
-        u = response.usage
-        input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
-        output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
+        ai_text = result.output
+        usage = result.usage
+        input_tokens = usage.input_tokens or 0
+        output_tokens = usage.output_tokens or 0
 
         # Persist to Supabase (source of truth for history); user_id injected from auth token
         user_id = request.user_id or ""
@@ -237,57 +201,53 @@ class LlmGrok:
           {"type": "chunk", "text": "<incremental text>"}
           {"type": "done",  "id": "<msg_id>", "created_at": "<iso>", "total_tokens": N}
           {"type": "error", "message": "<description>"}
+
+        The whole pipeline (history load, retrieval via tool, streaming, persistence) runs inside
+        one try/except so any failure surfaces as an `error` event instead of crashing the ASGI
+        response mid-stream.
         """
-        history, user_text, image_items = await self._prepare_request(request)
-
-        # MVP fast path: documents selected → always search, skip LLM routing entirely
-        if request.source_ids and request.project_id:
-            doc_context = await self._get_context(user_text, request.project_id, request.source_ids)
-            extra_messages = []
-        else:
-            doc_context = None
-            extra_messages = await self._route_tools(user_text, request)
-
-        # Stage 2: stream final answer — reasoning model with full history + document context
-        chat_obj = self._build_reasoning_chat(history, user_text, image_items, extra_messages, doc_context)
-
-        full_text = ""
-        final_response = None
         try:
-            async for response, chunk in chat_obj.stream():
-                if chunk.content:
-                    full_text += chunk.content
-                    yield f"data: {json.dumps({'type': 'chunk', 'text': chunk.content})}\n\n"
-                final_response = response
+            history, user_text, image_items = await self._prepare_request(request)
+            deps = ChatDeps(project_id=request.project_id, source_ids=request.source_ids)
+
+            full_text = ""
+            input_tokens, output_tokens = 0, 0
+            async with self._agent.run_stream(
+                self._build_user_prompt(user_text, image_items),
+                deps=deps,
+                message_history=self._to_message_history(history),
+            ) as result:
+                async for delta in result.stream_text(delta=True):
+                    if delta:
+                        full_text += delta
+                        yield f"data: {json.dumps({'type': 'chunk', 'text': delta})}\n\n"
+                usage = result.usage
+                input_tokens = usage.input_tokens or 0
+                output_tokens = usage.output_tokens or 0
+
+            # Persist to Supabase after stream completes; user_id injected from auth token
+            user_id = request.user_id or ""
+            await self._supabase.save_message(
+                user_id=user_id, thread_id=request.thread_id,
+                role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
+            )
+            resp = await self._supabase.save_message(
+                user_id=user_id, thread_id=request.thread_id,
+                role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
+            )
+
+            # Auto-generate title on first exchange (history was empty before this request)
+            generated_title = None
+            if not history:
+                try:
+                    generated_title = await self._generate_title(user_text, full_text)
+                    await self._supabase.update_thread_title(request.thread_id, generated_title)
+                except Exception as exc:
+                    logger.warning("Failed to generate thread title: %s", exc)
         except Exception as exc:
+            logger.exception("chat_stream failed")
             yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
             return
-
-        input_tokens, output_tokens = 0, 0
-        if final_response:
-            u = final_response.usage
-            input_tokens = getattr(u, "prompt_tokens", 0) or getattr(u, "input_tokens", 0)
-            output_tokens = getattr(u, "completion_tokens", 0) or getattr(u, "output_tokens", 0)
-
-        # Persist to Supabase after stream completes; user_id injected from auth token
-        user_id = request.user_id or ""
-        await self._supabase.save_message(
-            user_id=user_id, thread_id=request.thread_id,
-            role="user", content=[{"type": "text", "text": user_text}], token_count=input_tokens,
-        )
-        resp = await self._supabase.save_message(
-            user_id=user_id, thread_id=request.thread_id,
-            role="assistant", content=[{"type": "text", "text": full_text}], token_count=output_tokens,
-        )
-
-        # Auto-generate title on first exchange (history was empty before this request)
-        generated_title = None
-        if not history:
-            try:
-                generated_title = await self._generate_title(user_text, full_text)
-                await self._supabase.update_thread_title(request.thread_id, generated_title)
-            except Exception as exc:
-                logger.warning("Failed to generate thread title: %s", exc)
 
         done_payload: dict = {
             'type': 'done',
@@ -305,16 +265,12 @@ class LlmGrok:
 
     async def _generate_title(self, user_text: str, ai_text: str) -> str:
         """Generate a short thread title from the first exchange using the fast non-reasoning model."""
-        chat = self._client.chat.create(model=MODEL_ROUTER)
-        chat.append(system(
-            "Generate a short title (5-8 words) for a conversation based on the exchange below. "
-            "Reply with ONLY the title — no punctuation, no quotes, no extra text."
-        ))
-        chat.append(user(f"User: {user_text[:300]}\nAssistant: {ai_text[:300]}"))
-        response = await chat.sample()
-        return response.content.strip()[:80]
+        result = await self._title_agent.run(
+            f"User: {user_text[:300]}\nAssistant: {ai_text[:300]}"
+        )
+        return result.output.strip()[:80]
 
-    # ── RAG search (called by search_document tool handler) ───────────────────
+    # ── RAG search (called by the search_document tool) ───────────────────────
 
     async def _get_context(self, query: str, project_id: str | None, source_ids: list | None) -> str:
         """Search the xAI collection and return joined context chunks for the given query."""

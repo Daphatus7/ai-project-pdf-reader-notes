@@ -17,5 +17,6 @@ stripe
 sentry-sdk[fastapi]
 
 # LLM pipeline
+pydantic-ai-slim[xai]>=1.105.0
 langchain>=1.2.0
 langchain-openai>=1.1.0
