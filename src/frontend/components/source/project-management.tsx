@@ -31,7 +31,8 @@ export function ManagementPanel({
 	const [activeView, setActiveView] = useState<ActiveView>('projects');
 	const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
 	const [currentProjectName, setCurrentProjectName] = useState('');
-	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
+	const [currentDocumentData, setCurrentDocumentData] = useState<Uint8Array | null>(null);
+	const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
 	const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
 	const handleOpenProject = useCallback((projectId: string) => {
@@ -66,8 +67,9 @@ export function ManagementPanel({
 		if (!currentProjectId) return;
 		setIsLoadingDocument(true);
 		try {
-			const url = await projectsService.getDocumentUrl(currentProjectId, documentId);
-			setCurrentDocumentUrl(url);
+			const bytes = await projectsService.getDocumentBytes(currentProjectId, documentId);
+			setCurrentDocumentData(bytes);
+			setCurrentDocumentId(documentId);
 			setActiveView('reader');
 		} catch {
 			toast.error('Failed to open document');
@@ -77,15 +79,17 @@ export function ManagementPanel({
 	}, [currentProjectId]);
 
 	const handleBackToSources = useCallback(() => {
-		setCurrentDocumentUrl(null);
+		setCurrentDocumentData(null);
+		setCurrentDocumentId(null);
 		setActiveView('sources');
 	}, []);
 
 	// Route to the active panel
-	if (activeView === 'reader' && currentDocumentUrl) {
+	if (activeView === 'reader' && currentDocumentData && currentDocumentId) {
 		return (
 			<ReaderPanel
-				documentUrl={currentDocumentUrl}
+				documentData={currentDocumentData}
+				documentId={currentDocumentId}
 				onBack={handleBackToSources}
 				onScreenshotCapture={onScreenshotCapture}
 				onSaveToNote={onSaveToNote}

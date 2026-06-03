@@ -11,20 +11,24 @@ import '@/frontend/styles/pdf-reader.scss';
 import {Button} from "@/frontend/components/ui/button.tsx";
 
 interface PdfReaderProps {
-  fileUrl: string;
+  /** Raw PDF bytes, served from the in-memory cache so the file downloads only once. */
+  fileData: Uint8Array;
+  /** Stable identity of the file (documentId). Used as the React key so the
+   *  viewer is not remounted/re-rendered when the same document is reopened. */
+  fileKey: string;
   onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
   onSaveToNote?: (imageDataUrl: string, name: string) => void;
   onDownload?: (imageDataUrl: string, name: string) => void;
 }
 
-export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
+export function PdfReader({ fileData, fileKey, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPdfLoaded, setIsPdfLoaded] = useState(false);
 
   useEffect(() => {
     setIsPdfLoaded(false);
-  }, [fileUrl]);
+  }, [fileKey]);
 
   const toolbarPluginInstance = toolbarPlugin();
   const { Toolbar } = toolbarPluginInstance;
@@ -116,9 +120,9 @@ export function PdfReader({ fileUrl, onScreenshotCapture, onSaveToNote, onDownlo
 
         <Worker workerUrl={workerUrl}>
           <Viewer
-            key={fileUrl}
+            key={fileKey}
             plugins={[toolbarPluginInstance, screenshot.plugin]}
-            fileUrl={fileUrl}
+            fileUrl={fileData}
             onDocumentLoad={() => setIsPdfLoaded(true)}
           />
         </Worker>

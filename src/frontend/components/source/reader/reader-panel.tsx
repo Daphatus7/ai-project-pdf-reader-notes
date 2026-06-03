@@ -3,7 +3,8 @@ import { Button } from '@/frontend/components/ui/button';
 import { PdfReader } from './pdf-reader';
 
 interface ReaderPanelProps {
-	documentUrl: string;
+	documentData: Uint8Array;
+	documentId: string;
 	onBack: () => void;
 	onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
@@ -11,7 +12,8 @@ interface ReaderPanelProps {
 }
 
 export function ReaderPanel({
-	documentUrl,
+	documentData,
+	documentId,
 	onBack,
 	onScreenshotCapture,
 	onSaveToNote,
@@ -31,7 +33,8 @@ export function ReaderPanel({
 			</div>
 			<div className="flex-1 overflow-hidden">
 				<PdfReader
-					fileUrl={documentUrl}
+					fileData={documentData}
+					fileKey={documentId}
 					onScreenshotCapture={onScreenshotCapture}
 					onSaveToNote={onSaveToNote}
 					onDownload={onDownload}
