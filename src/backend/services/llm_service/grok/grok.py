@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # Stage 1: fast non-reasoning model — tool routing only (no history, query only)
 MODEL_ROUTER = "grok-4-1-fast-non-reasoning"
 # Stage 2: reasoning model — final answer (full history + injected tool context)
-MODEL_REASONING = "grok-4.20-0309-reasoning"
+MODEL_REASONING = "grok-4.3"
 
 MAX_MESSAGES = 20
 
