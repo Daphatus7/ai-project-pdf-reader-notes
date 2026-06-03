@@ -9,6 +9,16 @@ import { ReaderPanel } from './reader/reader-panel';
 
 type ActiveView = 'projects' | 'sources' | 'reader';
 
+/** An opened document shown as a tab in the reader. */
+export interface DocTab {
+	id: string;
+	name: string;
+	projectId: string;
+}
+
+/** Max number of recent tabs kept open; opening more evicts the oldest. */
+const MAX_TABS = 8;
+
 interface ManagementPanelProps {
 	onScreenshotCapture: (imageDataUrl: string, name: string, prompt?: string) => void;
 	onSaveToNote?: (imageDataUrl: string, name: string) => void;
@@ -31,8 +41,9 @@ export function ManagementPanel({
 	const [activeView, setActiveView] = useState<ActiveView>('projects');
 	const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
 	const [currentProjectName, setCurrentProjectName] = useState('');
-	const [currentDocumentData, setCurrentDocumentData] = useState<Uint8Array | null>(null);
-	const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
+	const [currentDocumentUrl, setCurrentDocumentUrl] = useState<string | null>(null);
+	const [openTabs, setOpenTabs] = useState<DocTab[]>([]);
+	const [activeTabId, setActiveTabId] = useState<string | null>(null);
 	const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
 	const handleOpenProject = useCallback((projectId: string) => {
@@ -63,33 +74,84 @@ export function ManagementPanel({
 		quota.refresh();
 	}, [project, quota]);
 
-	const handleOpenDocument = useCallback(async (documentId: string) => {
-		if (!currentProjectId) return;
+	// Load a document's bytes (served from cache after the first download) and
+	// make it the active tab. Shared by opening, switching, and closing tabs.
+	const activateDocument = useCallback(async (projectId: string, documentId: string) => {
 		setIsLoadingDocument(true);
 		try {
-			const bytes = await projectsService.getDocumentBytes(currentProjectId, documentId);
-			setCurrentDocumentData(bytes);
-			setCurrentDocumentId(documentId);
-			setActiveView('reader');
+			const objectUrl = await projectsService.getDocumentObjectUrl(projectId, documentId);
+			setCurrentDocumentUrl(objectUrl);
+			setActiveTabId(documentId);
 		} catch {
 			toast.error('Failed to open document');
 		} finally {
 			setIsLoadingDocument(false);
 		}
-	}, [currentProjectId]);
+	}, []);
 
+	const handleOpenDocument = useCallback(async (documentId: string, documentName: string) => {
+		if (!currentProjectId) return;
+		const projectId = currentProjectId;
+		// Add (or move) to the front of the recent-tabs list, capped at MAX_TABS.
+		setOpenTabs((prev) => {
+			const without = prev.filter((t) => t.id !== documentId);
+			const next = [{ id: documentId, name: documentName, projectId }, ...without];
+			// Free blobs for any tabs pushed past the cap so they don't leak.
+			next.slice(MAX_TABS).forEach((t) => projectsService.releaseDocument(t.id));
+			return next.slice(0, MAX_TABS);
+		});
+		setActiveView('reader');
+		await activateDocument(projectId, documentId);
+	}, [currentProjectId, activateDocument]);
+
+	// Select an already-open tab. `promote` moves it to the front of the MRU
+	// list (used when picking from the overflow menu, so it becomes visible).
+	const handleSelectTab = useCallback((documentId: string, opts?: { promote?: boolean }) => {
+		const tab = openTabs.find((t) => t.id === documentId);
+		if (!tab) return;
+		if (opts?.promote) {
+			setOpenTabs((prev) => {
+				const without = prev.filter((t) => t.id !== documentId);
+				return [tab, ...without];
+			});
+		}
+		if (documentId === activeTabId) return;
+		void activateDocument(tab.projectId, tab.id);
+	}, [activeTabId, openTabs, activateDocument]);
+
+	const handleCloseTab = useCallback((documentId: string) => {
+		setOpenTabs((prev) => {
+			const idx = prev.findIndex((t) => t.id === documentId);
+			const next = prev.filter((t) => t.id !== documentId);
+			// Closing the active tab: fall back to a neighbour, or leave the reader.
+			if (documentId === activeTabId) {
+				if (next.length === 0) {
+					setActiveView('sources');
+					setActiveTabId(null);
+					setCurrentDocumentUrl(null);
+				} else {
+					const fallback = next[Math.min(idx, next.length - 1)];
+					void activateDocument(fallback.projectId, fallback.id);
+				}
+			}
+			return next;
+		});
+	}, [activeTabId, activateDocument]);
+
+	// Back arrow returns to the source list but keeps tabs, so reopening resumes.
 	const handleBackToSources = useCallback(() => {
-		setCurrentDocumentData(null);
-		setCurrentDocumentId(null);
 		setActiveView('sources');
 	}, []);
 
 	// Route to the active panel
-	if (activeView === 'reader' && currentDocumentData && currentDocumentId) {
+	if (activeView === 'reader' && currentDocumentUrl && activeTabId) {
 		return (
 			<ReaderPanel
-				documentData={currentDocumentData}
-				documentId={currentDocumentId}
+				documentUrl={currentDocumentUrl}
+				activeTabId={activeTabId}
+				tabs={openTabs}
+				onSelectTab={handleSelectTab}
+				onCloseTab={handleCloseTab}
 				onBack={handleBackToSources}
 				onScreenshotCapture={onScreenshotCapture}
 				onSaveToNote={onSaveToNote}

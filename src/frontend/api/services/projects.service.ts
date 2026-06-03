@@ -24,19 +24,21 @@ const SIGNED_URL_TTL_MS = (3600 - 300) * 1000;
 const documentUrlCache = new Map<string, { url: string; expiresAt: number }>();
 
 /**
- * Cache of downloaded PDF bytes, keyed by documentId.
+ * Cache of blob object URLs for downloaded PDFs, keyed by documentId.
  *
  * Why: PDFs are immutable, but the viewer re-downloads them on every open
  * because navigating back unmounts the reader and remounts pdf.js, and the
- * signed-URL response is not reliably HTTP-cacheable. Holding the raw bytes in
- * memory lets us hand them straight to the viewer with no network round-trip
- * after the first load.
+ * signed-URL response is not reliably HTTP-cacheable. We download the bytes
+ * once, wrap them in a Blob, and hand the viewer a stable `blob:` URL — served
+ * from memory with no further network round-trips.
  *
- * Note: pdf.js detaches (neutralizes) the ArrayBuffer it is given, so callers
- * must receive a fresh copy each time — see getDocumentBytes returning .slice().
- * This cache is in-memory only and clears on full page reload.
+ * Why a blob URL rather than raw bytes: passing a Uint8Array makes pdf.js
+ * transfer (detach) its ArrayBuffer to the worker, after which the viewer's own
+ * internal fileUrl comparison crashes on the detached buffer. A URL string
+ * sidesteps that entirely. Object URLs live until revoked (on delete) or page
+ * reload; this cache is in-memory only.
  */
-const documentBytesCache = new Map<string, Uint8Array>();
+const documentObjectUrlCache = new Map<string, string>();
 
 export const projectsService = {
 	async listProjects(): Promise<Project[]> {
@@ -77,9 +79,22 @@ export const projectsService = {
 	async deleteDocument(projectId: string, documentId: string): Promise<string> {
 		const endpoint = apiConfig.endpoints.projects.document(projectId, documentId);
 		const response = await del<{ response: string }>(endpoint);
-		documentUrlCache.delete(documentId);
-		documentBytesCache.delete(documentId);
+		this.releaseDocument(documentId);
 		return response.response;
+	},
+
+	/**
+	 * Free a document's cached blob URL and signed URL. Call when a document is
+	 * deleted, or when its tab is evicted from the recent-tabs list, so blob
+	 * URLs don't accumulate in memory for the life of the page.
+	 */
+	releaseDocument(documentId: string): void {
+		documentUrlCache.delete(documentId);
+		const objectUrl = documentObjectUrlCache.get(documentId);
+		if (objectUrl) {
+			URL.revokeObjectURL(objectUrl);
+			documentObjectUrlCache.delete(documentId);
+		}
 	},
 
 	async getDocumentUrl(projectId: string, documentId: string): Promise<string> {
@@ -97,22 +112,22 @@ export const projectsService = {
 	},
 
 	/**
-	 * Fetch a document's PDF bytes, downloading once and serving from memory
-	 * thereafter. Returns a fresh copy on every call because pdf.js detaches the
-	 * buffer it receives, which would otherwise corrupt the cached master.
+	 * Get a blob object URL for a document's PDF, downloading once and serving
+	 * the cached URL (from memory) on every subsequent open.
 	 */
-	async getDocumentBytes(projectId: string, documentId: string): Promise<Uint8Array> {
-		const cached = documentBytesCache.get(documentId);
+	async getDocumentObjectUrl(projectId: string, documentId: string): Promise<string> {
+		const cached = documentObjectUrlCache.get(documentId);
 		if (cached) {
-			return cached.slice();
+			return cached;
 		}
 		const url = await this.getDocumentUrl(projectId, documentId);
 		const res = await fetch(url);
 		if (!res.ok) {
 			throw new Error(`Failed to download document (${res.status})`);
 		}
-		const bytes = new Uint8Array(await res.arrayBuffer());
-		documentBytesCache.set(documentId, bytes);
-		return bytes.slice();
+		const blob = await res.blob();
+		const objectUrl = URL.createObjectURL(blob);
+		documentObjectUrlCache.set(documentId, objectUrl);
+		return objectUrl;
 	},
 };

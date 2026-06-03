@@ -36,7 +36,7 @@ interface SourcePanelProps {
 	projectId: string;
 	projectName: string;
 	onBack: () => void;
-	onOpenDocument: (documentId: string) => void;
+	onOpenDocument: (documentId: string, documentName: string) => void;
 	isLoadingDocument?: boolean;
 	canUploadDocument?: boolean;
 	onDocumentChange?: () => void;
@@ -150,7 +150,7 @@ export function SourcePanel({
 										className="flex items-center gap-2 p-2 hover:bg-accent rounded-md group"
 									>
 										<button
-											onClick={() => onOpenDocument(doc.id)}
+											onClick={() => onOpenDocument(doc.id, doc.document_name)}
 											className="flex-1 flex items-center gap-2 text-left min-w-0"
 										>
 											<FileText className="h-4 w-4 text-muted-foreground shrink-0" />

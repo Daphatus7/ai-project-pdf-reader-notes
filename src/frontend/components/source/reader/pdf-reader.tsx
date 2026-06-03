@@ -11,8 +11,9 @@ import '@/frontend/styles/pdf-reader.scss';
 import {Button} from "@/frontend/components/ui/button.tsx";
 
 interface PdfReaderProps {
-  /** Raw PDF bytes, served from the in-memory cache so the file downloads only once. */
-  fileData: Uint8Array;
+  /** Blob object URL for the PDF, served from the in-memory cache so the file
+   *  downloads only once. */
+  fileUrl: string;
   /** Stable identity of the file (documentId). Used as the React key so the
    *  viewer is not remounted/re-rendered when the same document is reopened. */
   fileKey: string;
@@ -21,7 +22,7 @@ interface PdfReaderProps {
   onDownload?: (imageDataUrl: string, name: string) => void;
 }
 
-export function PdfReader({ fileData, fileKey, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
+export function PdfReader({ fileUrl, fileKey, onScreenshotCapture, onSaveToNote, onDownload }: PdfReaderProps) {
   const workerUrl = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPdfLoaded, setIsPdfLoaded] = useState(false);
@@ -122,7 +123,7 @@ export function PdfReader({ fileData, fileKey, onScreenshotCapture, onSaveToNote
           <Viewer
             key={fileKey}
             plugins={[toolbarPluginInstance, screenshot.plugin]}
-            fileUrl={fileData}
+            fileUrl={fileUrl}
             onDocumentLoad={() => setIsPdfLoaded(true)}
           />
         </Worker>
