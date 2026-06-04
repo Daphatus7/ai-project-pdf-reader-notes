@@ -217,6 +217,13 @@ export const zh: Translations = {
 		deleteThread: "删除对话",
 		/* source chip — replace '{name}' manually */
 		removeSource: "移除 {name}",
+		/* image attachments */
+		addImage: "添加图片",
+		removeImage: "移除图片",
+		/* "+" attachment menu */
+		addAttachment: "添加附件",
+		uploadDocument: "上传文档",
+		createProjectToUpload: "请先创建一个项目以上传文档",
 		/* Error messages */
 		errorSendMessage: "发送消息失败",
 		errorLoadThreads: "加载对话列表失败",

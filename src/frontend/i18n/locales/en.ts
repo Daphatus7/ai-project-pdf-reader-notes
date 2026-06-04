@@ -179,6 +179,13 @@ export const en = {
 		deleteThread: "Delete thread",
 		/* source chip — replace '{name}' manually */
 		removeSource: "Remove {name}",
+		/* image attachments */
+		addImage: "Add images",
+		removeImage: "Remove image",
+		/* "+" attachment menu */
+		addAttachment: "Add attachment",
+		uploadDocument: "Upload document",
+		createProjectToUpload: "Create a project to upload a document",
 		/* Error messages */
 		errorSendMessage: "Failed to send message",
 		errorLoadThreads: "Failed to load threads",
