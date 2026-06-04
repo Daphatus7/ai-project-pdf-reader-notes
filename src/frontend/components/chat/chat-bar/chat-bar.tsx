@@ -115,7 +115,7 @@ export function ChatBar({ onSend, isLoading, placeholder, selectedSources, onDes
 
 	return (
 		/* Container: uses CSS variables to follow light/dark mode */
-		<div className="bg-panel">
+		<div>
 			{/* Cursor-style context chips: shows selected sources above input */}
 			{selectedSources && selectedSources.length > 0 && (
 				<div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-1">
