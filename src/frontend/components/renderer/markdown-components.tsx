@@ -12,7 +12,6 @@ import { SelectableWrapper } from './selectable-wrapper';
 export type SectionClickHandler = (sectionType: string, content: string, html: string) => void;
 
 interface CodeProps {
-	inline?: boolean;
 	className?: string;
 	children?: ReactNode;
 	node?: AstNode;
@@ -20,6 +19,29 @@ interface CodeProps {
 
 /** Minimal position info from the hast/unist AST node */
 type AstNode = { position?: { start: { offset?: number }; end: { offset?: number } } };
+
+/** Minimal hast element shape needed to read a fenced code block's content */
+type HastNode = {
+	type?: string;
+	value?: string;
+	properties?: { className?: unknown };
+	children?: HastNode[];
+} & AstNode;
+
+/** Recursively collect text from a hast node. A fenced block is a single text
+ *  node unless a highlighter splits it into spans — both cases handled. */
+function hastText(node?: HastNode): string {
+	if (!node) return '';
+	if (node.type === 'text') return node.value ?? '';
+	return (node.children ?? []).map(hastText).join('');
+}
+
+/** Read the `language-xxx` token out of a hast element's className array */
+function hastLanguage(node?: HastNode): string {
+	const cls = node?.properties?.className;
+	const text = Array.isArray(cls) ? cls.join(' ') : typeof cls === 'string' ? cls : '';
+	return /language-(\w+)/.exec(text)?.[1] ?? '';
+}
 
 /** Slice the original markdown source using the AST node's position offsets */
 function sliceSource(source: string | undefined, node?: AstNode): string {
@@ -101,28 +123,37 @@ export function createMarkdownComponents(onSelect?: SectionClickHandler, source?
 			</SelectableWrapper>
 		),
 
-		// --- Code Blocks & Inline Code ---
-		code: ({ inline, className, children, node, ...props }: CodeProps) => {
-			const language = /language-(\w+)/.exec(className || '')?.[1] ?? '';
+		// --- Inline Code ---
+		// react-markdown v9+ dropped the `inline` prop; instead we rely on the
+		// HTML structure: inline code is a bare <code> (handled here), while a
+		// fenced block is <pre><code> (handled by `pre` below). CSS targets
+		// `code` vs `pre code` to style them differently.
+		code: ({ className, children, node }: CodeProps) => (
+			<SelectableWrapper sectionType="inline-code" rawMarkdown={sliceSource(source, node)} onSelect={onSelect} as="code">
+				<code className={className}>{children}</code>
+			</SelectableWrapper>
+		),
 
-			if (inline) {
-				return (
-					<SelectableWrapper sectionType="inline-code" rawMarkdown={sliceSource(source, node)} onSelect={onSelect} as="code">
-						{children}
-					</SelectableWrapper>
-				);
-			}
-
+		// --- Code Blocks ---
+		// `pre` is the sole entry point for fenced blocks. We rebuild content
+		// straight from the AST node (hastText) rather than reusing the rendered
+		// children, so the whole block is one selectable unit with no nested
+		// inline-code wrappers inside it.
+		pre: ({ node }) => {
+			const codeNode = (node as HastNode)?.children?.[0];
+			const language = hastLanguage(codeNode);
 			return (
-				<SelectableWrapper sectionType="code-block" rawMarkdown={sliceSource(source, node)} onSelect={onSelect} className="relative">
+				<SelectableWrapper sectionType="code-block" rawMarkdown={sliceSource(source, node as AstNode)} onSelect={onSelect} className="relative">
 					{language && (
 						<div className="absolute top-0 right-0 px-2 py-1 text-xs text-muted-foreground bg-muted/50 rounded-bl rounded-tr z-10">
 							{language}
 						</div>
 					)}
 					<pre>
-                   <code className={className} {...props}>{children}</code>
-                </pre>
+						<code className={codeNode?.properties?.className ? `language-${language}` : undefined}>
+							{hastText(codeNode)}
+						</code>
+					</pre>
 				</SelectableWrapper>
 			);
 		},
