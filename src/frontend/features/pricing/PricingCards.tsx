@@ -76,7 +76,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						</span>
 					</div>
 					<div className="flex items-baseline gap-1 mb-1.5">
-						<span className="text-[2.5rem] font-semibold tracking-tight text-[#0f172a] leading-none">$20</span>
+						<span className="text-[2.5rem] font-semibold tracking-tight text-[#0f172a] leading-none">$10</span>
 						<span className="text-[#6b7280] text-sm ml-1.5">/ mo</span>
 					</div>
 					<p className="text-xs text-[#6b7280] mt-2">{t.pricing.billedMonthly}</p>
@@ -115,7 +115,7 @@ export function PricingCards({ onSelectMonthly, onSelectYearly, freeAction }: Pr
 						</span>
 					</div>
 					<div className="flex items-baseline gap-1 mb-1.5">
-						<span className="text-[2.5rem] font-semibold tracking-tight text-[#0f172a] leading-none">$16</span>
+						<span className="text-[2.5rem] font-semibold tracking-tight text-[#0f172a] leading-none">$8</span>
 						<span className="text-[#6b7280] text-sm ml-1.5">/ mo</span>
 					</div>
 					<p className="text-xs text-[#6b7280] mt-2">{t.pricing.billedYearly}</p>
