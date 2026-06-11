@@ -4,7 +4,8 @@
 }
 
 # 不带 host 的 :port 在 Linux 上双栈绑定（含 ::），满足 Railway IPv6 私网
-:{$PORT:7777} {
+# 端口写死 7777：Railway 会自动注入 PORT 变量，用 {$PORT:7777} 会被它悄悄覆盖
+:7777 {
 	# 调试：访问日志输出到 stdout（Railway Deploy Logs 可见，404 会带具体请求路径）
 	log {
 		output stdout
