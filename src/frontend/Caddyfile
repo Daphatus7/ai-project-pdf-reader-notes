@@ -4,17 +4,32 @@
 }
 
 :{$PORT:8080} {
+	# 调试：访问日志输出到 stdout，在 Railway Deploy Logs 里能看到每个请求的路径与状态码
+	log {
+		output stdout
+		format console
+	}
+
 	encode gzip zstd
 
 	# 精确匹配 /blog 与 /blog/*（不会误吞 /blogfoo 之类路径）
 	@blog path /blog /blog/*
 	handle @blog {
+		# 调试：响应带此头 = 请求进入了反代分支（DevTools → Network → Response Headers）
+		header X-Debug-Source "frontend-blog-proxy"
 		reverse_proxy {$BLOG_UPSTREAM:http://blog:7777}
 	}
 
 	handle {
+		# 调试：/blog 请求若带回此头 = 线上跑的不是这份配置（@blog 分支未生效）
+		header X-Debug-Source "frontend-spa-fallback"
 		root * /srv
 		try_files {path} /index.html
 		file_server
+	}
+
+	handle_errors {
+		# 反代失败（上游域名解析不了 / 端口不通）时返回可读错误，而不是空白 502
+		respond "frontend gateway error {http.error.status_code}: {http.error.message}" {http.error.status_code}
 	}
 }

@@ -5,8 +5,20 @@
 
 # 不带 host 的 :port 在 Linux 上双栈绑定（含 ::），满足 Railway IPv6 私网
 :{$PORT:7777} {
+	# 调试：访问日志输出到 stdout（Railway Deploy Logs 可见，404 会带具体请求路径）
+	log {
+		output stdout
+		format console
+	}
+
 	root * /srv
 	encode gzip zstd
+
+	# 调试：健康检查端点 —— 公网访问 /blog/__health 返回 200 即证明整条反代链路打通
+	respond /blog/__health "blog service ok" 200
+
+	# 调试：响应带此头 = 内容确实由 blog 静态服务返回
+	header X-Debug-Source "blog-static"
 
 	# Astro 带 hash 的静态资源永久缓存
 	header /blog/_astro/* Cache-Control "public, max-age=50000, immutable"
