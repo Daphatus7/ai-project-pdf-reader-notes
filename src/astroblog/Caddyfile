@@ -4,12 +4,12 @@
 }
 
 # 不带 host 的 :port 在 Linux 上双栈绑定（含 ::），满足 Railway IPv6 私网
-:{$PORT:8080} {
+:{$PORT:8081} {
 	root * /srv
 	encode gzip zstd
 
 	# Astro 带 hash 的静态资源永久缓存
-	header /blog/_astro/* Cache-Control "public, max-age=31536000, immutable"
+	header /blog/_astro/* Cache-Control "public, max-age=50000, immutable"
 
 	file_server
 
