@@ -3,13 +3,13 @@
 	admin off
 }
 
-:{$PORT:7890} {
+:{$PORT:8080} {
 	encode gzip zstd
 
 	# 精确匹配 /blog 与 /blog/*（不会误吞 /blogfoo 之类路径）
 	@blog path /blog /blog/*
 	handle @blog {
-		reverse_proxy {$BLOG_UPSTREAM:http://blog:8080}
+		reverse_proxy {$BLOG_UPSTREAM:http://blog:7777}
 	}
 
 	handle {

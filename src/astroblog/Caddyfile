@@ -4,7 +4,7 @@
 }
 
 # 不带 host 的 :port 在 Linux 上双栈绑定（含 ::），满足 Railway IPv6 私网
-:{$PORT:8080} {
+:{$PORT:7777} {
 	root * /srv
 	encode gzip zstd
 
