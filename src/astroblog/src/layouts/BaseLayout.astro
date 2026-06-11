@@ -52,13 +52,13 @@ const ui = {
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-white text-slate-900 antialiased">
-    <header class="border-b border-slate-200">
-      <nav class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white print:hidden">
+      <nav class="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
         <div class="flex items-center gap-6">
-          <a href="/" class="hover:opacity-70">
-            <img src={`${BASE}/logo.svg`} alt={ui.backToApp} width="177" height="42" class="h-6 w-auto" />
+          <a href="/">
+            <img src={`${BASE}/logo.svg`} alt={ui.backToApp} class="h-8 w-auto" />
           </a>
-          <a href={listUrl(lang)} class="text-sm font-medium text-slate-500 hover:text-slate-900">
+          <a href={listUrl(lang)} class="text-sm text-slate-500 hover:text-slate-900 ">
             {ui.blog}
           </a>
         </div>
