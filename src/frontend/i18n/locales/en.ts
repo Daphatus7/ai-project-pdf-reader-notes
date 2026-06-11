@@ -173,6 +173,8 @@ export const en = {
 		unshared: "Sharing stopped. The link is no longer valid.",
 		unshareFailed: "Failed to stop sharing",
 		/* public share page */
+		copyText: "Copy text",
+		textCopied: "Text copied to clipboard",
 		updatedAt: "Updated",
 		notFoundTitle: "This note isn't available",
 		notFoundDescription: "The link may have been revoked or never existed.",

@@ -1,18 +1,24 @@
 /**
  * @file        selectable-wrapper.tsx
- * @description Wrapper component for click-to-select functionality in markdown
+ * @description Two wrapper variants for markdown sections:
+ *              - StaticSectionWrapper: read-only, no hover/click (e.g. public share page)
+ *              - SelectableWrapper: extends the static version with hover feedback
+ *                and click-to-select behavior
  */
 import React, { useState, useCallback, type ReactNode, type JSX } from 'react';
 import { cn } from '../ui/utils';
 
-export interface SelectableWrapperProps {
+export interface SectionWrapperProps {
 	children: ReactNode;
+	className?: string;
+	as?: keyof JSX.IntrinsicElements;
+}
+
+export interface SelectableWrapperProps extends SectionWrapperProps {
 	sectionType: string;
 	/** Raw markdown sliced from the AST source. When provided, passed to onSelect instead of extractTextContent. */
 	rawMarkdown?: string;
 	onSelect?: (sectionType: string, content: string, html: string) => void;
-	className?: string;
-	as?: keyof JSX.IntrinsicElements;
 }
 
 /**
@@ -31,7 +37,17 @@ function extractTextContent(node: ReactNode): string {
 }
 
 /**
- * Wrapper component that adds hover feedback and click selection to markdown sections.
+ * Static (read-only) variant — renders the section as-is, with no hover
+ * feedback, pointer cursor, or click handler.
+ */
+export function StaticSectionWrapper({ children, className, as: Component = 'div' }: SectionWrapperProps) {
+	return React.createElement(Component, { className }, children);
+}
+
+/**
+ * Interactive variant — adds hover feedback and click selection on top of
+ * the static wrapper. Renders as StaticSectionWrapper when no onSelect is
+ * provided, so view-only consumers get zero interactive affordances.
  */
 export function SelectableWrapper({
 	children,
@@ -50,6 +66,14 @@ export function SelectableWrapper({
 		const html = e.currentTarget.innerHTML;
 		onSelect(sectionType, content, html);
 	}, [children, sectionType, onSelect, rawMarkdown]);
+
+	if (!onSelect) {
+		return (
+			<StaticSectionWrapper className={className} as={Component}>
+				{children}
+			</StaticSectionWrapper>
+		);
+	}
 
 	return React.createElement(
 		Component,

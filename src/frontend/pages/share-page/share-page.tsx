@@ -6,8 +6,10 @@
  */
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FileQuestion } from 'lucide-react';
+import { toast } from 'sonner';
+import { FileQuestion, Copy, Check } from 'lucide-react';
 import { MarkdownRenderer } from '@/frontend/components/renderer/markdown-renderer';
+import { Button } from '@/frontend/components/ui/button.tsx';
 import { Skeleton } from '@/frontend/components/ui/skeleton.tsx';
 import { publicService } from '@/frontend/api/services/public.service';
 import type { PublicNote } from '@/frontend/api/types/note/note.ts';
@@ -20,6 +22,15 @@ export default function SharePage() {
 	const { t } = useLanguage();
 	const [note, setNote] = useState<PublicNote | null>(null);
 	const [state, setState] = useState<LoadState>('loading');
+	const [copied, setCopied] = useState(false);
+
+	const handleCopyText = async () => {
+		if (!note) return;
+		await navigator.clipboard.writeText(note.content_markdown);
+		setCopied(true);
+		toast.success(t.share.textCopied);
+		setTimeout(() => setCopied(false), 2000);
+	};
 
 	useEffect(() => {
 		if (!token) {
@@ -85,11 +96,15 @@ export default function SharePage() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<nav className="border-b print:hidden">
-				<div className="max-w-3xl mx-auto px-6 py-3">
+			<nav className="sticky top-0 z-10 border-b bg-background print:hidden">
+				<div className="max-w-3xl mx-auto px-6 py-3 flex items-center justify-between">
 					<Link to="/">
 						<img src="/logo.svg" alt="Atlas Notebook AI Logo" className="h-8" />
 					</Link>
+					<Button variant="outline" size="sm" onClick={handleCopyText}>
+						{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+						{t.share.copyText}
+					</Button>
 				</div>
 			</nav>
 			<article className="max-w-3xl mx-auto px-6 py-12 print:py-0">

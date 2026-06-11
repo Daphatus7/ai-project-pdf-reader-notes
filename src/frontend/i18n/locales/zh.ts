@@ -211,6 +211,8 @@ export const zh: Translations = {
 		unshared: "已停止分享，链接已失效。",
 		unshareFailed: "停止分享失败",
 		/* public share page */
+		copyText: "复制文本",
+		textCopied: "文本已复制到剪贴板",
 		updatedAt: "更新于",
 		notFoundTitle: "无法查看此笔记",
 		notFoundDescription: "链接可能已被撤销或不存在。",
