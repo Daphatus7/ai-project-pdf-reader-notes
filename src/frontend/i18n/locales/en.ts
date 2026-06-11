@@ -161,6 +161,25 @@ export const en = {
 		notebookDeleteFailed: "Failed to delete notebook",
 		noteMoveFailed: "Failed to move note",
 	},
+	share: {
+		/* note-pad share popover */
+		share: "Share",
+		shareTitle: "Share this note",
+		shareDescription: "Anyone with the link can view a read-only copy. Share again after editing to update it.",
+		copyLink: "Copy link",
+		linkCopied: "Link copied to clipboard",
+		stopSharing: "Stop sharing",
+		shareFailed: "Failed to share note",
+		unshared: "Sharing stopped. The link is no longer valid.",
+		unshareFailed: "Failed to stop sharing",
+		/* public share page */
+		updatedAt: "Updated",
+		notFoundTitle: "This note isn't available",
+		notFoundDescription: "The link may have been revoked or never existed.",
+		loadError: "Something went wrong loading this note. Please try again later.",
+		backHome: "Go to homepage",
+		madeWith: "Created with",
+	},
 	chat: {
 		/* Panel & bar */
 		panelTitle: "Chat",

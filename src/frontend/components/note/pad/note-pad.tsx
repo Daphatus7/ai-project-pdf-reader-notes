@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/
 import { NoteMarkdownRenderer } from './renderer/note-markdown-renderer'
 import { NoteRenderer } from './renderer/note-renderer'
 import { NoteSidebar } from './note-sidebar'
+import { NoteSharePopover } from './note-share-popover'
 import type { NotePadHandler } from '@/frontend/features/types/content-insertion.ts'
 import { useNotePad, type ViewMode } from './useNotePad'
 import { useQuota } from '@/frontend/features/quota/use-quota'
@@ -54,6 +55,7 @@ useImperativeHandle(ref, () => ({
 								</TabsList>
 							</div>
 							<div className="flex items-center gap-1">
+								<NoteSharePopover noteId={pad.selectedNoteId} />
 								<Button variant="ghost" size="icon" onClick={pad.saveCurrentNote} disabled={pad.isSaving}>
 									{pad.isSaving
 										? <Loader2 className="h-4 w-4 animate-spin" />

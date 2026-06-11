@@ -199,6 +199,25 @@ export const zh: Translations = {
 		notebookDeleteFailed: "删除笔记本失败",
 		noteMoveFailed: "移动笔记失败",
 	},
+	share: {
+		/* note-pad share popover */
+		share: "分享",
+		shareTitle: "分享这篇笔记",
+		shareDescription: "任何拥有链接的人都可以查看只读副本。编辑后再次分享即可更新。",
+		copyLink: "复制链接",
+		linkCopied: "链接已复制到剪贴板",
+		stopSharing: "停止分享",
+		shareFailed: "分享笔记失败",
+		unshared: "已停止分享，链接已失效。",
+		unshareFailed: "停止分享失败",
+		/* public share page */
+		updatedAt: "更新于",
+		notFoundTitle: "无法查看此笔记",
+		notFoundDescription: "链接可能已被撤销或不存在。",
+		loadError: "加载笔记时出错，请稍后再试。",
+		backHome: "返回首页",
+		madeWith: "创建于",
+	},
 	chat: {
 		/* Panel & bar */
 		panelTitle: "对话",

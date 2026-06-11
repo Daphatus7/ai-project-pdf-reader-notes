@@ -64,6 +64,28 @@ class DeleteNoteResponse(BaseModel):
     message: str
 
 
+# ==================== Sharing Schemas ====================
+
+class ShareNoteResponse(BaseModel):
+    """Response model for sharing a note. share_url is a relative path;
+    the frontend prepends window.location.origin."""
+    share_token: str
+    share_url: str
+
+
+class UnshareNoteResponse(BaseModel):
+    """Response model for stopping a share"""
+    message: str
+
+
+class PublicNoteResponse(BaseModel):
+    """Public-facing note snapshot. Deliberately excludes user_id, summary,
+    metadata and anything else private."""
+    title: str
+    content_markdown: str
+    updated_at: datetime
+
+
 # ==================== Notebook Schemas ====================
 
 class CreateNotebookRequest(BaseModel):

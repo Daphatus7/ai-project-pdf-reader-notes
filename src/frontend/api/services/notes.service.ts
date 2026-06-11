@@ -10,6 +10,7 @@ import type {
 	CreateNoteResponse,
 	UpdateNoteResponse,
 	DeleteNoteResponse,
+	ShareNoteResponse,
 } from '../types/note/note.ts';
 import { get, post, put, del, upload } from '../core/client';
 import { apiConfig } from '../core/config';
@@ -54,6 +55,27 @@ export const notesService = {
 	 */
 	async deleteNote(noteId: string): Promise<DeleteNoteResponse> {
 		return await del<DeleteNoteResponse>(`${NOTES_BASE}/${noteId}`);
+	},
+
+	/**
+	 * Publish (or refresh) a public read-only snapshot of a note
+	 */
+	async shareNote(noteId: string): Promise<ShareNoteResponse> {
+		return await post<ShareNoteResponse>(apiConfig.endpoints.notes.share(noteId), {});
+	},
+
+	/**
+	 * Stop sharing a note; the public link becomes invalid immediately
+	 */
+	async unshareNote(noteId: string): Promise<DeleteNoteResponse> {
+		return await del<DeleteNoteResponse>(apiConfig.endpoints.notes.share(noteId));
+	},
+
+	/**
+	 * Get current share status; null if the note is not shared
+	 */
+	async getShareStatus(noteId: string): Promise<ShareNoteResponse | null> {
+		return await get<ShareNoteResponse | null>(apiConfig.endpoints.notes.share(noteId));
 	},
 
 	/**

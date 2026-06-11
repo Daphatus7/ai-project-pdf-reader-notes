@@ -24,6 +24,10 @@ export const apiConfig = {
 		},
 		notes: {
 			base: '/api/v1/notes',
+			share: (noteId: string) => `/api/v1/notes/${noteId}/share`,
+		},
+		public: {
+			note: (token: string) => `/api/v1/public/notes/${token}`,
 		},
 		notebooks: {
 			base: '/api/v1/notebooks',

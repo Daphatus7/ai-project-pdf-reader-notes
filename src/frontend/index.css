@@ -15,7 +15,7 @@
 }
 @theme {
     --font-size: 16px;
-    --color-background: rgb(234,239,246);
+    --color-background: rgb(255 255 255);
     --color-panel: rgb(255, 255, 255);
     --color-foreground: #25252e;
     --color-card: #fff;

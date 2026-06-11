@@ -81,3 +81,16 @@ export interface UpdateNoteResponse {
 export interface DeleteNoteResponse {
   message: string;
 }
+
+// === Sharing Types ===
+
+export interface ShareNoteResponse {
+  share_token: string;
+  share_url: string; // relative path; prepend window.location.origin
+}
+
+export interface PublicNote {
+  title: string;
+  content_markdown: string;
+  updated_at: string; // ISO 8601
+}

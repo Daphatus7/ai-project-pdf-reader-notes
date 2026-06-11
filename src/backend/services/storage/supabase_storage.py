@@ -678,6 +678,96 @@ class SupabaseStorage(Service):
             logger.error(f'Failed to delete note {note_id}: {e}')
             internal_error('Failed to delete note')
 
+    # ==================== Note Sharing Operations ====================
+    # Public reads only ever touch shared_notes (a snapshot table), never notes,
+    # so unauthenticated traffic is physically isolated from private data.
+
+    async def share_note(self, user_id: str, note_id: str) -> str:
+        """Publish (or refresh) a public snapshot of a note. Returns the share token."""
+        import secrets
+        from datetime import datetime, timezone
+        note = await self.get_note(user_id, note_id)  # ownership check + latest content
+        try:
+            existing = await self.__database.table('shared_notes') \
+                        .select('share_token') \
+                        .eq('note_id', note_id) \
+                        .eq('user_id', user_id) \
+                        .execute()
+
+            snapshot = {
+                'title': note['title'],
+                'content_markdown': note['content_markdown'],
+                'updated_at': datetime.now(timezone.utc).isoformat(),
+            }
+
+            if existing.data:
+                # Keep the token stable so previously shared links keep working
+                token = existing.data[0]['share_token']
+                await self.__database.table('shared_notes') \
+                    .update(snapshot) \
+                    .eq('note_id', note_id) \
+                    .eq('user_id', user_id) \
+                    .execute()
+            else:
+                token = secrets.token_urlsafe(16)
+                await self.__database.table('shared_notes').insert({
+                    'share_token': token,
+                    'note_id': note_id,
+                    'user_id': user_id,
+                    **snapshot,
+                }).execute()
+
+            logger.info(f'Note shared: user={user_id}, note={note_id}')
+            return token
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to share note {note_id}: {e}')
+            internal_error('Failed to share note')
+
+    async def unshare_note(self, user_id: str, note_id: str) -> dict:
+        """Remove the public snapshot of a note; the old link 404s immediately."""
+        try:
+            await self.__database.table('shared_notes') \
+                .delete() \
+                .eq('note_id', note_id) \
+                .eq('user_id', user_id) \
+                .execute()
+            logger.info(f'Note unshared: user={user_id}, note={note_id}')
+            return {'message': 'Note unshared successfully'}
+        except Exception as e:
+            logger.error(f'Failed to unshare note {note_id}: {e}')
+            internal_error('Failed to unshare note')
+
+    async def get_public_note(self, token: str) -> dict:
+        """Fetch a shared note snapshot by token. Public-safe fields only."""
+        try:
+            response = await self.__database.table('shared_notes') \
+                        .select('title, content_markdown, updated_at') \
+                        .eq('share_token', token) \
+                        .execute()
+            if not response.data:
+                not_found('Shared note')
+            return response.data[0]
+        except AppError:
+            raise
+        except Exception as e:
+            logger.error(f'Failed to get shared note: {e}')
+            internal_error('Failed to retrieve shared note')
+
+    async def get_note_share_token(self, user_id: str, note_id: str) -> str | None:
+        """Return the share token for a note if it is currently shared."""
+        try:
+            response = await self.__database.table('shared_notes') \
+                        .select('share_token') \
+                        .eq('note_id', note_id) \
+                        .eq('user_id', user_id) \
+                        .execute()
+            return response.data[0]['share_token'] if response.data else None
+        except Exception as e:
+            logger.error(f'Failed to get share token for note {note_id}: {e}')
+            return None
+
     # ==================== Note Image Operations ====================
 
     async def _delete_note_images(self, paths: list[str]) -> None:

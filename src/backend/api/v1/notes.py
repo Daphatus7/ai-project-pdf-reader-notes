@@ -15,6 +15,8 @@ from src.backend.schemas.note import (
     UpdateNoteRequest,
     UpdateNoteResponse,
     DeleteNoteResponse,
+    ShareNoteResponse,
+    UnshareNoteResponse,
 )
 
 router = APIRouter(prefix='/notes', tags=['notes'])
@@ -90,6 +92,51 @@ async def delete_note(
     user_id = user['sub']
     result = await database_service.delete_note(user_id, note_id)
     return DeleteNoteResponse(**result)
+
+
+@router.post('/{note_id}/share', response_model=ShareNoteResponse)
+async def share_note(
+    note_id: str = Path(..., description='Note ID to share'),
+    user=Depends(get_user),
+    database_service=Depends(get_database_service),
+):
+    """
+    Publish (or refresh) a public read-only snapshot of a note.
+    Returns a share token; the public page lives at /share/{token}.
+    """
+    user_id = user['sub']
+    token = await database_service.share_note(user_id, note_id)
+    return ShareNoteResponse(share_token=token, share_url=f'/share/{token}')
+
+
+@router.delete('/{note_id}/share', response_model=UnshareNoteResponse)
+async def unshare_note(
+    note_id: str = Path(..., description='Note ID to stop sharing'),
+    user=Depends(get_user),
+    database_service=Depends(get_database_service),
+):
+    """
+    Stop sharing a note. The public link becomes invalid immediately.
+    """
+    user_id = user['sub']
+    result = await database_service.unshare_note(user_id, note_id)
+    return UnshareNoteResponse(**result)
+
+
+@router.get('/{note_id}/share', response_model=ShareNoteResponse | None)
+async def get_share_status(
+    note_id: str = Path(..., description='Note ID to check'),
+    user=Depends(get_user),
+    database_service=Depends(get_database_service),
+):
+    """
+    Return the current share token for a note, or null if not shared.
+    """
+    user_id = user['sub']
+    token = await database_service.get_note_share_token(user_id, note_id)
+    if token is None:
+        return None
+    return ShareNoteResponse(share_token=token, share_url=f'/share/{token}')
 
 
 _ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
