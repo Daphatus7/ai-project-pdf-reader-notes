@@ -30,6 +30,12 @@ FROM base AS production
 # Copy all source files
 COPY . .
 
+# .env 被 gitignore，不在 Railway 构建上下文里；Railway 以 build args 传入服务变量，
+# 必须用 ARG 显式声明，RUN 期间才能作为环境变量被 Vite 读到
+ARG VITE_API_BASE_URL
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+
 # Build production bundle (ARGs are available as env vars during RUN)
 RUN npm run build
 
