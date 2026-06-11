@@ -1,9 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroCard from '../components/HeroCard.astro';
 import PostCard from '../components/PostCard.astro';
-import { getPosts, listUrl } from '../lib/posts';
+import { formatDate, getPosts, listUrl, postUrl } from '../lib/posts';
 
 const posts = await getPosts('en');
+const featured = posts[0];
+const rest = posts.slice(1);
 ---
 
 <BaseLayout
@@ -11,10 +14,37 @@ const posts = await getPosts('en');
   description="Notes on AI-assisted reading, research workflows, and building Atlas Notebook."
   lang="en"
   altHref={listUrl('zh')}
+  width="wide"
 >
-  <h1 class="mb-8 text-3xl font-bold tracking-tight">Blog</h1>
-  <div class="space-y-10">
-    {posts.map((post) => <PostCard post={post} />)}
-    {posts.length === 0 && <p class="text-slate-500">No posts yet — check back soon.</p>}
-  </div>
+  {featured && (
+    <section class="grid items-center gap-12 py-8 lg:grid-cols-2 lg:py-16">
+      <div class="space-y-6">
+        <time datetime={featured.data.pubDate.toISOString()} class="block text-sm text-slate-500">
+          {formatDate(featured.data.pubDate, 'en')}
+        </time>
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
+          <a href={postUrl(featured)} class="hover:text-slate-600">{featured.data.title}</a>
+        </h1>
+        <p class="text-lg text-slate-600">{featured.data.description}</p>
+        <a
+          href={postUrl(featured)}
+          class="inline-flex items-center gap-2 rounded-full bg-[#0f172a] px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0f172a]/90"
+        >
+          Read More
+          <span aria-hidden="true">›</span>
+        </a>
+      </div>
+      <a href={postUrl(featured)} class="block">
+        <HeroCard post={featured} size="large" />
+      </a>
+    </section>
+  )}
+
+  {rest.length > 0 && (
+    <section class="grid gap-x-6 gap-y-10 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+      {rest.map((post) => <PostCard post={post} />)}
+    </section>
+  )}
+
+  {posts.length === 0 && <p class="text-slate-500">No posts yet — check back soon.</p>}
 </BaseLayout>

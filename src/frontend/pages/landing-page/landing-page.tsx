@@ -210,6 +210,7 @@ const LandingPage = () => {
 
 			<div className="min-h-screen bg-[#0d5a6b]">
 				{/* ── Header ──────────────────────────────────────────────────── */}
+				{/* 此 navbar 的 light 变体被 src/astroblog/src/components/Navbar.astro 静态复刻，改样式时同步两处 */}
 				<header className="sticky top-2 z-50">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className={`flex items-center justify-between h-20 backdrop-blur-md backdrop-saturate-120 rounded-2xl px-6 mb-4 transition-all duration-300 ${

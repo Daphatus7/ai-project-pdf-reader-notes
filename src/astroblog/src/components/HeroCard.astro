@@ -1,0 +1,32 @@
+---
+import { postSlug, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  size?: 'large' | 'small';
+}
+
+const { post, size = 'small' } = Astro.props;
+const { title, heroImage } = post.data;
+
+// 无 heroImage 时按 slug 哈希确定性取一个品牌渐变，同篇文章在任何页面渐变一致
+const gradients = [
+  'linear-gradient(135deg, #0d5a6b 0%, #1a7a8a 50%, #3ba89a 100%)',
+  'linear-gradient(135deg, #003e96 0%, #006aff 60%, #3ba89a 100%)',
+  'linear-gradient(135deg, #0f172a 0%, #0d5a6b 55%, #0fa478 100%)',
+  'linear-gradient(135deg, #0fa478 0%, #1a7a8a 50%, #0f172a 100%)',
+];
+const slug = postSlug(post);
+const hash = [...slug].reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) >>> 0, 0);
+const gradient = gradients[hash % gradients.length];
+---
+
+{heroImage ? (
+  <img src={heroImage} alt={title} class="aspect-video w-full rounded-2xl object-cover" loading={size === 'large' ? 'eager' : 'lazy'} />
+) : (
+  <div class="flex aspect-video w-full items-center justify-center rounded-2xl p-6" style={`background: ${gradient}`}>
+    <span class={`text-center font-semibold tracking-tight text-white ${size === 'large' ? 'text-3xl' : 'text-lg'}`}>
+      {title}
+    </span>
+  </div>
+)}

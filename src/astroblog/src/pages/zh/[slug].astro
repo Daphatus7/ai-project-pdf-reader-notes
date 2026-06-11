@@ -1,7 +1,7 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate, getAlternateUrl, getPosts, postSlug } from '../../lib/posts';
+import { formatDate, getAlternateUrl, getPosts, listUrl, postSlug } from '../../lib/posts';
 
 export async function getStaticPaths() {
   const posts = await getPosts('zh');
@@ -23,13 +23,19 @@ const altHref = await getAlternateUrl(post);
   updatedDate={post.data.updatedDate}
 >
   <article>
-    <header class="mb-8 space-y-2">
-      <h1 class="text-3xl font-bold tracking-tight">{post.data.title}</h1>
-      <time datetime={post.data.pubDate.toISOString()} class="block text-sm text-slate-400">
+    <header class="space-y-4">
+      <a href={listUrl('zh')} class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900">
+        <span aria-hidden="true">←</span>
+        返回博客
+      </a>
+      <time datetime={post.data.pubDate.toISOString()} class="block pt-4 text-sm text-slate-500">
         {formatDate(post.data.pubDate, 'zh')}
         {post.data.updatedDate && ` · 更新于 ${formatDate(post.data.updatedDate, 'zh')}`}
       </time>
+      <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">{post.data.title}</h1>
+      <p class="text-xl leading-relaxed text-slate-500">{post.data.description}</p>
     </header>
+    <hr class="my-10 border-slate-200" />
     <div class="prose prose-slate max-w-none">
       <Content />
     </div>

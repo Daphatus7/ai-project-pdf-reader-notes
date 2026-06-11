@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
-import LangSwitch from '../components/LangSwitch.astro';
-import { BASE, listUrl, type Lang } from '../lib/posts';
+import Navbar from '../components/Navbar.astro';
+import { BASE, type Lang } from '../lib/posts';
 
 interface Props {
   title: string;
@@ -12,17 +12,15 @@ interface Props {
   type?: 'website' | 'article';
   pubDate?: Date;
   updatedDate?: Date;
+  /** narrow = 文章窄栏（max-w-3xl），wide = 列表页全宽（max-w-7xl） */
+  width?: 'narrow' | 'wide';
 }
 
-const { title, description, lang, altHref, type = 'website', pubDate, updatedDate } = Astro.props;
+const { title, description, lang, altHref, type = 'website', pubDate, updatedDate, width = 'narrow' } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const altLang: Lang = lang === 'en' ? 'zh' : 'en';
 const rssHref = lang === 'zh' ? `${BASE}/zh/rss.xml` : `${BASE}/rss.xml`;
-const ui = {
-  en: { backToApp: 'Atlas Notebook', blog: 'Blog', rss: 'RSS' },
-  zh: { backToApp: 'Atlas Notebook', blog: '博客', rss: 'RSS' },
-}[lang];
 ---
 
 <!doctype html>
@@ -52,28 +50,14 @@ const ui = {
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-white text-slate-900 antialiased">
-    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white print:hidden">
-      <nav class="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
-        <div class="flex items-center gap-6">
-          <a href="/">
-            <img src={`${BASE}/logo.svg`} alt={ui.backToApp} class="h-8 w-auto" />
-          </a>
-          <a href={listUrl(lang)} class="text-sm text-slate-500 hover:text-slate-900 ">
-            {ui.blog}
-          </a>
-        </div>
-        <div class="flex items-center gap-4 text-sm">
-          <LangSwitch altHref={altHref} targetLang={altLang} />
-          <a href={rssHref} class="text-slate-400 hover:text-slate-600">{ui.rss}</a>
-        </div>
-      </nav>
-    </header>
-    <main class="mx-auto max-w-3xl px-4 py-10">
+    <Navbar lang={lang} altHref={altHref} />
+    <main class={`mx-auto px-4 py-10 ${width === 'wide' ? 'max-w-7xl sm:px-6 lg:px-8' : 'max-w-3xl'}`}>
       <slot />
     </main>
     <footer class="border-t border-slate-200">
-      <div class="mx-auto max-w-3xl px-4 py-8 text-sm text-slate-400">
-        © {new Date().getFullYear()} Atlas Notebook
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-8 text-sm text-slate-400 sm:px-6 lg:px-8">
+        <span>© {new Date().getFullYear()} Atlas Notebook</span>
+        <a href={rssHref} class="hover:text-slate-600">RSS</a>
       </div>
     </footer>
   </body>

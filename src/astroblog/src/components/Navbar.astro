@@ -1,0 +1,92 @@
+---
+// 与 src/frontend/pages/landing-page/landing-page.tsx 的 header（light 变体）保持视觉一致，改样式时同步两处
+import { listUrl, type Lang } from '../lib/posts';
+
+interface Props {
+  lang: Lang;
+  /** 另一语言版本的站内路径（含 /blog 前缀），用于语言切换 */
+  altHref: string;
+}
+
+const { lang, altHref } = Astro.props;
+
+// 文案逐字复制自 src/frontend/i18n/locales/{en,zh}.ts 的 landing.nav
+const ui = {
+  en: {
+    problems: 'Problems',
+    howItWorks: 'How it works',
+    features: 'Features',
+    faq: 'FAQ',
+    pricing: 'Pricing',
+    blog: 'Blog',
+    login: 'Log in',
+    startFree: 'Start for free',
+  },
+  zh: {
+    problems: '痛点',
+    howItWorks: '使用方式',
+    features: '功能特性',
+    faq: '常见问题',
+    pricing: '定价',
+    blog: '博客',
+    login: '登录',
+    startFree: '免费试用',
+  },
+}[lang];
+
+// 博客是独立静态站，锚点用绝对路径整页跳回 landing page
+const navLinks = [
+  { href: '/#problems', label: ui.problems },
+  { href: '/#workflow', label: ui.howItWorks },
+  { href: '/#features', label: ui.features },
+  { href: '/#faq', label: ui.faq },
+  { href: '/#pricing', label: ui.pricing },
+];
+---
+
+<header class="sticky top-2 z-50 print:hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20 backdrop-blur-md backdrop-saturate-120 rounded-2xl px-6 mb-4 bg-white/85 border border-[#0f172a]/10 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+      <!-- Logo -->
+      <a href="/" class="flex items-baseline gap-1">
+        <span class="text-3xl font-['Crimson_Text'] text-[#0f172a]">
+          <span class="text-[#006aff]">A</span>tlas
+        </span>
+        <span class="text-lg text-[#0f172a]">notebook</span>
+      </a>
+
+      <!-- Navigation -->
+      <nav class="hidden md:flex items-center gap-10">
+        {navLinks.map(({ href, label }) => (
+          <a href={href} class="text-sm font-medium text-[#0f172a]/70 hover:text-[#0f172a] transition-colors duration-300">
+            {label}
+          </a>
+        ))}
+        <a href={listUrl(lang)} class="text-sm font-medium text-[#0f172a] hover:text-[#0f172a] transition-colors duration-300" aria-current="page">
+          {ui.blog}
+        </a>
+      </nav>
+
+      <!-- CTA Buttons -->
+      <div class="flex items-center gap-4">
+        <a
+          href={altHref}
+          rel="alternate"
+          aria-label="Switch language"
+          class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full text-[#0f172a]/40 hover:text-[#0f172a] hover:bg-[#0f172a]/8 transition-colors duration-300"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20M2 12h20"></path>
+          </svg>
+        </a>
+        <a href="/login" class="hidden sm:block text-sm font-medium text-[#0f172a] hover:opacity-80 transition-colors duration-300">
+          {ui.login}
+        </a>
+        <a href="/signup" class="px-6 py-2.5 rounded-full text-sm font-semibold bg-[#0f172a] text-white hover:bg-[#0f172a]/90 transition-all duration-300">
+          {ui.startFree}
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
