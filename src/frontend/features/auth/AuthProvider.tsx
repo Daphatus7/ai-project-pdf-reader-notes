@@ -43,9 +43,23 @@ async function ensureProfileExists(session: Session) {
 	}
 }
 
+/**
+ * localStorage 里没有 Supabase 会话令牌（sb-*-auth-token）= 必然未登录，
+ * 可同步判定，让首次访客跳过 loading 直接渲染 landing page
+ */
+function hasStoredSession(): boolean {
+	try {
+		return Object.keys(localStorage).some(
+			(k) => k.startsWith('sb-') && k.endsWith('-auth-token')
+		);
+	} catch {
+		return false;
+	}
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [session, setSession] = useState<Session | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(hasStoredSession);
 	const profileChecked = useRef<Set<string>>(new Set());
 
 	useEffect(() => {

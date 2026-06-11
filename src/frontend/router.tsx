@@ -2,7 +2,8 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy } from "react";
 import AuthSwitch from "./features/auth/AuthSwitch.tsx";
 
-const LandingPage = lazy(() => import("./pages/landing-page/landing-page"));
+// landing 是未登录访客的首屏，打进主包避免二次往返；其余页面保持按需加载
+import LandingPage from "./pages/landing-page/landing-page";
 const LoginPage = lazy(() => import("./pages/login-page/login-page"));
 const SignupPage = lazy(() => import("./pages/signup-page/signup-page"));
 const NotePage = lazy(() => import("@/frontend/pages/my-note-page/my-note-page"));
