@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, listUrl } from '../../lib/posts';
+
+const posts = await getPosts('zh');
+---
+
+<BaseLayout
+  title="博客"
+  description="关于 AI 辅助阅读、研究工作流以及 Atlas Notebook 开发的笔记。"
+  lang="zh"
+  altHref={listUrl('en')}
+>
+  <h1 class="mb-8 text-3xl font-bold tracking-tight">博客</h1>
+  <div class="space-y-10">
+    {posts.map((post) => <PostCard post={post} />)}
+    {posts.length === 0 && <p class="text-slate-500">暂无文章，敬请期待。</p>}
+  </div>
+</BaseLayout>

@@ -1,0 +1,15 @@
+---
+import type { Lang } from '../lib/posts';
+
+interface Props {
+  altHref: string;
+  targetLang: Lang;
+}
+
+const { altHref, targetLang } = Astro.props;
+const label = targetLang === 'zh' ? '中文' : 'English';
+---
+
+<a href={altHref} class="font-medium text-slate-500 hover:text-slate-900" rel="alternate">
+  {label}
+</a>

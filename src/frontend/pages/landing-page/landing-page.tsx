@@ -156,7 +156,7 @@ const LandingPage = () => {
 	const [f1Visible, setF1Visible] = useState(false);
 	const [showEditor, setShowEditor] = useState(false);
 	const [navbarTheme, setNavbarTheme] = useState<'dark' | 'light'>('dark');
-	const { t, toggle } = useLanguage();
+	const { t, toggle, lang } = useLanguage();
 	const lp = t.landing;
 
 	useEffect(() => {
@@ -232,7 +232,8 @@ const LandingPage = () => {
 										{[lp.nav.problems, lp.nav.howItWorks, lp.nav.features, lp.nav.faq, lp.nav.pricing][i]}
 									</a>
 								))}
-								<a className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>{lp.nav.blog}</a>
+								{/* 博客是独立静态站点，用普通 <a> 整页跳出 SPA，不走 react-router */}
+								<a href={lang === 'zh' ? '/blog/zh/' : '/blog/'} className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>{lp.nav.blog}</a>
 							</nav>
 
 							{/* CTA Buttons */}
@@ -839,7 +840,7 @@ const LandingPage = () => {
 							{/* Link columns */}
 							{([
 								{ heading: lp.footer.col1heading, links: lp.footer.col1links, hrefs: ['#features', '#pricing', '#workflow', '#'] },
-								{ heading: lp.footer.col2heading, links: lp.footer.col2links, hrefs: ['#', '#', '#faq', 'mailto:support@atlasnotebook.com'] },
+								{ heading: lp.footer.col2heading, links: lp.footer.col2links, hrefs: ['/blog/', '#', '#faq', 'mailto:support@atlasnotebook.com'] },
 								{ heading: lp.footer.col3heading, links: lp.footer.col3links, hrefs: ['#', '#', '#'] },
 							] as const).map(({ heading, links, hrefs }) => (
 								<div key={heading} className="flex flex-col gap-4">

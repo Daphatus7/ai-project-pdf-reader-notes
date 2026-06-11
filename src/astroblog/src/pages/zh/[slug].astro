@@ -1,0 +1,37 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, getAlternateUrl, getPosts, postSlug } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts('zh');
+  return posts.map((post) => ({ params: { slug: postSlug(post) }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const altHref = await getAlternateUrl(post);
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  lang="zh"
+  altHref={altHref}
+  type="article"
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+>
+  <article>
+    <header class="mb-8 space-y-2">
+      <h1 class="text-3xl font-bold tracking-tight">{post.data.title}</h1>
+      <time datetime={post.data.pubDate.toISOString()} class="block text-sm text-slate-400">
+        {formatDate(post.data.pubDate, 'zh')}
+        {post.data.updatedDate && ` · 更新于 ${formatDate(post.data.updatedDate, 'zh')}`}
+      </time>
+    </header>
+    <div class="prose prose-slate max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

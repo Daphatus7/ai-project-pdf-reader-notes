@@ -16,3 +16,4 @@ User-agent: GoogleBot
 Allow: /
 
 Sitemap: https://atlasnotebook.com/sitemap.xml
+Sitemap: https://atlasnotebook.com/blog/sitemap-index.xml

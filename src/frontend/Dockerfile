@@ -33,19 +33,14 @@ COPY . .
 # Build production bundle (ARGs are available as env vars during RUN)
 RUN npm run build
 
-# Use Node.js to serve static files (simpler than nginx for MVP)
-FROM node:24
-
-WORKDIR /app
-
-# Install simple HTTP server
-RUN npm install -g serve
+# Caddy gateway: serves SPA static files and reverse-proxies /blog to the blog service
+FROM caddy:2-alpine
 
 # Copy built files from production stage
-COPY --from=production /app/build ./build
+COPY --from=production /app/build /srv
+
+# Build context is repo root
+COPY src/frontend/Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE ${PORT:-3000}
-
-# Serve static files - Railway injects $PORT, local defaults to 3000
-CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]
 

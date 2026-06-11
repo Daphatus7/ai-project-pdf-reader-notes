@@ -1,0 +1,29 @@
+---
+import { formatDate, postLang, postUrl, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const lang = postLang(post);
+---
+
+<article class="group">
+  <a href={postUrl(post)} class="block space-y-1.5">
+    <h2 class="text-xl font-semibold tracking-tight group-hover:text-slate-600">
+      {post.data.title}
+    </h2>
+    <time datetime={post.data.pubDate.toISOString()} class="block text-sm text-slate-400">
+      {formatDate(post.data.pubDate, lang)}
+    </time>
+    <p class="text-slate-600">{post.data.description}</p>
+    {post.data.tags.length > 0 && (
+      <ul class="flex flex-wrap gap-2 pt-1">
+        {post.data.tags.map((tag) => (
+          <li class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-500">{tag}</li>
+        ))}
+      </ul>
+    )}
+  </a>
+</article>

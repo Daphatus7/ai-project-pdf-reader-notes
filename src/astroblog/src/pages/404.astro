@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { listUrl } from '../lib/posts';
+---
+
+<BaseLayout title="Page not found" description="The page you are looking for does not exist." lang="en" altHref={listUrl('zh')}>
+  <div class="space-y-4 py-16 text-center">
+    <h1 class="text-4xl font-bold tracking-tight">404</h1>
+    <p class="text-slate-500">This page does not exist. · 页面不存在。</p>
+    <p class="space-x-4">
+      <a href={listUrl('en')} class="font-medium text-slate-700 underline hover:text-slate-900">Blog home</a>
+      <a href={listUrl('zh')} class="font-medium text-slate-700 underline hover:text-slate-900">博客首页</a>
+      <a href="/" class="font-medium text-slate-700 underline hover:text-slate-900">Atlas Notebook</a>
+    </p>
+  </div>
+</BaseLayout>
