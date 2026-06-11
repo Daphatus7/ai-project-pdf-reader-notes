@@ -3,19 +3,15 @@
 	admin off
 }
 
-:{$PORT:3000} {
+:{$PORT:8080} {
 	encode gzip zstd
 
 	# 精确匹配 /blog 与 /blog/*（不会误吞 /blogfoo 之类路径）
 	@blog path /blog /blog/*
 	handle @blog {
-		# 用 handle 而非 handle_path：博客产物链接自带 /blog 前缀，不能 strip
-		# Railway: BLOG_UPSTREAM=http://<blog服务>.railway.internal:8080（IPv6 私网）
-		# 本地 compose: 默认指向服务名 blog
-		reverse_proxy {$BLOG_UPSTREAM:http://blog:8080}
+		reverse_proxy {$BLOG_UPSTREAM:http://blog:8081}
 	}
 
-	# 其余全部走 SPA：静态文件优先，缺省 fallback 到 index.html
 	handle {
 		root * /srv
 		try_files {path} /index.html
