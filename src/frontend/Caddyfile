@@ -17,7 +17,7 @@
 	handle @blog {
 		# 调试：响应带此头 = 请求进入了反代分支（DevTools → Network → Response Headers）
 		header X-Debug-Source "frontend-blog-proxy"
-		reverse_proxy {$BLOG_UPSTREAM:http://blog:7777}
+		reverse_proxy {$BLOG_UPSTREAM:http://alluring-mindfulness.railway.internal:7777}
 	}
 
 	handle {
