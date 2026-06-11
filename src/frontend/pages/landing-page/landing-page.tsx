@@ -211,23 +211,22 @@ const LandingPage = () => {
 			<div className="min-h-screen bg-[#0d5a6b]">
 				{/* ── Header ──────────────────────────────────────────────────── */}
 				{/* 此 navbar 的 light 变体被 src/astroblog/src/components/Navbar.astro 静态复刻，改样式时同步两处 */}
-				<header className="sticky top-2 z-50">
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className={`flex items-center justify-between h-20 backdrop-blur-md backdrop-saturate-120 rounded-2xl px-6 mb-4 transition-all duration-300 ${
-								navbarTheme === 'dark'
-									? 'bg-white/10 border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.15)]'
-									: 'bg-white/85 border border-[#0f172a]/10 shadow-[0_4px_16px_rgba(0,0,0,0.08)]'
-							}`}>
-							{/* Logo */}
-							<div className="flex items-baseline gap-1">
-								<h1 className={`text-3xl font-['Crimson_Text'] transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>
-									<span className="text-[#006aff]">A</span>tlas
-								</h1>
-								<span className={`text-lg transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>notebook</span>
-							</div>
+				<header className="sticky top-0 z-50">
+					<div className={`relative flex items-center justify-between h-16 px-6 lg:px-10 backdrop-blur-md backdrop-saturate-120 transition-all duration-300 ${
+							navbarTheme === 'dark'
+								? 'bg-white/10 border-b border-white/20'
+								: 'bg-white/85 border-b border-[#0f172a]/10'
+						}`}>
+						{/* Logo */}
+						<div className="flex items-baseline gap-1">
+							<h1 className={`text-3xl font-['Crimson_Text'] transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>
+								<span className="text-[#006aff]">A</span>tlas
+							</h1>
+							<span className={`text-lg transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white' : 'text-[#0f172a]'}`}>notebook</span>
+						</div>
 
-							{/* Navigation */}
-							<nav className="hidden md:flex items-center gap-10">
+						{/* Navigation（绝对居中，不受两侧宽度影响） */}
+						<nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
 								{(['#problems', '#workflow', '#features', '#faq', '#pricing'] as const).map((href, i) => (
 									<a key={href} href={href} className={`text-sm font-medium transition-colors duration-300 ${navbarTheme === 'dark' ? 'text-white/95 hover:text-white' : 'text-[#0f172a]/70 hover:text-[#0f172a]'}`}>
 										{[lp.nav.problems, lp.nav.howItWorks, lp.nav.features, lp.nav.faq, lp.nav.pricing][i]}
@@ -257,12 +256,11 @@ const LandingPage = () => {
 								</Link>
 								<Link
 									to="/signup"
-									className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${navbarTheme === 'dark' ? 'bg-white text-[#0f172a] hover:bg-white/90' : 'bg-[#0f172a] text-white hover:bg-[#0f172a]/90'}`}
+									className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${navbarTheme === 'dark' ? 'bg-white text-[#0f172a] hover:bg-white/90' : 'bg-[#0f172a] text-white hover:bg-[#0f172a]/90'}`}
 								>
 									{lp.nav.startFree}
 								</Link>
 							</div>
-						</div>
 					</div>
 				</header>
 
