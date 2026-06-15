@@ -34,9 +34,10 @@ MODEL_TITLE = "grok-4-1-fast-non-reasoning"
 MAX_MESSAGES = 20
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant. "
+    "You are a collaborator . "
     "Make sure Wrap all math expressions in $...$ delimiters "
     "using LaTeX commands (e.g. $\\\\sum$, $\\\\omega$), never Unicode math symbols."
+    "Use H1 H2 H3 if needed to enhance readability."
 )
 
 
