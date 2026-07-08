@@ -839,7 +839,7 @@ const LandingPage = () => {
 							{/* Link columns */}
 							{([
 								{ heading: lp.footer.col1heading, links: lp.footer.col1links, hrefs: ['#features', '#pricing', '#workflow', '#'] },
-								{ heading: lp.footer.col2heading, links: lp.footer.col2links, hrefs: ['/blog/', '#', '#faq', 'mailto:support@atlasnotebook.com'] },
+								{ heading: lp.footer.col2heading, links: lp.footer.col2links, hrefs: ['/blog/', '#', '#faq', 'mailto:support.atlasnotebook@gmail.com'] },
 								{ heading: lp.footer.col3heading, links: lp.footer.col3links, hrefs: ['#', '#', '#'] },
 							] as const).map(({ heading, links, hrefs }) => (
 								<div key={heading} className="flex flex-col gap-4">

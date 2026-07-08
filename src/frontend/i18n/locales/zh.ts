@@ -377,7 +377,7 @@ export const zh: Translations = {
 				},
 				{
 					q: "我喜欢手写笔记，这个适合我吗？",
-					a: "可能不太适合。Atlas Notebook 主要为需要快速提取和结构化复杂数字信息的电脑用户而设计。不过，我们很想了解您的使用场景！欢迎发邮件至 support@atlasnotebook.com。",
+					a: "可能不太适合。Atlas Notebook 主要为需要快速提取和结构化复杂数字信息的电脑用户而设计。不过，我们很想了解您的使用场景！欢迎发邮件至 support.atlasnotebook@gmail.com。",
 				},
 				{
 					q: "Atlas Notebook 能读取 PDF 以外的格式吗？",

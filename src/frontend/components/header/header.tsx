@@ -117,7 +117,7 @@ export function Header() {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								{/* Contact via email */}
-								<DropdownMenuItem onClick={() => window.location.href = 'mailto:support@atlasnotebook.com '}>
+								<DropdownMenuItem onClick={() => window.location.href = 'mailto:support.atlasnotebook@gmail.com'}>
 									<Mail className="w-4 h-4 mr-2" />
 									{t.header.contact}
 								</DropdownMenuItem>

@@ -375,7 +375,7 @@ export const en = {
 				},
 				{
 					q: "I prefer handwritten notes, is this for me?",
-					a: "Probably not. Atlas Notebook is heavily optimized for laptop/PC users who need to rapidly extract and structure complex digital information. However, we'd love to hear your use case! Drop us a line at support@atlasnotebook.com.",
+					a: "Probably not. Atlas Notebook is heavily optimized for laptop/PC users who need to rapidly extract and structure complex digital information. However, we'd love to hear your use case! Drop us a line at support.atlasnotebook@gmail.com.",
 				},
 				{
 					q: "Can Atlas Notebook read formats other than PDF?",
