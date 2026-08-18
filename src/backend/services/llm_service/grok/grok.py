@@ -27,7 +27,7 @@ from src.backend.services.storage.supabase_storage import SupabaseStorage
 logger = logging.getLogger(__name__)
 
 # Single reasoning model — it decides on its own whether to call search_document / web search
-MODEL_REASONING = "grok-4.3"
+MODEL_REASONING = "grok-4.6"
 # Fast non-reasoning model — only used for cheap thread-title generation
 MODEL_TITLE = "grok-4-1-fast-non-reasoning"
 
